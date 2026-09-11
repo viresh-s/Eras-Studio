@@ -1,0 +1,222 @@
+-- =============================================
+-- ERAS Database Schema
+-- Run this in Supabase SQL Editor
+-- =============================================
+
+-- Enable UUID extension
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- =============================================
+-- 1. PROFILES TABLE
+-- =============================================
+CREATE TABLE public.profiles (
+  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  full_name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  phone_number TEXT,
+  role TEXT NOT NULL DEFAULT 'User' CHECK (role IN ('Admin', 'User', 'Creator')),
+  location_country TEXT,
+  location_city TEXT,
+  portfolio_url TEXT,
+  about_me TEXT,
+  profile_pic_url TEXT,
+  social_links JSONB DEFAULT '{}',
+  is_premium BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- RLS for profiles
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Public profiles are viewable by everyone"
+  ON public.profiles FOR SELECT
+  USING (true);
+
+CREATE POLICY "Users can update own profile"
+  ON public.profiles FOR UPDATE
+  USING (auth.uid() = id)
+  WITH CHECK (auth.uid() = id);
+
+CREATE POLICY "Users can insert own profile"
+  ON public.profiles FOR INSERT
+  WITH CHECK (auth.uid() = id);
+
+-- =============================================
+-- 2. ARTWORKS TABLE
+-- =============================================
+CREATE TABLE public.artworks (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  creator_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  art_type TEXT NOT NULL,
+  artist_name TEXT NOT NULL,
+  description TEXT,
+  external_link TEXT,
+  image_url TEXT NOT NULL,
+  price DECIMAL(10, 2),
+  status TEXT NOT NULL DEFAULT 'Available' CHECK (status IN ('Available', 'Sold')),
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- RLS for artworks
+ALTER TABLE public.artworks ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Artworks are viewable by everyone"
+  ON public.artworks FOR SELECT
+  USING (true);
+
+CREATE POLICY "Creators can insert own artworks"
+  ON public.artworks FOR INSERT
+  WITH CHECK (auth.uid() = creator_id);
+
+CREATE POLICY "Creators can update own artworks"
+  ON public.artworks FOR UPDATE
+  USING (auth.uid() = creator_id)
+  WITH CHECK (auth.uid() = creator_id);
+
+CREATE POLICY "Creators can delete own artworks"
+  ON public.artworks FOR DELETE
+  USING (auth.uid() = creator_id);
+
+-- =============================================
+-- 3. INQUIRIES_CHATS TABLE
+-- =============================================
+CREATE TABLE public.inquiries_chats (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  artwork_id UUID NOT NULL REFERENCES public.artworks(id) ON DELETE CASCADE,
+  guest_id UUID NOT NULL REFERENCES public.profiles(id),
+  creator_id UUID NOT NULL REFERENCES public.profiles(id),
+  status TEXT NOT NULL DEFAULT 'Active' CHECK (status IN ('Active', 'Closed')),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(artwork_id, guest_id)
+);
+
+-- RLS for inquiries_chats
+ALTER TABLE public.inquiries_chats ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Chat participants can view their chats"
+  ON public.inquiries_chats FOR SELECT
+  USING (auth.uid() = guest_id OR auth.uid() = creator_id);
+
+CREATE POLICY "Users can create inquiries"
+  ON public.inquiries_chats FOR INSERT
+  WITH CHECK (auth.uid() = guest_id);
+
+CREATE POLICY "Participants can update chat status"
+  ON public.inquiries_chats FOR UPDATE
+  USING (auth.uid() = guest_id OR auth.uid() = creator_id);
+
+-- =============================================
+-- 4. MESSAGES TABLE
+-- =============================================
+CREATE TABLE public.messages (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  chat_id UUID NOT NULL REFERENCES public.inquiries_chats(id) ON DELETE CASCADE,
+  sender_id UUID NOT NULL REFERENCES public.profiles(id),
+  content TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- RLS for messages
+ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Chat participants can view messages"
+  ON public.messages FOR SELECT
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.inquiries_chats
+      WHERE id = messages.chat_id
+      AND (guest_id = auth.uid() OR creator_id = auth.uid())
+    )
+  );
+
+CREATE POLICY "Chat participants can send messages"
+  ON public.messages FOR INSERT
+  WITH CHECK (
+    auth.uid() = sender_id
+    AND EXISTS (
+      SELECT 1 FROM public.inquiries_chats
+      WHERE id = messages.chat_id
+      AND (guest_id = auth.uid() OR creator_id = auth.uid())
+    )
+  );
+
+-- =============================================
+-- 5. TRIGGER: Auto-create profile on signup
+-- =============================================
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.profiles (id, full_name, email, phone_number, role)
+  VALUES (
+    NEW.id,
+    COALESCE(NEW.raw_user_meta_data->>'full_name', ''),
+    NEW.email,
+    COALESCE(NEW.raw_user_meta_data->>'phone_number', ''),
+    COALESCE(NEW.raw_user_meta_data->>'role', 'User')
+  );
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE OR REPLACE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- =============================================
+-- 6. INDEXES for performance
+-- =============================================
+CREATE INDEX idx_artworks_creator_id ON public.artworks(creator_id);
+CREATE INDEX idx_artworks_art_type ON public.artworks(art_type);
+CREATE INDEX idx_artworks_status ON public.artworks(status);
+CREATE INDEX idx_inquiries_guest_id ON public.inquiries_chats(guest_id);
+CREATE INDEX idx_inquiries_creator_id ON public.inquiries_chats(creator_id);
+CREATE INDEX idx_messages_chat_id ON public.messages(chat_id);
+CREATE INDEX idx_messages_created_at ON public.messages(created_at);
+
+-- =============================================
+-- 7. ENABLE REALTIME on messages table
+-- =============================================
+ALTER PUBLICATION supabase_realtime ADD TABLE public.messages;
+
+-- =============================================
+-- 8. STORAGE BUCKETS (run separately if needed)
+-- =============================================
+-- Note: Create these via Supabase Dashboard > Storage:
+-- Bucket: "artworks" (public)
+-- Bucket: "avatars" (public)
+-- 
+-- Or via SQL:
+-- INSERT INTO storage.buckets (id, name, public) VALUES ('artworks', 'artworks', true);
+-- INSERT INTO storage.buckets (id, name, public) VALUES ('avatars', 'avatars', true);
+--
+-- Storage policies:
+-- CREATE POLICY "Anyone can view artwork images" ON storage.objects FOR SELECT USING (bucket_id = 'artworks');
+-- CREATE POLICY "Authenticated users can upload artwork images" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'artworks' AND auth.role() = 'authenticated');
+-- CREATE POLICY "Users can update own artwork images" ON storage.objects FOR UPDATE USING (bucket_id = 'artworks' AND auth.uid()::text = (storage.foldername(name))[1]);
+-- CREATE POLICY "Users can delete own artwork images" ON storage.objects FOR DELETE USING (bucket_id = 'artworks' AND auth.uid()::text = (storage.foldername(name))[1]);
+-- CREATE POLICY "Anyone can view avatars" ON storage.objects FOR SELECT USING (bucket_id = 'avatars');
+-- CREATE POLICY "Authenticated users can upload avatars" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'avatars' AND auth.role() = 'authenticated');
+-- CREATE POLICY "Users can update own avatar" ON storage.objects FOR UPDATE USING (bucket_id = 'avatars' AND auth.uid()::text = (storage.foldername(name))[1]);
+-- CREATE POLICY "Users can delete own avatar" ON storage.objects FOR DELETE USING (bucket_id = 'avatars' AND auth.uid()::text = (storage.foldername(name))[1]);
+
+-- =============================================
+-- Admin policy additions
+-- =============================================
+CREATE POLICY "Admins can view all profiles"
+  ON public.profiles FOR SELECT
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.profiles
+      WHERE id = auth.uid() AND role = 'Admin'
+    )
+  );
+
+CREATE POLICY "Admins can view all chats"
+  ON public.inquiries_chats FOR SELECT
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.profiles
+      WHERE id = auth.uid() AND role = 'Admin'
+    )
+  );
