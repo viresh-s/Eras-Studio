@@ -34,7 +34,7 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   // Protected dashboard routes
-  const isDashboardRoute = request.nextUrl.pathname.startsWith('/creator') ||
+  const isDashboardRoute = request.nextUrl.pathname.startsWith('/portfolio') ||
     request.nextUrl.pathname.startsWith('/user') ||
     request.nextUrl.pathname.startsWith('/admin') ||
     request.nextUrl.pathname.startsWith('/messages');
@@ -42,7 +42,11 @@ export async function updateSession(request: NextRequest) {
   if (isDashboardRoute && !user) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
-    return NextResponse.redirect(url);
+    const response = NextResponse.redirect(url);
+    supabaseResponse.cookies.getAll().forEach((cookie) => {
+      response.cookies.set(cookie.name, cookie.value);
+    });
+    return response;
   }
 
   // Redirect logged-in users away from auth pages
@@ -54,15 +58,28 @@ export async function updateSession(request: NextRequest) {
       .eq('id', user.id)
       .single();
 
+    // If they have no profile, we shouldn't redirect them to a dashboard because 
+    // the dashboard will just bounce them back. Let the auth page render (or sign them out).
+    if (!profile) {
+      return supabaseResponse;
+    }
+
     const url = request.nextUrl.clone();
-    if (profile?.role === 'Creator') {
-      url.pathname = '/creator';
-    } else if (profile?.role === 'Admin') {
+    if (profile.role === 'Creator') {
+      url.pathname = '/portfolio';
+    } else if (profile.role === 'Admin') {
       url.pathname = '/admin';
     } else {
       url.pathname = '/user';
     }
-    return NextResponse.redirect(url);
+    const response = NextResponse.redirect(url);
+    
+    // Copy cookies from supabaseResponse to ensure session isn't lost
+    supabaseResponse.cookies.getAll().forEach((cookie) => {
+      response.cookies.set(cookie.name, cookie.value);
+    });
+    
+    return response;
   }
 
   return supabaseResponse;

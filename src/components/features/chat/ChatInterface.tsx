@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { sendMessage } from '@/actions/chatActions';
 import { useChatSubscription } from '@/hooks/useChatSubscription';
-import { Send, ArrowLeft, Image } from 'lucide-react';
+import { Send, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 
 interface ChatMessage {
@@ -74,25 +74,25 @@ export default function ChatInterface({
   return (
     <div className="flex flex-col h-[calc(100vh-140px)]">
       {/* Chat Header */}
-      <div className="border-b-4 border-brand-black bg-white p-4 flex items-center gap-4">
-        <Link href="/messages" className="p-2 border-2 border-brand-black hover:bg-brand-yellow transition-colors">
+      <div className="bg-white border-b border-gray-100 p-4 flex items-center gap-4">
+        <Link href="/messages" className="p-2 rounded-xl text-gray-500 hover:bg-gray-100 transition-colors">
           <ArrowLeft size={16} />
         </Link>
 
-        <div className="w-10 h-10 border-2 border-brand-black bg-brand-lightgray flex-shrink-0 overflow-hidden">
+        <div className="w-10 h-10 rounded-xl bg-gray-100 flex-shrink-0 overflow-hidden">
           {artwork.image_url && (
             <img src={artwork.image_url} alt="" className="w-full h-full object-cover" />
           )}
         </div>
 
         <div className="flex-1 min-w-0">
-          <p className="font-heading font-bold truncate">{artwork.title}</p>
-          <p className="text-brand-gray text-sm">with {otherPerson.full_name}</p>
+          <p className="font-semibold text-gray-900 truncate text-sm">{artwork.title}</p>
+          <p className="text-gray-500 text-xs">with {otherPerson.full_name}</p>
         </div>
       </div>
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-brand-offwhite">
+      <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50">
         {messages.map((message) => {
           const isMine = message.sender_id === userId;
 
@@ -102,14 +102,14 @@ export default function ChatInterface({
               className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}
             >
               <div
-                className={`max-w-[75%] border-3 border-brand-black p-3 ${
+                className={`max-w-[75%] rounded-2xl px-4 py-3 ${
                   isMine
-                    ? 'bg-brand-blue text-white shadow-brutal-sm'
-                    : 'bg-white shadow-brutal-sm'
+                    ? 'bg-gray-900 text-white'
+                    : 'bg-white shadow-[0_2px_8px_rgb(0,0,0,0.04)]'
                 }`}
               >
                 <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
-                <p className={`text-xs mt-1 ${isMine ? 'text-blue-200' : 'text-brand-gray'}`}>
+                <p className={`text-xs mt-1.5 ${isMine ? 'text-gray-400' : 'text-gray-400'}`}>
                   {formatTime(message.created_at)}
                 </p>
               </div>
@@ -120,7 +120,7 @@ export default function ChatInterface({
       </div>
 
       {/* Input Area */}
-      <div className="border-t-4 border-brand-black bg-white p-4">
+      <div className="bg-white border-t border-gray-100 p-4">
         <div className="flex gap-3">
           <input
             type="text"
@@ -128,16 +128,16 @@ export default function ChatInterface({
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Type a message..."
-            className="input-brutal flex-1"
+            className="flex-1 px-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-full outline-none transition-all duration-200 placeholder:text-gray-400 focus:ring-2 focus:ring-gray-900/10 focus:border-gray-400 focus:bg-white"
           />
           <button
             onClick={handleSend}
             disabled={!newMessage.trim() || isSending}
-            className={`btn-brutal px-4 ${
-              !newMessage.trim() ? 'opacity-50 cursor-not-allowed' : ''
+            className={`w-11 h-11 rounded-full bg-gray-900 text-white flex items-center justify-center transition-all hover:bg-gray-800 hover:scale-[1.02] ${
+              !newMessage.trim() ? 'opacity-40 cursor-not-allowed hover:scale-100' : ''
             }`}
           >
-            <Send size={18} />
+            <Send size={16} />
           </button>
         </div>
       </div>

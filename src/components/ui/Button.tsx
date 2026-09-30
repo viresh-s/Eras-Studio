@@ -1,41 +1,55 @@
 'use client';
 
 import { forwardRef } from 'react';
-import type { ButtonHTMLAttributes, ReactNode } from 'react';
+import { motion, HTMLMotionProps } from 'framer-motion';
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 
-type ButtonVariant = 'primary' | 'blue' | 'pink' | 'white' | 'black' | 'green' | 'red';
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+
+type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'coral' | 'danger';
 type ButtonSize = 'sm' | 'md' | 'lg';
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonProps extends Omit<HTMLMotionProps<"button">, "children"> {
   variant?: ButtonVariant;
   size?: ButtonSize;
-  children: ReactNode;
+  children: React.ReactNode;
   isLoading?: boolean;
   fullWidth?: boolean;
 }
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary: '',
-  blue: 'btn-brutal-blue',
-  pink: 'btn-brutal-pink',
-  white: 'btn-brutal-white',
-  black: 'btn-brutal-black',
-  green: 'btn-brutal-green',
-  red: 'btn-brutal-red',
+  primary: 'bg-gray-900 text-white hover:bg-gray-800',
+  secondary: 'bg-gray-100 text-gray-900 hover:bg-gray-200',
+  outline: 'bg-white text-gray-900 border border-gray-300 hover:bg-gray-50',
+  ghost: 'bg-transparent text-gray-700 hover:bg-gray-100',
+  coral: 'bg-accent-coral text-white hover:opacity-90',
+  danger: 'bg-red-500 text-white hover:bg-red-600',
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
-  sm: 'btn-brutal-sm',
-  md: '',
-  lg: 'btn-brutal-lg',
+  sm: 'px-4 py-2 text-sm',
+  md: 'px-6 py-2.5 text-sm',
+  lg: 'px-8 py-3.5 text-base',
 };
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ variant = 'primary', size = 'md', children, isLoading, fullWidth, className = '', disabled, ...props }, ref) => {
+  ({ variant = 'primary', size = 'md', children, isLoading, fullWidth, className, disabled, ...props }, ref) => {
     return (
-      <button
+      <motion.button
         ref={ref}
-        className={`btn-brutal ${variantClasses[variant]} ${sizeClasses[size]} ${fullWidth ? 'w-full' : ''} ${disabled || isLoading ? 'opacity-60 cursor-not-allowed' : ''} ${className}`}
+        whileHover={{ scale: disabled || isLoading ? 1 : 1.02 }}
+        whileTap={{ scale: disabled || isLoading ? 1 : 0.95 }}
+        className={cn(
+          'inline-flex items-center justify-center gap-2 rounded-full font-semibold transition-colors duration-200',
+          variantClasses[variant],
+          sizeClasses[size],
+          fullWidth && 'w-full',
+          (disabled || isLoading) && 'opacity-50 cursor-not-allowed',
+          className
+        )}
         disabled={disabled || isLoading}
         {...props}
       >
@@ -50,7 +64,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ) : (
           children
         )}
-      </button>
+      </motion.button>
     );
   }
 );

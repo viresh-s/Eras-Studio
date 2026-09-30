@@ -1,6 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Link from 'next/link';
 import { Search, MessageCircle } from 'lucide-react';
@@ -33,46 +32,46 @@ export default async function UserDashboard() {
 
   return (
     <div>
-      <h1 className="font-heading text-3xl font-bold mb-6">Collector Dashboard</h1>
+      <h1 className="text-2xl font-extrabold text-gray-900 mb-6">Collector Dashboard</h1>
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-        <Card>
+        <div className="bg-white rounded-2xl p-5 shadow-[0_2px_20px_rgb(0,0,0,0.04)]">
           <div className="flex items-center gap-3">
-            <div className="p-3 border-3 border-brand-black bg-brand-blue text-white">
-              <MessageCircle size={24} />
+            <div className="w-11 h-11 rounded-xl bg-blue-50 flex items-center justify-center">
+              <MessageCircle size={20} className="text-blue-600" />
             </div>
             <div>
-              <p className="text-brand-gray text-sm font-medium">Active Conversations</p>
-              <p className="font-heading text-2xl font-bold">{chatCount || 0}</p>
+              <p className="text-gray-500 text-xs font-medium">Active Conversations</p>
+              <p className="text-xl font-extrabold text-gray-900">{chatCount || 0}</p>
             </div>
           </div>
-        </Card>
+        </div>
 
         <Link href="/browse">
-          <Card className="cursor-pointer hover:bg-brand-yellow transition-colors">
+          <div className="bg-white rounded-2xl p-5 shadow-[0_2px_20px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-shadow cursor-pointer">
             <div className="flex items-center gap-3">
-              <div className="p-3 border-3 border-brand-black bg-brand-pink">
-                <Search size={24} />
+              <div className="w-11 h-11 rounded-xl bg-pink-50 flex items-center justify-center">
+                <Search size={20} className="text-pink-600" />
               </div>
               <div>
-                <p className="font-heading font-bold text-lg">Browse Artworks</p>
-                <p className="text-brand-gray text-sm">Discover new pieces →</p>
+                <p className="font-bold text-gray-900">Browse Artworks</p>
+                <p className="text-gray-500 text-xs">Discover new pieces →</p>
               </div>
             </div>
-          </Card>
+          </div>
         </Link>
       </div>
 
       {/* Active Conversations */}
       <div className="mb-8">
-        <h2 className="font-heading text-xl font-bold mb-4">Active Conversations</h2>
+        <h2 className="text-lg font-bold text-gray-900 mb-4">Active Conversations</h2>
         {chats && chats.length > 0 ? (
-          <div className="space-y-3">
+          <div className="space-y-2">
             {chats.map((chat: Record<string, unknown>) => (
               <Link key={chat.id as string} href={`/messages/${chat.id}`}>
-                <Card className="flex items-center gap-4 cursor-pointer hover:bg-brand-lightgray">
-                  <div className="w-14 h-14 border-2 border-brand-black flex-shrink-0 overflow-hidden bg-brand-lightgray">
+                <div className="bg-white rounded-xl p-4 flex items-center gap-4 shadow-[0_2px_20px_rgb(0,0,0,0.04)] hover:shadow-[0_4px_24px_rgb(0,0,0,0.06)] transition-shadow cursor-pointer">
+                  <div className="w-14 h-14 rounded-xl bg-gray-100 flex-shrink-0 overflow-hidden">
                     {(chat.artworks as Record<string, string>)?.image_url && (
                       <img
                         src={(chat.artworks as Record<string, string>).image_url}
@@ -82,36 +81,36 @@ export default async function UserDashboard() {
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-heading font-bold truncate">
+                    <p className="font-semibold text-gray-900 truncate">
                       {(chat.artworks as Record<string, string>)?.title}
                     </p>
-                    <p className="text-brand-gray text-sm">
+                    <p className="text-gray-500 text-sm">
                       with {(chat.creator as Record<string, string>)?.full_name}
                     </p>
                   </div>
                   <Badge variant="blue">Active</Badge>
-                </Card>
+                </div>
               </Link>
             ))}
           </div>
         ) : (
-          <Card>
-            <div className="text-center py-6">
-              <MessageCircle size={36} className="mx-auto mb-2 text-brand-gray" />
-              <p className="text-brand-gray mb-3">No active conversations</p>
-              <Link href="/browse" className="btn-brutal btn-brutal-sm">
-                Browse Artworks
-              </Link>
+          <div className="bg-white rounded-2xl shadow-[0_2px_20px_rgb(0,0,0,0.04)] p-8 text-center">
+            <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-3">
+              <MessageCircle size={18} className="text-gray-400" />
             </div>
-          </Card>
+            <p className="text-gray-500 text-sm mb-4">No active conversations</p>
+            <Link href="/browse" className="inline-flex items-center px-5 py-2 bg-gray-900 text-white rounded-full text-sm font-semibold hover:bg-gray-800 transition-all">
+              Browse Artworks
+            </Link>
+          </div>
         )}
       </div>
 
       {/* Discover */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-heading text-xl font-bold">Discover Artworks</h2>
-          <Link href="/browse" className="btn-brutal btn-brutal-sm btn-brutal-blue">
+          <h2 className="text-lg font-bold text-gray-900">Discover Artworks</h2>
+          <Link href="/browse" className="px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors">
             View All
           </Link>
         </div>
@@ -119,8 +118,8 @@ export default async function UserDashboard() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {recentArtworks.map((artwork) => (
               <Link key={artwork.id} href={`/artwork/${artwork.id}`}>
-                <Card padding="none" className="cursor-pointer">
-                  <div className="aspect-[4/3] bg-brand-lightgray border-b-3 border-brand-black overflow-hidden">
+                <div className="bg-white rounded-2xl overflow-hidden shadow-[0_2px_20px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-shadow cursor-pointer">
+                  <div className="aspect-[4/3] bg-gray-100 overflow-hidden">
                     <img
                       src={artwork.image_url}
                       alt={artwork.title}
@@ -128,22 +127,20 @@ export default async function UserDashboard() {
                     />
                   </div>
                   <div className="p-4">
-                    <h3 className="font-heading font-bold truncate">{artwork.title}</h3>
-                    <p className="text-brand-gray text-sm">{(artwork.profiles as Record<string, string>)?.full_name}</p>
+                    <h3 className="font-bold text-gray-900 truncate">{artwork.title}</h3>
+                    <p className="text-gray-500 text-sm">{(artwork.profiles as Record<string, string>)?.full_name}</p>
                     {artwork.price && (
-                      <p className="font-heading font-bold mt-1">${artwork.price}</p>
+                      <p className="font-bold text-gray-900 mt-1">${artwork.price}</p>
                     )}
                   </div>
-                </Card>
+                </div>
               </Link>
             ))}
           </div>
         ) : (
-          <Card>
-            <div className="text-center py-6">
-              <p className="text-brand-gray">No artworks available yet</p>
-            </div>
-          </Card>
+          <div className="bg-white rounded-2xl shadow-[0_2px_20px_rgb(0,0,0,0.04)] p-8 text-center">
+            <p className="text-gray-500 text-sm">No artworks available yet</p>
+          </div>
         )}
       </div>
     </div>

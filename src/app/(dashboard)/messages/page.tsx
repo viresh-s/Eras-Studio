@@ -1,7 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import Card from '@/components/ui/Card';
-import Badge from '@/components/ui/Badge';
 import Link from 'next/link';
 import { MessageCircle } from 'lucide-react';
 
@@ -23,57 +21,114 @@ export default async function MessagesPage() {
 
   return (
     <div>
-      <h1 className="font-heading text-3xl font-bold mb-6">Messages</h1>
+      {/* Header */}
+      <div className="mb-6">
+        <p className="text-xs font-semibold tracking-[0.2em] text-gray-400 uppercase mb-2">
+          Open to iRAS Start with a conversation instead
+        </p>
+        <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight mb-1">Your inbox</h1>
+        <p className="text-gray-500 text-sm">Interest first. A meaningful conversation next.</p>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex items-center gap-2 mb-8">
+        <button className="px-5 py-2 bg-gray-900 text-white text-sm font-semibold rounded-full">
+          Requests
+        </button>
+        <button className="px-5 py-2 bg-white text-gray-500 text-sm font-medium rounded-full border border-gray-200 hover:bg-gray-50 transition-colors">
+          Messages
+        </button>
+      </div>
 
       {chats && chats.length > 0 ? (
-        <div className="space-y-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {chats.map((chat: Record<string, unknown>) => {
             const isGuest = (chat.guest_id as string) === user.id;
             const otherPerson = isGuest
               ? (chat.creator as Record<string, string>)
               : (chat.guest as Record<string, string>);
+            const artwork = chat.artworks as Record<string, string>;
+            const date = new Date(chat.created_at as string);
+            const formattedDate = date.toLocaleDateString('en-US', {
+              day: 'numeric',
+              month: 'short',
+              year: 'numeric',
+            });
 
             return (
-              <Link key={chat.id as string} href={`/messages/${chat.id}`}>
-                <Card className="flex items-center gap-4 cursor-pointer hover:bg-brand-lightgray transition-colors">
+              <div
+                key={chat.id as string}
+                className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md transition-shadow"
+              >
+                <div className="flex gap-4">
                   {/* Artwork thumbnail */}
-                  <div className="w-14 h-14 border-2 border-brand-black flex-shrink-0 overflow-hidden bg-brand-lightgray">
-                    {(chat.artworks as Record<string, string>)?.image_url && (
+                  <div className="w-28 h-28 rounded-lg bg-gray-100 flex-shrink-0 overflow-hidden">
+                    {artwork?.image_url && (
                       <img
-                        src={(chat.artworks as Record<string, string>).image_url}
-                        alt=""
+                        src={artwork.image_url}
+                        alt={artwork.title || ''}
                         className="w-full h-full object-cover"
                       />
                     )}
                   </div>
 
-                  {/* Info */}
+                  {/* Content */}
                   <div className="flex-1 min-w-0">
-                    <p className="font-heading font-bold truncate">
-                      {(chat.artworks as Record<string, string>)?.title}
-                    </p>
-                    <p className="text-brand-gray text-sm truncate">
-                      with {otherPerson?.full_name}
-                    </p>
-                  </div>
+                    {/* Sender info + status */}
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <div className="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-600 overflow-hidden flex-shrink-0">
+                          {otherPerson?.profile_pic_url ? (
+                            <img src={otherPerson.profile_pic_url} alt="" className="w-full h-full object-cover" />
+                          ) : (
+                            otherPerson?.full_name?.substring(0, 2).toUpperCase() || '?'
+                          )}
+                        </div>
+                        <span className="text-sm font-bold text-gray-900">{otherPerson?.full_name}</span>
+                      </div>
+                      <span className={`text-[10px] font-semibold px-2.5 py-1 rounded-full ${
+                        (chat.status as string) === 'Active'
+                          ? 'bg-emerald-50 text-emerald-700'
+                          : 'bg-gray-100 text-gray-500'
+                      }`}>
+                        {chat.status as string}
+                      </span>
+                    </div>
 
-                  {/* Status */}
-                  <Badge variant={(chat.status as string) === 'Active' ? 'blue' : 'gray'}>
-                    {chat.status as string}
-                  </Badge>
-                </Card>
-              </Link>
+                    {/* Inquiry message */}
+                    <p className="text-sm font-semibold text-gray-900 mb-1">
+                      Interested in {artwork?.title}
+                    </p>
+                    <p className="text-xs text-gray-500 mb-3 line-clamp-2">
+                      &ldquo;I would love to learn more about this work and its availability.&rdquo;
+                    </p>
+
+                    {/* Date */}
+                    <p className="text-[11px] text-gray-400 mb-3">{formattedDate}</p>
+
+                    {/* Action buttons */}
+                    <div className="flex items-center gap-2">
+                      <Link
+                        href={`/messages/${chat.id}`}
+                        className="px-4 py-2 bg-gray-900 text-white text-xs font-semibold rounded-full hover:bg-gray-800 transition-colors"
+                      >
+                        Start Conversation
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
             );
           })}
         </div>
       ) : (
-        <Card>
-          <div className="text-center py-12">
-            <MessageCircle size={48} className="mx-auto mb-3 text-brand-gray" />
-            <p className="font-heading text-xl font-bold mb-2">No messages yet</p>
-            <p className="text-brand-gray">Start a conversation by expressing interest in an artwork</p>
+        <div className="bg-white rounded-xl border border-gray-200 p-16 text-center">
+          <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+            <MessageCircle size={24} className="text-gray-400" />
           </div>
-        </Card>
+          <p className="font-bold text-gray-900 text-lg mb-2">No messages yet</p>
+          <p className="text-gray-500 text-sm">Start a conversation by expressing interest in an artwork</p>
+        </div>
       )}
     </div>
   );

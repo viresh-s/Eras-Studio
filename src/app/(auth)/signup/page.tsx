@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { UserPlus, Mail, Lock, User, Phone, Palette, ShoppingBag } from 'lucide-react';
 import { signup } from '@/actions/authActions';
 import Button from '@/components/ui/Button';
@@ -16,7 +17,6 @@ const signupSchema = z.object({
   phoneNumber: z.string().min(7, 'Please enter a valid phone number'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
   confirmPassword: z.string(),
-  role: z.enum(['User', 'Creator']),
 }).refine((data) => data.password === data.confirmPassword, {
   message: 'Passwords don\'t match',
   path: ['confirmPassword'],
@@ -31,17 +31,13 @@ export default function SignupPage() {
   const {
     register,
     handleSubmit,
-    watch,
-    setValue,
     formState: { errors },
   } = useForm<SignupForm>({
     resolver: zodResolver(signupSchema),
-    defaultValues: {
-      role: 'User',
-    },
   });
 
-  const selectedRole = watch('role');
+  const router = useRouter();
+  const [selectedRole, setSelectedRole] = useState<'User' | 'Creator'>('User');
 
   const onSubmit = async (data: SignupForm) => {
     setIsLoading(true);
@@ -52,57 +48,63 @@ export default function SignupPage() {
     formData.append('password', data.password);
     formData.append('fullName', data.fullName);
     formData.append('phoneNumber', data.phoneNumber);
-    formData.append('role', data.role);
+    formData.append('role', selectedRole);
 
     const result = await signup(formData);
     if (result?.error) {
       setError(result.error);
       setIsLoading(false);
+    } else if (result?.requireEmailVerification) {
+      router.push(`/verify-email?email=${encodeURIComponent(data.email)}`);
+    } else if (result?.role) {
+      if (result.role === 'Creator') router.push('/portfolio');
+      else if (result.role === 'Admin') router.push('/admin');
+      else router.push('/user');
     }
   };
 
   return (
     <div>
-      <div className="border-4 border-brand-black bg-white shadow-brutal-lg p-8">
+      <div className="bg-white rounded-2xl shadow-[0_4px_24px_rgb(0,0,0,0.06)] p-8">
         <div className="mb-6">
-          <h1 className="font-heading text-3xl font-bold mb-2">Join ERAS</h1>
-          <p className="text-brand-gray">Create your account and start your journey</p>
+          <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Join Eras Studio</h1>
+          <p className="text-gray-500 text-sm">Create your account and start your journey</p>
         </div>
 
         {error && (
-          <div className="mb-4 border-3 border-brand-red bg-red-50 p-3 text-brand-red text-sm font-medium">
+          <div className="mb-4 bg-red-50 border border-red-200 rounded-xl p-3 text-red-600 text-sm">
             {error}
           </div>
         )}
 
         {/* Role Selector */}
         <div className="mb-6">
-          <label className="font-heading font-semibold text-sm uppercase tracking-wide block mb-2">
+          <label className="text-sm font-medium text-gray-700 block mb-2">
             I am a...
           </label>
           <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
-              onClick={() => setValue('role', 'User')}
-              className={`flex items-center justify-center gap-2 p-4 border-3 border-brand-black font-heading font-semibold transition-all ${
+              onClick={() => setSelectedRole('User')}
+              className={`flex items-center justify-center gap-2 p-4 rounded-xl text-sm font-semibold transition-all duration-200 ${
                 selectedRole === 'User'
-                  ? 'bg-brand-blue text-white shadow-brutal'
-                  : 'bg-white hover:bg-brand-lightgray'
+                  ? 'bg-blue-50 text-blue-700 ring-2 ring-blue-200'
+                  : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
               }`}
             >
-              <ShoppingBag size={20} />
+              <ShoppingBag size={18} />
               Collector
             </button>
             <button
               type="button"
-              onClick={() => setValue('role', 'Creator')}
-              className={`flex items-center justify-center gap-2 p-4 border-3 border-brand-black font-heading font-semibold transition-all ${
+              onClick={() => setSelectedRole('Creator')}
+              className={`flex items-center justify-center gap-2 p-4 rounded-xl text-sm font-semibold transition-all duration-200 ${
                 selectedRole === 'Creator'
-                  ? 'bg-brand-pink text-brand-black shadow-brutal'
-                  : 'bg-white hover:bg-brand-lightgray'
+                  ? 'bg-pink-50 text-pink-700 ring-2 ring-pink-200'
+                  : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
               }`}
             >
-              <Palette size={20} />
+              <Palette size={18} />
               Creator
             </button>
           </div>
@@ -117,7 +119,7 @@ export default function SignupPage() {
               error={errors.fullName?.message}
               {...register('fullName')}
             />
-            <User className="absolute right-3 top-9 text-brand-gray" size={18} />
+            <User className="absolute right-3 top-9 text-gray-400" size={16} />
           </div>
 
           <div className="relative">
@@ -128,7 +130,7 @@ export default function SignupPage() {
               error={errors.email?.message}
               {...register('email')}
             />
-            <Mail className="absolute right-3 top-9 text-brand-gray" size={18} />
+            <Mail className="absolute right-3 top-9 text-gray-400" size={16} />
           </div>
 
           <div className="relative">
@@ -139,7 +141,7 @@ export default function SignupPage() {
               error={errors.phoneNumber?.message}
               {...register('phoneNumber')}
             />
-            <Phone className="absolute right-3 top-9 text-brand-gray" size={18} />
+            <Phone className="absolute right-3 top-9 text-gray-400" size={16} />
           </div>
 
           <div className="relative">
@@ -150,7 +152,7 @@ export default function SignupPage() {
               error={errors.password?.message}
               {...register('password')}
             />
-            <Lock className="absolute right-3 top-9 text-brand-gray" size={18} />
+            <Lock className="absolute right-3 top-9 text-gray-400" size={16} />
           </div>
 
           <div className="relative">
@@ -161,25 +163,24 @@ export default function SignupPage() {
               error={errors.confirmPassword?.message}
               {...register('confirmPassword')}
             />
-            <Lock className="absolute right-3 top-9 text-brand-gray" size={18} />
+            <Lock className="absolute right-3 top-9 text-gray-400" size={16} />
           </div>
 
           <Button
             type="submit"
             fullWidth
             isLoading={isLoading}
-            variant={selectedRole === 'Creator' ? 'pink' : 'blue'}
           >
-            <UserPlus size={18} />
+            <UserPlus size={16} />
             Create Account as {selectedRole === 'Creator' ? 'Creator' : 'Collector'}
           </Button>
         </form>
       </div>
 
-      <div className="mt-4 border-4 border-brand-black bg-brand-yellow shadow-brutal p-4 text-center">
-        <p className="font-medium">
+      <div className="mt-4 bg-white rounded-2xl shadow-[0_2px_20px_rgb(0,0,0,0.04)] p-4 text-center">
+        <p className="text-sm text-gray-500">
           Already have an account?{' '}
-          <Link href="/login" className="font-bold underline underline-offset-4 hover:text-brand-blue">
+          <Link href="/login" className="font-semibold text-gray-900 hover:text-accent-coral transition-colors">
             Sign In
           </Link>
         </p>

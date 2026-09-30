@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { LogIn, Mail, Lock } from 'lucide-react';
 import { login } from '@/actions/authActions';
 import Button from '@/components/ui/Button';
@@ -29,6 +30,8 @@ export default function LoginPage() {
     resolver: zodResolver(loginSchema),
   });
 
+  const router = useRouter();
+
   const onSubmit = async (data: LoginForm) => {
     setIsLoading(true);
     setError(null);
@@ -41,19 +44,23 @@ export default function LoginPage() {
     if (result?.error) {
       setError(result.error);
       setIsLoading(false);
+    } else if (result?.role) {
+      if (result.role === 'Creator') router.push('/portfolio');
+      else if (result.role === 'Admin') router.push('/admin');
+      else router.push('/user');
     }
   };
 
   return (
     <div>
-      <div className="border-4 border-brand-black bg-white shadow-brutal-lg p-8">
+      <div className="bg-white rounded-2xl shadow-[0_4px_24px_rgb(0,0,0,0.06)] p-8">
         <div className="mb-6">
-          <h1 className="font-heading text-3xl font-bold mb-2">Welcome Back</h1>
-          <p className="text-brand-gray">Sign in to your ERAS account</p>
+          <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Welcome Back</h1>
+          <p className="text-gray-500 text-sm">Sign in to your Eras Studio account</p>
         </div>
 
         {error && (
-          <div className="mb-4 border-3 border-brand-red bg-red-50 p-3 text-brand-red text-sm font-medium">
+          <div className="mb-4 bg-red-50 border border-red-200 rounded-xl p-3 text-red-600 text-sm">
             {error}
           </div>
         )}
@@ -67,7 +74,7 @@ export default function LoginPage() {
               error={errors.email?.message}
               {...register('email')}
             />
-            <Mail className="absolute right-3 top-9 text-brand-gray" size={18} />
+            <Mail className="absolute right-3 top-9 text-gray-400" size={16} />
           </div>
 
           <div className="relative">
@@ -78,20 +85,20 @@ export default function LoginPage() {
               error={errors.password?.message}
               {...register('password')}
             />
-            <Lock className="absolute right-3 top-9 text-brand-gray" size={18} />
+            <Lock className="absolute right-3 top-9 text-gray-400" size={16} />
           </div>
 
           <Button type="submit" fullWidth isLoading={isLoading}>
-            <LogIn size={18} />
+            <LogIn size={16} />
             Sign In
           </Button>
         </form>
       </div>
 
-      <div className="mt-4 border-4 border-brand-black bg-brand-pink shadow-brutal p-4 text-center">
-        <p className="font-medium">
+      <div className="mt-4 bg-white rounded-2xl shadow-[0_2px_20px_rgb(0,0,0,0.04)] p-4 text-center">
+        <p className="text-sm text-gray-500">
           Don&apos;t have an account?{' '}
-          <Link href="/signup" className="font-bold underline underline-offset-4 hover:text-brand-blue">
+          <Link href="/signup" className="font-semibold text-gray-900 hover:text-accent-coral transition-colors">
             Sign Up
           </Link>
         </p>

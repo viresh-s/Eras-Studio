@@ -47,19 +47,19 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md' }:
       }}
     >
       {/* Overlay */}
-      <div className="absolute inset-0 bg-black/50" />
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
 
       {/* Modal */}
       <div
-        className={`relative ${sizeClasses[size]} w-full border-4 border-brand-black bg-white shadow-brutal-lg p-0 animate-in`}
-        style={{ animation: 'modalIn 0.15s ease-out' }}
+        className={`relative ${sizeClasses[size]} w-full bg-white rounded-2xl shadow-soft-xl p-0 overflow-hidden`}
+        style={{ animation: 'modalIn 0.2s ease-out' }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between border-b-4 border-brand-black bg-brand-yellow px-6 py-4">
-          <h2 className="font-heading text-xl font-bold">{title}</h2>
+        <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
+          <h2 className="text-lg font-bold text-gray-900">{title}</h2>
           <button
             onClick={onClose}
-            className="border-2 border-brand-black bg-white p-1.5 transition-all hover:bg-brand-red hover:text-white"
+            className="p-2 rounded-full text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700"
             aria-label="Close modal"
           >
             <X size={18} />

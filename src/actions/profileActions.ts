@@ -12,6 +12,12 @@ interface UpdateProfileData {
   about_me?: string | null;
   portfolio_url?: string | null;
   social_links?: Record<string, string> | null;
+  cover_image_url?: string | null;
+  primary_medium?: string | null;
+  artist_statement?: string | null;
+  art_forms?: string | null;
+  awards?: string | null;
+  other_links?: string | null;
 }
 
 export async function updateProfile(data: UpdateProfileData) {
@@ -19,16 +25,21 @@ export async function updateProfile(data: UpdateProfileData) {
   
   const { userId, ...updateData } = data;
 
+  // Remove undefined values so we don't overwrite with null accidentally
+  const cleanedData = Object.fromEntries(
+    Object.entries(updateData).filter(([_, v]) => v !== undefined)
+  );
+
   const { error } = await supabase
     .from('profiles')
-    .update(updateData)
+    .update(cleanedData)
     .eq('id', userId);
 
   if (error) {
     throw new Error(error.message);
   }
 
-  revalidatePath('/creator/profile');
+  revalidatePath('/profile');
   revalidatePath('/user/profile');
 }
 
@@ -57,5 +68,5 @@ export async function upgradeToPremiumServer(userId: string) {
     throw new Error(error.message);
   }
   
-  revalidatePath('/creator/upload');
+  revalidatePath('/portfolio/upload');
 }

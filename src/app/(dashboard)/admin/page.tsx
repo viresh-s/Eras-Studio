@@ -1,6 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import { Users, Image, MessageCircle, Shield, TrendingUp } from 'lucide-react';
 
@@ -61,94 +60,94 @@ export default async function AdminDashboard() {
   return (
     <div>
       <div className="flex items-center gap-3 mb-6">
-        <div className="p-2 border-3 border-brand-black bg-brand-yellow">
-          <Shield size={24} />
+        <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center">
+          <Shield size={20} className="text-amber-600" />
         </div>
-        <h1 className="font-heading text-3xl font-bold">Admin Dashboard</h1>
+        <h1 className="text-2xl font-extrabold text-gray-900">Admin Dashboard</h1>
       </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-        <Card>
+        <div className="bg-white rounded-2xl p-5 shadow-[0_2px_20px_rgb(0,0,0,0.04)]">
           <div className="flex items-center gap-3">
-            <div className="p-2 border-2 border-brand-black bg-brand-blue text-white">
-              <Users size={20} />
+            <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
+              <Users size={18} className="text-blue-600" />
             </div>
             <div>
-              <p className="text-brand-gray text-xs font-medium">Collectors</p>
-              <p className="font-heading text-xl font-bold">{totalUsers || 0}</p>
+              <p className="text-gray-500 text-xs font-medium">Collectors</p>
+              <p className="text-lg font-extrabold text-gray-900">{totalUsers || 0}</p>
             </div>
           </div>
-        </Card>
+        </div>
 
-        <Card>
+        <div className="bg-white rounded-2xl p-5 shadow-[0_2px_20px_rgb(0,0,0,0.04)]">
           <div className="flex items-center gap-3">
-            <div className="p-2 border-2 border-brand-black bg-brand-pink">
-              <Users size={20} />
+            <div className="w-10 h-10 rounded-xl bg-pink-50 flex items-center justify-center">
+              <Users size={18} className="text-pink-600" />
             </div>
             <div>
-              <p className="text-brand-gray text-xs font-medium">Creators</p>
-              <p className="font-heading text-xl font-bold">{totalCreators || 0}</p>
+              <p className="text-gray-500 text-xs font-medium">Creators</p>
+              <p className="text-lg font-extrabold text-gray-900">{totalCreators || 0}</p>
             </div>
           </div>
-        </Card>
+        </div>
 
-        <Card>
+        <div className="bg-white rounded-2xl p-5 shadow-[0_2px_20px_rgb(0,0,0,0.04)]">
           <div className="flex items-center gap-3">
-            <div className="p-2 border-2 border-brand-black bg-brand-yellow">
-              <Image size={20} />
+            <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center">
+              <Image size={18} className="text-amber-600" />
             </div>
             <div>
-              <p className="text-brand-gray text-xs font-medium">Artworks</p>
-              <p className="font-heading text-xl font-bold">{totalArtworks || 0}</p>
+              <p className="text-gray-500 text-xs font-medium">Artworks</p>
+              <p className="text-lg font-extrabold text-gray-900">{totalArtworks || 0}</p>
             </div>
           </div>
-        </Card>
+        </div>
 
-        <Card>
+        <div className="bg-white rounded-2xl p-5 shadow-[0_2px_20px_rgb(0,0,0,0.04)]">
           <div className="flex items-center gap-3">
-            <div className="p-2 border-2 border-brand-black bg-brand-green">
-              <MessageCircle size={20} />
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
+              <MessageCircle size={18} className="text-emerald-600" />
             </div>
             <div>
-              <p className="text-brand-gray text-xs font-medium">Active Chats</p>
-              <p className="font-heading text-xl font-bold">{activeChats || 0}</p>
+              <p className="text-gray-500 text-xs font-medium">Active Chats</p>
+              <p className="text-lg font-extrabold text-gray-900">{activeChats || 0}</p>
             </div>
           </div>
-        </Card>
+        </div>
 
-        <Card>
+        <div className="bg-white rounded-2xl p-5 shadow-[0_2px_20px_rgb(0,0,0,0.04)]">
           <div className="flex items-center gap-3">
-            <div className="p-2 border-2 border-brand-black bg-brand-yellow">
-              <TrendingUp size={20} />
+            <div className="w-10 h-10 rounded-xl bg-violet-50 flex items-center justify-center">
+              <TrendingUp size={18} className="text-violet-600" />
             </div>
             <div>
-              <p className="text-brand-gray text-xs font-medium">Premium</p>
-              <p className="font-heading text-xl font-bold">{premiumCreators || 0}</p>
+              <p className="text-gray-500 text-xs font-medium">Premium</p>
+              <p className="text-lg font-extrabold text-gray-900">{premiumCreators || 0}</p>
             </div>
           </div>
-        </Card>
+        </div>
       </div>
 
-      {/* Recent Users */}
+      {/* Recent Users & Artworks */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div>
-          <h2 className="font-heading text-xl font-bold mb-4">Recent Users</h2>
-          <Card padding="none">
+          <h2 className="text-lg font-bold text-gray-900 mb-4">Recent Users</h2>
+          <div className="bg-white rounded-2xl shadow-[0_2px_20px_rgb(0,0,0,0.04)] overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b-3 border-brand-black bg-brand-offwhite">
-                    <th className="text-left px-4 py-3 font-heading text-sm uppercase">Name</th>
-                    <th className="text-left px-4 py-3 font-heading text-sm uppercase">Role</th>
-                    <th className="text-left px-4 py-3 font-heading text-sm uppercase">Premium</th>
-                    <th className="text-left px-4 py-3 font-heading text-sm uppercase">Joined</th>
+                  <tr className="border-b border-gray-100 bg-gray-50">
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Name</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Role</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Premium</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Joined</th>
                   </tr>
                 </thead>
                 <tbody>
                   {recentUsers?.map((u) => (
-                    <tr key={u.id} className="border-b border-brand-lightgray hover:bg-brand-lightgray">
-                      <td className="px-4 py-3 text-sm font-medium">{u.full_name}</td>
+                    <tr key={u.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                      <td className="px-4 py-3 text-sm font-medium text-gray-900">{u.full_name}</td>
                       <td className="px-4 py-3">
                         <Badge variant={u.role === 'Creator' ? 'pink' : u.role === 'Admin' ? 'yellow' : 'blue'}>
                           {u.role}
@@ -161,7 +160,7 @@ export default async function AdminDashboard() {
                           <Badge variant="gray">No</Badge>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-sm text-brand-gray">
+                      <td className="px-4 py-3 text-sm text-gray-500">
                         {new Date(u.created_at).toLocaleDateString()}
                       </td>
                     </tr>
@@ -169,15 +168,15 @@ export default async function AdminDashboard() {
                 </tbody>
               </table>
             </div>
-          </Card>
+          </div>
         </div>
 
         <div>
-          <h2 className="font-heading text-xl font-bold mb-4">Recent Artworks</h2>
-          <div className="space-y-3">
+          <h2 className="text-lg font-bold text-gray-900 mb-4">Recent Artworks</h2>
+          <div className="space-y-2">
             {recentArtworks?.map((artwork) => (
-              <Card key={artwork.id} className="flex items-center gap-4">
-                <div className="w-14 h-14 border-2 border-brand-black bg-brand-lightgray flex-shrink-0 overflow-hidden">
+              <div key={artwork.id} className="bg-white rounded-xl p-4 flex items-center gap-4 shadow-[0_2px_20px_rgb(0,0,0,0.04)]">
+                <div className="w-14 h-14 rounded-xl bg-gray-100 flex-shrink-0 overflow-hidden">
                   <img
                     src={artwork.image_url}
                     alt={artwork.title}
@@ -185,20 +184,20 @@ export default async function AdminDashboard() {
                   />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-heading font-bold truncate">{artwork.title}</p>
-                  <p className="text-brand-gray text-sm">
+                  <p className="font-semibold text-gray-900 truncate">{artwork.title}</p>
+                  <p className="text-gray-500 text-sm">
                     by {(artwork.profiles as Record<string, string>)?.full_name}
                   </p>
                 </div>
                 <Badge variant={artwork.status === 'Available' ? 'green' : 'red'}>
                   {artwork.status}
                 </Badge>
-              </Card>
+              </div>
             ))}
             {(!recentArtworks || recentArtworks.length === 0) && (
-              <Card>
-                <p className="text-center text-brand-gray py-4">No artworks yet</p>
-              </Card>
+              <div className="bg-white rounded-2xl shadow-[0_2px_20px_rgb(0,0,0,0.04)] p-8 text-center">
+                <p className="text-gray-500 text-sm">No artworks yet</p>
+              </div>
             )}
           </div>
         </div>

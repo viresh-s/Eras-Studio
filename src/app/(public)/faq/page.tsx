@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Card from '@/components/ui/Card';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
 const faqs = [
@@ -9,16 +8,16 @@ const faqs = [
     category: 'General',
     questions: [
       {
-        q: 'What is ERAS?',
-        a: 'ERAS is an online art marketplace that connects creators (painters, artists, and makers) with collectors. Artists can upload and manage their artworks, while collectors can browse, discover, and express interest in pieces they love.',
+        q: 'What is Eras Studio?',
+        a: 'Eras Studio is an online art marketplace that connects creators (painters, artists, and makers) with collectors. Artists can upload and manage their artworks, while collectors can browse, discover, and express interest in pieces they love.',
       },
       {
-        q: 'Is ERAS free to use?',
+        q: 'Is Eras Studio free to use?',
         a: 'Yes! Collectors can browse and interact with creators completely free. Creators get a free trial with 3 artwork uploads and a 10-day access period. After that, creators can upgrade to Premium for unlimited uploads and additional features.',
       },
       {
         q: 'How does the buying process work?',
-        a: 'When you find an artwork you\'re interested in, click "Express Interest" to start a direct conversation with the creator. You can discuss pricing, shipping, and other details directly — ERAS facilitates the connection, not the transaction.',
+        a: 'When you find an artwork you\'re interested in, click "Express Interest" to start a direct conversation with the creator. You can discuss pricing, shipping, and other details directly — Eras Studio facilitates the connection, not the transaction.',
       },
     ],
   },
@@ -26,7 +25,7 @@ const faqs = [
     category: 'For Creators',
     questions: [
       {
-        q: 'How do I start selling on ERAS?',
+        q: 'How do I start selling on Eras Studio?',
         a: 'Sign up as a Creator, complete your profile, and start uploading your artworks. You\'ll need to provide details like title, art type, description, and images for each piece.',
       },
       {
@@ -35,7 +34,7 @@ const faqs = [
       },
       {
         q: 'What types of art can I sell?',
-        a: 'ERAS supports paintings, sculptures, photography, digital art, drawings, prints, mixed media, collages, textile art, ceramics, and more.',
+        a: 'Eras Studio supports paintings, sculptures, photography, digital art, drawings, prints, mixed media, collages, textile art, ceramics, and more.',
       },
     ],
   },
@@ -63,20 +62,20 @@ function FaqItem({ q, a }: { q: string; a: string }) {
 
   return (
     <div
-      className={`border-3 border-brand-black transition-all cursor-pointer ${
-        isOpen ? 'bg-white shadow-brutal' : 'bg-white hover:bg-brand-lightgray'
+      className={`bg-white rounded-xl border transition-all cursor-pointer ${
+        isOpen ? 'border-gray-200 shadow-[0_4px_24px_rgb(0,0,0,0.06)]' : 'border-gray-100 hover:border-gray-200'
       }`}
       onClick={() => setIsOpen(!isOpen)}
     >
-      <div className="flex items-center justify-between p-4">
-        <h4 className="font-heading font-bold text-base pr-4">{q}</h4>
-        <div className="flex-shrink-0 p-1 border-2 border-brand-black">
-          {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+      <div className="flex items-center justify-between p-5">
+        <h4 className="font-semibold text-gray-900 text-sm pr-4">{q}</h4>
+        <div className="flex-shrink-0 w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center">
+          {isOpen ? <ChevronUp size={14} className="text-gray-600" /> : <ChevronDown size={14} className="text-gray-600" />}
         </div>
       </div>
       {isOpen && (
-        <div className="px-4 pb-4 border-t-2 border-brand-black pt-3">
-          <p className="text-brand-gray leading-relaxed">{a}</p>
+        <div className="px-5 pb-5 border-t border-gray-100 pt-4">
+          <p className="text-gray-500 text-sm leading-relaxed">{a}</p>
         </div>
       )}
     </div>
@@ -86,22 +85,22 @@ function FaqItem({ q, a }: { q: string; a: string }) {
 export default function FaqPage() {
   return (
     <div>
-      <section className="border-b-4 border-brand-black bg-white">
-        <div className="max-w-4xl mx-auto px-6 py-16 text-center">
-          <h1 className="font-heading text-5xl font-bold mb-4">FAQ</h1>
-          <p className="text-xl text-brand-gray">
-            Frequently asked questions about ERAS
+      <section className="py-20">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-gray-900 mb-5">FAQ</h1>
+          <p className="text-xl text-gray-500">
+            Frequently asked questions about Eras Studio
           </p>
         </div>
       </section>
 
-      <section className="py-12">
+      <section className="pb-20">
         <div className="max-w-3xl mx-auto px-6 space-y-10">
           {faqs.map((section) => (
             <div key={section.category}>
-              <div className="inline-block mb-4 px-4 py-2 border-3 border-brand-black bg-brand-yellow font-heading font-bold text-sm uppercase tracking-widest">
+              <span className="inline-flex items-center px-4 py-1.5 bg-gray-100 rounded-full text-xs font-semibold text-gray-700 mb-4">
                 {section.category}
-              </div>
+              </span>
               <div className="space-y-3">
                 {section.questions.map((faq) => (
                   <FaqItem key={faq.q} q={faq.q} a={faq.a} />

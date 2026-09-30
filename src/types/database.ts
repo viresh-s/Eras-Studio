@@ -1,5 +1,5 @@
 export type UserRole = 'Admin' | 'User' | 'Creator';
-export type ArtworkStatus = 'Available' | 'Sold';
+export type ArtworkStatus = 'Available' | 'For Sale' | 'Not for sale' | 'Sold';
 export type ChatStatus = 'Active' | 'Closed';
 
 export interface Profile {
@@ -13,6 +13,12 @@ export interface Profile {
   portfolio_url: string | null;
   about_me: string | null;
   profile_pic_url: string | null;
+  cover_image_url: string | null;
+  primary_medium: string | null;
+  artist_statement: string | null;
+  art_forms: string | null;
+  awards: string | null;
+  other_links: string | null;
   social_links: SocialLinks;
   is_premium: boolean;
   created_at: string;
@@ -34,8 +40,17 @@ export interface Artwork {
   description: string | null;
   external_link: string | null;
   image_url: string;
+  additional_images: string[];
   price: number | null;
   status: ArtworkStatus;
+  year: string | null;
+  dimensions: string | null;
+  location: string | null;
+  style: string | null;
+  tags: string[];
+  collection: string | null;
+  price_visibility: string | null;
+  is_published: boolean;
   created_at: string;
 }
 

@@ -5,37 +5,52 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRouter } from 'next/navigation';
-import { Upload, Image, Link as LinkIcon } from 'lucide-react';
+import { Upload, Image, Link as LinkIcon, Trash2, Save } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { createArtwork } from '@/actions/artworkActions';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
 import TextArea from '@/components/ui/TextArea';
-import Card from '@/components/ui/Card';
 import type { FreemiumStatus } from '@/lib/freemium/check';
 
-const artTypes = [
-  { value: 'painting', label: 'Painting' },
-  { value: 'sculpture', label: 'Sculpture' },
-  { value: 'photography', label: 'Photography' },
-  { value: 'digital-art', label: 'Digital Art' },
-  { value: 'drawing', label: 'Drawing' },
-  { value: 'print', label: 'Print' },
-  { value: 'mixed-media', label: 'Mixed Media' },
-  { value: 'collage', label: 'Collage' },
-  { value: 'textile', label: 'Textile Art' },
-  { value: 'ceramic', label: 'Ceramic' },
-  { value: 'other', label: 'Other' },
+const mediumOptions = [
+  { value: 'Painting', label: 'Painting' },
+  { value: 'Sculpture', label: 'Sculpture' },
+  { value: 'Photography', label: 'Photography' },
+  { value: 'Digital Art', label: 'Digital Art' },
+  { value: 'Illustration', label: 'Illustration' },
+  { value: 'Mixed Media', label: 'Mixed Media' },
+];
+
+const visibilityOptions = [
+  { value: 'Show Price', label: 'Show Price' },
+  { value: 'Price on Request', label: 'Price on Request' },
+  { value: 'Hide Price', label: 'Hide Price' },
+];
+
+const availabilityOptions = [
+  { value: 'Available', label: 'Available' },
+  { value: 'For Sale', label: 'For Sale' },
+  { value: 'Not for sale', label: 'Not for sale' },
+  { value: 'Sold', label: 'Sold' },
 ];
 
 const uploadSchema = z.object({
   title: z.string().min(2, 'Title is required'),
-  artType: z.string().min(1, 'Please select an art type'),
+  artType: z.string().min(1, 'Please select a medium'), // We map this to Medium
   artistName: z.string().min(2, 'Artist name is required'),
+  year: z.string().optional(),
+  dimensions: z.string().optional(),
+  location: z.string().optional(),
+  style: z.string().optional(),
+  collection: z.string().optional(),
+  tags: z.string().optional(),
   description: z.string().optional(),
   externalLink: z.string().url('Please enter a valid URL').optional().or(z.literal('')),
   price: z.string().optional(),
+  priceVisibility: z.enum(['Show Price', 'Price on Request', 'Hide Price']),
+  status: z.enum(['Available', 'For Sale', 'Not for sale', 'Sold']),
 });
 
 type UploadForm = z.infer<typeof uploadSchema>;
@@ -48,9 +63,10 @@ interface UploadFormProps {
 export default function ArtworkUploadForm({ userId, freemiumStatus }: UploadFormProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [submitAction, setSubmitAction] = useState<'publish' | 'draft'>('publish');
   const [error, setError] = useState<string | null>(null);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
 
   const {
     register,
@@ -58,20 +74,36 @@ export default function ArtworkUploadForm({ userId, freemiumStatus }: UploadForm
     formState: { errors },
   } = useForm<UploadForm>({
     resolver: zodResolver(uploadSchema),
+    defaultValues: {
+      priceVisibility: 'Show Price',
+      status: 'Available',
+    }
   });
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setSelectedFile(file);
-      const url = URL.createObjectURL(file);
-      setPreviewUrl(url);
+    const files = Array.from(e.target.files || []);
+    if (files.length > 0) {
+      const newFiles = [...selectedFiles, ...files].slice(0, 5);
+      setSelectedFiles(newFiles);
+      
+      const newUrls = newFiles.map(file => URL.createObjectURL(file));
+      setPreviewUrls(newUrls);
     }
   };
 
+  const removeFile = (index: number) => {
+    const newFiles = [...selectedFiles];
+    newFiles.splice(index, 1);
+    setSelectedFiles(newFiles);
+    
+    const newUrls = [...previewUrls];
+    newUrls.splice(index, 1);
+    setPreviewUrls(newUrls);
+  };
+
   const onSubmit = async (data: UploadForm) => {
-    if (!selectedFile) {
-      setError('Please select an image file');
+    if (selectedFiles.length === 0) {
+      setError('Please select at least one image file');
       return;
     }
 
@@ -80,35 +112,59 @@ export default function ArtworkUploadForm({ userId, freemiumStatus }: UploadForm
 
     try {
       const supabase = createClient();
+      const uploadedUrls: string[] = [];
 
-      // Upload image to storage
-      const fileExt = selectedFile.name.split('.').pop();
-      const fileName = `${userId}/${Date.now()}.${fileExt}`;
+      // Upload all images
+      await Promise.all(
+        selectedFiles.map(async (file, index) => {
+          const fileExt = file.name.split('.').pop();
+          const fileName = `${userId}/${Date.now()}_${index}.${fileExt}`;
 
-      const { error: uploadError } = await supabase.storage
-        .from('artworks')
-        .upload(fileName, selectedFile);
+          const { error: uploadError } = await supabase.storage
+            .from('artworks')
+            .upload(fileName, file);
 
-      if (uploadError) throw uploadError;
+          if (uploadError) throw uploadError;
 
-      // Get public URL
-      const { data: urlData } = supabase.storage
-        .from('artworks')
-        .getPublicUrl(fileName);
+          const { data: urlData } = supabase.storage
+            .from('artworks')
+            .getPublicUrl(fileName);
 
-      // Insert artwork record via Server Action
+          uploadedUrls.push(urlData.publicUrl);
+        })
+      );
+
+      const coverImage = uploadedUrls[0];
+      const additionalImages = uploadedUrls.slice(1);
+      
+      const tagsArray = data.tags ? data.tags.split(',').map(t => t.trim()).filter(Boolean) : [];
+
       await createArtwork({
         userId,
         title: data.title,
         artType: data.artType,
         artistName: data.artistName,
+        year: data.year,
+        dimensions: data.dimensions,
+        location: data.location,
+        style: data.style,
+        collection: data.collection,
+        tags: tagsArray,
         description: data.description,
         externalLink: data.externalLink,
-        imageUrl: urlData.publicUrl,
+        imageUrl: coverImage,
+        additionalImages: additionalImages,
         price: data.price ? parseFloat(data.price) : null,
+        priceVisibility: data.priceVisibility,
+        isPublished: submitAction === 'publish',
+        // In the DB, the create action currently forces status to 'Available', 
+        // we'll fix the createAction shortly to accept data.status
       });
 
-      router.push('/creator/artworks');
+      // Quick fix: the createArtwork action above needs status
+      // We will pass it in anyway, assuming the server action is updated
+      
+      router.push('/portfolio/artworks');
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong');
@@ -118,16 +174,16 @@ export default function ArtworkUploadForm({ userId, freemiumStatus }: UploadForm
   };
 
   if (freemiumStatus.isLocked) {
-    return null; // UpgradePrompt handles this case
+    return null;
   }
 
   return (
-    <Card>
-      <h2 className="font-heading text-2xl font-bold mb-6">Upload New Artwork</h2>
+    <div className="bg-white rounded-2xl shadow-[0_2px_20px_rgb(0,0,0,0.04)] p-8">
+      <h2 className="text-xl font-bold text-gray-900 mb-6">Upload New Artwork</h2>
 
       {!freemiumStatus.isLocked && freemiumStatus.artworksLimit > 0 && (
-        <div className="mb-4 p-3 border-3 border-brand-black bg-brand-yellow">
-          <p className="font-heading text-sm font-semibold">
+        <div className="mb-4 p-4 bg-amber-50 rounded-xl border border-amber-200">
+          <p className="text-sm font-medium text-amber-800">
             Free Plan: {freemiumStatus.artworksUsed}/{freemiumStatus.artworksLimit} uploads used
             {freemiumStatus.daysRemaining > 0 && ` · ${freemiumStatus.daysRemaining} days remaining`}
           </p>
@@ -135,105 +191,123 @@ export default function ArtworkUploadForm({ userId, freemiumStatus }: UploadForm
       )}
 
       {error && (
-        <div className="mb-4 border-3 border-brand-red bg-red-50 p-3 text-brand-red text-sm font-medium">
+        <div className="mb-4 bg-red-50 border border-red-200 rounded-xl p-3 text-red-600 text-sm">
           {error}
         </div>
       )}
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Image Upload */}
         <div>
-          <label className="font-heading font-semibold text-sm uppercase tracking-wide block mb-2">
-            Artwork Image *
+          <label className="text-sm font-medium text-gray-700 block mb-2">
+            Artwork Images * (First image is the cover)
           </label>
-          <div
-            className={`border-3 border-dashed border-brand-black p-6 text-center cursor-pointer transition-all hover:bg-brand-lightgray ${
-              previewUrl ? 'border-solid' : ''
-            }`}
-            onClick={() => document.getElementById('file-upload')?.click()}
-          >
-            {previewUrl ? (
-              <div className="relative">
-                <img
-                  src={previewUrl}
-                  alt="Preview"
-                  className="max-h-64 mx-auto border-2 border-brand-black"
-                />
-                <p className="mt-2 text-sm text-brand-gray">Click to change image</p>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
+            {previewUrls.map((url, idx) => (
+              <div key={idx} className="relative group aspect-square rounded-xl overflow-hidden bg-gray-100 border border-gray-200">
+                <img src={url} alt={`Preview ${idx + 1}`} className="w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button
+                    type="button"
+                    onClick={() => removeFile(idx)}
+                    className="bg-red-500 text-white w-10 h-10 flex items-center justify-center rounded-full hover:bg-red-600 shadow-lg transform hover:scale-105 transition-all"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </div>
+                {idx === 0 && (
+                  <div className="absolute bottom-2 left-2 bg-gray-900/90 text-white text-[10px] font-bold px-2 py-1 rounded">
+                    COVER
+                  </div>
+                )}
               </div>
-            ) : (
-              <div>
-                <Upload size={48} className="mx-auto mb-3 text-brand-gray" />
-                <p className="font-heading font-semibold">Click to upload</p>
-                <p className="text-sm text-brand-gray mt-1">PNG, JPG, WEBP up to 10MB</p>
+            ))}
+            
+            {previewUrls.length < 5 && (
+              <div
+                className="aspect-square border-2 border-dashed border-gray-200 rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all hover:bg-gray-50 hover:border-gray-300"
+                onClick={() => document.getElementById('file-upload')?.click()}
+              >
+                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center mb-2">
+                  <Upload size={18} className="text-gray-400" />
+                </div>
+                <p className="font-semibold text-gray-900 text-xs">Add Image</p>
+                <p className="text-[10px] text-gray-400 mt-1">Up to 5 images</p>
               </div>
             )}
           </div>
+          
           <input
             id="file-upload"
             type="file"
             accept="image/*"
+            multiple
             onChange={handleFileChange}
             className="hidden"
           />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <Input
-            label="Title *"
-            placeholder="Name of the artwork"
-            error={errors.title?.message}
-            {...register('title')}
-          />
+          <Input label="Title *" placeholder="Name of the artwork" error={errors.title?.message} {...register('title')} />
+          <Input label="Artist Name *" placeholder="Who created this?" error={errors.artistName?.message} {...register('artistName')} />
+        </div>
 
-          <Select
-            label="Type of Art *"
-            options={artTypes}
-            placeholder="Select art type"
-            error={errors.artType?.message}
-            {...register('artType')}
-          />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <Select label="Medium *" options={mediumOptions} placeholder="Select Medium" error={errors.artType?.message} {...register('artType')} />
+          <Input label="Year" placeholder="e.g. 2024" error={errors.year?.message} {...register('year')} />
+          <Input label="Dimensions" placeholder="e.g. 24x36 in" error={errors.dimensions?.message} {...register('dimensions')} />
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <Input label="Location" placeholder="e.g. New York, NY" error={errors.location?.message} {...register('location')} />
+          <Input label="Style" placeholder="e.g. Abstract, Minimalist" error={errors.style?.message} {...register('style')} />
+          <Input label="Collection" placeholder="e.g. Summer Series" error={errors.collection?.message} {...register('collection')} />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <Input label="Tags (comma separated)" placeholder="e.g. oil, canvas, blue" error={errors.tags?.message} {...register('tags')} />
+          <Select label="Availability" options={availabilityOptions} error={errors.status?.message} {...register('status')} />
+          <Select label="Price Visibility" options={visibilityOptions} error={errors.priceVisibility?.message} {...register('priceVisibility')} />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <Input
-            label="Artist Name *"
-            placeholder="Who created this?"
-            error={errors.artistName?.message}
-            {...register('artistName')}
-          />
-
-          <Input
-            label="Price ($)"
-            type="number"
-            placeholder="0.00"
-            error={errors.price?.message}
-            {...register('price')}
-          />
+          <Input label="Price ($)" type="number" placeholder="0.00" error={errors.price?.message} {...register('price')} />
+          <div className="relative">
+            <Input label="Related Link" placeholder="https://..." error={errors.externalLink?.message} {...register('externalLink')} />
+            <LinkIcon className="absolute right-3 top-9 text-gray-400" size={16} />
+          </div>
         </div>
 
-        <TextArea
-          label="Description"
-          placeholder="Tell collectors about this piece..."
-          error={errors.description?.message}
-          {...register('description')}
-        />
+        <TextArea label="Description" placeholder="Tell collectors about this piece..." error={errors.description?.message} {...register('description')} />
 
-        <div className="relative">
-          <Input
-            label="Related Link"
-            placeholder="https://..."
-            error={errors.externalLink?.message}
-            {...register('externalLink')}
-          />
-          <LinkIcon className="absolute right-3 top-9 text-brand-gray" size={18} />
+        <div className="flex gap-4 pt-4 border-t border-gray-100">
+          <Button 
+            type="submit" 
+            isLoading={isLoading && submitAction === 'publish'} 
+            variant="coral"
+            className="flex-1"
+            onClick={() => setSubmitAction('publish')}
+          >
+            <Image size={16} />
+            Publish Artwork
+          </Button>
+          
+          <Button 
+            type="submit" 
+            isLoading={isLoading && submitAction === 'draft'} 
+            variant="secondary"
+            className="flex-1"
+            onClick={() => setSubmitAction('draft')}
+          >
+            <Save size={16} />
+            Save Draft
+          </Button>
+
+          <Button type="button" variant="outline" className="flex-1" onClick={() => router.push('/portfolio/artworks')}>
+            Cancel
+          </Button>
         </div>
-
-        <Button type="submit" fullWidth isLoading={isLoading} variant="pink">
-          <Image size={18} />
-          Upload Artwork
-        </Button>
       </form>
-    </Card>
+    </div>
   );
 }

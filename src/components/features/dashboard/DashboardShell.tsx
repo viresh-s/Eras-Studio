@@ -1,8 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import Sidebar from '@/components/features/dashboard/Sidebar';
-import TopBar from '@/components/features/dashboard/TopBar';
+import Navbar from '@/components/features/dashboard/Navbar';
+import Footer from '@/components/features/dashboard/Footer';
 import type { Profile, UserRole } from '@/types/database';
 
 interface DashboardShellProps {
@@ -11,40 +10,13 @@ interface DashboardShellProps {
 }
 
 export default function DashboardShell({ profile, children }: DashboardShellProps) {
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
   return (
-    <div className="min-h-screen bg-brand-offwhite flex">
-      {/* Mobile overlay */}
-      {mobileMenuOpen && (
-        <div
-          className="fixed inset-0 bg-black/30 z-40 lg:hidden"
-          onClick={() => setMobileMenuOpen(false)}
-        />
-      )}
-
-      {/* Sidebar */}
-      <div className={`fixed lg:sticky top-0 h-screen z-50 transition-transform duration-200 ${
-        mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-      }`}>
-        <Sidebar
-          role={profile.role as UserRole}
-          isCollapsed={sidebarCollapsed}
-          onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
-        />
-      </div>
-
-      {/* Main content */}
-      <div className="flex-1 flex flex-col min-h-screen">
-        <TopBar
-          profile={profile}
-          onMenuToggle={() => setMobileMenuOpen(!mobileMenuOpen)}
-        />
-        <main className="flex-1 p-6">
-          {children}
-        </main>
-      </div>
+    <div className="min-h-screen bg-[#FAFAFA] flex flex-col">
+      <Navbar profile={profile} />
+      <main className="max-w-[1400px] mx-auto px-6 py-8 flex-1 w-full">
+        {children}
+      </main>
+      <Footer />
     </div>
   );
 }

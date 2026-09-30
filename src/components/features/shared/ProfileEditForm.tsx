@@ -10,7 +10,6 @@ import { updateProfile, updateProfileAvatar } from '@/actions/profileActions';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import TextArea from '@/components/ui/TextArea';
-import Card from '@/components/ui/Card';
 import { Save, Camera } from 'lucide-react';
 import type { Profile } from '@/types/database';
 
@@ -116,38 +115,38 @@ export default function ProfileEditForm({ profile, showCreatorFields = false }: 
   };
 
   return (
-    <Card>
+    <div className="bg-white rounded-2xl shadow-[0_2px_20px_rgb(0,0,0,0.04)] p-8">
       {/* Avatar Section */}
-      <div className="flex items-center gap-6 mb-8 pb-6 border-b-3 border-brand-black">
+      <div className="flex items-center gap-6 mb-8 pb-6 border-b border-gray-100">
         <div className="relative">
-          <div className="w-24 h-24 border-4 border-brand-black bg-brand-pink flex items-center justify-center overflow-hidden">
+          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-rose-400 to-orange-300 flex items-center justify-center overflow-hidden shadow-sm">
             {profile.profile_pic_url ? (
               <img src={profile.profile_pic_url} alt="" className="w-full h-full object-cover" />
             ) : (
-              <span className="font-heading text-3xl font-bold">
+              <span className="text-white text-2xl font-bold">
                 {profile.full_name?.charAt(0)?.toUpperCase()}
               </span>
             )}
           </div>
-          <label className="absolute -bottom-2 -right-2 p-2 border-2 border-brand-black bg-brand-yellow cursor-pointer hover:bg-brand-blue hover:text-white transition-colors">
-            <Camera size={14} />
+          <label className="absolute -bottom-1 -right-1 p-2 rounded-full bg-gray-900 text-white cursor-pointer hover:bg-gray-800 transition-colors shadow-sm">
+            <Camera size={12} />
             <input type="file" accept="image/*" onChange={handleAvatarUpload} className="hidden" />
           </label>
         </div>
         <div>
-          <h2 className="font-heading text-xl font-bold">{profile.full_name}</h2>
-          <p className="text-brand-gray">{profile.email}</p>
+          <h2 className="text-lg font-bold text-gray-900">{profile.full_name}</h2>
+          <p className="text-gray-500 text-sm">{profile.email}</p>
         </div>
       </div>
 
       {success && (
-        <div className="mb-4 border-3 border-brand-green bg-green-50 p-3 text-brand-green text-sm font-medium">
+        <div className="mb-4 bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-emerald-700 text-sm">
           Profile updated successfully!
         </div>
       )}
 
       {error && (
-        <div className="mb-4 border-3 border-brand-red bg-red-50 p-3 text-brand-red text-sm font-medium">
+        <div className="mb-4 bg-red-50 border border-red-200 rounded-xl p-3 text-red-600 text-sm">
           {error}
         </div>
       )}
@@ -197,8 +196,8 @@ export default function ProfileEditForm({ profile, showCreatorFields = false }: 
               {...register('portfolio_url')}
             />
 
-            <div className="border-t-3 border-brand-black pt-5 mt-5">
-              <h3 className="font-heading text-lg font-bold mb-4">Social Links</h3>
+            <div className="border-t border-gray-100 pt-5 mt-5">
+              <h3 className="text-base font-bold text-gray-900 mb-4">Social Links</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <Input
                   label="Instagram"
@@ -222,10 +221,10 @@ export default function ProfileEditForm({ profile, showCreatorFields = false }: 
         )}
 
         <Button type="submit" isLoading={isLoading}>
-          <Save size={18} />
+          <Save size={16} />
           Save Changes
         </Button>
       </form>
-    </Card>
+    </div>
   );
 }

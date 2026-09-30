@@ -51,10 +51,10 @@ export default function ExpressInterestButton({ artworkId, creatorId, userId }: 
       <Button
         onClick={() => setIsModalOpen(true)}
         size="lg"
-        variant="pink"
+        variant="coral"
         fullWidth
       >
-        <MessageCircle size={20} />
+        <MessageCircle size={18} />
         Express Interest
       </Button>
 
@@ -65,7 +65,7 @@ export default function ExpressInterestButton({ artworkId, creatorId, userId }: 
         size="md"
       >
         <div className="space-y-4">
-          <p className="text-brand-gray">Choose a question or write your own message to the creator:</p>
+          <p className="text-gray-500 text-sm">Choose a question or write your own message to the creator:</p>
 
           {/* Predefined Questions */}
           <div className="space-y-2">
@@ -77,10 +77,10 @@ export default function ExpressInterestButton({ artworkId, creatorId, userId }: 
                   setSelectedQuestion(question === selectedQuestion ? null : question);
                   setCustomMessage('');
                 }}
-                className={`w-full text-left p-3 border-2 border-brand-black transition-all text-sm font-medium ${
+                className={`w-full text-left p-3 rounded-xl text-sm font-medium transition-all duration-150 ${
                   selectedQuestion === question
-                    ? 'bg-brand-yellow shadow-brutal-sm'
-                    : 'bg-white hover:bg-brand-lightgray'
+                    ? 'bg-gray-900 text-white'
+                    : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
                 }`}
               >
                 {question}
@@ -90,7 +90,7 @@ export default function ExpressInterestButton({ artworkId, creatorId, userId }: 
 
           {/* Custom Message */}
           <div>
-            <label className="font-heading font-semibold text-sm uppercase tracking-wide block mb-1.5">
+            <label className="text-sm font-medium text-gray-700 block mb-1.5">
               Or write your own
             </label>
             <textarea
@@ -101,7 +101,7 @@ export default function ExpressInterestButton({ artworkId, creatorId, userId }: 
               }}
               placeholder="Hi, I'm interested in this piece..."
               rows={3}
-              className="input-brutal resize-y"
+              className="w-full px-4 py-3 text-sm bg-white border border-gray-200 rounded-xl outline-none resize-y transition-all duration-200 placeholder:text-gray-400 focus:ring-2 focus:ring-gray-900/10 focus:border-gray-400"
             />
           </div>
 
@@ -110,9 +110,8 @@ export default function ExpressInterestButton({ artworkId, creatorId, userId }: 
             fullWidth
             isLoading={isLoading}
             disabled={!selectedQuestion && !customMessage.trim()}
-            variant="pink"
           >
-            <MessageCircle size={18} />
+            <MessageCircle size={16} />
             Start Conversation
           </Button>
         </div>

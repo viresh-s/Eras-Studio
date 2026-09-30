@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "ERAS — Art Marketplace",
-  description: "Discover and collect extraordinary artworks from talented creators worldwide. ERAS connects artists with collectors.",
+  title: "Eras Studio — Art Marketplace",
+  description: "Discover and collect extraordinary artworks from talented creators worldwide. Eras Studio connects artists with collectors.",
   keywords: ["art", "marketplace", "paintings", "collectors", "artists", "gallery"],
 };
 

@@ -20,6 +20,12 @@ CREATE TABLE public.profiles (
   portfolio_url TEXT,
   about_me TEXT,
   profile_pic_url TEXT,
+  cover_image_url TEXT,
+  primary_medium TEXT,
+  artist_statement TEXT,
+  art_forms TEXT,
+  awards TEXT,
+  other_links TEXT,
   social_links JSONB DEFAULT '{}',
   is_premium BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMPTZ DEFAULT NOW()
@@ -53,8 +59,17 @@ CREATE TABLE public.artworks (
   description TEXT,
   external_link TEXT,
   image_url TEXT NOT NULL,
+  additional_images TEXT[] DEFAULT '{}',
   price DECIMAL(10, 2),
-  status TEXT NOT NULL DEFAULT 'Available' CHECK (status IN ('Available', 'Sold')),
+  status TEXT NOT NULL DEFAULT 'Available' CHECK (status IN ('Available', 'For Sale', 'Not for sale', 'Sold')),
+  year TEXT,
+  dimensions TEXT,
+  location TEXT,
+  style TEXT,
+  tags TEXT[] DEFAULT '{}',
+  collection TEXT,
+  price_visibility TEXT DEFAULT 'Show Price' CHECK (price_visibility IN ('Show Price', 'Price on Request', 'Hide Price')),
+  is_published BOOLEAN DEFAULT TRUE,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
