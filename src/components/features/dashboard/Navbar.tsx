@@ -6,22 +6,24 @@ import { usePathname } from 'next/navigation';
 import { Settings, LogOut, ChevronDown, User, Sparkles } from 'lucide-react';
 import { logout } from '@/actions/authActions';
 import type { Profile, UserRole } from '@/types/database';
+import NotificationBell from './NotificationBell';
 
 interface NavbarProps {
   profile: Pick<Profile, 'full_name' | 'profile_pic_url'> & { role: string };
 }
 
 const navLinks = [
-  { href: '/browse', label: 'Discovery' },
+  { href: '/discovery', label: 'Discovery' },
   { href: '/portfolio', label: 'Portfolio' },
   { href: '/messages', label: 'Messages' },
   { href: '/profile', label: 'Profile' },
 ];
 
 const userNavLinks = [
-  { href: '/user', label: 'Discovery' },
-  { href: '/browse', label: 'Browse' },
+  { href: '/discovery', label: 'Discovery' },
   { href: '/messages', label: 'Messages' },
+  { href: '/purchases', label: 'Purchases' },
+  { href: '/saved', label: 'Saved' },
   { href: '/user/profile', label: 'Profile' },
 ];
 
@@ -72,10 +74,10 @@ export default function Navbar({ profile }: NavbarProps) {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-1 flex-shrink-0">
-            <span className="text-xl font-extrabold tracking-tight text-gray-900" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            <span className="text-2xl font-black tracking-tight text-gray-900 font-heading italic">
               Eras
             </span>
-            <span className="text-xl font-normal tracking-tight text-gray-900" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            <span className="text-xl font-medium tracking-tight text-gray-900 font-heading">
               Studio
             </span>
           </Link>
@@ -107,11 +109,14 @@ export default function Navbar({ profile }: NavbarProps) {
           </nav>
 
           {/* Right Section */}
-          <div className="relative flex items-center" ref={dropdownRef}>
-            <button
-              onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="flex items-center gap-2.5 p-1 rounded-full hover:bg-gray-50 transition-colors"
-            >
+          <div className="relative flex items-center">
+            <NotificationBell />
+            
+            <div className="relative flex items-center" ref={dropdownRef}>
+              <button
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+                className="flex items-center gap-2.5 p-1 rounded-full hover:bg-gray-50 transition-colors"
+              >
               <div className="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-600 overflow-hidden flex-shrink-0">
                 {profile.profile_pic_url ? (
                   <img
@@ -144,7 +149,7 @@ export default function Navbar({ profile }: NavbarProps) {
                 </div>
                 
                 <Link
-                  href="/profile"
+                  href={profile.role === 'Creator' ? '/profile' : '/user/profile'}
                   onClick={() => setDropdownOpen(false)}
                   className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors w-full text-left"
                 >
@@ -170,6 +175,7 @@ export default function Navbar({ profile }: NavbarProps) {
                 </form>
               </div>
             )}
+          </div>
           </div>
         </div>
       </div>

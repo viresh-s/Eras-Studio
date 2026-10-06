@@ -35,7 +35,7 @@ export async function updateSession(request: NextRequest) {
 
   // Protected dashboard routes
   const isDashboardRoute = request.nextUrl.pathname.startsWith('/portfolio') ||
-    request.nextUrl.pathname.startsWith('/user') ||
+    request.nextUrl.pathname.startsWith('/discovery') ||
     request.nextUrl.pathname.startsWith('/admin') ||
     request.nextUrl.pathname.startsWith('/messages');
 
@@ -70,7 +70,7 @@ export async function updateSession(request: NextRequest) {
     } else if (profile.role === 'Admin') {
       url.pathname = '/admin';
     } else {
-      url.pathname = '/user';
+      url.pathname = '/discovery';
     }
     const response = NextResponse.redirect(url);
     

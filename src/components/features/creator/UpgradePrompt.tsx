@@ -26,11 +26,10 @@ export default function UpgradePrompt({ userId, freemiumStatus }: UpgradePromptP
     }
   };
 
-  if (!freemiumStatus.isLocked) return null;
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="bg-white rounded-2xl shadow-[0_4px_24px_rgb(0,0,0,0.06)] p-10 text-center">
+    <div>
+      <div className="text-center pb-4">
         <div className="w-16 h-16 rounded-2xl bg-amber-50 flex items-center justify-center mx-auto mb-5">
           <Crown size={28} className="text-amber-600" />
         </div>
@@ -73,13 +72,13 @@ export default function UpgradePrompt({ userId, freemiumStatus }: UpgradePromptP
           </div>
         </div>
 
-        <Button onClick={handleUpgrade} isLoading={isUpgrading} size="lg">
+        <Button disabled size="lg" className="cursor-not-allowed">
           <Crown size={18} />
-          Upgrade Now — Demo
+          Upgrade Now — Demo (Disabled for testing)
         </Button>
 
         <p className="text-xs text-gray-400 mt-3">
-          Demo mode: This will activate premium features instantly
+          Demo mode: Upgrading is temporarily disabled so you can test the paywall.
         </p>
       </div>
     </div>

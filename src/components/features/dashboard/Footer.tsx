@@ -10,7 +10,7 @@ export default function Footer() {
           <span className="text-xs text-gray-400 ml-2">· All eyes. A single perspective.</span>
         </div>
         <div className="flex items-center gap-6">
-          <Link href="/browse" className="text-xs text-gray-500 hover:text-gray-900 transition-colors">
+          <Link href="/discovery" className="text-xs text-gray-500 hover:text-gray-900 transition-colors">
             Explore galleries →
           </Link>
           <span className="text-xs text-gray-400">

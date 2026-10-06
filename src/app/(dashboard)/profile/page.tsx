@@ -16,6 +16,11 @@ export default async function EditProfilePage() {
 
   if (!profile) redirect('/login');
 
+  // If a collector somehow navigates to /profile, redirect them to the correct page
+  if (profile.role !== 'Creator' && profile.role !== 'Admin') {
+    redirect('/user/profile');
+  }
+
   return (
     <div>
       <div className="mb-6">

@@ -54,7 +54,7 @@ export async function checkFreemiumStatus(userId: string): Promise<FreemiumStatu
   const daysRemaining = Math.max(0, 10 - daysSinceCreation);
 
   // Lock if either condition is met
-  const isTimeLocked = daysSinceCreation > 10;
+  const isTimeLocked = daysSinceCreation >= 10;
   const isArtworkLocked = artworksUsed >= 3;
 
   if (isTimeLocked && isArtworkLocked) {

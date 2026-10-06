@@ -59,7 +59,7 @@ export default function SignupPage() {
     } else if (result?.role) {
       if (result.role === 'Creator') router.push('/portfolio');
       else if (result.role === 'Admin') router.push('/admin');
-      else router.push('/user');
+      else router.push('/discovery');
     }
   };
 

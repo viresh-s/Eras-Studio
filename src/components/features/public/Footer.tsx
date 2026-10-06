@@ -3,23 +3,6 @@ import Link from 'next/link';
 export default function Footer() {
   return (
     <footer className="bg-gray-950 text-white">
-      {/* Big Statement */}
-      <div className="max-w-7xl mx-auto px-6 pt-20 pb-12">
-        <h2 className="text-4xl md:text-6xl font-extrabold tracking-tight leading-tight max-w-3xl">
-          Let&apos;s create something
-          <span className="text-accent-coral"> beautiful </span>
-          together.
-        </h2>
-        <div className="mt-8">
-          <Link
-            href="/signup"
-            className="inline-flex items-center px-8 py-3.5 text-sm font-semibold bg-white text-gray-900 rounded-full hover:bg-gray-100 transition-all hover:scale-[1.02]"
-          >
-            Get Started — It&apos;s Free
-          </Link>
-        </div>
-      </div>
-
       {/* Links Grid */}
       <div className="border-t border-gray-800">
         <div className="max-w-7xl mx-auto px-6 py-12">
@@ -41,7 +24,7 @@ export default function Footer() {
               </h4>
               <ul className="space-y-2.5">
                 {[
-                  { label: 'Browse Art', href: '/browse' },
+                  { label: 'Browse Art', href: '/discovery' },
                   { label: 'About', href: '/about' },
                   { label: 'Services', href: '/services' },
                   { label: 'FAQ', href: '/faq' },

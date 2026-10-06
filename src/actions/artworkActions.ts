@@ -2,6 +2,34 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
+import { z } from 'zod';
+
+const createArtworkSchema = z.object({
+  userId: z.string().uuid("Invalid user ID"),
+  title: z.string().min(1, "Title is required").max(255),
+  artType: z.string().min(1, "Art medium is required").max(100),
+  artistName: z.string().max(255),
+  description: z.string().max(5000).nullable().optional(),
+  externalLink: z.string().url().max(500).or(z.literal("")).nullable().optional(),
+  imageUrl: z.string().url("Invalid image URL"),
+  additionalImages: z.array(z.string().url()).optional(),
+  price: z.number().nonnegative().nullable().optional(),
+  year: z.string().max(4).nullable().optional(),
+  dimensions: z.string().max(100).nullable().optional(),
+  location: z.string().max(100).nullable().optional(),
+  style: z.string().max(100).nullable().optional(),
+  tags: z.array(z.string()).optional(),
+  collection: z.string().max(100).nullable().optional(),
+  priceVisibility: z.string().max(50).nullable().optional(),
+  isPublished: z.boolean().optional(),
+  status: z.string().max(50).nullable().optional(),
+});
+
+const updateArtworkSchema = createArtworkSchema.partial().extend({
+  userId: z.string().uuid("Invalid user ID"),
+});
+
+const uuidSchema = z.string().uuid("Invalid ID");
 
 interface CreateArtworkData {
   userId: string;
@@ -25,6 +53,10 @@ interface CreateArtworkData {
 }
 
 export async function createArtwork(data: CreateArtworkData) {
+  const parsed = createArtworkSchema.safeParse(data);
+  if (!parsed.success) {
+    throw new Error(`Validation Error: ${parsed.error.errors.map(e => e.message).join(', ')}`);
+  }
   const supabase = await createClient();
   
   const { error } = await supabase
@@ -58,6 +90,9 @@ export async function createArtwork(data: CreateArtworkData) {
 }
 
 export async function deleteArtwork(artworkId: string, userId: string) {
+  if (!uuidSchema.safeParse(artworkId).success || !uuidSchema.safeParse(userId).success) {
+    throw new Error("Validation Error: Invalid ID");
+  }
   const supabase = await createClient();
 
   const { error } = await supabase
@@ -74,6 +109,13 @@ export async function deleteArtwork(artworkId: string, userId: string) {
 }
 
 export async function updateArtwork(artworkId: string, data: Partial<CreateArtworkData> & { status?: string }) {
+  if (!uuidSchema.safeParse(artworkId).success) throw new Error("Validation Error: Invalid artwork ID");
+  
+  const parsed = updateArtworkSchema.safeParse(data);
+  if (!parsed.success) {
+    throw new Error(`Validation Error: ${parsed.error.errors.map(e => e.message).join(', ')}`);
+  }
+
   const supabase = await createClient();
   
   if (!data.userId) throw new Error("Unauthorized");

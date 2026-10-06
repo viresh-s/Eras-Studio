@@ -1,16 +1,20 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,800;1,400;1,600&display=swap');
 @import "tailwindcss";
 
 @theme inline {
   /* --- Colors --- */
-  --color-accent-coral: #FF6B5A;
-  --color-accent-yellow: #FBBF24;
-  --color-accent-rose: #FB7185;
-  --color-accent-violet: #8B5CF6;
-  --color-accent-emerald: #34D399;
+  --color-accent-coral: #C84B31; /* Deepened coral */
+  --color-accent-yellow: #E8C382; /* Muted gold */
+  --color-accent-rose: #9A3B3B; /* Deep rose/burgundy */
+  --color-accent-violet: #472D2D; /* Very dark brownish-violet */
+  --color-accent-emerald: #557153; /* Sage green */
+  --color-background: #FAF9F6; /* Alabaster off-white */
+  --color-surface: #FFFFFF;
+  --color-ink: #111111;
 
   /* --- Font --- */
   --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-heading: 'Playfair Display', Georgia, serif;
 
   /* --- Shadows --- */
   --shadow-soft: 0 2px 20px rgb(0 0 0 / 0.04);
@@ -28,18 +32,18 @@ html {
 }
 
 body {
-  background-color: #FFFFFF;
-  color: #111827;
-  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  font-family: var(--font-heading);
   font-weight: 800;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.01em;
 }
 
 /* --- Scrolling Marquee --- */

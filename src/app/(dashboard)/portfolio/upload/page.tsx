@@ -15,11 +15,7 @@ export default async function UploadPage() {
     <div>
       <h1 className="font-heading text-3xl font-bold mb-6">Upload Artwork</h1>
 
-      {freemiumStatus.isLocked ? (
-        <UpgradePrompt userId={user.id} freemiumStatus={freemiumStatus} />
-      ) : (
-        <ArtworkUploadForm userId={user.id} freemiumStatus={freemiumStatus} />
-      )}
+      <ArtworkUploadForm userId={user.id} freemiumStatus={freemiumStatus} />
     </div>
   );
 }

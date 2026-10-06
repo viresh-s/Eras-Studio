@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -13,6 +13,8 @@ import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
 import TextArea from '@/components/ui/TextArea';
 import type { FreemiumStatus } from '@/lib/freemium/check';
+import Modal from '@/components/ui/Modal';
+import UpgradePrompt from '@/components/features/creator/UpgradePrompt';
 
 const mediumOptions = [
   { value: 'Painting', label: 'Painting' },
@@ -67,6 +69,19 @@ export default function ArtworkUploadForm({ userId, freemiumStatus }: UploadForm
   const [error, setError] = useState<string | null>(null);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+
+  useEffect(() => {
+    if (freemiumStatus.isLocked) {
+      setShowUpgradeModal(true);
+      const timer = setTimeout(() => {
+        setShowUpgradeModal(false);
+      }, 5000);
+      return () => clearTimeout(timer);
+    } else {
+      setShowUpgradeModal(false);
+    }
+  }, [freemiumStatus.isLocked]);
 
   const {
     register,
@@ -173,9 +188,6 @@ export default function ArtworkUploadForm({ userId, freemiumStatus }: UploadForm
     }
   };
 
-  if (freemiumStatus.isLocked) {
-    return null;
-  }
 
   return (
     <div className="bg-white rounded-2xl shadow-[0_2px_20px_rgb(0,0,0,0.04)] p-8">
@@ -287,6 +299,7 @@ export default function ArtworkUploadForm({ userId, freemiumStatus }: UploadForm
             variant="coral"
             className="flex-1"
             onClick={() => setSubmitAction('publish')}
+            disabled={freemiumStatus.isLocked}
           >
             <Image size={16} />
             Publish Artwork
@@ -298,6 +311,7 @@ export default function ArtworkUploadForm({ userId, freemiumStatus }: UploadForm
             variant="secondary"
             className="flex-1"
             onClick={() => setSubmitAction('draft')}
+            disabled={freemiumStatus.isLocked}
           >
             <Save size={16} />
             Save Draft
@@ -308,6 +322,10 @@ export default function ArtworkUploadForm({ userId, freemiumStatus }: UploadForm
           </Button>
         </div>
       </form>
+      
+      <Modal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} title="Premium Required" size="md">
+        <UpgradePrompt userId={userId} freemiumStatus={freemiumStatus} />
+      </Modal>
     </div>
   );
 }

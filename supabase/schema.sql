@@ -235,3 +235,64 @@ CREATE POLICY "Admins can view all chats"
       WHERE id = auth.uid() AND role = 'Admin'
     )
   );
+
+-- =============================================
+-- 9. SAVED_ARTWORKS TABLE
+-- =============================================
+CREATE TABLE public.saved_artworks (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  artwork_id UUID NOT NULL REFERENCES public.artworks(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(user_id, artwork_id)
+);
+
+-- RLS for saved_artworks
+ALTER TABLE public.saved_artworks ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view their own saved artworks"
+  ON public.saved_artworks FOR SELECT
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can save artworks"
+  ON public.saved_artworks FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can unsave artworks"
+  ON public.saved_artworks FOR DELETE
+  USING (auth.uid() = user_id);
+
+CREATE INDEX idx_saved_artworks_user_id ON public.saved_artworks(user_id);
+
+-- =============================================
+-- 10. NOTIFICATIONS TABLE
+-- =============================================
+CREATE TABLE public.notifications (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  message TEXT NOT NULL,
+  type TEXT NOT NULL, -- e.g., 'UPGRADE', 'INTEREST_RAISED', 'INTEREST_ACCEPTED'
+  is_read BOOLEAN DEFAULT FALSE,
+  link TEXT, -- Optional link to redirect when clicked
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- RLS for notifications
+ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view their own notifications"
+  ON public.notifications FOR SELECT
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own notifications"
+  ON public.notifications FOR UPDATE
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "System can insert notifications"
+  ON public.notifications FOR INSERT
+  WITH CHECK (true); -- In a real app, you might restrict this to service role, but for Server Actions we allow it
+
+CREATE INDEX idx_notifications_user_id ON public.notifications(user_id);
+CREATE INDEX idx_notifications_created_at ON public.notifications(created_at);

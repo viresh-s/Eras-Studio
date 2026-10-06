@@ -3,9 +3,17 @@
 import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { z } from 'zod';
+
+const emailSchema = z.string().email('Invalid email address').max(255);
+const passwordSchema = z.string().min(6, 'Password must be at least 6 characters').max(100);
 
 export async function changeEmail(formData: FormData) {
-  const email = formData.get('email') as string;
+  const emailRaw = formData.get('email');
+  const parsed = emailSchema.safeParse(emailRaw);
+  if (!parsed.success) return { error: parsed.error.errors[0].message };
+  const email = parsed.data;
+
   const supabase = await createClient();
 
   const { error } = await supabase.auth.updateUser({ email });
@@ -17,7 +25,11 @@ export async function changeEmail(formData: FormData) {
 }
 
 export async function changePassword(formData: FormData) {
-  const password = formData.get('password') as string;
+  const passwordRaw = formData.get('password');
+  const parsed = passwordSchema.safeParse(passwordRaw);
+  if (!parsed.success) return { error: parsed.error.errors[0].message };
+  const password = parsed.data;
+
   const supabase = await createClient();
 
   const { error } = await supabase.auth.updateUser({ password });
@@ -29,7 +41,11 @@ export async function changePassword(formData: FormData) {
 }
 
 export async function deleteAccount(formData: FormData) {
-  const password = formData.get('password') as string;
+  const passwordRaw = formData.get('password');
+  const parsed = passwordSchema.safeParse(passwordRaw);
+  if (!parsed.success) return { error: parsed.error.errors[0].message };
+  const password = parsed.data;
+
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 

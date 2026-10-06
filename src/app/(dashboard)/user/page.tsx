@@ -48,7 +48,7 @@ export default async function UserDashboard() {
           </div>
         </div>
 
-        <Link href="/browse">
+        <Link href="/discovery">
           <div className="bg-white rounded-2xl p-5 shadow-[0_2px_20px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-shadow cursor-pointer">
             <div className="flex items-center gap-3">
               <div className="w-11 h-11 rounded-xl bg-pink-50 flex items-center justify-center">
@@ -99,7 +99,7 @@ export default async function UserDashboard() {
               <MessageCircle size={18} className="text-gray-400" />
             </div>
             <p className="text-gray-500 text-sm mb-4">No active conversations</p>
-            <Link href="/browse" className="inline-flex items-center px-5 py-2 bg-gray-900 text-white rounded-full text-sm font-semibold hover:bg-gray-800 transition-all">
+            <Link href="/discovery" className="inline-flex items-center px-5 py-2 bg-gray-900 text-white rounded-full text-sm font-semibold hover:bg-gray-800 transition-all">
               Browse Artworks
             </Link>
           </div>
@@ -110,7 +110,7 @@ export default async function UserDashboard() {
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-bold text-gray-900">Discover Artworks</h2>
-          <Link href="/browse" className="px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors">
+          <Link href="/discovery" className="px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors">
             View All
           </Link>
         </div>

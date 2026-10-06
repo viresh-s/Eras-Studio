@@ -12,23 +12,23 @@ export default function ProfileTabs({ artworks, profile }: ProfileTabsProps) {
   const [activeTab, setActiveTab] = useState('works');
 
   const tabs = [
-    { id: 'works', label: 'Creative Works' },
-    { id: 'collection', label: 'Collection' },
+    { id: 'works', label: 'Selected Works' },
+    { id: 'collection', label: 'Collections' },
     { id: 'about', label: 'About' },
   ];
 
   return (
     <div>
       {/* Tab Headers */}
-      <div className="flex items-center gap-2 mb-8">
+      <div className="flex items-center gap-2 mb-10 border-b border-transparent">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`px-5 py-2 text-sm font-semibold rounded-full transition-colors ${
+            className={`px-6 py-2.5 text-xs font-semibold rounded-full transition-colors ${
               activeTab === tab.id
-                ? 'bg-gray-900 text-white'
-                : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-50'
+                ? 'bg-[#1A1A1A] text-white'
+                : 'bg-transparent text-gray-500 hover:text-gray-900'
             }`}
           >
             {tab.label}

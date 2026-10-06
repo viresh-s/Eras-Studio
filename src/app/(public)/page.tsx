@@ -30,7 +30,7 @@ export default function HomePage() {
               </p>
               <div className="flex flex-wrap gap-4">
                 <Link
-                  href="/browse"
+                  href="/discovery"
                   className="inline-flex items-center gap-2 px-8 py-4 bg-gray-900 text-white rounded-full text-base font-semibold hover:bg-gray-800 transition-all hover:scale-[1.02] active:scale-[0.98]"
                 >
                   Browse Artworks
@@ -210,7 +210,7 @@ export default function HomePage() {
               <ArrowRight size={20} />
             </Link>
             <Link
-              href="/browse"
+              href="/discovery"
               className="inline-flex items-center gap-2 px-10 py-5 border border-white/20 text-white rounded-full text-lg font-bold hover:bg-white/10 transition-all hover:scale-[1.02] active:scale-[0.98]"
             >
               Explore Gallery

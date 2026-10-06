@@ -34,7 +34,7 @@ const creatorLinks = [
 
 const userLinks = [
   { href: '/user', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/browse', label: 'Browse Art', icon: Search },
+  { href: '/discovery', label: 'Browse Art', icon: Search },
   { href: '/messages', label: 'Messages', icon: MessageCircle },
   { href: '/user/profile', label: 'Profile', icon: UserCircle },
 ];

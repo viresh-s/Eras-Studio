@@ -1,6 +1,6 @@
 export type UserRole = 'Admin' | 'User' | 'Creator';
 export type ArtworkStatus = 'Available' | 'For Sale' | 'Not for sale' | 'Sold';
-export type ChatStatus = 'Active' | 'Closed';
+export type ChatStatus = 'Pending' | 'Active' | 'Closed';
 
 export interface Profile {
   id: string;

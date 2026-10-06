@@ -2,6 +2,22 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
+import { z } from 'zod';
+
+const loginSchema = z.object({
+  email: z.string().email('Invalid email address').max(255),
+  password: z.string().min(1, 'Password is required').max(100)
+});
+
+const signupSchema = z.object({
+  email: z.string().email('Invalid email address').max(255),
+  password: z.string().min(6, 'Password must be at least 6 characters').max(100),
+  fullName: z.string().min(1, 'Full name is required').max(100),
+  phoneNumber: z.string().max(20).optional(),
+  role: z.enum(['Creator', 'Collector', 'User']).default('User')
+});
+
+const emailSchema = z.string().email('Invalid email address').max(255);
 
 export interface AuthResult {
   error?: string;
@@ -10,10 +26,17 @@ export interface AuthResult {
 }
 
 export async function login(formData: FormData): Promise<AuthResult> {
-  const supabase = await createClient();
+  const parsed = loginSchema.safeParse({
+    email: formData.get('email'),
+    password: formData.get('password')
+  });
 
-  const email = formData.get('email') as string;
-  const password = formData.get('password') as string;
+  if (!parsed.success) {
+    return { error: `Validation Error: ${parsed.error.errors[0].message}` };
+  }
+  const { email, password } = parsed.data;
+
+  const supabase = await createClient();
 
   const { error } = await supabase.auth.signInWithPassword({
     email,
@@ -60,13 +83,20 @@ export async function login(formData: FormData): Promise<AuthResult> {
 }
 
 export async function signup(formData: FormData): Promise<AuthResult> {
-  const supabase = await createClient();
+  const parsed = signupSchema.safeParse({
+    email: formData.get('email'),
+    password: formData.get('password'),
+    fullName: formData.get('fullName'),
+    phoneNumber: formData.get('phoneNumber') || undefined,
+    role: formData.get('role')
+  });
 
-  const email = formData.get('email') as string;
-  const password = formData.get('password') as string;
-  const fullName = formData.get('fullName') as string;
-  const phoneNumber = formData.get('phoneNumber') as string;
-  const role = formData.get('role') as string;
+  if (!parsed.success) {
+    return { error: `Validation Error: ${parsed.error.errors[0].message}` };
+  }
+  const { email, password, fullName, phoneNumber, role } = parsed.data;
+
+  const supabase = await createClient();
 
   const { data: authData, error } = await supabase.auth.signUp({
     email,
@@ -115,7 +145,11 @@ export async function logout(): Promise<void> {
   redirect('/');
 }
 
-export async function resendVerificationEmail(email: string): Promise<{ error?: string, success?: boolean }> {
+export async function resendVerificationEmail(emailRaw: string): Promise<{ error?: string, success?: boolean }> {
+  const parsed = emailSchema.safeParse(emailRaw);
+  if (!parsed.success) return { error: parsed.error.errors[0].message };
+  const email = parsed.data;
+
   const supabase = await createClient();
   const { error } = await supabase.auth.resend({
     type: 'signup',

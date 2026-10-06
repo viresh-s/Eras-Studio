@@ -1,9 +1,11 @@
 import { createClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
-import Badge from '@/components/ui/Badge';
 import Link from 'next/link';
-import { ArrowLeft, ExternalLink, User } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import ExpressInterestButton from '@/components/features/artwork/ExpressInterestButton';
+import SaveArtworkButton from '@/components/features/artwork/SaveArtworkButton';
+import ArtworkImageGallery from '@/components/features/artwork/ArtworkImageGallery';
+import ExpandableDescription from '@/components/features/artwork/ExpandableDescription';
 
 interface ArtworkPageProps {
   params: Promise<{ id: string }>;
@@ -36,122 +38,149 @@ export default async function ArtworkPage({ params }: ArtworkPageProps) {
   const isOwner = user?.id === artwork.creator_id;
   const canExpress = user && userRole === 'User' && !isOwner;
 
+  let existingChat = null;
+  let isSaved = false;
+  if (canExpress && user) {
+    const { data: chatData } = await supabase
+      .from('inquiries_chats')
+      .select('id, status')
+      .eq('artwork_id', id)
+      .eq('guest_id', user.id)
+      .maybeSingle();
+    
+    existingChat = chatData;
+
+    // Check if artwork is saved (ignore errors if table missing)
+    const { data: savedData } = await supabase
+      .from('saved_artworks')
+      .select('id')
+      .eq('artwork_id', id)
+      .eq('user_id', user.id)
+      .maybeSingle();
+      
+    isSaved = !!savedData;
+  }
+
+  const creator = artwork.profiles as any;
+
   return (
-    <div className="min-h-screen bg-white">
-      {/* Top Bar */}
-      <div className="bg-white border-b border-gray-100 px-6 py-4">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <Link href="/browse" className="flex items-center gap-2 text-sm font-semibold text-gray-600 hover:text-gray-900 transition-colors">
-            <ArrowLeft size={16} />
-            Back to Gallery
-          </Link>
-          <Link href="/" className="text-lg font-extrabold tracking-tight text-gray-900">
-            Eras Studio
+    <div className="min-h-screen bg-[#FAFAFA]">
+      <div className="max-w-[1400px] mx-auto px-6 py-12 lg:py-16">
+        
+        {/* Back Button */}
+        <div className="mb-10">
+          <Link 
+            href="/discovery" 
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 rounded-full text-xs font-bold text-gray-900 hover:bg-gray-50 transition-colors shadow-sm"
+          >
+            <ArrowLeft size={14} />
+            Back to discovery
           </Link>
         </div>
-      </div>
 
-      <div className="max-w-6xl mx-auto px-6 py-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-          {/* Image */}
-          <div className="bg-white rounded-2xl overflow-hidden shadow-[0_2px_20px_rgb(0,0,0,0.04)]">
-            <div className="aspect-square bg-gray-50 overflow-hidden">
-              <img
-                src={artwork.image_url}
-                alt={artwork.title}
-                className="w-full h-full object-contain"
-              />
-            </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
+          
+          {/* Left: Artwork Image Container */}
+          <div className="w-full">
+            <ArtworkImageGallery 
+              primaryImage={artwork.image_url} 
+              additionalImages={artwork.additional_images} 
+              altText={artwork.title} 
+            />
           </div>
 
-          {/* Details */}
-          <div className="space-y-6">
-            <div>
-              <Badge variant="green" className="mb-3">{artwork.art_type}</Badge>
-              <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-gray-900 mb-2">{artwork.title}</h1>
-              <p className="text-gray-500 text-lg">by {artwork.artist_name}</p>
-            </div>
-
-            {artwork.price && (
-              <div className="bg-gray-50 rounded-2xl p-5 inline-block">
-                <p className="text-3xl font-extrabold text-gray-900">${artwork.price}</p>
-              </div>
-            )}
-
-            <div className="flex items-center gap-2">
-              <Badge variant={artwork.status === 'Available' ? 'green' : 'red'}>
-                {artwork.status}
-              </Badge>
-            </div>
-
-            {artwork.description && (
-              <div className="bg-white rounded-2xl shadow-[0_2px_20px_rgb(0,0,0,0.04)] p-6">
-                <h3 className="font-bold text-gray-900 mb-2">Description</h3>
-                <p className="text-gray-500 leading-relaxed text-sm">{artwork.description}</p>
-              </div>
-            )}
-
-            {artwork.external_link && (
-              <a
-                href={artwork.external_link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-gray-300 text-gray-700 text-sm font-semibold hover:bg-gray-50 transition-colors"
-              >
-                <ExternalLink size={16} />
-                View Related Link
-              </a>
-            )}
-
-            {/* Creator Info */}
-            <div className="bg-white rounded-2xl shadow-[0_2px_20px_rgb(0,0,0,0.04)] p-6">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-rose-400 to-orange-300 flex items-center justify-center overflow-hidden shadow-sm">
-                  {(artwork.profiles as Record<string, string>)?.profile_pic_url ? (
-                    <img
-                      src={(artwork.profiles as Record<string, string>).profile_pic_url}
-                      alt=""
-                      className="w-full h-full object-cover"
-                    />
+          {/* Right: Details */}
+          <div className="pt-4 lg:pt-8 w-full max-w-2xl mx-auto">
+            
+            {/* Header info */}
+            <div className="mb-8">
+              <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-widest mb-3">
+                {artwork.art_type} | {artwork.year || '2023'}
+              </p>
+              <h1 className="text-5xl lg:text-6xl text-gray-900 mb-6 tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>
+                {artwork.title}
+              </h1>
+              
+              <Link href={`/artist/${artwork.creator_id}`} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-gray-100 transition-colors -ml-3">
+                <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-[10px] font-bold text-gray-600 overflow-hidden">
+                  {creator?.profile_pic_url ? (
+                    <img src={creator.profile_pic_url} alt="" className="w-full h-full object-cover" />
                   ) : (
-                    <User size={22} className="text-white" />
+                    creator?.full_name?.substring(0, 2).toUpperCase() || '?'
                   )}
                 </div>
-                <div>
-                  <p className="font-bold text-gray-900">
-                    {(artwork.profiles as Record<string, string>)?.full_name}
-                  </p>
-                  {(artwork.profiles as Record<string, string>)?.portfolio_url && (
-                    <a
-                      href={(artwork.profiles as Record<string, string>).portfolio_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-accent-coral text-sm font-medium hover:underline"
-                    >
-                      View Portfolio →
-                    </a>
-                  )}
-                </div>
-              </div>
+                <span className="text-sm font-semibold text-gray-900">{creator?.full_name}</span>
+                <span className="text-gray-400 text-xs ml-1">↗</span>
+              </Link>
             </div>
 
-            {/* Express Interest */}
-            {canExpress && (
-              <ExpressInterestButton
-                artworkId={artwork.id}
-                creatorId={artwork.creator_id}
-                userId={user.id}
-              />
-            )}
+            {/* Expandable Description */}
+            <ExpandableDescription text={artwork.description || ''} />
 
-            {!user && (
-              <Link
-                href="/login"
-                className="block w-full text-center px-6 py-3.5 bg-gray-900 text-white rounded-full font-semibold hover:bg-gray-800 transition-all hover:scale-[1.02]"
-              >
-                Sign In to Express Interest
-              </Link>
-            )}
+            {/* Metadata Table */}
+            <div className="border-t border-gray-200/60 mb-12">
+              {[
+                { label: 'Medium', value: artwork.style || artwork.art_type },
+                { label: 'Dimensions', value: artwork.dimensions || 'Contact for details' },
+                { label: 'Year', value: artwork.year },
+                { label: 'Location', value: artwork.location || 'Not specified' },
+                { label: 'Collection', value: artwork.collection || artwork.title },
+                { label: 'Availability', value: artwork.status },
+              ].map((item, idx) => (
+                <div key={idx} className="flex py-3.5 border-b border-gray-200/60 text-[13px]">
+                  <div className="w-1/3 text-gray-500">{item.label}</div>
+                  <div className="w-2/3 text-gray-900 font-medium">{item.value}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Price & Actions */}
+            <div>
+              <p className="text-lg font-bold text-gray-900 mb-5">
+                {artwork.price_visibility === 'Hidden' ? 'Price on request' : (artwork.price ? `$${artwork.price.toLocaleString()}` : 'Price on request')}
+              </p>
+              
+              <div className="flex flex-wrap items-center gap-3 mb-6">
+                {canExpress ? (
+                  <div className="w-auto">
+                    <ExpressInterestButton
+                      artworkId={artwork.id}
+                      creatorId={artwork.creator_id}
+                      userId={user.id}
+                      initialChatId={existingChat?.id}
+                      initialStatus={existingChat?.status}
+                    />
+                  </div>
+                ) : !user ? (
+                  <Link
+                    href="/login"
+                    className="px-6 py-3 bg-gray-900 text-white rounded-full text-sm font-semibold hover:bg-gray-800 transition-colors"
+                  >
+                    Sign in to Express Interest →
+                  </Link>
+                ) : null}
+
+                <Link 
+                  href={`/artist/${artwork.creator_id}`}
+                  className="px-6 py-3 bg-white border border-gray-200 text-gray-900 rounded-full text-sm font-semibold hover:bg-gray-50 transition-colors shadow-sm"
+                >
+                  View Creator
+                </Link>
+                
+                {user && !isOwner && (
+                  <SaveArtworkButton 
+                    artworkId={artwork.id} 
+                    initialIsSaved={isSaved} 
+                    userId={user.id} 
+                  />
+                )}
+              </div>
+
+              <p className="text-[11px] text-gray-500 leading-relaxed max-w-sm">
+                A direct connection, not a checkout. Pricing and any expenses are discussed privately with the creator.
+              </p>
+            </div>
+
           </div>
         </div>
       </div>
