@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { LogIn, Mail, Lock } from 'lucide-react';
+import { LogIn, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { login } from '@/actions/authActions';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
@@ -21,6 +21,7 @@ type LoginForm = z.infer<typeof loginSchema>;
 export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -80,12 +81,19 @@ export default function LoginPage() {
           <div className="relative">
             <Input
               label="Password"
-              type="password"
+              type={showPassword ? "text" : "password"}
               placeholder="••••••••"
               error={errors.password?.message}
               {...register('password')}
             />
-            <Lock className="absolute right-3 top-9 text-gray-400" size={16} />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-9 text-gray-400 hover:text-gray-600 transition-colors"
+              tabIndex={-1}
+            >
+              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
           </div>
 
           <Button type="submit" fullWidth isLoading={isLoading}>

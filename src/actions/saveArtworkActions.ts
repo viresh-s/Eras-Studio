@@ -35,5 +35,5 @@ export async function toggleSaveArtwork(artworkId: string, isSaved: boolean) {
   }
 
   revalidatePath(`/artwork/${artworkId}`);
-  revalidatePath('/saved');
+  revalidatePath('/purchases');
 }

@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { MessageCircle, Check, Clock, Send } from 'lucide-react';
-import { acceptChatRequest, sendMessage } from '@/actions/chatActions';
+import { acceptChatRequest, sendMessage, rejectChatRequest } from '@/actions/chatActions';
 import { createClient } from '@/lib/supabase/client';
 import Button from '@/components/ui/Button';
 
@@ -22,7 +22,13 @@ export default function ChatListClient({ initialChats, currentUserId }: ChatList
   const [loadingIds, setLoadingIds] = useState<Record<string, boolean>>({});
   const [selectedChatId, setSelectedChatId] = useState<string | null>(initialChatId || null);
 
-  const pendingChats = chats.filter((c) => c.status === 'Pending');
+  const pendingChats = chats.filter((c) => {
+    if (c.status !== 'Pending') return false;
+    const createdAt = new Date(c.created_at);
+    const now = new Date();
+    const diffDays = Math.ceil(Math.abs(now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24));
+    return diffDays <= 5;
+  });
   const activeChats = chats.filter((c) => c.status === 'Active');
 
   // Handle active tab change
@@ -41,6 +47,20 @@ export default function ChatListClient({ initialChats, currentUserId }: ChatList
         prev.map((c) => (c.id === chatId ? { ...c, status: 'Active' } : c))
       );
       // Optional: switch to Messages tab after accept
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingIds((prev) => ({ ...prev, [chatId]: false }));
+    }
+  };
+
+  const handleReject = async (chatId: string) => {
+    setLoadingIds((prev) => ({ ...prev, [chatId]: true }));
+    try {
+      await rejectChatRequest(chatId);
+      setChats((prev) =>
+        prev.map((c) => (c.id === chatId ? { ...c, status: 'Rejected' } : c))
+      );
     } catch (err) {
       console.error(err);
     } finally {
@@ -116,9 +136,18 @@ export default function ChatListClient({ initialChats, currentUserId }: ChatList
                           {isGuest ? (
                             <p className="text-xs font-medium text-gray-400">Waiting for creator response.</p>
                           ) : (
-                            <Button onClick={() => handleAccept(chat.id)} isLoading={loadingIds[chat.id]} size="sm">
-                              Accept Request
-                            </Button>
+                            <div className="flex gap-2">
+                              <Button onClick={() => handleAccept(chat.id)} isLoading={loadingIds[chat.id]} size="sm">
+                                Accept Request
+                              </Button>
+                              <button 
+                                onClick={() => handleReject(chat.id)} 
+                                disabled={loadingIds[chat.id]} 
+                                className="px-4 py-2 text-sm font-semibold text-gray-500 hover:text-red-600 transition-colors disabled:opacity-50"
+                              >
+                                Reject
+                              </button>
+                            </div>
                           )}
                         </div>
                       </div>
@@ -209,9 +238,7 @@ function ActiveChatPane({ chatId, userId, chatDetails }: { chatId: string, userI
   const [isSending, setIsSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
-  const isGuest = chatDetails.guest_id === userId;
-  const otherPerson = isGuest ? chatDetails.creator : chatDetails.guest;
-  const artwork = chatDetails.artworks;
+
 
   useEffect(() => {
     const supabase = createClient();
@@ -255,6 +282,12 @@ function ActiveChatPane({ chatId, userId, chatDetails }: { chatId: string, userI
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
   };
+
+  if (!chatDetails) return null;
+
+  const isGuest = chatDetails.guest_id === userId;
+  const otherPerson = isGuest ? chatDetails.creator : chatDetails.guest;
+  const artwork = chatDetails.artworks;
 
   return (
     <>

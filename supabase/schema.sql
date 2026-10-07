@@ -101,7 +101,7 @@ CREATE TABLE public.inquiries_chats (
   artwork_id UUID NOT NULL REFERENCES public.artworks(id) ON DELETE CASCADE,
   guest_id UUID NOT NULL REFERENCES public.profiles(id),
   creator_id UUID NOT NULL REFERENCES public.profiles(id),
-  status TEXT NOT NULL DEFAULT 'Active' CHECK (status IN ('Active', 'Closed')),
+  status TEXT NOT NULL DEFAULT 'Pending' CHECK (status IN ('Pending', 'Active', 'Rejected', 'Closed', 'Expired')),
   created_at TIMESTAMPTZ DEFAULT NOW(),
   UNIQUE(artwork_id, guest_id)
 );
@@ -274,6 +274,7 @@ CREATE TABLE public.notifications (
   message TEXT NOT NULL,
   type TEXT NOT NULL, -- e.g., 'UPGRADE', 'INTEREST_RAISED', 'INTEREST_ACCEPTED'
   is_read BOOLEAN DEFAULT FALSE,
+  read_at TIMESTAMPTZ,
   link TEXT, -- Optional link to redirect when clicked
   created_at TIMESTAMPTZ DEFAULT NOW()
 );

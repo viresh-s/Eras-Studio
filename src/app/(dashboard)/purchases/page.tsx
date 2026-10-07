@@ -29,6 +29,21 @@ export default async function PurchasesPage() {
     .eq('guest_id', user.id)
     .order('created_at', { ascending: false });
 
+  // Fetch saved artworks
+  const { data: savedItems } = await supabase
+    .from('saved_artworks')
+    .select(`
+      artwork_id,
+      artworks (
+        *,
+        profiles!artworks_creator_id_fkey (full_name)
+      )
+    `)
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false });
+
+  const savedArtworks = savedItems?.map(item => item.artworks).filter(Boolean) || [];
+
   // Format data for the client
   const formattedAcquisitions = (inquiries || []).map(inq => {
     const artwork = inq.artworks as any;
@@ -48,7 +63,10 @@ export default async function PurchasesPage() {
 
   return (
     <div>
-      <PurchasesClient initialAcquisitions={formattedAcquisitions} />
+      <PurchasesClient 
+        initialAcquisitions={formattedAcquisitions} 
+        savedArtworks={savedArtworks} 
+      />
     </div>
   );
 }

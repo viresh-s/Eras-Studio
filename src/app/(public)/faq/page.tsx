@@ -13,7 +13,7 @@ const faqs = [
       },
       {
         q: 'Is Eras Studio free to use?',
-        a: 'Yes! Collectors can browse and interact with creators completely free. Creators get a free trial with 3 artwork uploads and a 10-day access period. After that, creators can upgrade to Premium for unlimited uploads and additional features.',
+        a: 'Yes! Collectors can browse and interact with creators completely free. Creators get a free tier with 3 artwork uploads. After that, creators can upgrade to Premium for unlimited uploads and additional features.',
       },
       {
         q: 'How does the buying process work?',
@@ -30,7 +30,7 @@ const faqs = [
       },
       {
         q: 'What happens when my free trial ends?',
-        a: 'After your 10-day trial or 3 free uploads (whichever comes first), you\'ll need to upgrade to Premium to continue uploading new artworks. Your existing artworks will remain visible.',
+        a: 'After your 3 free uploads, you\'ll need to upgrade to Premium to continue uploading new artworks. Your existing artworks will always remain visible.',
       },
       {
         q: 'What types of art can I sell?',

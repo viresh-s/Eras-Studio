@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import Badge from '@/components/ui/Badge';
 import Link from 'next/link';
-import { Search, Filter, ArrowRight, Heart } from 'lucide-react';
+import { Search, Filter, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const artTypeOptions = [
@@ -52,18 +52,29 @@ export default function BrowsePage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [artTypeFilter, setArtTypeFilter] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const ITEMS_PER_PAGE = 12;
 
+  // Reset page when filters change
   useEffect(() => {
-    fetchArtworks();
+    setPage(1);
+    setArtworks([]);
+    setHasMore(true);
   }, [searchQuery, artTypeFilter]);
 
-  const fetchArtworks = async () => {
+  // Fetch when page changes or filters reset
+  useEffect(() => {
+    fetchArtworks(page === 1);
+  }, [page, searchQuery, artTypeFilter]);
+
+  const fetchArtworks = async (isReset = false) => {
     setIsLoading(true);
     const supabase = createClient();
 
     let query = supabase
       .from('artworks')
-      .select('id, title, art_type, artist_name, image_url, price, status, year, profiles(full_name)')
+      .select('id, title, art_type, artist_name, image_url, price, status, year, profiles(full_name)', { count: 'exact' })
       .eq('status', 'Available')
       .order('created_at', { ascending: false });
 
@@ -75,8 +86,32 @@ export default function BrowsePage() {
       query = query.eq('art_type', artTypeFilter);
     }
 
-    const { data } = await query;
-    setArtworks((data as unknown as ArtworkItem[]) || []);
+    // Apply pagination range
+    const from = (page - 1) * ITEMS_PER_PAGE;
+    const to = from + ITEMS_PER_PAGE - 1;
+    query = query.range(from, to);
+
+    const { data, count } = await query;
+    
+    if (data) {
+      if (isReset) {
+        setArtworks(data as unknown as ArtworkItem[]);
+      } else {
+        setArtworks(prev => {
+          // Prevent duplicates on double-fetch during strict mode
+          const newArtworks = data as unknown as ArtworkItem[];
+          const existingIds = new Set(prev.map(a => a.id));
+          const uniqueNewArtworks = newArtworks.filter(a => !existingIds.has(a.id));
+          return [...prev, ...uniqueNewArtworks];
+        });
+      }
+      
+      if (count !== null) {
+        setHasMore(from + data.length < count);
+      } else {
+        setHasMore(data.length === ITEMS_PER_PAGE);
+      }
+    }
     setIsLoading(false);
   };
 
@@ -239,7 +274,7 @@ export default function BrowsePage() {
         </div>
 
         {/* Results */}
-        {isLoading ? (
+        {isLoading && artworks.length === 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {[...Array(8)].map((_, i) => (
                <div key={i} className="bg-white rounded-xl border border-gray-200 animate-pulse overflow-hidden">
@@ -252,12 +287,13 @@ export default function BrowsePage() {
             ))}
           </div>
         ) : artworks.length > 0 ? (
-          <motion.div 
-            variants={containerVariants}
-            initial="hidden"
-            animate="show"
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-          >
+          <>
+            <motion.div 
+              variants={containerVariants}
+              initial="hidden"
+              animate="show"
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+            >
             {artworks.map((artwork) => (
               <motion.div key={artwork.id} variants={itemVariants} className="h-full">
                 <Link href={`/artwork/${artwork.id}`} className="group block h-full">
@@ -268,17 +304,6 @@ export default function BrowsePage() {
                         alt={artwork.title}
                         className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
                       />
-                      {/* Heart button */}
-                      <button
-                        className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-gray-500 hover:text-red-500 transition-colors z-10"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                        }}
-                      >
-                        <Heart size={14} />
-                      </button>
-                      
                       {/* Status tag */}
                       <div className="absolute bottom-3 left-3 z-10">
                         <span className="inline-block px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded bg-white text-gray-900 shadow-sm">
@@ -312,7 +337,20 @@ export default function BrowsePage() {
                 </Link>
               </motion.div>
             ))}
-          </motion.div>
+            </motion.div>
+
+            {hasMore && (
+              <div className="mt-12 flex justify-center">
+                <button
+                  onClick={() => setPage(p => p + 1)}
+                  disabled={isLoading}
+                  className="px-8 py-3 bg-white border border-gray-200 text-gray-900 rounded-full font-semibold hover:bg-gray-50 transition-colors shadow-sm disabled:opacity-50"
+                >
+                  {isLoading ? 'Loading...' : 'Load More'}
+                </button>
+              </div>
+            )}
+          </>
         ) : (
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}

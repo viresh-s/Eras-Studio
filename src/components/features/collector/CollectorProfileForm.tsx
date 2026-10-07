@@ -172,13 +172,6 @@ export default function CollectorProfileForm({ profile, email }: CollectorProfil
           </button>
 
           <Link
-            href="/saved"
-            className="px-6 py-2.5 bg-white border border-gray-200 text-gray-900 rounded-full text-xs font-semibold hover:bg-gray-50 transition-colors shadow-sm"
-          >
-            Saved Artworks
-          </Link>
-
-          <Link
             href="/messages"
             className="px-6 py-2.5 bg-white border border-gray-200 text-gray-900 rounded-full text-xs font-semibold hover:bg-gray-50 transition-colors shadow-sm"
           >
@@ -189,7 +182,7 @@ export default function CollectorProfileForm({ profile, email }: CollectorProfil
             href="/purchases"
             className="px-6 py-2.5 bg-white border border-gray-200 text-gray-900 rounded-full text-xs font-semibold hover:bg-gray-50 transition-colors shadow-sm"
           >
-            Purchase History
+            Collection & Purchases
           </Link>
         </div>
       </form>

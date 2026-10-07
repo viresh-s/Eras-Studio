@@ -23,7 +23,6 @@ const userNavLinks = [
   { href: '/discovery', label: 'Discovery' },
   { href: '/messages', label: 'Messages' },
   { href: '/purchases', label: 'Purchases' },
-  { href: '/saved', label: 'Saved' },
   { href: '/user/profile', label: 'Profile' },
 ];
 

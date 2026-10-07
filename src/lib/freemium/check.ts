@@ -46,42 +46,13 @@ export async function checkFreemiumStatus(userId: string): Promise<FreemiumStatu
     .eq('creator_id', userId);
 
   const artworksUsed = count || 0;
-
-  // Check time since creation
-  const createdAt = new Date(profile.created_at);
-  const now = new Date();
-  const daysSinceCreation = Math.floor((now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24));
-  const daysRemaining = Math.max(0, 10 - daysSinceCreation);
-
-  // Lock if either condition is met
-  const isTimeLocked = daysSinceCreation >= 10;
   const isArtworkLocked = artworksUsed >= 3;
-
-  if (isTimeLocked && isArtworkLocked) {
-    return {
-      isLocked: true,
-      reason: 'Your free trial has ended and you\'ve used all 3 free uploads. Upgrade to Premium to continue.',
-      daysRemaining: 0,
-      artworksUsed,
-      artworksLimit: 3,
-    };
-  }
-
-  if (isTimeLocked) {
-    return {
-      isLocked: true,
-      reason: 'Your 10-day free trial has ended. Upgrade to Premium to continue uploading.',
-      daysRemaining: 0,
-      artworksUsed,
-      artworksLimit: 3,
-    };
-  }
 
   if (isArtworkLocked) {
     return {
       isLocked: true,
       reason: 'You\'ve used all 3 free uploads. Upgrade to Premium for unlimited uploads.',
-      daysRemaining,
+      daysRemaining: -1,
       artworksUsed,
       artworksLimit: 3,
     };
@@ -90,7 +61,7 @@ export async function checkFreemiumStatus(userId: string): Promise<FreemiumStatu
   return {
     isLocked: false,
     reason: '',
-    daysRemaining,
+    daysRemaining: -1,
     artworksUsed,
     artworksLimit: 3,
   };

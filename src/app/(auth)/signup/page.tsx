@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { UserPlus, Mail, Lock, User, Phone, Palette, ShoppingBag } from 'lucide-react';
+import { UserPlus, Mail, Lock, User, Phone, Palette, ShoppingBag, Eye, EyeOff } from 'lucide-react';
 import { signup } from '@/actions/authActions';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
@@ -27,6 +27,8 @@ type SignupForm = z.infer<typeof signupSchema>;
 export default function SignupPage() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const {
     register,
@@ -147,23 +149,37 @@ export default function SignupPage() {
           <div className="relative">
             <Input
               label="Password"
-              type="password"
+              type={showPassword ? "text" : "password"}
               placeholder="••••••••"
               error={errors.password?.message}
               {...register('password')}
             />
-            <Lock className="absolute right-3 top-9 text-gray-400" size={16} />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-9 text-gray-400 hover:text-gray-600 transition-colors"
+              tabIndex={-1}
+            >
+              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
           </div>
 
           <div className="relative">
             <Input
               label="Confirm Password"
-              type="password"
+              type={showConfirmPassword ? "text" : "password"}
               placeholder="••••••••"
               error={errors.confirmPassword?.message}
               {...register('confirmPassword')}
             />
-            <Lock className="absolute right-3 top-9 text-gray-400" size={16} />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              className="absolute right-3 top-9 text-gray-400 hover:text-gray-600 transition-colors"
+              tabIndex={-1}
+            >
+              {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
           </div>
 
           <Button

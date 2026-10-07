@@ -33,7 +33,6 @@ export default function ServicesPage() {
               <ul className="space-y-3 mb-6">
                 {[
                   'Up to 3 artwork uploads',
-                  '10-day full access trial',
                   '1-1 messaging with collectors',
                   'Basic profile page',
                   'Browse and discover art',

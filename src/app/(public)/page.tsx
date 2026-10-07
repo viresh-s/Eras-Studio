@@ -162,7 +162,7 @@ export default function HomePage() {
                   </div>
                   <div className="pt-1">
                     <h4 className="text-lg font-extrabold text-gray-900 mb-2">Free to Start</h4>
-                    <p className="text-gray-500 leading-relaxed">Creators get 3 free uploads and a 10-day trial</p>
+                    <p className="text-gray-500 leading-relaxed">Creators get 3 free uploads to test the platform.</p>
                   </div>
                 </div>
               </div>

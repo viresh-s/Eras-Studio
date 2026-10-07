@@ -43,7 +43,7 @@ export default async function ArtworkPage({ params }: ArtworkPageProps) {
   if (canExpress && user) {
     const { data: chatData } = await supabase
       .from('inquiries_chats')
-      .select('id, status')
+      .select('id, status, created_at')
       .eq('artwork_id', id)
       .eq('guest_id', user.id)
       .maybeSingle();
@@ -149,6 +149,7 @@ export default async function ArtworkPage({ params }: ArtworkPageProps) {
                       userId={user.id}
                       initialChatId={existingChat?.id}
                       initialStatus={existingChat?.status}
+                      initialCreatedAt={existingChat?.created_at}
                     />
                   </div>
                 ) : !user ? (

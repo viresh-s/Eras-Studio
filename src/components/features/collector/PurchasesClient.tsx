@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Layers, ChevronDown } from 'lucide-react';
+import { Layers, ChevronDown, Bookmark, Eye } from 'lucide-react';
+import ArtworkGridCard from '@/components/features/creator/ArtworkGridCard';
 
 const PROGRESS_STAGES = [
   'Interest Raised',
@@ -24,8 +25,14 @@ type Acquisition = {
   dbStatus?: string;
 };
 
-export default function PurchasesClient({ initialAcquisitions }: { initialAcquisitions: Acquisition[] }) {
-  const [activeTab, setActiveTab] = useState<'Active' | 'Completed' | 'Interested'>('Active');
+export default function PurchasesClient({ 
+  initialAcquisitions, 
+  savedArtworks 
+}: { 
+  initialAcquisitions: Acquisition[], 
+  savedArtworks: any[] 
+}) {
+  const [activeTab, setActiveTab] = useState<'Active' | 'Completed' | 'Interested' | 'Saved'>('Active');
   
   // Local state to simulate status changes
   const [statuses, setStatuses] = useState<Record<string, string>>(
@@ -80,7 +87,7 @@ export default function PurchasesClient({ initialAcquisitions }: { initialAcquis
 
       {/* Tabs */}
       <div className="flex items-center gap-2 mb-8">
-        {(['Active', 'Completed', 'Interested'] as const).map(tab => (
+        {(['Active', 'Completed', 'Interested', 'Saved'] as const).map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -224,6 +231,35 @@ export default function PurchasesClient({ initialAcquisitions }: { initialAcquis
                   </Link>
                 </div>
               ))}
+            </div>
+          )
+        )}
+
+        {activeTab === 'Saved' && (
+          savedArtworks.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-6">
+              {savedArtworks.map((artwork: any) => (
+                <ArtworkGridCard 
+                  key={artwork.id} 
+                  artwork={artwork} 
+                  creatorName={artwork.profiles?.full_name} 
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="bg-white rounded-xl border border-gray-200 p-16 text-center max-w-2xl mx-auto mt-6">
+              <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+                <Bookmark size={24} className="text-gray-400" />
+              </div>
+              <p className="font-bold text-gray-900 text-lg mb-2">No saved artworks</p>
+              <p className="text-gray-500 text-sm mb-6">Explore the gallery and save artworks you love to find them here later.</p>
+              <Link
+                href="/discovery"
+                className="inline-flex items-center gap-2 px-6 py-2.5 bg-gray-900 text-white rounded-full text-sm font-semibold hover:bg-gray-800 transition-all shadow-sm"
+              >
+                <Eye size={16} />
+                Explore Gallery
+              </Link>
             </div>
           )
         )}

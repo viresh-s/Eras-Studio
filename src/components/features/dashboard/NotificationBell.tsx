@@ -10,6 +10,7 @@ export default function NotificationBell() {
   const [notifications, setNotifications] = useState<any[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
+  const [currentTime, setCurrentTime] = useState(Date.now());
   const dropdownRef = useRef<HTMLDivElement>(null);
   const supabase = createClient();
 
@@ -33,8 +34,11 @@ export default function NotificationBell() {
       )
       .subscribe();
 
+    const timer = setInterval(() => setCurrentTime(Date.now()), 60000);
+
     return () => {
       supabase.removeChannel(channel);
+      clearInterval(timer);
     };
   }, []);
 
@@ -84,14 +88,16 @@ export default function NotificationBell() {
   const markAsRead = async (id: string) => {
     if (id === 'UPGRADE-PERSISTENT') return; // Cannot be marked as read until they actually upgrade
 
+    const nowIso = new Date().toISOString();
+
     setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, is_read: true } : n))
+      prev.map((n) => (n.id === id ? { ...n, is_read: true, read_at: nowIso } : n))
     );
     setUnreadCount((prev) => Math.max(0, prev - 1));
 
     await supabase
       .from('notifications')
-      .update({ is_read: true })
+      .update({ is_read: true, read_at: nowIso })
       .eq('id', id);
   };
 
@@ -99,8 +105,10 @@ export default function NotificationBell() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
+    const nowIso = new Date().toISOString();
+
     setNotifications((prev) => 
-      prev.map((n) => (n.id === 'UPGRADE-PERSISTENT' ? n : { ...n, is_read: true }))
+      prev.map((n) => (n.id === 'UPGRADE-PERSISTENT' ? n : { ...n, is_read: true, read_at: nowIso }))
     );
     
     // Check if the persistent one is there so we keep unreadCount = 1
@@ -111,10 +119,22 @@ export default function NotificationBell() {
 
     await supabase
       .from('notifications')
-      .update({ is_read: true })
+      .update({ is_read: true, read_at: nowIso })
       .eq('user_id', user.id)
       .eq('is_read', false);
   };
+
+  const visibleNotifications = notifications.filter(n => {
+    if (n.id === 'UPGRADE-PERSISTENT') return true;
+    if (!n.is_read) return true;
+    
+    // If it is read, but no read_at is present, keep it for 10 mins since creation, or just assume it's old and hide it immediately. 
+    // To be safe, if we don't have read_at, we just hide it.
+    if (!n.read_at) return false;
+
+    const readTime = new Date(n.read_at).getTime();
+    return (currentTime - readTime) < 10 * 60 * 1000;
+  });
 
   return (
     <div className="relative flex items-center mr-2" ref={dropdownRef}>
@@ -143,12 +163,12 @@ export default function NotificationBell() {
           </div>
 
           <div className="max-h-[300px] overflow-y-auto">
-            {notifications.length === 0 ? (
+            {visibleNotifications.length === 0 ? (
               <div className="px-4 py-6 text-center text-sm text-gray-500">
                 No notifications yet.
               </div>
             ) : (
-              notifications.map((notif) => (
+              visibleNotifications.map((notif) => (
                 <div
                   key={notif.id}
                   className={`px-4 py-3 border-b border-gray-50 last:border-0 hover:bg-gray-50 transition-colors cursor-pointer ${
