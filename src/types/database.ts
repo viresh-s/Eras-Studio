@@ -21,6 +21,11 @@ export interface Profile {
   other_links: string | null;
   social_links: SocialLinks;
   is_premium: boolean;
+<<<<<<< HEAD
+=======
+  plan?: 'free' | 'pro' | 'elite' | string;
+  status?: 'active' | 'suspended' | string;
+>>>>>>> cfd4433 (Updated regarding COR)
   created_at: string;
 }
 
@@ -93,3 +98,13 @@ export interface ContactSubmission {
   message: string;
   created_at: string;
 }
+<<<<<<< HEAD
+=======
+
+export type { Report, ReportReason, ReportStatus } from './report';
+export * from './cor';
+
+
+
+
+>>>>>>> cfd4433 (Updated regarding COR)

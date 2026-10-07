@@ -297,3 +297,70 @@ CREATE POLICY "System can insert notifications"
 
 CREATE INDEX idx_notifications_user_id ON public.notifications(user_id);
 CREATE INDEX idx_notifications_created_at ON public.notifications(created_at);
+<<<<<<< HEAD
+=======
+
+-- =============================================
+-- 11. REPORTS TABLE (Artwork Moderation & Safety)
+-- =============================================
+CREATE TABLE public.reports (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  artwork_id UUID NOT NULL REFERENCES public.artworks(id) ON DELETE CASCADE,
+  reporter_user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  artwork_owner_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+  reason TEXT NOT NULL CHECK (reason IN (
+    'Possible copyright infringement',
+    'Inappropriate / NSFW content',
+    'Plagiarism or stolen work',
+    'Spam or misleading information',
+    'Harassment or hate speech',
+    'Other / Policy violation'
+  )),
+  details TEXT CHECK (char_length(details) <= 2000),
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'resolved', 'dismissed')),
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.reports ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can create reports"
+  ON public.reports FOR INSERT
+  WITH CHECK (auth.uid() = reporter_user_id);
+
+CREATE POLICY "Users can view their own submitted reports"
+  ON public.reports FOR SELECT
+  USING (auth.uid() = reporter_user_id);
+
+CREATE POLICY "Admins can view all reports"
+  ON public.reports FOR SELECT
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.profiles
+      WHERE id = auth.uid() AND role = 'Admin'
+    )
+  );
+
+CREATE POLICY "Admins can update report status"
+  ON public.reports FOR UPDATE
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.profiles
+      WHERE id = auth.uid() AND role = 'Admin'
+    )
+  );
+
+CREATE INDEX idx_reports_artwork_id ON public.reports(artwork_id);
+CREATE INDEX idx_reports_reporter_user_id ON public.reports(reporter_user_id);
+CREATE INDEX idx_reports_status ON public.reports(status);
+CREATE INDEX idx_reports_created_at ON public.reports(created_at);
+
+-- =============================================
+-- 12. COR (Curatorial Opportunities & Representation)
+-- For complete COR tables (cor_profiles, cor_career_info, cor_skills, cor_experience,
+-- cor_education, cor_links, cor_documents, cor_representation, cor_opportunities,
+-- cor_applications, cor_consultations, cor_activity_logs), see: supabase/cor_schema.sql
+-- =============================================
+
+
+
+>>>>>>> cfd4433 (Updated regarding COR)

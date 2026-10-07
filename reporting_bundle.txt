@@ -1,0 +1,270 @@
+﻿================================================================================
+ERAS STUDIO - ARTWORK REPORTING & MODERATION CODE BUNDLE
+================================================================================
+This bundle contains all code needed to merge the Artwork Reporting feature:
+1. Server Action: src/actions/reportActions.ts
+2. Types: Report, ReportReason, ReportStatus (src/types/database.ts)
+3. Validation: ReportReasonSchema, ReportArtworkSchema (src/lib/security/validators.ts)
+4. UI Component: Report button, state, and modal in ArtworkDiscoveryDetail.tsx
+5. SQL Schema: reports table definition
+
+================================================================================
+### 1. SERVER ACTION: src/actions/reportActions.ts
+================================================================================
+'use server';
+
+import { requireAuth } from '@/lib/security/authGuard';
+import { checkRateLimit } from '@/lib/security/rateLimiter';
+import { SafeIdSchema, ReportReasonSchema, sanitizeText } from '@/lib/security/validators';
+import { securityLogger } from '@/lib/security/logger';
+import { revalidatePath } from 'next/cache';
+
+interface SubmitReportInput {
+  artworkId: string;
+  reporterUserId?: string; // Optional client-passed param, ignored in favor of authenticated session
+  artworkOwnerId?: string;
+  reason: string;
+  details?: string;
+}
+
+export async function submitArtworkReport(input: SubmitReportInput) {
+  // 1. Strict Server-Side Authentication
+  const { user, supabase } = await requireAuth({ requireActive: true });
+
+  // 2. Rate limit moderation reports: max 5 reports per 15 minutes per user
+  const rateLimit = checkRateLimit(`report-submit:${user.id}`, { maxRequests: 5, windowSeconds: 900 });
+  if (!rateLimit.allowed) {
+    throw new Error('Report submission limit reached. Please wait before submitting another report.');
+  }
+
+  // 3. Validate Inputs
+  const validArtworkId = SafeIdSchema.parse(input.artworkId);
+  const validReason = ReportReasonSchema.parse(input.reason);
+  const sanitizedDetails = input.details ? sanitizeText(input.details, 2000) : null;
+  const validOwnerId = input.artworkOwnerId ? SafeIdSchema.safeParse(input.artworkOwnerId).data || null : null;
+
+  // 4. Insert report with server-enforced reporter identity
+  const { error } = await supabase
+    .from('reports')
+    .insert({
+      artwork_id: validArtworkId,
+      reporter_user_id: user.id, // Strictly server derived
+      artwork_owner_id: validOwnerId,
+      reason: validReason,
+      details: sanitizedDetails,
+      status: 'pending', // Client cannot set approved or resolved
+    });
+
+  if (error) {
+    securityLogger.error('Moderation report submission failed', { userId: user.id, artworkId: validArtworkId, error: error.message });
+    throw new Error('Failed to submit moderation report.');
+  }
+
+  securityLogger.info('Artwork moderation report submitted', {
+    userId: user.id,
+    artworkId: validArtworkId,
+    reason: validReason,
+  });
+
+  revalidatePath(`/artwork/${validArtworkId}`);
+  return { success: true };
+}
+
+
+================================================================================
+### 2. TYPES: src/types/database.ts
+================================================================================
+export type ReportStatus = 'pending' | 'resolved' | 'dismissed';
+export type ReportReason =
+  | 'Possible copyright infringement'
+  | 'Inappropriate / NSFW content'
+  | 'Plagiarism or stolen work'
+  | 'Spam or misleading information'
+  | 'Harassment or hate speech'
+  | 'Other / Policy violation';
+
+export interface Report {
+  id: string;
+  artwork_id: string;
+  reporter_user_id: string;
+  artwork_owner_id: string | null;
+  reason: ReportReason | string;
+  details: string | null;
+  status: ReportStatus;
+  created_at: string;
+}
+
+================================================================================
+### 3. VALIDATION SCHEMAS: src/lib/security/validators.ts
+================================================================================
+export const ReportReasonSchema = z.enum([
+  'Possible copyright infringement',
+  'Inappropriate / NSFW content',
+  'Plagiarism or stolen work',
+  'Spam or misleading information',
+  'Harassment or hate speech',
+  'Other / Policy violation',
+]);
+
+export const ReportArtworkSchema = z.object({
+  artworkId: SafeIdSchema,
+  artworkOwnerId: SafeIdSchema.optional().nullable(),
+  reason: ReportReasonSchema,
+  details: z.string().max(2000, 'Report details must not exceed 2000 characters').optional().nullable(),
+});
+
+================================================================================
+### 4. UI INTEGRATION: src/components/features/artwork/ArtworkDiscoveryDetail.tsx
+================================================================================
+// 1. Imports
+import { submitArtworkReport } from '@/actions/reportActions';
+import { TriangleAlert } from 'lucide-react';
+import Modal from '@/components/ui/Modal';
+import Button from '@/components/ui/Button';
+
+// 2. Component State inside ArtworkDiscoveryDetail:
+const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+const [reportReason, setReportReason] = useState('Possible copyright infringement');
+const [reportDetails, setReportDetails] = useState('');
+const [isSubmittingReport, setIsSubmittingReport] = useState(false);
+
+const handleOpenReport = () => {
+  if (!currentUser) {
+    showToast('Authentication required', 'Please sign in to report artwork.', 'info');
+    return;
+  }
+  setIsReportModalOpen(true);
+};
+
+const handleSubmitReport = async (e?: React.FormEvent) => {
+  if (e) e.preventDefault();
+  if (!currentUser) return;
+
+  setIsSubmittingReport(true);
+  try {
+    await submitArtworkReport({
+      artworkId: artwork.id,
+      reporterUserId: currentUser.id,
+      artworkOwnerId: artwork.user_id,
+      reason: reportReason,
+      details: reportDetails,
+    });
+    setIsReportModalOpen(false);
+    setReportDetails('');
+    showToast(
+      'Report Submitted',
+      'Thank you. Your report has been submitted to curatorial moderation.',
+      'success'
+    );
+  } catch (err: any) {
+    console.error('Failed to submit report:', err);
+    showToast('Error', err.message || 'Failed to submit report', 'error');
+  } finally {
+    setIsSubmittingReport(false);
+  }
+};
+
+// 3. Action Button JSX (in artwork action bar):
+<button
+  type="button"
+  onClick={handleOpenReport}
+  title="Report Artwork"
+  aria-label="Report Artwork"
+  className="w-10 h-10 rounded-full flex items-center justify-center border border-white/10 bg-white/5 hover:bg-rose-500/10 hover:border-rose-500/30 text-white/60 hover:text-rose-400 transition-all duration-200"
+>
+  <TriangleAlert className="w-4 h-4 transition-transform group-hover:scale-110" />
+</button>
+
+// 4. Modal Dialog JSX:
+<Modal
+  isOpen={isReportModalOpen}
+  onClose={() => setIsReportModalOpen(false)}
+  title="Report Artwork"
+>
+  <form onSubmit={handleSubmitReport} className="space-y-4">
+    <div>
+      <label className="block text-xs font-mono uppercase tracking-wider text-white/50 mb-1.5">
+        Reason for report *
+      </label>
+      <select
+        value={reportReason}
+        onChange={(e) => setReportReason(e.target.value)}
+        className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-rose-500"
+      >
+        <option value="Possible copyright infringement">Possible copyright infringement</option>
+        <option value="Inappropriate / NSFW content">Inappropriate / NSFW content</option>
+        <option value="Plagiarism or stolen work">Plagiarism or stolen work</option>
+        <option value="Spam or misleading information">Spam or misleading information</option>
+        <option value="Harassment or hate speech">Harassment or hate speech</option>
+        <option value="Other / Policy violation">Other / Policy violation</option>
+      </select>
+    </div>
+
+    <div>
+      <label className="block text-xs font-mono uppercase tracking-wider text-white/50 mb-1.5">
+        Additional details (optional)
+      </label>
+      <textarea
+        value={reportDetails}
+        onChange={(e) => setReportDetails(e.target.value)}
+        placeholder="Provide any relevant context (up to 2000 characters)..."
+        maxLength={2000}
+        rows={4}
+        className="w-full bg-black/40 border border-white/15 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-rose-500 resize-none"
+      />
+      <span className="block text-right text-xs text-white/40 mt-1">
+        {reportDetails.length} / 2000
+      </span>
+    </div>
+
+    <div className="flex items-center justify-end gap-3 pt-2">
+      <Button
+        variant="ghost"
+        type="button"
+        onClick={() => setIsReportModalOpen(false)}
+        disabled={isSubmittingReport}
+      >
+        Cancel
+      </Button>
+      <Button
+        variant="primary"
+        type="submit"
+        disabled={isSubmittingReport}
+        className="bg-rose-600 hover:bg-rose-500 text-white"
+      >
+        {isSubmittingReport ? 'Submitting...' : 'Submit Report'}
+      </Button>
+    </div>
+  </form>
+</Modal>
+
+================================================================================
+### 5. SQL DATABASE MIGRATION FOR REPORTS
+================================================================================
+CREATE TABLE IF NOT EXISTS public.reports (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  artwork_id UUID REFERENCES public.artworks(id) ON DELETE CASCADE,
+  reporter_user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  artwork_owner_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  reason TEXT NOT NULL,
+  details TEXT,
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'resolved', 'dismissed')),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now())
+);
+
+ALTER TABLE public.reports ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can create reports"
+  ON public.reports FOR INSERT
+  TO authenticated
+  WITH CHECK (auth.uid() = reporter_user_id);
+
+CREATE POLICY "Admins can view reports"
+  ON public.reports FOR SELECT
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.profiles
+      WHERE profiles.id = auth.uid() AND profiles.role = 'admin'
+    )
+  );

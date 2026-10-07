@@ -148,8 +148,11 @@ export async function acceptChatRequest(chatId: string) {
 
   if (error) throw new Error(error.message);
 
+<<<<<<< HEAD
   if (error) throw new Error(error.message);
 
+=======
+>>>>>>> cfd4433 (Updated regarding COR)
   if (chatData) {
     const artworkObj = Array.isArray(chatData.artworks) ? chatData.artworks[0] : chatData.artworks;
     const artworkTitle = (artworkObj as any)?.title || 'an artwork';

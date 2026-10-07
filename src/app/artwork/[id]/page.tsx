@@ -1,11 +1,15 @@
 import { createClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
+<<<<<<< HEAD
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import ExpressInterestButton from '@/components/features/artwork/ExpressInterestButton';
 import SaveArtworkButton from '@/components/features/artwork/SaveArtworkButton';
 import ArtworkImageGallery from '@/components/features/artwork/ArtworkImageGallery';
 import ExpandableDescription from '@/components/features/artwork/ExpandableDescription';
+=======
+import ArtworkDiscoveryDetail from '@/components/features/artwork/ArtworkDiscoveryDetail';
+>>>>>>> cfd4433 (Updated regarding COR)
 
 interface ArtworkPageProps {
   params: Promise<{ id: string }>;
@@ -23,8 +27,15 @@ export default async function ArtworkPage({ params }: ArtworkPageProps) {
 
   if (!artwork) notFound();
 
+<<<<<<< HEAD
   const { data: { user } } = await supabase.auth.getUser();
   let userRole = null;
+=======
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  let userRole: string | null = null;
+>>>>>>> cfd4433 (Updated regarding COR)
 
   if (user) {
     const { data: profile } = await supabase
@@ -32,7 +43,11 @@ export default async function ArtworkPage({ params }: ArtworkPageProps) {
       .select('role')
       .eq('id', user.id)
       .single();
+<<<<<<< HEAD
     userRole = profile?.role;
+=======
+    userRole = profile?.role || null;
+>>>>>>> cfd4433 (Updated regarding COR)
   }
 
   const isOwner = user?.id === artwork.creator_id;
@@ -40,6 +55,10 @@ export default async function ArtworkPage({ params }: ArtworkPageProps) {
 
   let existingChat = null;
   let isSaved = false;
+<<<<<<< HEAD
+=======
+
+>>>>>>> cfd4433 (Updated regarding COR)
   if (canExpress && user) {
     const { data: chatData } = await supabase
       .from('inquiries_chats')
@@ -47,7 +66,11 @@ export default async function ArtworkPage({ params }: ArtworkPageProps) {
       .eq('artwork_id', id)
       .eq('guest_id', user.id)
       .maybeSingle();
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> cfd4433 (Updated regarding COR)
     existingChat = chatData;
 
     // Check if artwork is saved (ignore errors if table missing)
@@ -57,6 +80,7 @@ export default async function ArtworkPage({ params }: ArtworkPageProps) {
       .eq('artwork_id', id)
       .eq('user_id', user.id)
       .maybeSingle();
+<<<<<<< HEAD
       
     isSaved = !!savedData;
   }
@@ -186,5 +210,19 @@ export default async function ArtworkPage({ params }: ArtworkPageProps) {
         </div>
       </div>
     </div>
+=======
+
+    isSaved = !!savedData;
+  }
+
+  return (
+    <ArtworkDiscoveryDetail
+      artwork={artwork}
+      currentUser={user ? { id: user.id } : null}
+      userRole={userRole}
+      existingChat={existingChat}
+      isSaved={isSaved}
+    />
+>>>>>>> cfd4433 (Updated regarding COR)
   );
 }

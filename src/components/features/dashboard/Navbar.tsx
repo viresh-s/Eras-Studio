@@ -15,12 +15,20 @@ interface NavbarProps {
 const navLinks = [
   { href: '/discovery', label: 'Discovery' },
   { href: '/portfolio', label: 'Portfolio' },
+<<<<<<< HEAD
+=======
+  { href: '/cor', label: 'COR Hub' },
+>>>>>>> cfd4433 (Updated regarding COR)
   { href: '/messages', label: 'Messages' },
   { href: '/profile', label: 'Profile' },
 ];
 
 const userNavLinks = [
   { href: '/discovery', label: 'Discovery' },
+<<<<<<< HEAD
+=======
+  { href: '/cor', label: 'COR Hub' },
+>>>>>>> cfd4433 (Updated regarding COR)
   { href: '/messages', label: 'Messages' },
   { href: '/purchases', label: 'Purchases' },
   { href: '/user/profile', label: 'Profile' },
@@ -28,6 +36,10 @@ const userNavLinks = [
 
 const adminNavLinks = [
   { href: '/admin', label: 'Dashboard' },
+<<<<<<< HEAD
+=======
+  { href: '/cor', label: 'COR Hub' },
+>>>>>>> cfd4433 (Updated regarding COR)
   { href: '/admin/users', label: 'Users' },
   { href: '/admin/artworks', label: 'Artworks' },
   { href: '/admin/analytics', label: 'Analytics' },
