@@ -80,7 +80,7 @@ export default function CreatorSettingsForm({ userProfile }: { userProfile: any 
 
       const { error: uploadError } = await supabase.storage
         .from('avatars')
-        .upload(filePath, file, { 
+        .upload(filePath, file, {
           upsert: true,  // Overwrite if exists
           cacheControl: '3600',
         });
@@ -148,7 +148,7 @@ export default function CreatorSettingsForm({ userProfile }: { userProfile: any 
           {successMsg}
         </div>
       )}
-      
+
       {errorMsg && (
         <div className="mb-4 bg-red-50 border border-red-200 rounded-xl p-3 text-red-600 text-sm">
           {errorMsg}
@@ -167,7 +167,7 @@ export default function CreatorSettingsForm({ userProfile }: { userProfile: any 
             ) : (
               <User className="text-gray-400 w-10 h-10" />
             )}
-            
+
             {/* Hover overlay */}
             {isUploadingAvatar ? (
               <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
@@ -230,7 +230,7 @@ export default function CreatorSettingsForm({ userProfile }: { userProfile: any 
         </div>
 
         <div className="pt-4">
-          <Button type="submit" isLoading={isLoading} variant="coral">
+          <Button type="submit" isLoading={isLoading} variant="primary">
             <Save size={16} /> Save Changes
           </Button>
         </div>

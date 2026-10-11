@@ -85,3 +85,66 @@ export async function submitArtworkReport(
     reportId: data?.id,
   };
 }
+
+export interface SubmitUserReportInput {
+  reportedUserId: string;
+  reason: string;
+  details?: string | null;
+}
+
+export async function submitUserReport(
+  input: SubmitUserReportInput
+): Promise<SubmitReportResult> {
+  const { user, supabase } = await requireAuth({ requireActive: true });
+
+  const rateLimit = checkRateLimit(`report-user:${user.id}`, {
+    maxRequests: 5,
+    windowSeconds: 900,
+  });
+  if (!rateLimit.allowed) {
+    return {
+      success: false,
+      message: 'Report submission limit reached. Please wait before submitting another report.',
+    };
+  }
+
+  const validReportedUserId = SafeIdSchema.parse(input.reportedUserId);
+  const validReason = ReportReasonSchema.parse(input.reason);
+  const sanitizedDetails = input.details ? sanitizeText(input.details, 2000) : null;
+
+  const { data, error } = await supabase
+    .from('reports')
+    .insert({
+      reported_user_id: validReportedUserId,
+      reporter_user_id: user.id,
+      reason: validReason,
+      details: sanitizedDetails,
+      status: 'pending',
+    })
+    .select('id')
+    .single();
+
+  if (error) {
+    securityLogger.error('User moderation report submission failed', {
+      userId: user.id,
+      reportedUserId: validReportedUserId,
+      error: error.message,
+    });
+    return {
+      success: false,
+      message: error.message || 'Failed to submit moderation report.',
+    };
+  }
+
+  securityLogger.info('User moderation report submitted', {
+    userId: user.id,
+    reportedUserId: validReportedUserId,
+    reason: validReason,
+  });
+
+  return {
+    success: true,
+    message: 'User Report Submitted: Thank you for keeping our community safe.',
+    reportId: data?.id,
+  };
+}

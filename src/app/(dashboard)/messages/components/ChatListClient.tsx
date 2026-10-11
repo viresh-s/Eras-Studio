@@ -7,6 +7,7 @@ import { MessageCircle, Check, Clock, Send } from 'lucide-react';
 import { acceptChatRequest, sendMessage, rejectChatRequest } from '@/actions/chatActions';
 import { createClient } from '@/lib/supabase/client';
 import Button from '@/components/ui/Button';
+import ReportUserButton from '@/components/features/user/ReportUserButton';
 
 interface ChatListClientProps {
   initialChats: any[];
@@ -301,9 +302,17 @@ function ActiveChatPane({ chatId, userId, chatDetails }: { chatId: string, userI
             <p className="text-xs text-gray-500 font-medium">{artwork?.title}</p>
           </div>
         </div>
-        <Link href={`/artwork/${chatDetails.artwork_id}`} className="px-5 py-2.5 bg-white border border-gray-200 rounded-full text-xs font-bold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm">
-          View Artwork ↗
-        </Link>
+        <div className="flex items-center gap-2">
+          <ReportUserButton
+            reportedUserId={otherPerson?.id}
+            reportedUserName={otherPerson?.full_name}
+            currentUserId={userId}
+            variant="icon-only"
+          />
+          <Link href={`/artwork/${chatDetails.artwork_id}`} className="px-5 py-2.5 bg-white border border-gray-200 rounded-full text-xs font-bold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm">
+            View Artwork ↗
+          </Link>
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto p-8 space-y-4">

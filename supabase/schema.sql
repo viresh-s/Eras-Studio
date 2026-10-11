@@ -297,9 +297,6 @@ CREATE POLICY "System can insert notifications"
 
 CREATE INDEX idx_notifications_user_id ON public.notifications(user_id);
 CREATE INDEX idx_notifications_created_at ON public.notifications(created_at);
-<<<<<<< HEAD
-=======
-
 -- =============================================
 -- 11. REPORTS TABLE (Artwork Moderation & Safety)
 -- =============================================
@@ -363,4 +360,3 @@ CREATE INDEX idx_reports_created_at ON public.reports(created_at);
 
 
 
->>>>>>> cfd4433 (Updated regarding COR)

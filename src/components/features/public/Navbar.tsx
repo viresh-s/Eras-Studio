@@ -19,11 +19,12 @@ export default function Navbar() {
   const pathname = usePathname();
 
   return (
-    <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-100">
+    <nav className="sticky top-0 z-50 bg-[#FAF5EC]/90 backdrop-blur-md border-b border-[#E8E8E3]">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="text-xl font-extrabold tracking-tight text-gray-900">
-          Eras Studio
+        <Link href="/" className="font-serif text-2xl font-bold tracking-tight text-[#141413] hover:opacity-80 transition-opacity flex items-center gap-2">
+          <span>Eras Studio</span>
+          <span className="w-1.5 h-1.5 rounded-full bg-[#865E16] inline-block mb-1"></span>
         </Link>
 
         {/* Desktop Nav */}
@@ -34,8 +35,8 @@ export default function Navbar() {
               href={link.href}
               className={`px-4 py-2 text-sm font-medium rounded-full transition-colors duration-200 ${
                 pathname === link.href
-                  ? 'bg-gray-900 text-white'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                  ? 'bg-[#141413] text-[#FAF5EC]'
+                  : 'text-[#6E6E69] hover:text-[#141413] hover:bg-black/5'
               }`}
             >
               {link.label}
@@ -44,11 +45,11 @@ export default function Navbar() {
         </div>
 
         {/* Auth Buttons */}
-        <div className="hidden md:flex items-center gap-3">
-          <Link href="/login" className="px-5 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
+        <div className="hidden md:flex items-center gap-2">
+          <Link href="/login" className="px-4 py-1.5 text-xs uppercase tracking-[0.08em] font-medium text-[#6E6E69] hover:text-[#141413] transition-colors">
             Log In
           </Link>
-          <Link href="/signup" className="px-5 py-2.5 text-sm font-semibold bg-gray-900 text-white rounded-full hover:bg-gray-800 transition-all hover:scale-[1.02]">
+          <Link href="/signup" className="px-5 py-2 text-xs uppercase tracking-[0.08em] font-medium bg-[#141413] text-[#FAF5EC] border border-[#141413] rounded-full hover:bg-transparent hover:text-[#141413] transition-all duration-200">
             Sign Up
           </Link>
         </div>
@@ -56,7 +57,7 @@ export default function Navbar() {
         {/* Mobile Toggle */}
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="md:hidden p-2 rounded-xl text-gray-600 hover:bg-gray-100 transition-colors"
+          className="md:hidden p-2 rounded-xl text-[#141413] hover:bg-black/5 transition-colors"
         >
           {mobileOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
@@ -64,7 +65,7 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-gray-100 bg-white px-6 py-4 space-y-1">
+        <div className="md:hidden border-t border-[#E8E8E3] bg-[#FAF5EC] px-6 py-4 space-y-1">
           {navLinks.map((link) => (
             <Link
               key={link.href}
@@ -72,18 +73,18 @@ export default function Navbar() {
               onClick={() => setMobileOpen(false)}
               className={`block px-4 py-3 text-sm font-medium rounded-xl transition-colors ${
                 pathname === link.href
-                  ? 'bg-gray-900 text-white'
-                  : 'text-gray-600 hover:bg-gray-50'
+                  ? 'bg-[#141413] text-[#FAF5EC]'
+                  : 'text-[#6E6E69] hover:bg-black/5'
               }`}
             >
               {link.label}
             </Link>
           ))}
-          <div className="pt-3 mt-2 border-t border-gray-100 flex gap-3">
-            <Link href="/login" className="flex-1 text-center px-4 py-2.5 text-sm font-medium rounded-full border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors">
+          <div className="pt-3 mt-2 border-t border-[#E8E8E3] flex gap-3">
+            <Link href="/login" className="flex-1 text-center px-4 py-2 text-xs uppercase tracking-[0.08em] font-medium rounded-full border border-[#E8E8E3] text-[#141413] hover:bg-black/5 transition-colors">
               Log In
             </Link>
-            <Link href="/signup" className="flex-1 text-center px-4 py-2.5 text-sm font-semibold rounded-full bg-gray-900 text-white hover:bg-gray-800 transition-colors">
+            <Link href="/signup" className="flex-1 text-center px-4 py-2 text-xs uppercase tracking-[0.08em] font-medium rounded-full bg-[#141413] text-[#FAF5EC] border border-[#141413] hover:bg-transparent hover:text-[#141413] transition-colors">
               Sign Up
             </Link>
           </div>

@@ -27,7 +27,7 @@ export default function ServicesPage() {
               <h3 className="text-2xl font-bold text-gray-900 mb-1">Free Plan</h3>
               <p className="text-gray-500 text-sm mb-6">Get started at no cost</p>
               <div className="bg-gray-50 rounded-2xl p-5 mb-6 text-center">
-                <p className="text-4xl font-extrabold text-gray-900">$0</p>
+                <p className="text-4xl font-extrabold text-gray-900">₹0</p>
                 <p className="text-gray-400 text-sm">forever</p>
               </div>
               <ul className="space-y-3 mb-6">
@@ -43,14 +43,14 @@ export default function ServicesPage() {
                   </li>
                 ))}
               </ul>
-              <Link href="/signup" className="block w-full text-center px-6 py-3 rounded-full border border-gray-300 text-gray-700 text-sm font-semibold hover:bg-gray-50 transition-colors">
+              <Link href="/signup" className="block w-full text-center px-6 py-2.5 rounded-full border border-[#141413]/25 text-[#141413] text-xs uppercase tracking-[0.08em] font-medium hover:border-[#141413] hover:bg-[#141413] hover:text-[#FAF5EC] transition-all duration-200">
                 Get Started Free
               </Link>
             </div>
 
             {/* Premium Plan */}
             <div className="relative">
-              <div className="absolute -top-3 right-6 px-4 py-1.5 bg-accent-coral text-white rounded-full text-xs font-bold">
+              <div className="absolute -top-3 right-6 px-3.5 py-1 bg-[#865E16] text-[#FAF5EC] rounded-full text-[10px] font-bold uppercase tracking-wider">
                 POPULAR
               </div>
               <div className="bg-white rounded-2xl p-8 shadow-[0_4px_24px_rgb(0,0,0,0.08)] border border-gray-100 h-full">
@@ -77,8 +77,8 @@ export default function ServicesPage() {
                     </li>
                   ))}
                 </ul>
-                <Link href="/signup" className="flex items-center justify-center gap-2 w-full px-6 py-3 rounded-full bg-gray-900 text-white text-sm font-semibold hover:bg-gray-800 transition-all hover:scale-[1.02]">
-                  <Crown size={16} />
+                <Link href="/signup" className="flex items-center justify-center gap-2 w-full px-6 py-2.5 rounded-full bg-[#141413] text-[#FAF5EC] border border-[#141413] text-xs uppercase tracking-[0.08em] font-medium hover:bg-transparent hover:text-[#141413] transition-all duration-200">
+                  <Crown size={15} />
                   Join Premium Waitlist
                 </Link>
               </div>
@@ -131,9 +131,9 @@ export default function ServicesPage() {
           <p className="text-lg text-gray-500 mb-8">
             Join Eras Studio for free and start showcasing your work to collectors worldwide.
           </p>
-          <Link href="/signup" className="inline-flex items-center gap-2 px-8 py-3.5 bg-gray-900 text-white rounded-full text-sm font-semibold hover:bg-gray-800 transition-all hover:scale-[1.02]">
-            Create Your Account
-            <ArrowRight size={16} />
+          <Link href="/signup" className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#141413] text-[#FAF5EC] border border-[#141413] rounded-full text-xs uppercase tracking-[0.08em] font-medium hover:bg-transparent hover:text-[#141413] transition-all duration-200 group">
+            <span>Create Your Account</span>
+            <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
           </Link>
         </div>
       </section>

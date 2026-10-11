@@ -21,18 +21,18 @@ interface ButtonProps extends Omit<HTMLMotionProps<"button">, "children"> {
 }
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary: 'bg-gray-900 text-white hover:bg-gray-800',
-  secondary: 'bg-gray-100 text-gray-900 hover:bg-gray-200',
-  outline: 'bg-white text-gray-900 border border-gray-300 hover:bg-gray-50',
-  ghost: 'bg-transparent text-gray-700 hover:bg-gray-100',
-  coral: 'bg-accent-coral text-white hover:opacity-90',
-  danger: 'bg-red-500 text-white hover:bg-red-600',
+  primary: 'bg-[#141413] text-[#FAF5EC] border border-[#141413] hover:bg-black hover:border-black shadow-none',
+  secondary: 'bg-transparent text-[#141413] border border-[#141413]/25 hover:border-[#141413] hover:bg-[#141413] hover:text-[#FAF5EC]',
+  outline: 'bg-transparent text-[#141413] border border-[#E8E8E3] hover:border-[#141413]',
+  ghost: 'bg-transparent text-[#6E6E69] hover:text-[#141413] hover:bg-black/5',
+  coral: 'bg-[#C84B31] text-white hover:bg-[#B33F27] border border-[#C84B31]',
+  danger: 'bg-[#9A3B3B] text-white hover:bg-[#853030] border border-[#9A3B3B]',
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
-  sm: 'px-4 py-2 text-xs',
-  md: 'px-6 py-3 text-xs',
-  lg: 'px-8 py-4 text-sm',
+  sm: 'px-4 py-1.5 text-[11px]',
+  md: 'px-5 py-2.5 text-xs',
+  lg: 'px-7 py-3 text-[13px]',
 };
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -40,10 +40,10 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <motion.button
         ref={ref}
-        whileHover={{ scale: disabled || isLoading ? 1 : 1.02 }}
-        whileTap={{ scale: disabled || isLoading ? 1 : 0.95 }}
+        whileHover={{ scale: disabled || isLoading ? 1 : 1.01 }}
+        whileTap={{ scale: disabled || isLoading ? 1 : 0.98 }}
         className={cn(
-          'inline-flex items-center justify-center gap-2 rounded-none font-semibold transition-colors duration-200 uppercase tracking-widest text-xs',
+          'inline-flex items-center justify-center gap-2 rounded-full font-medium tracking-[0.04em] transition-all duration-200',
           variantClasses[variant],
           sizeClasses[size],
           fullWidth && 'w-full',
@@ -55,11 +55,11 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       >
         {isLoading ? (
           <>
-            <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <svg className="animate-spin h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
             </svg>
-            Loading...
+            <span>Loading...</span>
           </>
         ) : (
           children

@@ -4,9 +4,9 @@ import { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 
 const defaultImages = [
-  'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?q=80&w=600&auto=format&fit=crop', // Abstract
-  'https://images.unsplash.com/photo-1549887552-cb1071d3e5ca?q=80&w=600&auto=format&fit=crop', // Portrait
-  'https://images.unsplash.com/photo-1561214115-f2f11415a575?q=80&w=600&auto=format&fit=crop', // Minimal
+  'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?auto=format&fit=crop&w=700&q=80',
+  'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=700&q=80',
+  'https://images.unsplash.com/photo-1579783901586-d88db74b4fe4?auto=format&fit=crop&w=700&q=80',
 ];
 
 export default function HeroStack() {

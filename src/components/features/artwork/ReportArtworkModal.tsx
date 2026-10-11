@@ -103,20 +103,20 @@ export default function ReportArtworkModal({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 16 }}
             transition={{ type: 'spring', damping: 25, stiffness: 350 }}
-            className="relative w-full max-w-lg bg-white rounded-3xl shadow-soft-xl border border-gray-100 overflow-hidden z-10 my-auto"
+            className="relative w-full max-w-md max-h-[90vh] flex flex-col bg-[var(--color-cor-surface)] rounded-3xl shadow-soft-xl border border-[var(--color-cor-border)] z-10 my-auto"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="px-6 sm:px-8 pt-7 pb-5 border-b border-gray-100 flex items-start justify-between">
+            <div className="px-5 sm:px-6 pt-5 pb-4 border-b border-[var(--color-cor-border-light)] flex items-start justify-between shrink-0">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600">
+                <div className="w-10 h-10 rounded-2xl bg-[#FAF5EC] border border-[#E8E8E3] flex items-center justify-center text-[#9A3B3B]">
                   <ShieldAlert size={20} />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900 leading-snug">
+                  <h3 className="text-lg font-serif font-bold text-[var(--color-cor-ink)] leading-snug">
                     Report Artwork
                   </h3>
-                  <p className="text-xs text-gray-500 font-medium truncate max-w-xs sm:max-w-sm">
+                  <p className="text-xs text-[var(--color-cor-ink-light)] font-medium truncate max-w-[200px] sm:max-w-[250px]">
                     Flagging &quot;{artworkTitle}&quot; for moderation review
                   </p>
                 </div>
@@ -147,7 +147,7 @@ export default function ReportArtworkModal({
                 <p className="text-xs text-gray-400">This window will close shortly...</p>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="px-6 sm:px-8 py-6 space-y-5">
+              <form onSubmit={handleSubmit} className="px-5 sm:px-6 py-5 space-y-4 overflow-y-auto flex-1 custom-scrollbar">
                 {/* Error Banner */}
                 {errorMessage && (
                   <div className="p-3.5 bg-red-50 border border-red-200 rounded-2xl flex items-start gap-3 text-red-700 text-xs font-medium">
@@ -157,20 +157,20 @@ export default function ReportArtworkModal({
                 )}
 
                 {/* Reason Selection */}
-                <div className="space-y-2.5">
-                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">
-                    Select a reason <span className="text-red-500">*</span>
+                <div className="space-y-2">
+                  <label className="block text-xs font-bold text-[var(--color-cor-ink)] uppercase tracking-wider">
+                    Select a reason <span className="text-[#9A3B3B]">*</span>
                   </label>
-                  <div className="grid grid-cols-1 gap-2 max-h-56 overflow-y-auto pr-1">
+                  <div className="grid grid-cols-1 gap-2">
                     {REPORT_REASONS.map((reason) => {
                       const isSelected = selectedReason === reason;
                       return (
                         <label
                           key={reason}
-                          className={`flex items-center gap-3 p-3 rounded-xl border text-xs sm:text-sm font-medium cursor-pointer transition-all ${
+                          className={`flex items-center gap-3 p-2.5 rounded-xl border text-xs sm:text-sm font-medium cursor-pointer transition-all ${
                             isSelected
-                              ? 'border-gray-900 bg-gray-50/80 text-gray-900 shadow-xs'
-                              : 'border-gray-200 hover:border-gray-300 text-gray-700 hover:bg-gray-50/40'
+                              ? 'border-[var(--color-cor-ink)] bg-[#F4F4ED] text-[var(--color-cor-ink)] shadow-xs'
+                              : 'border-[var(--color-cor-border-light)] hover:border-[var(--color-cor-border)] text-[var(--color-cor-ink-light)] hover:bg-[#FAF5EC]'
                           }`}
                         >
                           <input
@@ -193,13 +193,13 @@ export default function ReportArtworkModal({
                   <div className="flex items-center justify-between">
                     <label
                       htmlFor="report-details"
-                      className="text-xs font-bold text-gray-700 uppercase tracking-wider"
+                      className="text-xs font-bold text-[var(--color-cor-ink)] uppercase tracking-wider"
                     >
                       Additional Details (Optional)
                     </label>
                     <span
                       className={`text-[11px] font-medium ${
-                        details.length > MAX_CHARS ? 'text-red-600' : 'text-gray-400'
+                        details.length > MAX_CHARS ? 'text-[#9A3B3B]' : 'text-[var(--color-cor-ink-light)]'
                       }`}
                     >
                       {details.length}/{MAX_CHARS}
@@ -209,29 +209,29 @@ export default function ReportArtworkModal({
                     id="report-details"
                     value={details}
                     onChange={(e) => setDetails(e.target.value.slice(0, MAX_CHARS))}
-                    rows={3}
+                    rows={2}
                     placeholder="Provide additional context or reference links to assist our review team..."
-                    className="w-full px-4 py-3 text-sm bg-gray-50/50 border border-gray-200 rounded-2xl outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-400 focus:bg-white transition-all resize-none placeholder:text-gray-400 text-gray-900"
+                    className="w-full px-4 py-3 text-sm bg-[#F4F4ED] border border-[var(--color-cor-border-light)] rounded-2xl outline-none focus:ring-1 focus:ring-[var(--color-cor-ink)] focus:border-[var(--color-cor-ink)] focus:bg-white transition-all resize-none placeholder:text-[var(--color-cor-ink-light)] text-[var(--color-cor-ink)]"
                   />
-                  <p className="text-[11px] text-gray-500 leading-normal">
+                  <p className="text-[11px] text-[var(--color-cor-ink-light)] leading-normal">
                     Reports are confidential and reviewed within 24-48 hours according to ERAS Studio safety standards.
                   </p>
                 </div>
 
                 {/* Action Buttons */}
-                <div className="pt-2 flex items-center justify-end gap-3 border-t border-gray-100">
+                <div className="pt-2 flex items-center justify-end gap-3 border-t border-[var(--color-cor-border-light)] shrink-0">
                   <button
                     type="button"
                     onClick={handleClose}
                     disabled={isSubmitting}
-                    className="px-5 py-2.5 rounded-full text-xs font-bold text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+                    className="px-5 py-2.5 rounded-full text-xs font-bold text-[var(--color-cor-ink-light)] hover:text-[var(--color-cor-ink)] hover:bg-[#F4F4ED] transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="px-6 py-2.5 bg-gray-900 hover:bg-gray-800 disabled:opacity-60 text-white rounded-full text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 shadow-sm"
+                    className="px-6 py-2.5 bg-[var(--color-cor-ink)] hover:bg-black disabled:opacity-60 text-white rounded-full text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 shadow-sm"
                   >
                     {isSubmitting ? (
                       <>

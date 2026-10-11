@@ -2,18 +2,19 @@ import Link from 'next/link';
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-950 text-white">
+    <footer className="bg-[#141413] text-[#FAF5EC]">
       {/* Links Grid */}
-      <div className="border-t border-gray-800">
-        <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="border-t border-[#262624]">
+        <div className="max-w-7xl mx-auto px-6 py-14">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {/* Brand */}
             <div className="col-span-2 md:col-span-1">
-              <Link href="/" className="text-xl font-extrabold tracking-tight">
-                Eras Studio
+              <Link href="/" className="font-serif text-2xl font-bold tracking-tight text-[#FAF5EC] flex items-center gap-2">
+                <span>Eras Studio</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#865E16] inline-block mb-1"></span>
               </Link>
-              <p className="mt-3 text-gray-400 text-sm leading-relaxed max-w-xs">
-                Where art meets its collector. Connecting talented creators with passionate art enthusiasts worldwide.
+              <p className="mt-3 text-[#9E9E98] text-sm leading-relaxed max-w-xs">
+                Where art meets its collector. An editorial marketplace connecting independent creators with passionate art patrons worldwide.
               </p>
             </div>
 

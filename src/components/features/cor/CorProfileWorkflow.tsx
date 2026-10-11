@@ -1022,7 +1022,7 @@ export default function CorProfileWorkflow({ initialProfile }: CorProfileWorkflo
                       type="text"
                       value={goals.expected_salary}
                       onChange={(e) => setGoals({ ...goals, expected_salary: e.target.value })}
-                      placeholder="e.g. ₹12,00,000 / year or $40,000 stipend"
+                      placeholder="e.g. ₹12,00,000 / year or ₹3,50,000 stipend"
                       className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-[#E8E8E3] bg-[#FAF9F6] text-[#141413] focus:outline-none focus:border-[#141413]"
                     />
                   </div>

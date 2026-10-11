@@ -2,15 +2,24 @@
 @import "tailwindcss";
 
 @theme inline {
-  /* --- Colors --- */
+  /* --- COR Aesthetic Colors --- */
+  --color-cor-bg: #FAF5EC;
+  --color-cor-surface: #FFFFFF;
+  --color-cor-ink: #141413;
+  --color-cor-ink-light: #6E6E69;
+  --color-cor-border: #E8E8E3;
+  --color-cor-border-light: #F0F0EB;
+  --color-cor-accent: #865E16; /* Gold/sparkle accent used in COR */
+
+  /* --- Legacy Colors (Will be phased out) --- */
   --color-accent-coral: #C84B31; /* Deepened coral */
   --color-accent-yellow: #E8C382; /* Muted gold */
   --color-accent-rose: #9A3B3B; /* Deep rose/burgundy */
   --color-accent-violet: #472D2D; /* Very dark brownish-violet */
   --color-accent-emerald: #557153; /* Sage green */
-  --color-background: #FAF9F6; /* Alabaster off-white */
-  --color-surface: #FFFFFF;
-  --color-ink: #111111;
+  --color-background: var(--color-cor-bg); 
+  --color-surface: var(--color-cor-surface);
+  --color-ink: var(--color-cor-ink);
 
   /* --- Font --- */
   --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
@@ -42,7 +51,7 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
-  font-weight: 800;
+  font-weight: 600; /* Adjusted from 800 for COR aesthetic luxury minimal */
   letter-spacing: -0.01em;
 }
 
@@ -76,6 +85,6 @@ h1, h2, h3, h4, h5, h6 {
 
 /* --- Selection --- */
 ::selection {
-  background-color: #FF6B5A;
-  color: #FFFFFF;
+  background-color: var(--color-cor-ink);
+  color: var(--color-cor-surface);
 }

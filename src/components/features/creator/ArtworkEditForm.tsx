@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRouter } from 'next/navigation';
@@ -10,6 +10,7 @@ import { updateArtwork } from '@/actions/artworkActions';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
+import MultiSelect from '@/components/ui/MultiSelect';
 import TextArea from '@/components/ui/TextArea';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
@@ -36,16 +37,53 @@ const availabilityOptions = [
   { value: 'Sold', label: 'Sold' },
 ];
 
+const styleOptions = [
+  { value: 'Abstract', label: 'Abstract' },
+  { value: 'Minimalist', label: 'Minimalist' },
+  { value: 'Contemporary', label: 'Contemporary' },
+  { value: 'Modern', label: 'Modern' },
+  { value: 'Impressionism', label: 'Impressionism' },
+  { value: 'Pop Art', label: 'Pop Art' },
+  { value: 'Surrealism', label: 'Surrealism' },
+  { value: 'Realism', label: 'Realism' },
+  { value: 'Expressionism', label: 'Expressionism' },
+  { value: 'Cubism', label: 'Cubism' },
+  { value: 'Other', label: 'Other' },
+];
+
+const collectionOptions = [
+  { value: 'Summer Series', label: 'Summer Series' },
+  { value: 'Winter Series', label: 'Winter Series' },
+  { value: 'Spring Collection', label: 'Spring Collection' },
+  { value: 'Autumn Collection', label: 'Autumn Collection' },
+  { value: 'Portraits', label: 'Portraits' },
+  { value: 'Landscapes', label: 'Landscapes' },
+  { value: 'Still Life', label: 'Still Life' },
+  { value: 'Other', label: 'Other' },
+];
+
+const tagsOptions = [
+  { value: 'oil, canvas', label: 'Oil on Canvas' },
+  { value: 'acrylic, canvas', label: 'Acrylic on Canvas' },
+  { value: 'watercolor, paper', label: 'Watercolor on Paper' },
+  { value: 'digital', label: 'Digital' },
+  { value: 'mixed media', label: 'Mixed Media' },
+  { value: 'photography', label: 'Photography' },
+  { value: 'sculpture', label: 'Sculpture' },
+];
+
 const editSchema = z.object({
   title: z.string().min(2, 'Title is required'),
   artType: z.string().min(1, 'Please select a medium'),
   artistName: z.string().min(2, 'Artist name is required'),
   year: z.string().optional(),
   dimensions: z.string().optional(),
+  width: z.string().optional(),
+  height: z.string().optional(),
   location: z.string().optional(),
   style: z.string().optional(),
   collection: z.string().optional(),
-  tags: z.string().optional(),
+  tags: z.array(z.string()).optional(),
   description: z.string().optional(),
   externalLink: z.string().url('Please enter a valid URL').optional().or(z.literal('')),
   price: z.string().optional(),
@@ -68,16 +106,20 @@ export default function ArtworkEditForm({ userId, artwork }: ArtworkEditFormProp
 
   // Initial images from the database
   const initialImages = [artwork.image_url, ...(artwork.additional_images || [])].filter(Boolean);
-  
+
   const [existingUrls, setExistingUrls] = useState<string[]>(initialImages);
   const [newFiles, setNewFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  const [customStyle, setCustomStyle] = useState('');
+  const [customCollection, setCustomCollection] = useState('');
 
   const totalImages = existingUrls.length + newFiles.length;
 
   const {
     register,
     handleSubmit,
+    watch,
+    control,
     formState: { errors },
   } = useForm<EditForm>({
     resolver: zodResolver(editSchema),
@@ -87,10 +129,12 @@ export default function ArtworkEditForm({ userId, artwork }: ArtworkEditFormProp
       artistName: artwork.artist_name || '',
       year: artwork.year || '',
       dimensions: artwork.dimensions || '',
+      width: artwork.width || '',
+      height: artwork.height || '',
       location: artwork.location || '',
       style: artwork.style || '',
       collection: artwork.collection || '',
-      tags: artwork.tags ? artwork.tags.join(', ') : '',
+      tags: artwork.tags || [],
       description: artwork.description || '',
       externalLink: artwork.external_link || '',
       price: artwork.price ? artwork.price.toString() : '',
@@ -99,15 +143,19 @@ export default function ArtworkEditForm({ userId, artwork }: ArtworkEditFormProp
     }
   });
 
+  const selectedStyle = watch('style');
+  const selectedCollection = watch('collection');
+  const selectedPriceVisibility = watch('priceVisibility');
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (files.length > 0) {
       const availableSlots = 5 - totalImages;
       const filesToAdd = files.slice(0, availableSlots);
-      
+
       const updatedFiles = [...newFiles, ...filesToAdd];
       setNewFiles(updatedFiles);
-      
+
       const newPreviewUrls = filesToAdd.map(file => URL.createObjectURL(file));
       setPreviewUrls([...previewUrls, ...newPreviewUrls]);
     }
@@ -125,7 +173,7 @@ export default function ArtworkEditForm({ userId, artwork }: ArtworkEditFormProp
     const updatedFiles = [...newFiles];
     updatedFiles.splice(index, 1);
     setNewFiles(updatedFiles);
-    
+
     const updatedPreviews = [...previewUrls];
     updatedPreviews.splice(index, 1);
     setPreviewUrls(updatedPreviews);
@@ -169,8 +217,10 @@ export default function ArtworkEditForm({ userId, artwork }: ArtworkEditFormProp
       const finalUrls = [...existingUrls, ...uploadedUrls];
       const coverImage = finalUrls[0];
       const additionalImages = finalUrls.slice(1);
-      
-      const tagsArray = data.tags ? data.tags.split(',').map(t => t.trim()).filter(Boolean) : [];
+
+      const finalStyle = data.style === 'Other' ? customStyle : data.style;
+      const finalCollection = data.collection === 'Other' ? customCollection : data.collection;
+      const tagsArray = data.tags || [];
 
       await updateArtwork(artwork.id, {
         userId,
@@ -179,9 +229,11 @@ export default function ArtworkEditForm({ userId, artwork }: ArtworkEditFormProp
         artistName: data.artistName,
         year: data.year,
         dimensions: data.dimensions,
+        width: data.width,
+        height: data.height,
         location: data.location,
-        style: data.style,
-        collection: data.collection,
+        style: finalStyle,
+        collection: finalCollection,
         tags: tagsArray,
         description: data.description,
         externalLink: data.externalLink,
@@ -218,7 +270,7 @@ export default function ArtworkEditForm({ userId, artwork }: ArtworkEditFormProp
       )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        
+
         {/* Editable Image Gallery */}
         <div>
           <label className="text-sm font-medium text-gray-700 block mb-2">
@@ -269,7 +321,7 @@ export default function ArtworkEditForm({ userId, artwork }: ArtworkEditFormProp
                 </div>
               </div>
             ))}
-            
+
             {/* Add More Button */}
             {totalImages < 5 && (
               <div
@@ -284,7 +336,7 @@ export default function ArtworkEditForm({ userId, artwork }: ArtworkEditFormProp
               </div>
             )}
           </div>
-          
+
           <input
             id="edit-file-upload"
             type="file"
@@ -303,23 +355,78 @@ export default function ArtworkEditForm({ userId, artwork }: ArtworkEditFormProp
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           <Select label="Medium *" options={mediumOptions} placeholder="Select Medium" error={errors.artType?.message} {...register('artType')} />
           <Input label="Year" placeholder="e.g. 2024" error={errors.year?.message} {...register('year')} />
-          <Input label="Dimensions" placeholder="e.g. 24x36 in" error={errors.dimensions?.message} {...register('dimensions')} />
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <Input label="Location" placeholder="e.g. New York, NY" error={errors.location?.message} {...register('location')} />
-          <Input label="Style" placeholder="e.g. Abstract, Minimalist" error={errors.style?.message} {...register('style')} />
-          <Input label="Collection" placeholder="e.g. Summer Series" error={errors.collection?.message} {...register('collection')} />
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-gray-700">Dimensions (in)</label>
+            <div className="flex items-center gap-3">
+              <input
+                type="number" step="0.1" placeholder="W"
+                className={`w-full px-2 py-3 text-sm bg-transparent border-b-2 outline-none transition-all placeholder:text-gray-400 text-center ${errors.width ? 'border-red-300 focus:border-red-500' : 'border-gray-300 focus:border-gray-900'}`}
+                {...register('width')}
+              />
+              <span className="text-gray-400 text-[10px]">✕</span>
+              <input
+                type="number" step="0.1" placeholder="H"
+                className={`w-full px-2 py-3 text-sm bg-transparent border-b-2 outline-none transition-all placeholder:text-gray-400 text-center ${errors.height ? 'border-red-300 focus:border-red-500' : 'border-gray-300 focus:border-gray-900'}`}
+                {...register('height')}
+              />
+            </div>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <Input label="Tags (comma separated)" placeholder="e.g. oil, canvas, blue" error={errors.tags?.message} {...register('tags')} />
+          <Input label="Location" placeholder="e.g. New York, NY" error={errors.location?.message} {...register('location')} />
+
+          <div className="flex flex-col gap-2">
+            <Select label="Style" options={styleOptions} placeholder="Select Style" error={errors.style?.message} {...register('style')} />
+            {selectedStyle === 'Other' && (
+              <Input autoFocus label="Custom Style" placeholder="Specify your style..." value={customStyle} onChange={(e) => setCustomStyle(e.target.value)} />
+            )}
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Select label="Collection" options={collectionOptions} placeholder="Select Collection" error={errors.collection?.message} {...register('collection')} />
+            {selectedCollection === 'Other' && (
+              <Input autoFocus label="Custom Collection" placeholder="Specify collection name..." value={customCollection} onChange={(e) => setCustomCollection(e.target.value)} />
+            )}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="flex flex-col gap-2">
+            <Controller
+              name="tags"
+              control={control}
+              render={({ field }) => (
+                <MultiSelect
+                  label="Tags"
+                  options={tagsOptions}
+                  placeholder="Select Tags"
+                  value={field.value || []}
+                  onChange={field.onChange}
+                  error={errors.tags?.message}
+                />
+              )}
+            />
+          </div>
           <Select label="Availability" options={availabilityOptions} error={errors.status?.message} {...register('status')} />
           <Select label="Price Visibility" options={visibilityOptions} error={errors.priceVisibility?.message} {...register('priceVisibility')} />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <Input label="Price ($)" type="number" placeholder="0.00" error={errors.price?.message} {...register('price')} />
+          <Input
+            label={
+              selectedPriceVisibility === 'Hide Price'
+                ? 'Price (₹) · Hidden from public view'
+                : selectedPriceVisibility === 'Price on Request'
+                ? 'Price (₹) · Will display as "On Request"'
+                : 'Price (₹)'
+            }
+            type="number"
+            placeholder="0"
+            error={errors.price?.message}
+            {...register('price')}
+          />
           <div className="relative">
             <Input label="Related Link" placeholder="https://..." error={errors.externalLink?.message} {...register('externalLink')} />
             <LinkIcon className="absolute right-3 top-9 text-gray-400" size={16} />
@@ -329,20 +436,20 @@ export default function ArtworkEditForm({ userId, artwork }: ArtworkEditFormProp
         <TextArea label="Description" placeholder="Tell collectors about this piece..." error={errors.description?.message} {...register('description')} />
 
         <div className="flex gap-4 pt-4 border-t border-gray-100">
-          <Button 
-            type="submit" 
-            isLoading={isLoading && submitAction === 'publish'} 
-            variant="coral"
+          <Button
+            type="submit"
+            isLoading={isLoading && submitAction === 'publish'}
+            variant="primary"
             className="flex-1"
             onClick={() => setSubmitAction('publish')}
           >
             <Save size={16} />
             Publish Changes
           </Button>
-          
-          <Button 
-            type="submit" 
-            isLoading={isLoading && submitAction === 'draft'} 
+
+          <Button
+            type="submit"
+            isLoading={isLoading && submitAction === 'draft'}
             variant="secondary"
             className="flex-1"
             onClick={() => setSubmitAction('draft')}

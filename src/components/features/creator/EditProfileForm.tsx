@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Save, Upload, Camera, Loader2, X } from 'lucide-react';
@@ -9,8 +9,22 @@ import { updateProfile, updateProfileAvatar } from '@/actions/profileActions';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import TextArea from '@/components/ui/TextArea';
+import MultiSelect from '@/components/ui/MultiSelect';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+
+const artFormsOptions = [
+  { value: 'Painting', label: 'Painting' },
+  { value: 'Sculpture', label: 'Sculpture' },
+  { value: 'Photography', label: 'Photography' },
+  { value: 'Digital Art', label: 'Digital Art' },
+  { value: 'Illustration', label: 'Illustration' },
+  { value: 'Mixed Media', label: 'Mixed Media' },
+  { value: 'Drawing', label: 'Drawing' },
+  { value: 'Printmaking', label: 'Printmaking' },
+  { value: 'Textile Arts', label: 'Textile Arts' },
+  { value: 'Installation', label: 'Installation' },
+];
 
 const editProfileSchema = z.object({
   full_name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -19,7 +33,7 @@ const editProfileSchema = z.object({
   primary_medium: z.string().optional(),
   about_me: z.string().optional(),
   artist_statement: z.string().optional(),
-  art_forms: z.string().optional(),
+  art_forms: z.array(z.string()).optional(),
   website: z.string().optional(),
   instagram: z.string().optional(),
   awards: z.string().optional(),
@@ -45,7 +59,7 @@ export default function EditProfileForm({ userProfile }: { userProfile: any }) {
   const [isUploadingCover, setIsUploadingCover] = useState(false);
   const coverInputRef = useRef<HTMLInputElement>(null);
 
-  const { register, handleSubmit, formState: { errors } } = useForm<EditProfileFormData>({
+  const { register, handleSubmit, control, formState: { errors } } = useForm<EditProfileFormData>({
     resolver: zodResolver(editProfileSchema),
     defaultValues: {
       full_name: userProfile.full_name || '',
@@ -54,7 +68,7 @@ export default function EditProfileForm({ userProfile }: { userProfile: any }) {
       primary_medium: userProfile.primary_medium || '',
       about_me: userProfile.about_me || '',
       artist_statement: userProfile.artist_statement || '',
-      art_forms: userProfile.art_forms || '',
+      art_forms: userProfile.art_forms ? userProfile.art_forms.split(',').map((s: string) => s.trim()) : [],
       website: userProfile.social_links?.website || '',
       instagram: userProfile.social_links?.instagram || '',
       awards: userProfile.awards || '',
@@ -154,7 +168,7 @@ export default function EditProfileForm({ userProfile }: { userProfile: any }) {
         portfolio_url: data.portfolio_url,
         primary_medium: data.primary_medium,
         artist_statement: data.artist_statement,
-        art_forms: data.art_forms,
+        art_forms: data.art_forms ? data.art_forms.join(', ') : '',
         awards: data.awards,
         other_links: data.other_links,
         social_links: {
@@ -173,7 +187,7 @@ export default function EditProfileForm({ userProfile }: { userProfile: any }) {
   };
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-8">
+    <div className="bg-[var(--color-cor-surface)] rounded-3xl border border-[var(--color-cor-border)] p-8">
       {successMsg && (
         <div className="mb-6 bg-green-50 border border-green-200 rounded-lg p-3 text-green-700 text-sm flex items-center justify-between">
           {successMsg}
@@ -191,7 +205,7 @@ export default function EditProfileForm({ userProfile }: { userProfile: any }) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
         {/* Profile Image */}
         <div
-          className="border-2 border-dashed border-gray-200 rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors relative overflow-hidden"
+          className="border-2 border-dashed border-[var(--color-cor-border)] rounded-3xl p-8 flex flex-col items-center justify-center cursor-pointer hover:bg-[#F4F4ED] transition-colors relative overflow-hidden"
           onClick={() => !isUploadingAvatar && avatarInputRef.current?.click()}
         >
           {avatarPreview ? (
@@ -199,24 +213,24 @@ export default function EditProfileForm({ userProfile }: { userProfile: any }) {
               <img src={avatarPreview} alt="Profile" className="w-full h-full object-cover" />
             </div>
           ) : (
-            <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center mb-3 text-xl font-bold text-gray-500">
+            <div className="w-20 h-20 rounded-full bg-[#F4F4ED] flex items-center justify-center mb-3 text-xl font-bold text-[var(--color-cor-ink-light)]">
               {getInitials(userProfile.full_name)}
             </div>
           )}
           {isUploadingAvatar ? (
-            <Loader2 className="w-5 h-5 animate-spin text-gray-400 mb-2" />
+            <Loader2 className="w-5 h-5 animate-spin text-[var(--color-cor-ink-light)] mb-2" />
           ) : (
-            <Upload className="w-5 h-5 text-gray-400 mb-2" />
+            <Upload className="w-5 h-5 text-[var(--color-cor-ink-light)] mb-2" />
           )}
-          <p className="text-sm font-semibold text-gray-900">Profile Image</p>
-          <p className="text-xs text-gray-400 mt-0.5">Choose file, drag & drop or Paste</p>
-          <p className="text-xs text-gray-400">Choose File · No file chosen</p>
+          <p className="text-sm font-semibold text-[var(--color-cor-ink)]">Profile Image</p>
+          <p className="text-xs text-[var(--color-cor-ink-light)] mt-0.5">Choose file, drag & drop or Paste</p>
+          <p className="text-xs text-[var(--color-cor-ink-light)]">Choose File · No file chosen</p>
           <input ref={avatarInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
         </div>
 
         {/* Cover Image */}
         <div
-          className="border-2 border-dashed border-gray-200 rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors relative overflow-hidden"
+          className="border-2 border-dashed border-[var(--color-cor-border)] rounded-3xl p-8 flex flex-col items-center justify-center cursor-pointer hover:bg-[#F4F4ED] transition-colors relative overflow-hidden"
           onClick={() => !isUploadingCover && coverInputRef.current?.click()}
         >
           {coverPreview ? (
@@ -224,18 +238,18 @@ export default function EditProfileForm({ userProfile }: { userProfile: any }) {
               <img src={coverPreview} alt="Cover" className="w-full h-full object-cover" />
             </div>
           ) : (
-            <div className="w-20 h-20 rounded-lg bg-gray-200 flex items-center justify-center mb-3">
-              <Camera className="w-8 h-8 text-gray-400" />
+            <div className="w-20 h-20 rounded-xl bg-[#F4F4ED] flex items-center justify-center mb-3">
+              <Camera className="w-8 h-8 text-[var(--color-cor-ink-light)]" />
             </div>
           )}
           {isUploadingCover ? (
-            <Loader2 className="w-5 h-5 animate-spin text-gray-400 mb-2" />
+            <Loader2 className="w-5 h-5 animate-spin text-[var(--color-cor-ink-light)] mb-2" />
           ) : (
-            <Upload className="w-5 h-5 text-gray-400 mb-2" />
+            <Upload className="w-5 h-5 text-[var(--color-cor-ink-light)] mb-2" />
           )}
-          <p className="text-sm font-semibold text-gray-900">Cover Image</p>
-          <p className="text-xs text-gray-400 mt-0.5">Choose file, drag & drop or Paste</p>
-          <p className="text-xs text-gray-400">Choose File · No file chosen</p>
+          <p className="text-sm font-semibold text-[var(--color-cor-ink)]">Cover Image</p>
+          <p className="text-xs text-[var(--color-cor-ink-light)] mt-0.5">Choose file, drag & drop or Paste</p>
+          <p className="text-xs text-[var(--color-cor-ink-light)]">Choose File · No file chosen</p>
           <input ref={coverInputRef} type="file" accept="image/*" className="hidden" onChange={handleCoverUpload} />
         </div>
       </div>
@@ -258,7 +272,22 @@ export default function EditProfileForm({ userProfile }: { userProfile: any }) {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <Input label="Art Forms" placeholder="e.g. Oil Painting, Watercolor" error={errors.art_forms?.message} {...register('art_forms')} />
+          <div className="flex flex-col gap-2">
+            <Controller
+              name="art_forms"
+              control={control}
+              render={({ field }) => (
+                <MultiSelect
+                  label="Art Forms"
+                  options={artFormsOptions}
+                  placeholder="Select Art Forms"
+                  value={field.value || []}
+                  onChange={field.onChange}
+                  error={errors.art_forms?.message}
+                />
+              )}
+            />
+          </div>
           <Input label="Website" placeholder="https://..." error={errors.website?.message} {...register('website')} />
         </div>
 
@@ -273,8 +302,8 @@ export default function EditProfileForm({ userProfile }: { userProfile: any }) {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-3 pt-4 border-t border-gray-100">
-          <Button type="submit" isLoading={isLoading} variant="coral">
+        <div className="flex items-center gap-3 pt-4 border-t border-[var(--color-cor-border-light)]">
+          <Button type="submit" isLoading={isLoading} variant="primary">
             <Save size={16} />
             Save Changes
           </Button>

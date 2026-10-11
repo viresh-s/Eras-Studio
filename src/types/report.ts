@@ -5,7 +5,6 @@ export const REPORT_REASONS = [
   'Inappropriate / NSFW content',
   'Plagiarism or stolen work',
   'Spam or misleading information',
-  'Harassment or hate speech',
   'Other / Policy violation',
 ] as const;
 

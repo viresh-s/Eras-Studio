@@ -15,20 +15,14 @@ interface NavbarProps {
 const navLinks = [
   { href: '/discovery', label: 'Discovery' },
   { href: '/portfolio', label: 'Portfolio' },
-<<<<<<< HEAD
-=======
   { href: '/cor', label: 'COR Hub' },
->>>>>>> cfd4433 (Updated regarding COR)
   { href: '/messages', label: 'Messages' },
   { href: '/profile', label: 'Profile' },
 ];
 
 const userNavLinks = [
   { href: '/discovery', label: 'Discovery' },
-<<<<<<< HEAD
-=======
   { href: '/cor', label: 'COR Hub' },
->>>>>>> cfd4433 (Updated regarding COR)
   { href: '/messages', label: 'Messages' },
   { href: '/purchases', label: 'Purchases' },
   { href: '/user/profile', label: 'Profile' },
@@ -36,10 +30,7 @@ const userNavLinks = [
 
 const adminNavLinks = [
   { href: '/admin', label: 'Dashboard' },
-<<<<<<< HEAD
-=======
   { href: '/cor', label: 'COR Hub' },
->>>>>>> cfd4433 (Updated regarding COR)
   { href: '/admin/users', label: 'Users' },
   { href: '/admin/artworks', label: 'Artworks' },
   { href: '/admin/analytics', label: 'Analytics' },
@@ -80,15 +71,15 @@ export default function Navbar({ profile }: NavbarProps) {
   };
 
   return (
-    <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
+    <header className="bg-[var(--color-cor-surface)] border-b border-[var(--color-cor-border)] sticky top-0 z-50">
       <div className="max-w-[1400px] mx-auto px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-1 flex-shrink-0">
-            <span className="text-2xl font-black tracking-tight text-gray-900 font-heading italic">
+          <Link href="/discovery" className="flex items-center gap-1 flex-shrink-0">
+            <span className="text-2xl font-semibold tracking-tight text-[var(--color-cor-ink)] font-serif italic">
               Eras
             </span>
-            <span className="text-xl font-medium tracking-tight text-gray-900 font-heading">
+            <span className="text-xl font-medium tracking-tight text-[var(--color-cor-ink)] font-serif">
               Studio
             </span>
           </Link>
@@ -106,13 +97,13 @@ export default function Navbar({ profile }: NavbarProps) {
                   href={link.href}
                   className={`relative px-4 py-5 text-sm font-medium transition-colors ${
                     isActive
-                      ? 'text-gray-900'
-                      : 'text-gray-500 hover:text-gray-900'
+                      ? 'text-[var(--color-cor-ink)]'
+                      : 'text-[var(--color-cor-ink-light)] hover:text-[var(--color-cor-ink)]'
                   }`}
                 >
                   {link.label}
                   {isActive && (
-                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-[2px] bg-gray-900 rounded-full" />
+                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-[2px] bg-[var(--color-cor-ink)] rounded-full" />
                   )}
                 </Link>
               );
@@ -141,45 +132,53 @@ export default function Navbar({ profile }: NavbarProps) {
               </div>
 
               <div className="hidden lg:block text-left">
-                <p className="text-sm font-semibold text-gray-900 leading-tight">
+                <p className="text-sm font-semibold text-[var(--color-cor-ink)] leading-tight">
                   {profile.full_name || 'Creator'}
                 </p>
-                <p className="text-xs text-gray-500 leading-tight flex items-center gap-1">
+                <p className="text-xs text-[var(--color-cor-ink-light)] leading-tight flex items-center gap-1">
                   Free plan
                 </p>
               </div>
-              <ChevronDown size={14} className="text-gray-400 hidden lg:block" />
+              <ChevronDown size={14} className="text-[var(--color-cor-ink-light)] hidden lg:block" />
             </button>
 
             {/* Dropdown Menu */}
             {dropdownOpen && (
-              <div className="absolute top-full right-0 mt-2 w-56 bg-white border border-gray-200 rounded-xl shadow-lg py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-                <div className="px-4 py-2 border-b border-gray-100 mb-1 lg:hidden">
-                  <p className="text-sm font-semibold text-gray-900 truncate">{profile.full_name}</p>
-                  <p className="text-xs text-gray-500">Free plan</p>
+              <div className="absolute top-full right-0 mt-2 w-56 bg-[var(--color-cor-surface)] border border-[var(--color-cor-border)] rounded-2xl shadow-soft-xl py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="px-4 py-2 border-b border-[var(--color-cor-border-light)] mb-1 lg:hidden">
+                  <p className="text-sm font-semibold text-[var(--color-cor-ink)] truncate">{profile.full_name}</p>
+                  <p className="text-xs text-[var(--color-cor-ink-light)]">Free plan</p>
                 </div>
                 
                 <Link
                   href={profile.role === 'Creator' ? '/profile' : '/user/profile'}
                   onClick={() => setDropdownOpen(false)}
-                  className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors w-full text-left"
+                  className="flex items-center gap-2 px-4 py-2 text-sm text-[var(--color-cor-ink)] hover:bg-[#F4F4ED] transition-colors w-full text-left"
                 >
                   <User size={16} /> Edit Profile
                 </Link>
 
+                <Link
+                  href="/settings"
+                  onClick={() => setDropdownOpen(false)}
+                  className="flex items-center gap-2 px-4 py-2 text-sm text-[var(--color-cor-ink)] hover:bg-[#F4F4ED] transition-colors w-full text-left"
+                >
+                  <Settings size={16} /> Account Settings
+                </Link>
+
                 <button
                   disabled
-                  className="flex items-center gap-2 px-4 py-2 text-sm text-gray-400 cursor-not-allowed w-full text-left opacity-70"
+                  className="flex items-center gap-2 px-4 py-2 text-sm text-[var(--color-cor-ink-light)] cursor-not-allowed w-full text-left opacity-70"
                 >
                   <Sparkles size={16} /> Upgrade (Coming Soon)
                 </button>
 
-                <div className="h-px bg-gray-100 my-1"></div>
+                <div className="h-px bg-[var(--color-cor-border-light)] my-1"></div>
 
                 <form action={logout}>
                   <button
                     type="submit"
-                    className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors w-full text-left"
+                    className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-[#FAF5EC] transition-colors w-full text-left"
                   >
                     <LogOut size={16} /> Sign out
                   </button>
@@ -205,13 +204,13 @@ export default function Navbar({ profile }: NavbarProps) {
                 href={link.href}
                 className={`relative px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors ${
                   isActive
-                    ? 'text-gray-900'
-                    : 'text-gray-500 hover:text-gray-900'
+                    ? 'text-[var(--color-cor-ink)]'
+                    : 'text-[var(--color-cor-ink-light)] hover:text-[var(--color-cor-ink)]'
                 }`}
               >
                 {link.label}
                 {isActive && (
-                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-[2px] bg-gray-900 rounded-full" />
+                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-[2px] bg-[var(--color-cor-ink)] rounded-full" />
                 )}
               </Link>
             );

@@ -9,17 +9,17 @@ import { motion } from 'framer-motion';
 
 const artTypeOptions = [
   { value: '', label: 'All Types' },
-  { value: 'painting', label: 'Painting' },
-  { value: 'sculpture', label: 'Sculpture' },
-  { value: 'photography', label: 'Photography' },
-  { value: 'digital-art', label: 'Digital Art' },
-  { value: 'drawing', label: 'Drawing' },
-  { value: 'print', label: 'Print' },
-  { value: 'mixed-media', label: 'Mixed Media' },
-  { value: 'collage', label: 'Collage' },
-  { value: 'textile', label: 'Textile Art' },
-  { value: 'ceramic', label: 'Ceramic' },
-  { value: 'other', label: 'Other' },
+  { value: 'Painting', label: 'Painting' },
+  { value: 'Sculpture', label: 'Sculpture' },
+  { value: 'Photography', label: 'Photography' },
+  { value: 'Digital Art', label: 'Digital Art' },
+  { value: 'Drawing', label: 'Drawing' },
+  { value: 'Print', label: 'Print' },
+  { value: 'Mixed Media', label: 'Mixed Media' },
+  { value: 'Collage', label: 'Collage' },
+  { value: 'Textile Art', label: 'Textile Art' },
+  { value: 'Ceramic', label: 'Ceramic' },
+  { value: 'Other', label: 'Other' },
 ];
 
 interface ArtworkItem {
@@ -29,6 +29,7 @@ interface ArtworkItem {
   artist_name: string;
   image_url: string;
   price: number | null;
+  price_visibility?: string | null;
   status: string;
   year?: string | null;
   profiles: { full_name: string } | null;
@@ -74,7 +75,7 @@ export default function BrowsePage() {
 
     let query = supabase
       .from('artworks')
-      .select('id, title, art_type, artist_name, image_url, price, status, year, profiles(full_name)', { count: 'exact' })
+      .select('id, title, art_type, artist_name, image_url, price, price_visibility, status, year, profiles(full_name)', { count: 'exact' })
       .eq('status', 'Available')
       .order('created_at', { ascending: false });
 
@@ -144,23 +145,13 @@ export default function BrowsePage() {
               onClick={() => {
                 document.getElementById('gallery')?.scrollIntoView({ behavior: 'smooth' });
               }}
-              className="inline-flex items-center gap-3 px-8 py-4 bg-black text-white rounded-full font-medium hover:bg-gray-800 transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#141413] text-[#FAF5EC] border border-[#141413] rounded-full text-xs uppercase tracking-[0.08em] font-medium hover:bg-black transition-all duration-200 group"
             >
-              Explore the gallery
-              <ArrowRight size={18} />
+              <span>Explore the gallery</span>
+              <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform duration-200" />
             </button>
             
-            <div className="mt-16 flex items-center gap-4">
-              <div className="flex -space-x-3">
-                <div className="w-10 h-10 rounded-full border-2 border-[#F5F5F5] bg-gray-200 flex items-center justify-center text-[10px] font-bold text-gray-600">RM</div>
-                <div className="w-10 h-10 rounded-full border-2 border-[#F5F5F5] bg-gray-200 flex items-center justify-center text-[10px] font-bold text-gray-600">MN</div>
-                <div className="w-10 h-10 rounded-full border-2 border-[#F5F5F5] bg-gray-200 flex items-center justify-center text-[10px] font-bold text-gray-600">AR</div>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-xs font-medium text-gray-900 leading-tight">Independent minds.</span>
-                <span className="text-xs text-gray-500 leading-tight">Extraordinary perspectives.</span>
-              </div>
-            </div>
+
           </div>
           
           {/* Right: Artwork Cards Collage */}
@@ -296,41 +287,42 @@ export default function BrowsePage() {
             >
             {artworks.map((artwork) => (
               <motion.div key={artwork.id} variants={itemVariants} className="h-full">
-                <Link href={`/artwork/${artwork.id}`} className="group block h-full">
-                  <div className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 h-full flex flex-col">
-                    <div className="aspect-[4/5] bg-gray-100 overflow-hidden relative">
+                <Link href={`/artwork/${artwork.id}`} className="group block h-full cursor-pointer">
+                  <div className="flex flex-col h-full">
+                    <div className="aspect-[4/5] bg-[#E8E8E3] overflow-hidden relative rounded-xl mb-4">
                       <img
                         src={artwork.image_url}
                         alt={artwork.title}
-                        className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                       />
                       {/* Status tag */}
-                      <div className="absolute bottom-3 left-3 z-10">
-                        <span className="inline-block px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded bg-white text-gray-900 shadow-sm">
+                      <div className="absolute top-4 right-4 z-10">
+                        <span className="inline-block px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest rounded-full bg-white/90 backdrop-blur-md text-[var(--color-cor-ink)] shadow-sm">
                           {artwork.art_type}
                         </span>
                       </div>
                     </div>
                     
-                    <div className="p-4 flex-1 flex flex-col">
-                      <div className="flex items-start justify-between">
+                    <div className="flex-1 flex flex-col px-1">
+                      <div className="flex items-start justify-between gap-4">
                         <div className="min-w-0 flex-1">
-                          <h3 className="font-bold text-gray-900 truncate">{artwork.title}</h3>
-                          <p className="text-gray-500 text-xs mt-0.5">
-                            <span className="font-medium text-gray-700">{artwork.artist_name || artwork.profiles?.full_name}</span>
-                            {artwork.year ? ` · ${artwork.year}` : ''}
+                          <h3 className="font-serif text-[19px] font-bold text-[var(--color-cor-ink)] truncate leading-tight group-hover:opacity-70 transition-opacity">{artwork.title}</h3>
+                          <p className="text-[var(--color-cor-ink-light)] text-[11px] mt-1.5 uppercase tracking-wider font-semibold">
+                            {artwork.artist_name || artwork.profiles?.full_name}
+                            {artwork.year ? `, ${artwork.year}` : ''}
                           </p>
                         </div>
-                      </div>
-                      
-                      <div className="mt-auto pt-4 flex items-center justify-between">
-                        {artwork.price ? (
-                          <span className="font-bold text-gray-900 text-sm">
-                            ${artwork.price}
-                          </span>
-                        ) : (
-                          <span className="text-gray-400 text-xs font-medium">Price on request</span>
-                        )}
+                        <div className="shrink-0 text-right pt-0.5">
+                          {artwork.price_visibility === 'Hide Price' || artwork.price_visibility === 'Hidden' ? null : artwork.price_visibility === 'Price on Request' ? (
+                            <span className="text-[var(--color-cor-ink-light)] text-[11px] font-medium uppercase tracking-wider">On Request</span>
+                          ) : artwork.price ? (
+                            <span className="font-bold text-[var(--color-cor-ink)] text-sm">
+                              ₹{artwork.price.toLocaleString('en-IN')}
+                            </span>
+                          ) : (
+                            <span className="text-[var(--color-cor-ink-light)] text-[11px] font-medium uppercase tracking-wider">On Request</span>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -344,7 +336,7 @@ export default function BrowsePage() {
                 <button
                   onClick={() => setPage(p => p + 1)}
                   disabled={isLoading}
-                  className="px-8 py-3 bg-white border border-gray-200 text-gray-900 rounded-full font-semibold hover:bg-gray-50 transition-colors shadow-sm disabled:opacity-50"
+                  className="px-6 py-2.5 bg-transparent border border-[#141413]/25 text-[#141413] rounded-full text-xs uppercase tracking-[0.08em] font-medium hover:border-[#141413] hover:bg-[#141413] hover:text-[#FAF5EC] transition-all duration-200 shadow-none disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   {isLoading ? 'Loading...' : 'Load More'}
                 </button>
@@ -355,13 +347,13 @@ export default function BrowsePage() {
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-xl border border-gray-200 p-20 text-center"
+            className="bg-[#FAF5EC] rounded-3xl border border-[#E8E8E3] py-24 px-6 text-center shadow-soft-sm"
           >
-            <div className="w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center mx-auto mb-5 shadow-sm">
-              <Filter size={24} className="text-gray-400" />
+            <div className="w-16 h-16 rounded-2xl bg-white flex items-center justify-center mx-auto mb-6 shadow-sm border border-[#E8E8E3]">
+              <Filter size={24} className="text-[#9A3B3B]" />
             </div>
-            <p className="font-extrabold text-gray-900 text-2xl mb-3 tracking-tight">No artworks found</p>
-            <p className="text-gray-500">Try adjusting your search or filter criteria</p>
+            <p className="font-serif italic text-[var(--color-cor-ink)] text-2xl mb-3 tracking-tight">No artworks found</p>
+            <p className="text-[var(--color-cor-ink-light)] text-sm font-medium">Try adjusting your search or filter criteria to discover new pieces.</p>
           </motion.div>
         )}
       </div>

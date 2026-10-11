@@ -89,6 +89,8 @@ export const CreateArtworkSchema = z.object({
   price: z.number().min(0, 'Price cannot be negative').max(100000000, 'Price exceeds maximum allowed').optional().nullable(),
   year: z.string().trim().max(10, 'Year must not exceed 10 characters').optional().nullable(),
   dimensions: z.string().trim().max(100, 'Dimensions must not exceed 100 characters').optional().nullable(),
+  width: z.string().trim().max(50, 'Width must not exceed 50 characters').optional().nullable(),
+  height: z.string().trim().max(50, 'Height must not exceed 50 characters').optional().nullable(),
   location: z.string().trim().max(150, 'Location must not exceed 150 characters').optional().nullable(),
   style: z.string().trim().max(100, 'Style must not exceed 100 characters').optional().nullable(),
   tags: z.array(z.string().trim().max(50)).max(20, 'Maximum 20 tags allowed').optional(),
@@ -134,6 +136,12 @@ export const CreateChatSchema = z.object({
 export const ReportArtworkSchema = z.object({
   artworkId: SafeIdSchema,
   artworkOwnerId: SafeIdSchema.optional().nullable(),
+  reason: ReportReasonSchema,
+  details: z.string().max(2000, 'Report details must not exceed 2000 characters').optional().nullable(),
+});
+
+export const ReportUserSchema = z.object({
+  reportedUserId: SafeIdSchema,
   reason: ReportReasonSchema,
   details: z.string().max(2000, 'Report details must not exceed 2000 characters').optional().nullable(),
 });

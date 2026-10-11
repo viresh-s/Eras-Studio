@@ -5,15 +5,15 @@ interface BadgeProps {
 }
 
 const variantClasses = {
-  default: 'bg-gray-100 text-gray-700',
-  blue: 'bg-blue-50 text-blue-700',
-  coral: 'bg-orange-50 text-orange-700',
-  green: 'bg-emerald-50 text-emerald-700',
-  red: 'bg-red-50 text-red-700',
-  gray: 'bg-gray-100 text-gray-500',
-  violet: 'bg-violet-50 text-violet-700',
-  yellow: 'bg-amber-50 text-amber-700',
-  pink: 'bg-pink-50 text-pink-700',
+  default: 'bg-[var(--color-cor-border-light)] text-[var(--color-cor-ink)]',
+  blue: 'bg-[#F4F4ED] text-[var(--color-cor-ink)]',
+  coral: 'bg-[#FAF5EC] text-[#865E16]',
+  green: 'bg-[#F4F4ED] text-[#557153]',
+  red: 'bg-[#FAF5EC] text-[#9A3B3B]',
+  gray: 'bg-white border border-[var(--color-cor-border)] text-[var(--color-cor-ink-light)]',
+  violet: 'bg-[#F4F4ED] text-[var(--color-cor-ink)]',
+  yellow: 'bg-[#FAF5EC] text-[#865E16]',
+  pink: 'bg-[#FAF5EC] text-[var(--color-cor-ink)]',
 };
 
 export default function Badge({ variant = 'default', children, className = '' }: BadgeProps) {

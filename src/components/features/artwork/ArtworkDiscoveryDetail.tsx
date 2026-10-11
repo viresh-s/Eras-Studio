@@ -30,6 +30,8 @@ interface ArtworkData {
   status: string;
   year: string | null;
   dimensions: string | null;
+  width: string | null;
+  height: string | null;
   location: string | null;
   style: string | null;
   tags: string[];
@@ -186,7 +188,12 @@ export default function ArtworkDiscoveryDetail({
             <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-xs divide-y divide-gray-100 text-xs sm:text-sm">
               {[
                 { label: 'Medium & Technique', value: artwork.style || artwork.art_type },
-                { label: 'Dimensions', value: artwork.dimensions || 'Contact artist' },
+                { 
+                  label: 'Dimensions', 
+                  value: (artwork.width && artwork.height) 
+                    ? `${artwork.width} x ${artwork.height}` 
+                    : (artwork.dimensions || 'Contact artist') 
+                },
                 { label: 'Year Created', value: artwork.year || 'Contemporary' },
                 { label: 'Origin / Location', value: artwork.location || 'Studio Collection' },
                 { label: 'Series / Collection', value: artwork.collection || 'Independent Work' },
@@ -206,11 +213,19 @@ export default function ArtworkDiscoveryDetail({
                   <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-1">
                     Direct Acquisition
                   </p>
-                  <p className="text-2xl sm:text-3xl font-extrabold text-gray-900">
-                    {artwork.price_visibility === 'Hidden' || !artwork.price
-                      ? 'Price on request'
-                      : `$${artwork.price.toLocaleString()}`}
-                  </p>
+                  {artwork.price_visibility === 'Hide Price' || artwork.price_visibility === 'Hidden' ? (
+                    <p className="text-xl font-bold text-gray-500">
+                      Price not disclosed
+                    </p>
+                  ) : artwork.price_visibility === 'Price on Request' || !artwork.price ? (
+                    <p className="text-2xl sm:text-3xl font-extrabold text-gray-900">
+                      Price on request
+                    </p>
+                  ) : (
+                    <p className="text-2xl sm:text-3xl font-extrabold text-gray-900">
+                      ₹{artwork.price.toLocaleString('en-IN')}
+                    </p>
+                  )}
                 </div>
                 {artwork.external_link && (
                   <a

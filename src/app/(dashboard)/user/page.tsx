@@ -129,8 +129,12 @@ export default async function UserDashboard() {
                   <div className="p-4">
                     <h3 className="font-bold text-gray-900 truncate">{artwork.title}</h3>
                     <p className="text-gray-500 text-sm">{(artwork.profiles as Record<string, string>)?.full_name}</p>
-                    {artwork.price && (
-                      <p className="font-bold text-gray-900 mt-1">${artwork.price}</p>
+                    {artwork.price_visibility !== 'Hide Price' && artwork.price_visibility !== 'Hidden' && (
+                      <p className="font-bold text-gray-900 mt-1">
+                        {artwork.price_visibility === 'Price on Request' || !artwork.price
+                          ? 'Price on Request'
+                          : `₹${artwork.price.toLocaleString('en-IN')}`}
+                      </p>
                     )}
                   </div>
                 </div>

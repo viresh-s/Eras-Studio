@@ -55,11 +55,11 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md' }:
         style={{ animation: 'modalIn 0.2s ease-out' }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
-          <h2 className="text-lg font-bold text-gray-900">{title}</h2>
+        <div className="flex items-center justify-between px-6 py-5 border-b border-[var(--color-cor-border-light)]">
+          <h2 className="font-serif text-xl font-semibold text-[var(--color-cor-ink)]">{title}</h2>
           <button
             onClick={onClose}
-            className="p-2 rounded-full text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700"
+            className="p-2 rounded-full text-[var(--color-cor-ink-light)] transition-colors hover:bg-[var(--color-cor-bg)] hover:text-[var(--color-cor-ink)]"
             aria-label="Close modal"
           >
             <X size={18} />

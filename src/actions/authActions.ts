@@ -159,3 +159,16 @@ export async function resendVerificationEmail(emailRaw: string): Promise<{ error
   if (error) return { error: error.message };
   return { success: true };
 }
+
+export async function sendPasswordResetOtp(emailRaw: string): Promise<{ error?: string, success?: boolean }> {
+  const parsed = emailSchema.safeParse(emailRaw);
+  if (!parsed.success) return { error: parsed.error.errors[0].message };
+  const email = parsed.data;
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.resetPasswordForEmail(email);
+
+  if (error) return { error: error.message };
+  return { success: true };
+}
+

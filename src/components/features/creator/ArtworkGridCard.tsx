@@ -11,6 +11,7 @@ interface ArtworkGridCardProps {
     artist_name?: string;
     year?: string | null;
     price?: number | null;
+    price_visibility?: string | null;
     status: string;
     is_published?: boolean;
   };
@@ -86,9 +87,17 @@ export default function ArtworkGridCard({ artwork, creatorName, children }: Artw
                 </span>
               </div>
               
-              {artwork.price && (
+              {artwork.price_visibility === 'Hide Price' || artwork.price_visibility === 'Hidden' ? null : artwork.price_visibility === 'Price on Request' ? (
+                <span className="text-[11px] font-medium text-gray-500">
+                  On Request
+                </span>
+              ) : artwork.price ? (
                 <span className="text-xs font-bold text-gray-900">
-                  ${artwork.price.toLocaleString()}
+                  ₹{artwork.price.toLocaleString('en-IN')}
+                </span>
+              ) : (
+                <span className="text-[11px] font-medium text-gray-500">
+                  On Request
                 </span>
               )}
             </div>

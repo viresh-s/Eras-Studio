@@ -59,8 +59,7 @@ export default function SignupPage() {
     } else if (result?.requireEmailVerification) {
       router.push(`/verify-email?email=${encodeURIComponent(data.email)}`);
     } else if (result?.role) {
-      if (result.role === 'Creator') router.push('/portfolio');
-      else if (result.role === 'Admin') router.push('/admin');
+      if (result.role === 'Admin') router.push('/admin');
       else router.push('/discovery');
     }
   };
@@ -95,7 +94,7 @@ export default function SignupPage() {
               }`}
             >
               <ShoppingBag size={18} />
-              Collector
+              User
             </button>
             <button
               type="button"
@@ -188,7 +187,7 @@ export default function SignupPage() {
             isLoading={isLoading}
           >
             <UserPlus size={16} />
-            Create Account as {selectedRole === 'Creator' ? 'Creator' : 'Collector'}
+            Create Account as {selectedRole === 'Creator' ? 'Creator' : 'User'}
           </Button>
         </form>
       </div>

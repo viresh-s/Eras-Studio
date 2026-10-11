@@ -46,8 +46,7 @@ export default function LoginPage() {
       setError(result.error);
       setIsLoading(false);
     } else if (result?.role) {
-      if (result.role === 'Creator') router.push('/portfolio');
-      else if (result.role === 'Admin') router.push('/admin');
+      if (result.role === 'Admin') router.push('/admin');
       else router.push('/discovery');
     }
   };
@@ -94,6 +93,15 @@ export default function LoginPage() {
             >
               {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
+          </div>
+
+          <div className="flex items-center justify-end -mt-1 mb-1">
+            <Link
+              href="/forgot-password"
+              className="text-xs font-medium text-gray-500 hover:text-gray-900 transition-colors underline-offset-4 hover:underline"
+            >
+              Forgot password?
+            </Link>
           </div>
 
           <Button type="submit" fullWidth isLoading={isLoading}>

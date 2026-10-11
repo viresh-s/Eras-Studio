@@ -11,7 +11,7 @@ export interface AuthenticatedContext {
   };
   profile: Profile;
   ip: string;
-  supabase: SupabaseClient<any, 'public', any>;
+  supabase: SupabaseClient;
 }
 
 export interface RequireAuthOptions {
@@ -33,8 +33,8 @@ export async function getClientIp(): Promise<string> {
   return '127.0.0.1';
 }
 
-function isSupabaseClient(arg: any): arg is SupabaseClient {
-  return arg && typeof arg === 'object' && 'auth' in arg && 'from' in arg;
+function isSupabaseClient(arg: unknown): arg is SupabaseClient {
+  return typeof arg === 'object' && arg !== null && 'auth' in arg && 'from' in arg;
 }
 
 /**

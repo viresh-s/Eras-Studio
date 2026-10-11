@@ -33,13 +33,15 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Protected dashboard routes
-  const isDashboardRoute = request.nextUrl.pathname.startsWith('/portfolio') ||
+  // Protected routes: artworks, discovery, portfolio, admin, messages, settings
+  const isProtectedRoute = request.nextUrl.pathname.startsWith('/artwork') ||
+    request.nextUrl.pathname.startsWith('/portfolio') ||
     request.nextUrl.pathname.startsWith('/discovery') ||
     request.nextUrl.pathname.startsWith('/admin') ||
-    request.nextUrl.pathname.startsWith('/messages');
+    request.nextUrl.pathname.startsWith('/messages') ||
+    request.nextUrl.pathname.startsWith('/settings');
 
-  if (isDashboardRoute && !user) {
+  if (isProtectedRoute && !user) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     const response = NextResponse.redirect(url);
@@ -49,9 +51,12 @@ export async function updateSession(request: NextRequest) {
     return response;
   }
 
-  // Redirect logged-in users away from auth pages
-  const isAuthRoute = request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/signup';
-  if (isAuthRoute && user) {
+  // Redirect logged-in users away from auth pages and the landing page
+  const isAuthOrLandingRoute = request.nextUrl.pathname === '/login' || 
+                               request.nextUrl.pathname === '/signup' || 
+                               request.nextUrl.pathname === '/';
+                               
+  if (isAuthOrLandingRoute && user) {
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
@@ -65,11 +70,10 @@ export async function updateSession(request: NextRequest) {
     }
 
     const url = request.nextUrl.clone();
-    if (profile.role === 'Creator') {
-      url.pathname = '/portfolio';
-    } else if (profile.role === 'Admin') {
+    if (profile.role === 'Admin') {
       url.pathname = '/admin';
     } else {
+      // Direct both Creators and Users/Collectors to the discovery page
       url.pathname = '/discovery';
     }
     const response = NextResponse.redirect(url);

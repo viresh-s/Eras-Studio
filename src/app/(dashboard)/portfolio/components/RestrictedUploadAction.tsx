@@ -21,7 +21,7 @@ export default function RestrictedUploadAction({ isLimited, label, className = '
   }, [isLimited]);
 
   // Set default class if not provided
-  const buttonClass = className || "inline-flex items-center gap-2 px-6 py-2.5 bg-gray-900 text-white rounded-full text-sm font-semibold hover:bg-gray-800 transition-all shadow-sm";
+  const buttonClass = className || "inline-flex items-center gap-2 px-5 py-2.5 bg-[#141413] text-[#FAF5EC] border border-[#141413] rounded-full text-xs uppercase tracking-[0.08em] font-medium hover:bg-black transition-all";
 
   return (
     <>

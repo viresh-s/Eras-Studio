@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
 import ProfileTabs from '@/components/features/creator/ProfileTabs';
+import ReportUserButton from '@/components/features/user/ReportUserButton';
 import { Mail, MapPin } from 'lucide-react';
 
 interface ArtistProfilePageProps {
@@ -88,10 +89,18 @@ export default async function ArtistProfilePage({ params }: ArtistProfilePagePro
             </p>
           )}
 
-          <div className="flex justify-center items-center">
+          <div className="flex justify-center items-center gap-3">
              <span className="px-4 py-1.5 text-[11px] font-semibold rounded-full bg-white border border-gray-200 text-gray-700 shadow-sm">
                Pro Creator
              </span>
+             {user && !isOwner && (
+                <ReportUserButton
+                  reportedUserId={profile.id}
+                  reportedUserName={profile.full_name}
+                  currentUserId={user.id}
+                  variant="icon-only"
+                />
+             )}
           </div>
         </div>
 

@@ -45,9 +45,9 @@ export default function Card({
   return (
     <motion.div
       className={cn(
-        'bg-white rounded-2xl shadow-[0_2px_20px_rgb(0,0,0,0.04)] overflow-hidden group',
+        'bg-white rounded-3xl border border-[var(--color-cor-border)] overflow-hidden group',
         paddingClasses[padding],
-        hover && 'transition-shadow duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)]',
+        hover && 'transition-shadow duration-300 hover:shadow-soft-md',
         className
       )}
       {...baseAnimation}
