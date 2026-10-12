@@ -185,7 +185,10 @@ export async function sendPasswordResetOtp(emailRaw: string): Promise<{ error?: 
   const email = parsed.data;
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.resetPasswordForEmail(email);
+  const origin = await getRequestOrigin();
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${origin}/auth/callback?next=/forgot-password?mode=reset`,
+  });
 
   if (error) return { error: error.message };
   return { success: true };

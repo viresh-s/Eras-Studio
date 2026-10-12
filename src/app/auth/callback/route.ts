@@ -7,13 +7,20 @@ export async function GET(request: Request) {
   const code = searchParams.get('code');
   const token_hash = searchParams.get('token_hash');
   const type = searchParams.get('type') as EmailOtpType | null;
+  const next = searchParams.get('next');
 
   const supabase = await createClient();
+
+  const isPasswordRecovery = type === 'recovery' || (Boolean(next) && next!.includes('forgot-password'));
 
   if (code) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
-      // User must be redirected to login page after email verification
+      if (isPasswordRecovery) {
+        // Keep recovery session active so user can update their password
+        return NextResponse.redirect(`${origin}/forgot-password?mode=reset`);
+      }
+      // User requested login redirect after email verification
       await supabase.auth.signOut();
       return NextResponse.redirect(`${origin}/login?verified=true`);
     }
@@ -25,10 +32,16 @@ export async function GET(request: Request) {
       type,
     });
     if (!error) {
-      // Sign out auto-session so the user logs in as requested
+      if (isPasswordRecovery) {
+        return NextResponse.redirect(`${origin}/forgot-password?mode=reset`);
+      }
       await supabase.auth.signOut();
       return NextResponse.redirect(`${origin}/login?verified=true`);
     }
+  }
+
+  if (isPasswordRecovery) {
+    return NextResponse.redirect(`${origin}/forgot-password?mode=reset`);
   }
 
   // Redirect to login page with verified state
