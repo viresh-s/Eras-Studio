@@ -1,40 +1,58 @@
 'use client';
 
-import { forwardRef } from 'react';
+import React, { forwardRef } from 'react';
 import type { InputHTMLAttributes } from 'react';
 
-interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
   helperText?: string;
+  leftIcon?: React.ReactNode;
+  rightIcon?: React.ReactNode;
 }
 
-const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, helperText, className = '', id, ...props }, ref) => {
-    const inputId = id || label?.toLowerCase().replace(/\s+/g, '-');
+export const Input = forwardRef<HTMLInputElement, InputProps>(
+  ({ label, error, helperText, leftIcon, rightIcon, className = '', id, disabled, ...props }, ref) => {
+    const inputId = id || (label ? label.toLowerCase().replace(/\s+/g, '-') : undefined);
 
     return (
-      <div className="flex flex-col gap-1.5">
+      <div className="w-full space-y-1.5 text-left">
         {label && (
           <label
             htmlFor={inputId}
-            className="text-xs font-semibold text-[var(--color-cor-ink)]"
+            className="block text-xs font-medium text-[#4A4A45] tracking-tight"
           >
             {label}
           </label>
         )}
-        <input
-          ref={ref}
-          id={inputId}
-          className={`w-full px-4 py-3 text-sm bg-white border rounded-xl outline-none transition-all duration-200 placeholder:text-[var(--color-cor-ink-light)] ${error ? 'border-red-300 focus:border-red-500 focus:ring-1 focus:ring-red-500' : 'border-[var(--color-cor-border)] focus:border-[var(--color-cor-ink)] focus:ring-1 focus:ring-[var(--color-cor-ink)]'} ${className}`}
-          {...props}
-        />
-        {error && (
-          <span className="text-red-500 text-xs font-medium">{error}</span>
-        )}
-        {helperText && !error && (
-          <span className="text-gray-400 text-xs">{helperText}</span>
-        )}
+        <div className="relative flex items-center">
+          {leftIcon && (
+            <div className="absolute left-3 text-[#8A8A84] pointer-events-none flex items-center">
+              {leftIcon}
+            </div>
+          )}
+          <input
+            id={inputId}
+            ref={ref}
+            disabled={disabled}
+            className={`w-full bg-white text-[#141413] text-sm placeholder:text-[#9A9A94] border ${
+              error ? 'border-[#D94E4E]' : 'border-[#E8E8E3]'
+            } rounded-lg py-2.5 ${leftIcon ? 'pl-9' : 'pl-3.5'} ${
+              rightIcon ? 'pr-9' : 'pr-3.5'
+            } transition-colors duration-150 focus:outline-none focus:border-[#B8532F] focus:ring-1 focus:ring-[#B8532F] disabled:bg-[#F7F7F4] disabled:text-[#8E8E88] disabled:cursor-not-allowed ${className}`}
+            {...props}
+          />
+          {rightIcon && (
+            <div className="absolute right-3 text-[#8A8A84] flex items-center">
+              {rightIcon}
+            </div>
+          )}
+        </div>
+        {error ? (
+          <p className="text-xs text-[#B83838] font-medium">{error}</p>
+        ) : helperText ? (
+          <p className="text-xs text-[#71716D]">{helperText}</p>
+        ) : null}
       </div>
     );
   }

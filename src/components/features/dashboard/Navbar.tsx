@@ -29,13 +29,14 @@ const userNavLinks = [
 ];
 
 const adminNavLinks = [
-  { href: '/admin', label: 'Dashboard' },
-  { href: '/cor', label: 'COR Hub' },
+  { href: '/admin/overview', label: 'Admin Panel' },
   { href: '/admin/users', label: 'Users' },
   { href: '/admin/artworks', label: 'Artworks' },
-  { href: '/admin/analytics', label: 'Analytics' },
-  { href: '/messages', label: 'Messages' },
-  { href: '/admin/profile', label: 'Profile' },
+  { href: '/admin/cor', label: 'COR Ops' },
+  { href: '/admin/reports', label: 'Reports' },
+  { href: '/admin/subscriptions', label: 'Subscriptions' },
+  { href: '/discovery', label: 'Discovery' },
+  { href: '/cor', label: 'COR Hub' },
 ];
 
 export default function Navbar({ profile }: NavbarProps) {

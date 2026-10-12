@@ -56,8 +56,7 @@ export default function NotificationBell() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    const { data } = await supabase
-      .from('notifications')
+    const { data } = await (supabase.from('notifications') as any)
       .select('*')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
@@ -81,7 +80,7 @@ export default function NotificationBell() {
       }
 
       setNotifications(finalData);
-      setUnreadCount(finalData.filter((n) => !n.is_read).length);
+      setUnreadCount(finalData.filter((n: any) => !n.is_read).length);
     }
   };
 
@@ -95,8 +94,7 @@ export default function NotificationBell() {
     );
     setUnreadCount((prev) => Math.max(0, prev - 1));
 
-    await supabase
-      .from('notifications')
+    await (supabase.from('notifications') as any)
       .update({ is_read: true, read_at: nowIso })
       .eq('id', id);
   };
@@ -117,8 +115,7 @@ export default function NotificationBell() {
       return hasPersistent ? 1 : 0;
     });
 
-    await supabase
-      .from('notifications')
+    await (supabase.from('notifications') as any)
       .update({ is_read: true, read_at: nowIso })
       .eq('user_id', user.id)
       .eq('is_read', false);
