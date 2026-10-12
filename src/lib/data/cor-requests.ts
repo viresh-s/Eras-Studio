@@ -223,10 +223,23 @@ export const corRequestsRepo = {
     const supabase = getSupabaseAdmin();
     if (supabase) {
       try {
+        const isUuid = (val?: string) =>
+          typeof val === "string" &&
+          /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(val);
+
+        let safeAdminId: string | null = null;
+        if (isUuid(adminId)) {
+          const { data: prof } = await (supabase.from("profiles") as any)
+            .select("id")
+            .eq("id", adminId)
+            .maybeSingle();
+          if (prof?.id) safeAdminId = prof.id;
+        }
+
         const { data, error } = await (supabase.from("cor_members") as any)
           .update({
             status: "active",
-            approved_by: adminId,
+            approved_by: safeAdminId,
             approved_at: now,
             updated_at: now,
           })
@@ -251,6 +264,8 @@ export const corRequestsRepo = {
           });
 
           return mapped;
+        } else if (error) {
+          console.error("Supabase cor_members approve error:", error);
         }
       } catch (err) {
         console.error("Supabase cor_members approve failed:", err);
@@ -279,10 +294,23 @@ export const corRequestsRepo = {
     const supabase = getSupabaseAdmin();
     if (supabase) {
       try {
+        const isUuid = (val?: string) =>
+          typeof val === "string" &&
+          /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(val);
+
+        let safeAdminId: string | null = null;
+        if (isUuid(adminId)) {
+          const { data: prof } = await (supabase.from("profiles") as any)
+            .select("id")
+            .eq("id", adminId)
+            .maybeSingle();
+          if (prof?.id) safeAdminId = prof.id;
+        }
+
         const { data, error } = await (supabase.from("cor_members") as any)
           .update({
             status: "declined",
-            declined_by: adminId,
+            declined_by: safeAdminId,
             declined_at: now,
             decline_reason: reason || null,
             admin_review_notes: note || null,
@@ -309,6 +337,8 @@ export const corRequestsRepo = {
           });
 
           return mapped;
+        } else if (error) {
+          console.error("Supabase cor_members decline error:", error);
         }
       } catch (err) {
         console.error("Supabase cor_members decline failed:", err);

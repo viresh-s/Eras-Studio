@@ -177,21 +177,36 @@ export const corMembersRepo = {
     const supabase = getSupabaseAdmin();
     if (supabase) {
       try {
+        const isUuid = (val?: string | null) =>
+          typeof val === "string" &&
+          /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(val);
+
+        let safeAdminId: string | null = null;
+        if (isUuid(data.approvedBy)) {
+          const { data: prof } = await (supabase.from("profiles") as any)
+            .select("id")
+            .eq("id", data.approvedBy)
+            .maybeSingle();
+          if (prof?.id) safeAdminId = prof.id;
+        }
+
         const { data: inserted, error } = await (supabase.from("cor_members") as any).insert({
           creator_id: data.creatorId || data.userId,
           status: data.status || "active",
           desired_role: data.desiredRole || null,
-          skills: data.skills || [],
-          experience_years: data.experienceYears || null,
-          preferred_work_type: data.preferredWorkType || null,
-          internal_notes: data.internalNotes || null,
+          primary_skills: data.skills || [],
+          years_of_experience: data.experienceYears || null,
+          remote_preference: data.preferredWorkType || null,
+          admin_review_notes: data.internalNotes || null,
           career_strategy: data.careerStrategy || null,
-          approved_by: data.approvedBy || null,
+          approved_by: safeAdminId,
           approved_at: data.approvedAt || now,
         }).select().single();
 
         if (!error && inserted) {
           return mapMemberFromSupabase(inserted);
+        } else if (error) {
+          console.error("Supabase cor_members insert error:", error);
         }
       } catch (err) {
         console.error("Supabase cor_members insert failed:", err);
@@ -210,13 +225,29 @@ export const corMembersRepo = {
     const supabase = getSupabaseAdmin();
     if (supabase) {
       try {
+        const isUuid = (val?: string | null) =>
+          typeof val === "string" &&
+          /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(val);
+
         const updatePayload: any = { updated_at: now };
         if (data.status) updatePayload.status = data.status;
-        if (data.internalNotes !== undefined) updatePayload.internal_notes = data.internalNotes;
+        if (data.internalNotes !== undefined) updatePayload.admin_review_notes = data.internalNotes;
         if (data.careerStrategy !== undefined) updatePayload.career_strategy = data.careerStrategy;
         if (data.desiredRole) updatePayload.desired_role = data.desiredRole;
-        if (data.skills) updatePayload.skills = data.skills;
-        if (data.approvedBy) updatePayload.approved_by = data.approvedBy;
+        if (data.skills) updatePayload.primary_skills = data.skills;
+        if (data.experienceYears) updatePayload.years_of_experience = data.experienceYears;
+        if (data.preferredWorkType) updatePayload.remote_preference = data.preferredWorkType;
+        if (data.approvedBy !== undefined) {
+          let safeAdminId: string | null = null;
+          if (isUuid(data.approvedBy)) {
+            const { data: prof } = await (supabase.from("profiles") as any)
+              .select("id")
+              .eq("id", data.approvedBy)
+              .maybeSingle();
+            if (prof?.id) safeAdminId = prof.id;
+          }
+          updatePayload.approved_by = safeAdminId;
+        }
         if (data.approvedAt) updatePayload.approved_at = data.approvedAt;
 
         const { data: updated, error } = await (supabase.from("cor_members") as any)
@@ -232,6 +263,8 @@ export const corMembersRepo = {
 
         if (!error && updated) {
           return mapMemberFromSupabase(updated);
+        } else if (error) {
+          console.error("Supabase cor_members update error:", error);
         }
       } catch (err) {
         console.error("Supabase cor_members update failed:", err);
