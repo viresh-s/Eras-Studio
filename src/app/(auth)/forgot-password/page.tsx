@@ -14,7 +14,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
-import { sendPasswordResetOtp } from '@/actions/authActions';
+import { sendPasswordResetOtp, updateUserPassword } from '@/actions/authActions';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 
@@ -200,37 +200,68 @@ function ForgotPasswordContent() {
   useEffect(() => {
     const mode = searchParams.get('mode');
     const type = searchParams.get('type');
+    const code = searchParams.get('code');
+    const token_hash = searchParams.get('token_hash');
+    const errParam = searchParams.get('error');
     const errDesc = searchParams.get('error_description');
 
-    if (errDesc) {
-      setError(decodeURIComponent(errDesc));
+    if (errParam || errDesc) {
+      setError(
+        errDesc
+          ? decodeURIComponent(errDesc)
+          : 'Your password reset link is invalid or has expired. Please request a new one below.'
+      );
+      setStep('email');
       return;
     }
 
-    const hash = typeof window !== 'undefined' ? window.location.hash : '';
-    const isRecoveryHash = hash.includes('type=recovery') || hash.includes('access_token');
-    const isRecoveryQuery = mode === 'reset' || type === 'recovery';
-
-    if (isRecoveryQuery || isRecoveryHash) {
-      setStep('password');
-      setInfoMessage('Email verified successfully! Please enter your new password.');
-    }
-
-    // Verify session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session && (isRecoveryQuery || isRecoveryHash)) {
-        setStep('password');
+    const verifySessionAndTokens = async () => {
+      // 1. If code was passed directly in query param
+      if (code) {
+        setIsLoading(true);
+        const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+        setIsLoading(false);
+        if (!exchangeError && data?.session) {
+          setStep('password');
+          setInfoMessage('Email link verified successfully! Please enter your new password.');
+          return;
+        }
       }
-    });
 
-    // Listen for Supabase password recovery events (e.g. from hash token exchange)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'PASSWORD_RECOVERY') {
+      // 2. If token_hash was passed directly
+      if (token_hash && type) {
+        setIsLoading(true);
+        const { data, error: verifyError } = await supabase.auth.verifyOtp({ token_hash, type });
+        setIsLoading(false);
+        if (!verifyError && data?.session) {
+          setStep('password');
+          setInfoMessage('Email link verified successfully! Please enter your new password.');
+          return;
+        }
+      }
+
+      // 3. Check active session (from cookies or storage)
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        setStep('password');
+        setInfoMessage('Session verified. Please enter your new password below.');
+      } else if (mode === 'reset' || type === 'recovery') {
+        // mode=reset was requested, but no active session exists
+        setError(
+          'Your password reset session could not be verified or has expired. Please enter your email to request a new link, or enter your 6-digit code.'
+        );
+        setStep('email');
+      }
+    };
+
+    verifySessionAndTokens();
+
+    // Listen for Supabase password recovery events (from hash tokens or auth state changes)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session && (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN')) {
         setStep('password');
         setError(null);
         setInfoMessage('Authentication verified. Please enter your new password.');
-      } else if (event === 'SIGNED_IN' && (isRecoveryQuery || isRecoveryHash)) {
-        setStep('password');
       }
     });
 
@@ -347,7 +378,7 @@ function ForgotPasswordContent() {
         setInfoMessage('Session verified! You can now set your new password.');
       } else {
         setError(
-          'No active reset session detected yet. Please ensure you clicked the "Reset Password" link in the email sent to your inbox, or enter the 6-digit code below.'
+          'No active reset session detected on this browser yet. Make sure you clicked the "Reset Password" link in the email on this device. If you opened the email on another phone or browser, please open it here or enter the 6-digit code below.'
         );
       }
     } catch {
@@ -428,12 +459,44 @@ function ForgotPasswordContent() {
     setIsLoading(true);
 
     try {
-      const { error: updateError } = await supabase.auth.updateUser({
-        password: newPassword,
-      });
+      // Check if session exists on client
+      const { data: { session } } = await supabase.auth.getSession();
 
-      if (updateError) {
-        setError(updateError.message || 'Failed to update password');
+      // 1. Try client SDK first if session is present
+      let updated = false;
+      if (session) {
+        const { error: clientError } = await supabase.auth.updateUser({
+          password: newPassword,
+        });
+        if (!clientError) {
+          updated = true;
+        }
+      }
+
+      // 2. If client failed or session not in storage, attempt server action
+      if (!updated) {
+        const serverResult = await updateUserPassword(newPassword);
+        if (serverResult.success) {
+          updated = true;
+        } else if (serverResult.error) {
+          if (
+            serverResult.error.includes('Auth session missing') ||
+            serverResult.error.includes('session missing')
+          ) {
+            setError(
+              'Your password reset session has expired or could not be found. Please request a new reset email or enter the 6-digit verification code.'
+            );
+            setIsLoading(false);
+            return;
+          }
+          setError(serverResult.error);
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      if (!updated) {
+        setError('Your session has expired. Please request a new password reset link.');
         setIsLoading(false);
         return;
       }
@@ -677,6 +740,20 @@ function ForgotPasswordContent() {
               <Lock size={16} />
               Save New Password
             </Button>
+
+            <div className="pt-2 text-center">
+              <button
+                type="button"
+                onClick={() => {
+                  setStep('email');
+                  setError(null);
+                  setInfoMessage(null);
+                }}
+                className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                Need to request a new link? Start over
+              </button>
+            </div>
           </form>
         )}
 

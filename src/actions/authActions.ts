@@ -194,3 +194,24 @@ export async function sendPasswordResetOtp(emailRaw: string): Promise<{ error?: 
   return { success: true };
 }
 
+export async function updateUserPassword(newPassword: string): Promise<{ error?: string, success?: boolean }> {
+  if (!newPassword || newPassword.length < 6) {
+    return { error: 'Password must be at least 6 characters' };
+  }
+
+  const supabase = await createClient();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    return { error: 'Auth session missing! Please verify via your email link or enter the 6-digit verification code.' };
+  }
+
+  const { error } = await supabase.auth.updateUser({
+    password: newPassword,
+  });
+
+  if (error) return { error: error.message };
+  return { success: true };
+}
+
+
