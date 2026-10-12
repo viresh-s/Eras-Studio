@@ -51,7 +51,7 @@ export interface CreateArtworkData {
   location?: string;
   style?: string;
   tags?: string[];
-  collection?: string;
+  collection?: string | null;
   priceVisibility?: string;
   isPublished?: boolean;
   status?: string;
@@ -196,6 +196,7 @@ export async function updateArtwork(artworkId: string, data: Partial<CreateArtwo
 
   securityLogger.info('ARTWORK_UPDATED', { artworkId, userId: user.id });
 
+  revalidatePath('/portfolio');
   revalidatePath('/portfolio/artworks');
   revalidatePath(`/artwork/${artworkId}`);
   revalidatePath('/discovery');

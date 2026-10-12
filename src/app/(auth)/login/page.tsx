@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { LogIn, Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { LogIn, Mail, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 import { login } from '@/actions/authActions';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
@@ -18,10 +18,13 @@ const loginSchema = z.object({
 
 type LoginForm = z.infer<typeof loginSchema>;
 
-export default function LoginPage() {
+function LoginFormContent() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  const searchParams = useSearchParams();
+  const isVerified = searchParams.get('verified') === 'true';
 
   const {
     register,
@@ -58,6 +61,13 @@ export default function LoginPage() {
           <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Welcome Back</h1>
           <p className="text-gray-500 text-sm">Sign in to your Eras Studio account</p>
         </div>
+
+        {isVerified && (
+          <div className="mb-4 bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-emerald-800 text-sm flex items-center gap-2">
+            <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
+            <span>Email verified successfully! Please sign in with your credentials.</span>
+          </div>
+        )}
 
         {error && (
           <div className="mb-4 bg-red-50 border border-red-200 rounded-xl p-3 text-red-600 text-sm">
@@ -120,5 +130,13 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-center bg-white rounded-2xl">Loading...</div>}>
+      <LoginFormContent />
+    </Suspense>
   );
 }

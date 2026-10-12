@@ -2,7 +2,19 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
+import { headers } from 'next/headers';
 import { z } from 'zod';
+
+async function getRequestOrigin(): Promise<string> {
+  try {
+    const headerList = await headers();
+    const host = headerList.get('host') || 'localhost:3000';
+    const proto = headerList.get('x-forwarded-proto') || (host.includes('localhost') ? 'http' : 'https');
+    return `${proto}://${host}`;
+  } catch {
+    return process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  }
+}
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address').max(255),
@@ -97,11 +109,13 @@ export async function signup(formData: FormData): Promise<AuthResult> {
   const { email, password, fullName, phoneNumber, role } = parsed.data;
 
   const supabase = await createClient();
+  const origin = await getRequestOrigin();
 
   const { data: authData, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
+      emailRedirectTo: `${origin}/auth/callback?next=/login?verified=true`,
       data: {
         full_name: fullName,
         phone_number: phoneNumber,
@@ -151,9 +165,14 @@ export async function resendVerificationEmail(emailRaw: string): Promise<{ error
   const email = parsed.data;
 
   const supabase = await createClient();
+  const origin = await getRequestOrigin();
+
   const { error } = await supabase.auth.resend({
     type: 'signup',
     email,
+    options: {
+      emailRedirectTo: `${origin}/auth/callback?next=/login?verified=true`,
+    },
   });
 
   if (error) return { error: error.message };

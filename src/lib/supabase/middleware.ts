@@ -57,6 +57,11 @@ export async function updateSession(request: NextRequest) {
                                request.nextUrl.pathname === '/';
                                
   if (isAuthOrLandingRoute && user) {
+    // If the user arrives with ?verified=true, allow them to see the login screen
+    if (request.nextUrl.pathname === '/login' && request.nextUrl.searchParams.get('verified') === 'true') {
+      return supabaseResponse;
+    }
+
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')

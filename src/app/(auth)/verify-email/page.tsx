@@ -23,8 +23,8 @@ function VerifyEmailContent() {
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' || session) {
-        // When they verify, Supabase logs them in. Redirect to their dashboard!
-        router.push('/login');
+        // When they verify, redirect to the login page with confirmation
+        router.push('/login?verified=true');
       }
     });
 
