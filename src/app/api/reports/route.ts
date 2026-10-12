@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { ReportArtworkSchema } from '@/types/report';
 
 export async function POST(request: Request) {
@@ -51,7 +52,12 @@ export async function POST(request: Request) {
       );
     }
 
-    const { data, error } = await supabase
+    const adminClient = (process.env.SUPABASE_SERVICE_ROLE_KEY && process.env.NEXT_PUBLIC_SUPABASE_URL)
+      ? createSupabaseClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY)
+      : null;
+    const dbClient = adminClient || supabase;
+
+    const { error } = await dbClient
       .from('reports')
       .insert({
         artwork_id: artworkId,
@@ -60,9 +66,7 @@ export async function POST(request: Request) {
         reason,
         details: details?.trim() || null,
         status: 'pending',
-      })
-      .select('id')
-      .single();
+      });
 
     if (error) {
       return NextResponse.json(
@@ -74,7 +78,6 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       message: 'Report Submitted: Thank you for helping keep our community safe.',
-      reportId: data?.id,
     });
   } catch (err: any) {
     return NextResponse.json(

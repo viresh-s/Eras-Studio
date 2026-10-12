@@ -5,6 +5,7 @@ import { checkRateLimit } from '@/lib/security/rateLimiter';
 import { SafeIdSchema, ReportReasonSchema, sanitizeText } from '@/lib/security/validators';
 import { securityLogger } from '@/lib/security/logger';
 import { revalidatePath } from 'next/cache';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 
 export interface SubmitReportInput {
   artworkId: string;
@@ -46,8 +47,14 @@ export async function submitArtworkReport(
     ? SafeIdSchema.safeParse(input.artworkOwnerId).data || null
     : null;
 
-  // 4. Insert report with server-enforced reporter identity
-  const { data, error } = await supabase
+  // 4. Use admin client if service role key is present, otherwise user client
+  const adminClient = (process.env.SUPABASE_SERVICE_ROLE_KEY && process.env.NEXT_PUBLIC_SUPABASE_URL)
+    ? createSupabaseClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY)
+    : null;
+  const dbClient = adminClient || supabase;
+
+  // Insert report without .select('id') so Postgres does not enforce SELECT policy on returning row
+  const { error } = await dbClient
     .from('reports')
     .insert({
       artwork_id: validArtworkId,
@@ -56,9 +63,7 @@ export async function submitArtworkReport(
       reason: validReason,
       details: sanitizedDetails,
       status: 'pending', // Client cannot set approved or resolved
-    })
-    .select('id')
-    .single();
+    });
 
   if (error) {
     securityLogger.error('Moderation report submission failed', {
@@ -82,7 +87,6 @@ export async function submitArtworkReport(
   return {
     success: true,
     message: 'Report Submitted: Thank you for helping keep our community safe.',
-    reportId: data?.id,
   };
 }
 
@@ -112,7 +116,12 @@ export async function submitUserReport(
   const validReason = ReportReasonSchema.parse(input.reason);
   const sanitizedDetails = input.details ? sanitizeText(input.details, 2000) : null;
 
-  const { data, error } = await supabase
+  const adminClient = (process.env.SUPABASE_SERVICE_ROLE_KEY && process.env.NEXT_PUBLIC_SUPABASE_URL)
+    ? createSupabaseClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY)
+    : null;
+  const dbClient = adminClient || supabase;
+
+  const { error } = await dbClient
     .from('reports')
     .insert({
       reported_user_id: validReportedUserId,
@@ -120,9 +129,7 @@ export async function submitUserReport(
       reason: validReason,
       details: sanitizedDetails,
       status: 'pending',
-    })
-    .select('id')
-    .single();
+    });
 
   if (error) {
     securityLogger.error('User moderation report submission failed', {
@@ -145,6 +152,5 @@ export async function submitUserReport(
   return {
     success: true,
     message: 'User Report Submitted: Thank you for keeping our community safe.',
-    reportId: data?.id,
   };
 }
