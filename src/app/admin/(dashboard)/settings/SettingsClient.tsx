@@ -189,7 +189,7 @@ export function SettingsClient({ initialSettings }: SettingsClientProps) {
                 min={0}
                 max={10000}
                 value={formState.freeArtworkLimit}
-                onChange={(e) => {
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   const val = parseInt(e.target.value, 10);
                   setFormState((prev) => ({
                     ...prev,
@@ -207,7 +207,7 @@ export function SettingsClient({ initialSettings }: SettingsClientProps) {
                 min={0}
                 max={10000}
                 value={formState.liteArtworkLimit}
-                onChange={(e) => {
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   const val = parseInt(e.target.value, 10);
                   setFormState((prev) => ({
                     ...prev,
@@ -225,7 +225,7 @@ export function SettingsClient({ initialSettings }: SettingsClientProps) {
                 min={0}
                 max={10000}
                 value={formState.proArtworkLimit}
-                onChange={(e) => {
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   const val = parseInt(e.target.value, 10);
                   setFormState((prev) => ({
                     ...prev,
@@ -243,7 +243,7 @@ export function SettingsClient({ initialSettings }: SettingsClientProps) {
                 min={0}
                 max={10000}
                 value={formState.inviteRequestLimit}
-                onChange={(e) => {
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   const val = parseInt(e.target.value, 10);
                   setFormState((prev) => ({
                     ...prev,
@@ -400,7 +400,7 @@ export function SettingsClient({ initialSettings }: SettingsClientProps) {
             <Select
               label="Default Profile Visibility"
               value={formState.defaultProfileVisibility}
-              onChange={(e) =>
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
                 setFormState((prev) => ({
                   ...prev,
                   defaultProfileVisibility: e.target.value as "public" | "private",

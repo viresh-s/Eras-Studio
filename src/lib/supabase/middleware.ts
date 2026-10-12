@@ -6,17 +6,9 @@ export async function updateSession(request: NextRequest) {
     request,
   });
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!supabaseUrl || !supabaseAnonKey) {
-    console.warn('[Supabase Middleware] Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY. Please ensure .env.local is populated and restart the server.');
-    return supabaseResponse;
-  }
-
   const supabase = createServerClient(
-    supabaseUrl,
-    supabaseAnonKey,
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
         getAll() {
@@ -41,11 +33,36 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Protected routes: artworks, discovery, portfolio, admin, messages, settings
-  const isProtectedRoute = request.nextUrl.pathname.startsWith('/artwork') ||
+  const isAdminLoginRoute = request.nextUrl.pathname === '/admin/login';
+  const isAdminRoute = request.nextUrl.pathname.startsWith('/admin');
+  const hasAdminCookie = Boolean(request.cookies.get('erasstudio_admin_session')?.value);
+
+  // If already logged into admin and accessing admin login page, redirect to overview
+  if (isAdminLoginRoute && hasAdminCookie) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/admin/overview';
+    return NextResponse.redirect(url);
+  }
+
+  // Handle protected admin routes
+  if (isAdminRoute && !isAdminLoginRoute) {
+    if (!hasAdminCookie && !user) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/admin/login';
+      const response = NextResponse.redirect(url);
+      supabaseResponse.cookies.getAll().forEach((cookie) => {
+        response.cookies.set(cookie.name, cookie.value);
+      });
+      return response;
+    }
+  }
+
+  // Other protected routes: artworks, discovery, portfolio, messages, settings, cor
+  const isProtectedRoute =
+    request.nextUrl.pathname.startsWith('/artwork') ||
     request.nextUrl.pathname.startsWith('/portfolio') ||
     request.nextUrl.pathname.startsWith('/discovery') ||
-    request.nextUrl.pathname.startsWith('/admin') ||
+    request.nextUrl.pathname.startsWith('/cor') ||
     request.nextUrl.pathname.startsWith('/messages') ||
     request.nextUrl.pathname.startsWith('/settings');
 
@@ -60,12 +77,12 @@ export async function updateSession(request: NextRequest) {
   }
 
   // Redirect logged-in users away from auth pages and the landing page
-  const isAuthOrLandingRoute = request.nextUrl.pathname === '/login' || 
-                               request.nextUrl.pathname === '/signup' || 
-                               request.nextUrl.pathname === '/';
-                               
+  const isAuthOrLandingRoute =
+    request.nextUrl.pathname === '/login' ||
+    request.nextUrl.pathname === '/signup' ||
+    request.nextUrl.pathname === '/';
+
   if (isAuthOrLandingRoute && user) {
-    // If the user arrives with ?verified=true, allow them to see the login screen
     if (request.nextUrl.pathname === '/login' && request.nextUrl.searchParams.get('verified') === 'true') {
       return supabaseResponse;
     }
@@ -76,26 +93,22 @@ export async function updateSession(request: NextRequest) {
       .eq('id', user.id)
       .single();
 
-    // If they have no profile, we shouldn't redirect them to a dashboard because 
-    // the dashboard will just bounce them back. Let the auth page render (or sign them out).
     if (!profile) {
       return supabaseResponse;
     }
 
     const url = request.nextUrl.clone();
     if (profile.role === 'Admin') {
-      url.pathname = '/admin';
+      url.pathname = '/admin/overview';
     } else {
-      // Direct both Creators and Users/Collectors to the discovery page
       url.pathname = '/discovery';
     }
     const response = NextResponse.redirect(url);
-    
-    // Copy cookies from supabaseResponse to ensure session isn't lost
+
     supabaseResponse.cookies.getAll().forEach((cookie) => {
       response.cookies.set(cookie.name, cookie.value);
     });
-    
+
     return response;
   }
 

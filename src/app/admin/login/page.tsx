@@ -95,7 +95,7 @@ export default function LoginPage() {
               autoComplete="username"
               placeholder="Admin username"
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
               disabled={isLoading}
               leftIcon={<User className="w-3.5 h-3.5" />}
               required
@@ -108,7 +108,7 @@ export default function LoginPage() {
               autoComplete="current-password"
               placeholder="••••••••••••"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
               disabled={isLoading}
               leftIcon={<Lock className="w-3.5 h-3.5" />}
               rightIcon={

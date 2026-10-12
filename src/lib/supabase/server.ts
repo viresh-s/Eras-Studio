@@ -1,22 +1,71 @@
 import { createServerClient } from '@supabase/ssr';
-import { createClient as createSupabaseClient, SupabaseClient } from '@supabase/supabase-js';
+import { createClient as createSupabaseJsClient, SupabaseClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
+import type { Database } from './types';
 
-export async function createClient() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error(
-      'Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY. Please verify your .env.local file and restart the development server.'
-    );
+/**
+ * Checks whether Supabase environment variables are properly configured.
+ */
+export function isSupabaseConfigured(): boolean {
+  if (!supabaseUrl) return false;
+  if (supabaseUrl.includes('your_supabase') || supabaseUrl.includes('your-project')) return false;
+  return Boolean(supabaseServiceRoleKey || supabaseAnonKey);
+}
+
+let serverClientInstance: SupabaseClient<Database> | null = null;
+
+/**
+ * Server-side Supabase client for Server Components, Server Actions, and Repositories.
+ * Uses the Service Role Key if available (bypasses RLS for full admin control),
+ * or falls back to Anon Key.
+ */
+export function getSupabaseAdmin(): SupabaseClient<Database> | null {
+  if (!isSupabaseConfigured()) {
+    return null;
   }
 
+  if (serverClientInstance) {
+    return serverClientInstance;
+  }
+
+  const key = supabaseServiceRoleKey || supabaseAnonKey;
+  if (!key || !supabaseUrl) {
+    return null;
+  }
+
+  serverClientInstance = createSupabaseJsClient<Database>(supabaseUrl, key, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+    },
+    global: {
+      fetch: (url, options = {}) => {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 10000);
+        return fetch(url, {
+          ...options,
+          signal: options.signal || controller.signal,
+        }).finally(() => clearTimeout(timeout));
+      },
+    },
+  });
+
+  return serverClientInstance;
+}
+
+/**
+ * SSR Supabase client using cookies for authenticated user actions.
+ */
+export async function createClient() {
   const cookieStore = await cookies();
 
   return createServerClient(
-    supabaseUrl,
-    supabaseAnonKey,
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
         getAll() {
@@ -35,32 +84,4 @@ export async function createClient() {
       },
     }
   );
-}
-
-const rawSupabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const rawSupabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const rawSupabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-export function isSupabaseConfigured(): boolean {
-  if (!rawSupabaseUrl) return false;
-  return Boolean(rawSupabaseServiceRoleKey || rawSupabaseAnonKey);
-}
-
-let serverAdminInstance: SupabaseClient<any> | null = null;
-
-export function getSupabaseAdmin(): SupabaseClient<any> | null {
-  if (!isSupabaseConfigured()) return null;
-  if (serverAdminInstance) return serverAdminInstance;
-
-  const key = rawSupabaseServiceRoleKey || rawSupabaseAnonKey;
-  if (!key || !rawSupabaseUrl) return null;
-
-  serverAdminInstance = createSupabaseClient(rawSupabaseUrl, key, {
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false,
-    },
-  });
-
-  return serverAdminInstance;
 }
