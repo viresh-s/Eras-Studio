@@ -11,7 +11,7 @@ import { ArrowLeft } from 'lucide-react';
 
 export const metadata = {
   title: 'Career Consultations | COR PRO | ErasStudio®',
-  description: 'Schedule a 1-on-1 session with the iRAS career team for portfolio reviews, interview preparation, and residency guidance.',
+  description: 'Schedule a 1-on-1 session with the Eras career team for portfolio reviews, interview preparation, and residency guidance.',
 };
 
 export default async function CorConsultationsPage() {
@@ -50,7 +50,7 @@ export default async function CorConsultationsPage() {
       <CorPageHeader
         eyebrow="A LITTLE GUIDANCE GOES A LONG WAY"
         title="Career Consultation"
-        description="Choose a session with the iRAS career team. All scheduled times are in Indian Standard Time (IST)."
+        description="Choose a session with the Eras career team. All scheduled times are in Indian Standard Time (IST)."
         actions={
           <Link
             href="/cor"

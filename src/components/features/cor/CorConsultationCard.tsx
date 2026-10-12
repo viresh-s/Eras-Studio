@@ -50,7 +50,7 @@ export default function CorConsultationCard({ consultation }: CorConsultationCar
           <div className="py-6 text-center text-xs text-[#6E6E69] space-y-2">
             <p>No consultation scheduled yet.</p>
             <p className="text-[11px] text-[#8A8A85]">
-              Meet 1-on-1 with an iRAS career advisor to review your portfolio and interview strategy.
+              Meet 1-on-1 with an Eras career advisor to review your portfolio and interview strategy.
             </p>
           </div>
         )}

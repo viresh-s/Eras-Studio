@@ -62,7 +62,7 @@ export default function CorHeroSection({ profile, completeness }: CorHeroSection
         </h2>
 
         <p className="text-xs sm:text-sm text-[#6E6E69] leading-relaxed max-w-xl font-normal">
-          Tell us about your skills, experience and ambitions. The iRAS career team will review your profile and help you find your direction.
+          Tell us about your skills, experience and ambitions. The Eras career team will review your profile and help you find your direction.
         </p>
 
         <div className="pt-2">

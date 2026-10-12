@@ -1154,7 +1154,7 @@ export default function CorProfileWorkflow({ initialProfile }: CorProfileWorkflo
                 Submit COR Membership Request
               </h3>
               <p className="text-xs text-[#6E6E69]">
-                Please review your career details before sending them to the iRAS curatorial team.
+                Please review your career details before sending them to the Eras curatorial team.
               </p>
             </div>
 

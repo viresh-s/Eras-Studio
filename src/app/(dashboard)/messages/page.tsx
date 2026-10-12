@@ -24,7 +24,7 @@ export default async function MessagesPage() {
       {/* Header */}
       <div className="mb-6">
         <p className="text-xs font-semibold tracking-[0.2em] text-gray-400 uppercase mb-2">
-          Open to iRAS Start with a conversation instead
+          Direct Inquiries · Eras Studio
         </p>
         <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight mb-1">Your inbox</h1>
         <p className="text-gray-500 text-sm">Interest first. A meaningful conversation next.</p>

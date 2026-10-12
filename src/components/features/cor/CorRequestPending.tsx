@@ -221,7 +221,7 @@ export default function CorRequestPending({
               <span>Assigned Reviewer</span>
             </div>
             <p>
-              Lead Curator: <strong>Priya Nair</strong> (iRAS Career Advisory Team).
+              Lead Curator: <strong>Priya Nair</strong> (Eras Career Advisory Team).
             </p>
           </div>
         </div>

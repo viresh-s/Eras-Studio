@@ -333,7 +333,7 @@ function ActiveChatPane({ chatId, userId, chatDetails }: { chatId: string, userI
       </div>
 
       <div className="p-6 bg-transparent">
-        <p className="text-[10px] text-gray-400 font-medium mb-3 text-center">Local demo conversation - No payments or transactions on iRAS</p>
+        <p className="text-[10px] text-gray-400 font-medium mb-3 text-center">Local demo conversation - No payments or transactions on Eras</p>
         <div className="bg-white rounded-full flex items-center p-2 shadow-sm border border-gray-200/50">
           <input
             type="text"

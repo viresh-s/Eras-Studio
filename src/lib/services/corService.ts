@@ -529,7 +529,7 @@ export class CorService {
       creatorId,
       'profile_submitted',
       'Career profile submitted',
-      'Your profile has been submitted to the iRAS career team for initial review.'
+      'Your profile has been submitted to the Eras career team for initial review.'
     );
 
     return (
