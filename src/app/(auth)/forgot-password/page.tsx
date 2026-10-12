@@ -12,9 +12,6 @@ import {
   CheckCircle2,
   ArrowLeft,
   RefreshCw,
-  ExternalLink,
-  ShieldCheck,
-  Sparkles,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { sendPasswordResetOtp } from '@/actions/authActions';
