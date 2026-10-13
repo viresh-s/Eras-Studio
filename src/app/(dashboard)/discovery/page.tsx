@@ -221,15 +221,129 @@ export default function BrowsePage() {
 
   return (
     <div className="min-h-screen bg-[var(--color-cor-bg,#FAFAF8)] font-sans">
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-6 sm:py-10">
-        
+      {/* Hero Section */}
+      <div className="max-w-[1400px] mx-auto px-6 py-16 lg:py-24">
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-24">
+          {/* Left: Text Content */}
+          <div className="lg:w-1/2 flex flex-col items-start text-left z-10">
+            <p className="text-xs font-semibold tracking-[0.2em] text-gray-500 uppercase mb-6 flex items-center gap-3">
+              <span className="w-1.5 h-1.5 rounded-full bg-gray-400 block"></span>
+              A SPACE FOR THE CREATIVE SPIRIT
+            </p>
+            <h1 className="text-5xl md:text-7xl font-bold text-gray-900 tracking-tight leading-[1.05] mb-6 font-serif">
+              Find a work.<br />
+              Feel a <span className="italic font-normal">connection.</span>
+            </h1>
+            <div className="space-y-1 mb-8">
+              <p className="text-gray-600 text-base md:text-lg">
+                Discover original perspectives from independent artists.
+              </p>
+              <p className="text-gray-600 text-base md:text-lg">
+                A new favourite is waiting to be found.
+              </p>
+            </div>
+
+            <button
+              onClick={() => {
+                document.getElementById('gallery')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#141413] text-[#FAF5EC] border border-[#141413] rounded-full text-xs uppercase tracking-[0.08em] font-medium hover:bg-black transition-all duration-200 group cursor-pointer"
+            >
+              <span>Explore the gallery</span>
+              <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform duration-200" />
+            </button>
+          </div>
+
+          {/* Right: Artwork Cards Collage */}
+          <div className="lg:w-1/2 relative h-[450px] lg:h-[500px] w-full flex items-center justify-center pointer-events-none mt-8 lg:mt-0">
+            {/* Card 1 (Left) */}
+            <motion.div
+              initial={{ opacity: 0, rotate: -25, x: -100, y: 50 }}
+              animate={{ opacity: 1, rotate: -15, x: -80, y: 20 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="absolute z-10 w-64 bg-white rounded-xl shadow-2xl p-3 transform-origin-bottom"
+            >
+              <div className="aspect-[3/4] bg-[#5B798A] overflow-hidden rounded-lg mb-3">
+                <div className="w-full h-full relative">
+                  <div className="absolute top-0 right-0 w-full h-1/2 bg-[#1B3644] rotate-[30deg] scale-150 transform origin-top-right"></div>
+                  <div className="absolute bottom-0 right-0 w-2/3 h-1/2 bg-[#C4775A] skew-y-12 translate-y-10"></div>
+                  <div className="absolute top-1/4 right-1/4 w-12 h-12 bg-[#F2F0E6] rounded-full"></div>
+                </div>
+              </div>
+              <div>
+                <p className="text-[10px] text-gray-500 mb-0.5 uppercase tracking-wide">Blue Horizon</p>
+                <p className="text-[8px] text-gray-400">Painting / 2023</p>
+              </div>
+            </motion.div>
+
+            {/* Card 2 (Center - top) */}
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: -20 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="absolute z-30 w-72 bg-white rounded-xl shadow-2xl p-3"
+            >
+              <div className="aspect-[3/4] bg-[#D7AC9C] overflow-hidden rounded-lg mb-3">
+                <div className="w-full h-full relative">
+                  <div className="absolute top-0 right-0 w-full h-2/3 bg-[#5D3035] -rotate-[20deg] scale-150 transform origin-top-right"></div>
+                  <div className="absolute bottom-0 left-1/4 w-1/3 h-3/4 bg-[#1F3740] skew-y-[-10deg] translate-y-10"></div>
+                  <div className="absolute top-1/4 right-1/4 w-16 h-16 bg-[#F2F0E6] rounded-full"></div>
+                </div>
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-gray-900 mb-0.5">Monsoon No. 4</p>
+                <p className="text-[9px] text-gray-500 uppercase tracking-wide">Painting / 2023</p>
+              </div>
+            </motion.div>
+
+            {/* Card 3 (Right) */}
+            <motion.div
+              initial={{ opacity: 0, rotate: 25, x: 100, y: 50 }}
+              animate={{ opacity: 1, rotate: 15, x: 80, y: 20 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+              className="absolute z-20 w-64 bg-white rounded-xl shadow-2xl p-3 transform-origin-bottom"
+            >
+              <div className="aspect-[3/4] bg-[#F2B75A] overflow-hidden rounded-lg mb-3">
+                <div className="w-full h-full relative p-4">
+                  <div className="w-full h-full border-[20px] border-[#AC452D] rounded-t-full bg-[#E5D7A9] relative overflow-hidden">
+                    <div className="w-full h-20 bg-[#C4775A] absolute bottom-0 opacity-50"></div>
+                    <div className="w-16 h-16 rounded-full bg-[#F2F0E6] absolute top-10 left-1/2 -translate-x-1/2"></div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <p className="text-[10px] text-gray-500 mb-0.5 uppercase tracking-wide">Fragments of Memory</p>
+                <p className="text-[8px] text-gray-400">Mixed Media / 2024</p>
+              </div>
+            </motion.div>
+
+            {/* Circular text badge */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 1 }}
+              className="absolute z-40 -bottom-8 left-[45%] lg:left-1/3 w-28 h-28 bg-[#F0EBE6] rounded-full flex items-center justify-center shadow-lg border border-white"
+            >
+              <div className="text-center">
+                <p className="text-gray-800 text-sm font-serif italic leading-tight">Art is a</p>
+                <p className="text-gray-800 text-sm font-serif italic leading-tight">way of</p>
+                <p className="text-gray-800 text-sm font-serif italic leading-tight">seeing.</p>
+                <p className="text-[6px] tracking-widest text-gray-500 mt-2 uppercase">Eras Studio</p>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content (Gallery & Discovery Bar) */}
+      <div id="gallery" className="max-w-[1400px] mx-auto px-4 sm:px-6 pb-32">
         {/* ========================================================================= */}
         {/* 1. DISCOVERY HEADER (Matching user specification)                         */}
         {/* ========================================================================= */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-          <h1 className="font-serif text-3xl sm:text-4xl text-[#141413] tracking-tight">
+          <h2 className="font-serif text-3xl sm:text-4xl text-[#141413] tracking-tight">
             A world of original work
-          </h1>
+          </h2>
 
           {/* Sort Dropdown */}
           <div className="relative self-start sm:self-auto">
