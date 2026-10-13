@@ -242,23 +242,43 @@ export default function ArtworkDiscoveryDetail({
 
               {/* Interaction Actions Bar */}
               <div className="flex flex-wrap items-center gap-3">
-                {canExpress ? (
-                  <ExpressInterestButton
-                    artworkId={artwork.id}
-                    creatorId={artwork.creator_id}
-                    userId={currentUser.id}
-                    initialChatId={existingChat?.id}
-                    initialStatus={existingChat?.status}
-                    initialCreatedAt={existingChat?.created_at}
-                  />
-                ) : !currentUser ? (
-                  <Link
-                    href="/login"
-                    className="px-6 py-3 bg-gray-900 text-white rounded-full text-xs font-bold uppercase tracking-wider hover:bg-gray-800 transition-colors shadow-xs"
-                  >
-                    Sign in to Express Interest →
-                  </Link>
-                ) : null}
+                {(() => {
+                  const isPriceOnRequest =
+                    artwork.price_visibility === 'Price on Request' ||
+                    (!artwork.price &&
+                      artwork.price_visibility !== 'Hide Price' &&
+                      artwork.price_visibility !== 'Hidden');
+
+                  if (canExpress) {
+                    return (
+                      <ExpressInterestButton
+                        artworkId={artwork.id}
+                        creatorId={artwork.creator_id}
+                        userId={currentUser.id}
+                        initialChatId={existingChat?.id}
+                        initialStatus={existingChat?.status}
+                        initialCreatedAt={existingChat?.created_at}
+                        isPriceOnRequest={isPriceOnRequest}
+                        artworkTitle={artwork.title}
+                      />
+                    );
+                  }
+
+                  if (!currentUser) {
+                    return (
+                      <Link
+                        href="/login"
+                        className="px-6 py-3 bg-gray-900 text-white rounded-full text-xs font-bold uppercase tracking-wider hover:bg-gray-800 transition-colors shadow-xs"
+                      >
+                        {isPriceOnRequest
+                          ? 'Sign in to Request Price →'
+                          : 'Sign in to Express Interest →'}
+                      </Link>
+                    );
+                  }
+
+                  return null;
+                })()}
 
                 {/* Save / Bookmark Button */}
                 {currentUser && !isOwner && (

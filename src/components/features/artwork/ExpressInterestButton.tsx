@@ -11,6 +11,8 @@ interface ExpressInterestButtonProps {
   initialChatId?: string;
   initialStatus?: string;
   initialCreatedAt?: string;
+  isPriceOnRequest?: boolean;
+  artworkTitle?: string;
 }
 
 export default function ExpressInterestButton({ 
@@ -19,12 +21,19 @@ export default function ExpressInterestButton({
   userId, 
   initialChatId, 
   initialStatus,
-  initialCreatedAt
+  initialCreatedAt,
+  isPriceOnRequest = false,
+  artworkTitle,
 }: ExpressInterestButtonProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [showInput, setShowInput] = useState(false);
-  const [message, setMessage] = useState('I am interested in this artwork.');
+  
+  const defaultMessage = isPriceOnRequest
+    ? `Hello, I would like to request the price and acquisition details for ${artworkTitle ? `"${artworkTitle}"` : 'this artwork'}.`
+    : 'I am interested in this artwork.';
+
+  const [message, setMessage] = useState(defaultMessage);
 
   // Check if chat is expired (Pending for > 5 days)
   const isExpired = () => {
@@ -57,15 +66,21 @@ export default function ExpressInterestButton({
     setIsLoading(true);
 
     try {
-      await createChatSession(artworkId, userId, creatorId, message.trim() || 'I am interested in this artwork.');
+      await createChatSession(artworkId, userId, creatorId, message.trim() || defaultMessage);
       setIsRequested(true);
       setShowInput(false);
     } catch (err) {
-      console.error('Failed to express interest:', err);
+      console.error('Failed to send price/interest request:', err);
     } finally {
       setIsLoading(false);
     }
   };
+
+  const buttonLabel = isRequested
+    ? (isPriceOnRequest ? 'Price Requested' : 'Request Sent')
+    : canResend
+    ? (isPriceOnRequest ? 'Resend Price Request →' : 'Resend Interest →')
+    : (isPriceOnRequest ? 'Request Price →' : 'Express Interest →');
 
   return (
     <>
@@ -78,7 +93,7 @@ export default function ExpressInterestButton({
             : 'bg-gray-900 text-white hover:bg-gray-800 disabled:opacity-70 disabled:cursor-not-allowed'
         }`}
       >
-        {isRequested ? 'Request Sent' : (canResend ? 'Resend Interest →' : 'Express Interest →')}
+        {buttonLabel}
       </button>
 
       {showInput && (
@@ -91,10 +106,13 @@ export default function ExpressInterestButton({
             onClick={(e) => e.stopPropagation()}
           >
             <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
-              <h3 className="text-[17px] font-bold text-gray-900">Express Interest</h3>
+              <h3 className="text-[17px] font-bold text-gray-900">
+                {isPriceOnRequest ? 'Request Price' : 'Express Interest'}
+              </h3>
               <button 
                 onClick={() => setShowInput(false)} 
                 className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-400 hover:text-gray-600 hover:bg-gray-200 transition-colors"
+                aria-label="Close modal"
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
               </button>
@@ -102,16 +120,20 @@ export default function ExpressInterestButton({
             
             <div className="p-6">
               <label className="block text-[13px] font-bold text-gray-900 mb-2 uppercase tracking-wide">
-                Message to creator
+                {isPriceOnRequest ? 'Price inquiry to creator' : 'Message to creator'}
               </label>
               <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-400 focus:bg-white transition-all resize-none mb-2"
                 rows={4}
-                placeholder="Add a custom message..."
+                placeholder={isPriceOnRequest ? "Ask about pricing and availability..." : "Add a custom message..."}
               />
-              <p className="text-xs text-gray-500 mb-8 font-medium">This message will start a new conversation with the creator.</p>
+              <p className="text-xs text-gray-500 mb-8 font-medium">
+                {isPriceOnRequest
+                  ? "This will start a conversation with the creator to receive price and acquisition terms."
+                  : "This message will start a new conversation with the creator."}
+              </p>
               
               <div className="flex items-center justify-end gap-3">
                 <button
@@ -126,7 +148,7 @@ export default function ExpressInterestButton({
                   disabled={isLoading || !message.trim()}
                   className="px-6 py-2.5 bg-gray-900 text-white rounded-full text-sm font-semibold hover:bg-gray-800 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 >
-                  {isLoading ? 'Sending...' : 'Send Request →'}
+                  {isLoading ? 'Sending...' : (isPriceOnRequest ? 'Send Price Request →' : 'Send Request →')}
                 </button>
               </div>
             </div>

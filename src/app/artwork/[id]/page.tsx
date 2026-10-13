@@ -38,7 +38,7 @@ export default async function ArtworkPage({ params }: ArtworkPageProps) {
   }
 
   const isOwner = user?.id === artwork.creator_id;
-  const canExpress = user && userRole === 'User' && !isOwner;
+  const canExpress = Boolean(user && !isOwner);
 
   let existingChat = null;
   let isSaved = false;
