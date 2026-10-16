@@ -10,6 +10,7 @@ import { UserPlus, Mail, Lock, User, Phone, Palette, ShoppingBag, Eye, EyeOff } 
 import { signup } from '@/actions/authActions';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
+import SocialAuthButtons from '@/components/features/auth/SocialAuthButtons';
 
 const signupSchema = z.object({
   fullName: z.string().min(2, 'Name must be at least 2 characters'),
@@ -110,6 +111,8 @@ export default function SignupPage() {
             </button>
           </div>
         </div>
+
+        <SocialAuthButtons mode="signup" role={selectedRole} onError={(err) => setError(err)} />
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="relative">

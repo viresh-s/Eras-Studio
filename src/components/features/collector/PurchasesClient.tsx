@@ -34,7 +34,7 @@ export default function PurchasesClient({
 }) {
   const [activeTab, setActiveTab] = useState<'Active' | 'Completed' | 'Interested' | 'Saved'>('Active');
   
-  // Local state to simulate status changes
+  // Local optimistic state for order tracking
   const [statuses, setStatuses] = useState<Record<string, string>>(
     initialAcquisitions.reduce((acc, acq) => ({ ...acc, [acq.id]: acq.initialStatus }), {})
   );
@@ -144,10 +144,10 @@ export default function PurchasesClient({
                   })}
                 </div>
 
-                {/* Simulate Dropdown */}
+                {/* Tracking Status */}
                 <div className="max-w-xs">
                   <label className="block text-[11px] font-bold text-gray-900 mb-2 uppercase tracking-wider">
-                    Simulate progress
+                    Tracking status
                   </label>
                   <div className="relative">
                     <select
@@ -192,7 +192,7 @@ export default function PurchasesClient({
 
                 <div className="max-w-xs">
                   <label className="block text-[11px] font-bold text-gray-900 mb-2 uppercase tracking-wider">
-                    Simulate progress
+                    Tracking status
                   </label>
                   <div className="relative">
                     <select

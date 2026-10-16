@@ -74,7 +74,7 @@ export default function NotificationBell() {
           message: freemiumStatus.reason,
           type: 'UPGRADE_REQUIRED',
           is_read: false,
-          link: '/portfolio/upload',
+          link: '/subscription',
           created_at: new Date().toISOString(),
         });
       }

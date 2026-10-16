@@ -25,8 +25,8 @@ export interface InquiryMessage {
   createdAt: string;
 }
 
-let mockChats: InquiryChat[] = [];
-let mockMessages: InquiryMessage[] = [];
+let fallbackChatsStore: InquiryChat[] = [];
+let fallbackMessagesStore: InquiryMessage[] = [];
 
 function mapInterestFromSupabase(row: any, collectorId: string): CollectorArtworkInterest {
   const art = row.artworks || {};
@@ -144,9 +144,9 @@ export const inquiriesRepo = {
     }
 
     if (status) {
-      return mockChats.filter((c) => c.status === status);
+      return fallbackChatsStore.filter((c) => c.status === status);
     }
-    return [...mockChats];
+    return [...fallbackChatsStore];
   },
 
   /**
@@ -190,7 +190,7 @@ export const inquiriesRepo = {
       return [];
     }
 
-    return mockMessages.filter((m) => m.chatId === chatId);
+    return fallbackMessagesStore.filter((m) => m.chatId === chatId);
   },
 
   /**
@@ -235,7 +235,7 @@ export const inquiriesRepo = {
       content,
       createdAt: new Date().toISOString(),
     };
-    mockMessages.push(newMsg);
+    fallbackMessagesStore.push(newMsg);
     return newMsg;
   },
 
@@ -259,7 +259,7 @@ export const inquiriesRepo = {
       return false;
     }
 
-    const chat = mockChats.find((c) => c.id === chatId);
+    const chat = fallbackChatsStore.find((c) => c.id === chatId);
     if (chat) {
       chat.status = status;
       return true;

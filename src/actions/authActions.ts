@@ -213,5 +213,3 @@ export async function updateUserPassword(newPassword: string): Promise<{ error?:
   if (error) return { error: error.message };
   return { success: true };
 }
-
-

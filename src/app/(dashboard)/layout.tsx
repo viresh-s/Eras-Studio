@@ -10,11 +10,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
-    .select('full_name, profile_pic_url, role')
+    .select('full_name, profile_pic_url, role, plan, is_premium')
     .eq('id', user.id)
-    .single();
+    .maybeSingle();
 
-  if (profileError && profileError.code !== 'PGRST116') {
+  if (profileError) {
     console.error("DashboardLayout Profile Fetch Error:", JSON.stringify(profileError, null, 2));
   }
 

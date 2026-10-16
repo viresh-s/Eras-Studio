@@ -5,7 +5,11 @@ import Footer from '@/components/features/dashboard/Footer';
 import type { Profile, UserRole } from '@/types/database';
 
 interface DashboardShellProps {
-  profile: Pick<Profile, 'full_name' | 'profile_pic_url'> & { role: string };
+  profile: Pick<Profile, 'full_name' | 'profile_pic_url'> & {
+    role: string;
+    plan?: string | null;
+    is_premium?: boolean | null;
+  };
   children: React.ReactNode;
 }
 

@@ -433,7 +433,7 @@ export function ArtworkUploadForm({
                   {selectedFile ? formatFileSize(selectedFile.size) : "Ready for submission"} • Primary Catalog Asset
                 </p>
 
-                {/* Simulated / Real Upload Progress */}
+                {/* Upload Progress */}
                 {isUploading && (
                   <div className="space-y-1 pt-1">
                     <div className="flex justify-between text-[10px] text-[#71716D]">

@@ -10,6 +10,7 @@ import { LogIn, Mail, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 import { login } from '@/actions/authActions';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
+import SocialAuthButtons from '@/components/features/auth/SocialAuthButtons';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email'),
@@ -25,6 +26,7 @@ function LoginFormContent() {
 
   const searchParams = useSearchParams();
   const isVerified = searchParams.get('verified') === 'true';
+  const urlError = searchParams.get('error');
 
   const {
     register,
@@ -69,11 +71,13 @@ function LoginFormContent() {
           </div>
         )}
 
-        {error && (
+        {(error || urlError) && (
           <div className="mb-4 bg-red-50 border border-red-200 rounded-xl p-3 text-red-600 text-sm">
-            {error}
+            {error || urlError}
           </div>
         )}
+
+        <SocialAuthButtons mode="login" onError={(err) => setError(err)} />
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="relative">

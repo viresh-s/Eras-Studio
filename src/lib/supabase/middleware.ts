@@ -53,7 +53,7 @@ export async function updateSession(request: NextRequest) {
           .from('profiles')
           .select('role')
           .eq('id', user.id)
-          .single();
+          .maybeSingle();
         if (profile?.role === 'Admin') {
           isSupabaseAdmin = true;
         }
@@ -71,14 +71,15 @@ export async function updateSession(request: NextRequest) {
     }
   }
 
-  // Other protected routes: artworks, discovery, portfolio, messages, settings, cor
+  // Other protected routes: artworks, discovery, portfolio, messages, settings, cor, subscription
   const isProtectedRoute =
     request.nextUrl.pathname.startsWith('/artwork') ||
     request.nextUrl.pathname.startsWith('/portfolio') ||
     request.nextUrl.pathname.startsWith('/discovery') ||
     request.nextUrl.pathname.startsWith('/cor') ||
     request.nextUrl.pathname.startsWith('/messages') ||
-    request.nextUrl.pathname.startsWith('/settings');
+    request.nextUrl.pathname.startsWith('/settings') ||
+    request.nextUrl.pathname.startsWith('/subscription');
 
   if (isProtectedRoute && !user) {
     const url = request.nextUrl.clone();
@@ -105,7 +106,7 @@ export async function updateSession(request: NextRequest) {
       .from('profiles')
       .select('role')
       .eq('id', user.id)
-      .single();
+      .maybeSingle();
 
     if (!profile) {
       return supabaseResponse;

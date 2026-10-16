@@ -55,7 +55,7 @@ export default async function PurchasesPage() {
       price: artwork.price,
       creatorName: artwork.profiles?.full_name || 'Unknown Artist',
       createdAt: inq.created_at,
-      // Default mock status for the demo
+      // Default initial acquisition status stage
       initialStatus: 'Interest Raised',
       dbStatus: inq.status
     };

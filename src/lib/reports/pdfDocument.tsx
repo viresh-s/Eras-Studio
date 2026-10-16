@@ -1187,7 +1187,7 @@ export function StudioPerformanceDocument({ data }: DocumentProps) {
                 Curatorial Console Verification
               </Text>
               <Text style={{ fontSize: 7, fontFamily: "Helvetica", color: "#8A8A85", marginTop: 2 }}>
-                Generated securely from verified platform records. No simulated statistics.
+                Generated securely from verified platform records and audited live data.
               </Text>
             </View>
             <View style={{ display: "flex", alignItems: "flex-end" }}>

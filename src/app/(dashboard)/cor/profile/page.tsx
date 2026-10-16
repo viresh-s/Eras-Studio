@@ -24,7 +24,7 @@ export default async function CorProfilePage() {
     .from('profiles')
     .select('*')
     .eq('id', user.id)
-    .single();
+    .maybeSingle();
 
   const isPro = isProUser(profile);
 

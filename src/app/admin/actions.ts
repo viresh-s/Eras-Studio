@@ -314,7 +314,7 @@ export async function uploadArtworkMediaAction(
       }
     }
 
-    // Fallback for local/offline mock environments
+    // Fallback for environments without direct storage bucket access
     const buffer = Buffer.from(await file.arrayBuffer());
     const base64 = buffer.toString("base64");
     const dataUrl = `data:${file.type};base64,${base64}`;

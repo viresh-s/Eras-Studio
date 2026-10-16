@@ -9,7 +9,11 @@ import type { Profile, UserRole } from '@/types/database';
 import NotificationBell from './NotificationBell';
 
 interface NavbarProps {
-  profile: Pick<Profile, 'full_name' | 'profile_pic_url'> & { role: string };
+  profile: Pick<Profile, 'full_name' | 'profile_pic_url'> & {
+    role: string;
+    plan?: string | null;
+    is_premium?: boolean | null;
+  };
 }
 
 const navLinks = [
@@ -41,6 +45,12 @@ const adminNavLinks = [
 
 export default function Navbar({ profile }: NavbarProps) {
   const pathname = usePathname();
+
+  const rawPlan = profile.plan || (profile.is_premium ? 'pro' : 'free');
+  const normalizedPlan = (rawPlan || 'free').toLowerCase().trim();
+  const isPro = normalizedPlan === 'pro' || normalizedPlan === 'elite';
+  const isLite = normalizedPlan === 'lite' || normalizedPlan === 'light';
+  const planLabel = isPro ? 'Pro plan' : isLite ? 'Lite plan' : 'Free plan';
 
   const links =
     profile.role === 'Creator'
@@ -137,7 +147,7 @@ export default function Navbar({ profile }: NavbarProps) {
                   {profile.full_name || 'Creator'}
                 </p>
                 <p className="text-xs text-[var(--color-cor-ink-light)] leading-tight flex items-center gap-1">
-                  Free plan
+                  {planLabel}
                 </p>
               </div>
               <ChevronDown size={14} className="text-[var(--color-cor-ink-light)] hidden lg:block" />
@@ -148,7 +158,7 @@ export default function Navbar({ profile }: NavbarProps) {
               <div className="absolute top-full right-0 mt-2 w-56 bg-[var(--color-cor-surface)] border border-[var(--color-cor-border)] rounded-2xl shadow-soft-xl py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                 <div className="px-4 py-2 border-b border-[var(--color-cor-border-light)] mb-1 lg:hidden">
                   <p className="text-sm font-semibold text-[var(--color-cor-ink)] truncate">{profile.full_name}</p>
-                  <p className="text-xs text-[var(--color-cor-ink-light)]">Free plan</p>
+                  <p className="text-xs text-[var(--color-cor-ink-light)]">{planLabel}</p>
                 </div>
                 
                 <Link
@@ -167,12 +177,13 @@ export default function Navbar({ profile }: NavbarProps) {
                   <Settings size={16} /> Account Settings
                 </Link>
 
-                <button
-                  disabled
-                  className="flex items-center gap-2 px-4 py-2 text-sm text-[var(--color-cor-ink-light)] cursor-not-allowed w-full text-left opacity-70"
+                <Link
+                  href="/subscription"
+                  onClick={() => setDropdownOpen(false)}
+                  className="flex items-center gap-2 px-4 py-2 text-sm text-[var(--color-cor-ink)] hover:bg-[#F4F4ED] transition-colors w-full text-left"
                 >
-                  <Sparkles size={16} /> Upgrade (Coming Soon)
-                </button>
+                  <Sparkles size={16} className="text-[#865E16]" /> Subscription
+                </Link>
 
                 <div className="h-px bg-[var(--color-cor-border-light)] my-1"></div>
 

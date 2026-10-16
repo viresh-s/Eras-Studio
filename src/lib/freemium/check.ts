@@ -16,7 +16,7 @@ export async function checkFreemiumStatus(userId: string): Promise<FreemiumStatu
     .from('profiles')
     .select('is_premium, created_at')
     .eq('id', userId)
-    .single();
+    .maybeSingle();
 
   if (!profile) {
     return {

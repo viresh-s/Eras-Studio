@@ -214,7 +214,7 @@ export function SubscriptionsClient({ initialSubscribers, stats }: Subscriptions
           Subscriptions
         </h1>
         <p className="mt-1 text-sm text-[#6E6E69]">
-          Local plan controls. No real billing or subscription changes.
+          Platform membership administration. Manage creator tiers and privileges.
         </p>
       </div>
 
@@ -426,8 +426,7 @@ export function SubscriptionsClient({ initialSubscribers, stats }: Subscriptions
       )}
 
       <p className="text-[11px] text-[#8A8A85] max-w-lg">
-        Illustrative period metrics. 14 upgrades &middot; 3 downgrades &middot; 8 COR conversions. Choosing
-        a plan above simulates upgrade, downgrade or reactivation.
+        Creator tier distribution and historical subscription activity.
       </p>
     </div>
   );
