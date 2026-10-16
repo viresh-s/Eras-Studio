@@ -5,6 +5,7 @@ import { checkRateLimit } from '@/lib/security/rateLimiter';
 import { sanitizeText } from '@/lib/security/validators';
 import { securityLogger } from '@/lib/security/logger';
 import { createNotification } from './notificationActions';
+import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
 const createChatSchema = z.object({
@@ -239,6 +240,8 @@ export async function acceptChatRequest(chatId: string) {
     'INTEREST_ACCEPTED',
     `/messages?chatId=${chatId}`
   );
+
+  revalidatePath('/messages');
 }
 
 export async function rejectChatRequest(chatId: string) {

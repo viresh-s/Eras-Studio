@@ -41,29 +41,36 @@ export default function ChatListClient({ initialChats, currentUserId }: ChatList
   };
 
   const handleAccept = async (chatId: string) => {
+    // Optimistic immediate update for instant UI feedback (0ms perceptual lag)
+    const previousChats = [...chats];
+    setChats((prev) =>
+      prev.map((c) => (c.id === chatId ? { ...c, status: 'Active' } : c))
+    );
     setLoadingIds((prev) => ({ ...prev, [chatId]: true }));
     try {
       await acceptChatRequest(chatId);
-      setChats((prev) =>
-        prev.map((c) => (c.id === chatId ? { ...c, status: 'Active' } : c))
-      );
-      // Optional: switch to Messages tab after accept
     } catch (err) {
-      console.error(err);
+      console.error('Failed to accept chat request:', err);
+      setChats(previousChats);
+      alert('Failed to accept request. Please try again.');
     } finally {
       setLoadingIds((prev) => ({ ...prev, [chatId]: false }));
     }
   };
 
   const handleReject = async (chatId: string) => {
+    // Optimistic immediate update for instant UI feedback (0ms perceptual lag)
+    const previousChats = [...chats];
+    setChats((prev) =>
+      prev.map((c) => (c.id === chatId ? { ...c, status: 'Rejected' } : c))
+    );
     setLoadingIds((prev) => ({ ...prev, [chatId]: true }));
     try {
       await rejectChatRequest(chatId);
-      setChats((prev) =>
-        prev.map((c) => (c.id === chatId ? { ...c, status: 'Rejected' } : c))
-      );
     } catch (err) {
-      console.error(err);
+      console.error('Failed to reject chat request:', err);
+      setChats(previousChats);
+      alert('Failed to reject request. Please try again.');
     } finally {
       setLoadingIds((prev) => ({ ...prev, [chatId]: false }));
     }

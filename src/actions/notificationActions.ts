@@ -1,6 +1,6 @@
 'use server';
 
-import { createClient } from '@/lib/supabase/server';
+import { createClient, getSupabaseAdmin } from '@/lib/supabase/server';
 import { z } from 'zod';
 
 const notificationSchema = z.object({
@@ -23,9 +23,10 @@ export async function createNotification(
     throw new Error(`Validation Error: ${parsed.error.errors.map(e => e.message).join(', ')}`);
   }
 
-  const supabase = await createClient();
+  const supabaseAdmin = getSupabaseAdmin();
+  const supabase = supabaseAdmin || (await createClient());
 
-  const { error } = await supabase.from('notifications').insert({
+  const { error } = await (supabase.from('notifications') as any).insert({
     user_id: userId,
     title,
     message,
