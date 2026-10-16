@@ -176,36 +176,16 @@ export async function requireAdminSession(requiredPermission?: Permission): Prom
     } catch {}
   }
 
-  // Seamlessly provide Super Admin session if unauthenticated or in development
   if (!session) {
-    session = {
-      id: DEFAULT_ADMIN.id,
-      username: process.env.ADMIN_USERNAME || 'admin123',
-      role: 'super_admin',
-      name: DEFAULT_ADMIN.name,
-      email: DEFAULT_ADMIN.email,
-    };
-
-    try {
-      const autoToken = await createSessionToken(session);
-      cookieStore.set({
-        name: COOKIE_OPTIONS.name,
-        value: autoToken,
-        httpOnly: COOKIE_OPTIONS.httpOnly,
-        secure: COOKIE_OPTIONS.secure,
-        sameSite: COOKIE_OPTIONS.sameSite,
-        path: COOKIE_OPTIONS.path,
-        maxAge: COOKIE_OPTIONS.maxAge,
-      });
-    } catch {}
+    throw new Error("Unauthorized: Admin authentication required.");
   }
 
   if (!isAdminOrModerator(session.role)) {
-    session.role = 'super_admin';
+    throw new Error("Forbidden: Admin or Moderator privileges required.");
   }
 
   if (requiredPermission && !hasPermission(session.role, requiredPermission)) {
-    session.role = 'super_admin';
+    throw new Error(`Forbidden: Missing required permission '${requiredPermission}'.`);
   }
 
   return session;

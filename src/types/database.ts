@@ -20,6 +20,14 @@ export interface Profile {
   awards: string | null;
   other_links: string | null;
   social_links: SocialLinks;
+  artist_bio_file_url?: string | null;
+  cv_file_url?: string | null;
+  artist_statement_file_url?: string | null;
+  short_portfolio_file_url?: string | null;
+  long_portfolio_file_url?: string | null;
+  top_artworks_drive_url?: string | null;
+  has_project_proposals?: string | null;
+  latest_proposal_file_url?: string | null;
   is_premium: boolean;
   plan?: 'free' | 'pro' | 'elite' | string;
   status?: 'active' | 'suspended' | string;

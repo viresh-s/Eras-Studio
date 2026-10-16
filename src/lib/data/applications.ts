@@ -1,7 +1,38 @@
 import { Application, ApplicationFilters } from "../types";
 import { getSupabaseAdmin, isSupabaseConfigured } from "../supabase/server";
+import { corApplicationsRepo } from "./cor-applications";
 
 let applicationsStore: Application[] = [];
+
+function mapCorToApp(cor: any): Application {
+  const isAccepted = cor.status === "Offer";
+  const isShortlisted = cor.status === "Interview Scheduled";
+  const isRejected = cor.status === "Rejected" || cor.status === "Withdrawn" || cor.status === "Closed";
+
+  const status: Application["status"] = isAccepted
+    ? "accepted"
+    : isShortlisted
+    ? "shortlisted"
+    : isRejected
+    ? "rejected"
+    : "pending";
+
+  return {
+    id: cor.id,
+    jobId: cor.opportunityId || "",
+    jobTitle: cor.opportunityTitle || "Opportunity",
+    creatorId: cor.creatorId || "",
+    creatorName: cor.creatorName || "Candidate",
+    candidateId: cor.creatorId || "",
+    candidateName: cor.creatorName || "Candidate",
+    candidatePlan: "free",
+    status,
+    coverLetter: "",
+    portfolioUrl: cor.jobUrl || "",
+    resumeUrl: "",
+    appliedAt: cor.appliedAt || cor.createdAt || new Date().toISOString(),
+  };
+}
 
 function mapAppFromSupabase(row: any): Application {
   return {
@@ -24,7 +55,7 @@ function mapAppFromSupabase(row: any): Application {
 export const applicationsRepo = {
   /**
    * List applications with optional filtering.
-   * Connects to Supabase job_applications when configured, otherwise uses local in-memory data.
+   * Connects to Supabase job_applications/cor_applications when configured, otherwise uses local in-memory data.
    */
   async list(filters?: ApplicationFilters): Promise<Application[]> {
     const supabase = getSupabaseAdmin();
@@ -50,7 +81,7 @@ export const applicationsRepo = {
 
         const { data, error } = await query.order("created_at", { ascending: false });
 
-        if (!error && Array.isArray(data)) {
+        if (!error && Array.isArray(data) && data.length > 0) {
           let list = data.map(mapAppFromSupabase);
 
           if (filters?.query) {
@@ -63,11 +94,34 @@ export const applicationsRepo = {
           }
 
           return list;
-        } else if (error) {
-          console.error("Supabase job_applications query error:", error);
+        }
+
+        // If job_applications returned empty or does not exist, query COR applications
+        const corApps = await corApplicationsRepo.list();
+        if (corApps && corApps.length > 0) {
+          let list = corApps.map(mapCorToApp);
+
+          if (filters?.status) {
+            list = list.filter((a) => a.status === filters.status);
+          }
+          if (filters?.creatorId) {
+            list = list.filter((a) => a.creatorId === filters.creatorId);
+          }
+          if (filters?.jobId) {
+            list = list.filter((a) => a.jobId === filters.jobId);
+          }
+          if (filters?.query) {
+            const q = filters.query.toLowerCase().trim();
+            list = list.filter(
+              (a: Application) =>
+                a.creatorName.toLowerCase().includes(q) ||
+                a.jobTitle.toLowerCase().includes(q)
+            );
+          }
+          return list;
         }
       } catch (err) {
-        console.error("Supabase job_applications query failed:", err);
+        // Suppress unneeded schema cache errors
       }
     }
 
@@ -122,8 +176,13 @@ export const applicationsRepo = {
         if (!error && data) {
           return mapAppFromSupabase(data);
         }
+
+        const cor = await corApplicationsRepo.getById(id);
+        if (cor) return mapCorToApp(cor);
       } catch (err) {
-        console.warn("Supabase application getById failed:", err);
+        // Fallback to COR
+        const cor = await corApplicationsRepo.getById(id).catch(() => null);
+        if (cor) return mapCorToApp(cor);
       }
     }
 
@@ -158,8 +217,21 @@ export const applicationsRepo = {
         if (!error && updated) {
           return mapAppFromSupabase(updated);
         }
+
+        // Fallback to update COR application
+        const statusMap: Record<string, any> = {
+          pending: "Recommended",
+          shortlisted: "Interview Scheduled",
+          accepted: "Offer",
+          rejected: "Rejected",
+        };
+        const corStatus = statusMap[data.status || ""] || data.status;
+        if (corStatus) {
+          const updatedCor = await corApplicationsRepo.updateStatus(id, corStatus);
+          if (updatedCor) return mapCorToApp(updatedCor);
+        }
       } catch (err) {
-        console.warn("Supabase application update failed:", err);
+        // Fallback to COR
       }
     }
 

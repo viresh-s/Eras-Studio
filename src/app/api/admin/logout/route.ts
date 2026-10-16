@@ -17,6 +17,7 @@ export async function POST() {
       }).catch(() => {});
     }
 
+    cookieStore.delete(COOKIE_OPTIONS.name);
     cookieStore.set({
       name: COOKIE_OPTIONS.name,
       value: "",

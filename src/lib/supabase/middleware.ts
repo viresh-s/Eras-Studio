@@ -46,14 +46,28 @@ export async function updateSession(request: NextRequest) {
 
   // Handle protected admin routes
   if (isAdminRoute && !isAdminLoginRoute) {
-    if (!hasAdminCookie && !user) {
-      const url = request.nextUrl.clone();
-      url.pathname = '/admin/login';
-      const response = NextResponse.redirect(url);
-      supabaseResponse.cookies.getAll().forEach((cookie) => {
-        response.cookies.set(cookie.name, cookie.value);
-      });
-      return response;
+    if (!hasAdminCookie) {
+      let isSupabaseAdmin = false;
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+        if (profile?.role === 'Admin') {
+          isSupabaseAdmin = true;
+        }
+      }
+
+      if (!isSupabaseAdmin) {
+        const url = request.nextUrl.clone();
+        url.pathname = '/admin/login';
+        const response = NextResponse.redirect(url);
+        supabaseResponse.cookies.getAll().forEach((cookie) => {
+          response.cookies.set(cookie.name, cookie.value);
+        });
+        return response;
+      }
     }
   }
 

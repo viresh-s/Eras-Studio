@@ -88,7 +88,7 @@ export default async function OverviewPage() {
       title: "Pending Applications",
       description: "Open call & residency applications",
       count: appStats.pending,
-      href: "/admin/applications?status=pending",
+      href: "/admin/cor/applications",
       icon: FileText,
     },
   ];

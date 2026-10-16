@@ -21,6 +21,14 @@ const updateProfileSchema = z.object({
   art_forms: z.string().max(500).nullable().optional(),
   awards: z.string().max(1000).nullable().optional(),
   other_links: z.string().max(1000).nullable().optional(),
+  artist_bio_file_url: z.string().url().max(1000).or(z.literal("")).nullable().optional(),
+  cv_file_url: z.string().url().max(1000).or(z.literal("")).nullable().optional(),
+  artist_statement_file_url: z.string().url().max(1000).or(z.literal("")).nullable().optional(),
+  short_portfolio_file_url: z.string().url().max(1000).or(z.literal("")).nullable().optional(),
+  long_portfolio_file_url: z.string().url().max(1000).or(z.literal("")).nullable().optional(),
+  top_artworks_drive_url: z.string().url().max(1000).or(z.literal("")).nullable().optional(),
+  has_project_proposals: z.string().max(500).nullable().optional(),
+  latest_proposal_file_url: z.string().url().max(1000).or(z.literal("")).nullable().optional(),
 });
 
 const uuidSchema = z.string().uuid("Invalid user ID");
@@ -41,6 +49,14 @@ interface UpdateProfileData {
   art_forms?: string | null;
   awards?: string | null;
   other_links?: string | null;
+  artist_bio_file_url?: string | null;
+  cv_file_url?: string | null;
+  artist_statement_file_url?: string | null;
+  short_portfolio_file_url?: string | null;
+  long_portfolio_file_url?: string | null;
+  top_artworks_drive_url?: string | null;
+  has_project_proposals?: string | null;
+  latest_proposal_file_url?: string | null;
 }
 
 export async function updateProfile(data: UpdateProfileData) {

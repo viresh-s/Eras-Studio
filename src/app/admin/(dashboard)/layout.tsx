@@ -182,11 +182,10 @@ export default function DashboardLayout({
       await fetch("/api/admin/logout", {
         method: "POST",
       });
-      router.push("/admin/login");
-      router.refresh();
+      window.location.href = "/admin/login";
     } catch (err) {
       console.error("Logout error:", err);
-      router.push("/admin/login");
+      window.location.href = "/admin/login";
     } finally {
       setIsLoggingOut(false);
     }
