@@ -2,22 +2,34 @@
 
 import { useState, useEffect, Suspense, useMemo } from 'react';
 import Link from 'next/link';
-import { MailCheck, RefreshCw } from 'lucide-react';
+import { MailCheck, RefreshCw, Pencil, CheckCircle2, AlertCircle, ArrowLeft } from 'lucide-react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { resendVerificationEmail } from '@/actions/authActions';
+import { resendVerificationEmail, changeVerificationEmail } from '@/actions/authActions';
 import Button from '@/components/ui/Button';
+import Input from '@/components/ui/Input';
 import { createClient } from '@/lib/supabase/client';
 
 function VerifyEmailContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const email = searchParams.get('email');
+  const initialEmail = searchParams.get('email') || '';
   const supabase = useMemo(() => createClient(), []);
   
+  const [currentEmail, setCurrentEmail] = useState(initialEmail);
+  const [isEditingEmail, setIsEditingEmail] = useState(false);
+  const [newEmailInput, setNewEmailInput] = useState('');
+  const [isChangingEmail, setIsChangingEmail] = useState(false);
+
   const [countdown, setCountdown] = useState(0);
   const [attempts, setAttempts] = useState<{ timestamp: number }[]>([]);
   const [isResending, setIsResending] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  useEffect(() => {
+    if (initialEmail && initialEmail !== currentEmail) {
+      setCurrentEmail(initialEmail);
+    }
+  }, [initialEmail]);
 
   // Listen for auth state changes (e.g., user clicks link in a new tab)
   useEffect(() => {
@@ -53,7 +65,7 @@ function VerifyEmailContent() {
             setCountdown(Math.ceil((60000 - timePassed) / 1000));
           }
         }
-      } catch (e) {
+      } catch {
         // ignore
       }
     }
@@ -68,8 +80,8 @@ function VerifyEmailContent() {
   }, [countdown]);
 
   const handleResend = async () => {
-    if (!email) {
-      setMessage({ type: 'error', text: 'Email address is missing. Please sign up again.' });
+    if (!currentEmail) {
+      setMessage({ type: 'error', text: 'Email address is missing. Please sign up again or enter your email.' });
       return;
     }
 
@@ -81,13 +93,12 @@ function VerifyEmailContent() {
     setIsResending(true);
     setMessage(null);
 
-    const result = await resendVerificationEmail(email);
+    const result = await resendVerificationEmail(currentEmail);
 
     if (result.error) {
-      // Sometimes Supabase rate limits explicitly returning an error
       setMessage({ type: 'error', text: result.error });
     } else {
-      setMessage({ type: 'success', text: 'Verification email resent successfully! Check your inbox.' });
+      setMessage({ type: 'success', text: `Verification link resent to ${currentEmail}! Please check your inbox.` });
       
       const newAttempts = [...attempts, { timestamp: Date.now() }];
       setAttempts(newAttempts);
@@ -98,36 +109,146 @@ function VerifyEmailContent() {
     setIsResending(false);
   };
 
+  const handleChangeEmailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const targetEmail = newEmailInput.trim();
+
+    if (!targetEmail) {
+      setMessage({ type: 'error', text: 'Please enter a valid email address.' });
+      return;
+    }
+
+    if (!currentEmail) {
+      setMessage({ type: 'error', text: 'Original email is missing. Please sign up with your email.' });
+      return;
+    }
+
+    if (targetEmail.toLowerCase() === currentEmail.toLowerCase()) {
+      setMessage({ type: 'error', text: 'The new email is identical to the current email.' });
+      return;
+    }
+
+    setIsChangingEmail(true);
+    setMessage(null);
+
+    try {
+      const res = await changeVerificationEmail(currentEmail, targetEmail);
+      if (res.error) {
+        setMessage({ type: 'error', text: res.error });
+      } else if (res.success && res.newEmail) {
+        setCurrentEmail(res.newEmail);
+        setIsEditingEmail(false);
+        router.replace(`/verify-email?email=${encodeURIComponent(res.newEmail)}`);
+        setMessage({
+          type: 'success',
+          text: `Email updated to ${res.newEmail}! We've dispatched a fresh confirmation link to your new inbox.`,
+        });
+        setCountdown(60);
+      }
+    } catch (err: any) {
+      setMessage({ type: 'error', text: err.message || 'Failed to update email address. Please try again.' });
+    } finally {
+      setIsChangingEmail(false);
+    }
+  };
+
   const isLimitReached = attempts.length >= 3;
-  const isButtonDisabled = isResending || countdown > 0 || isLimitReached || !email;
+  const isButtonDisabled = isResending || countdown > 0 || isLimitReached || !currentEmail;
 
   return (
-    <div className="bg-white rounded-2xl shadow-[0_4px_24px_rgb(0,0,0,0.06)] p-8 text-center max-w-md mx-auto mt-12">
+    <div className="bg-white rounded-2xl shadow-[0_4px_24px_rgb(0,0,0,0.06)] p-6 sm:p-8 text-center max-w-md mx-auto mt-12 border border-[#E8E8E3]">
       <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
         <MailCheck size={32} />
       </div>
       
-      <h1 className="text-2xl font-extrabold text-gray-900 mb-3">Check your inbox</h1>
+      <h1 className="text-2xl font-extrabold text-gray-900 mb-2">Check your inbox</h1>
       
-      <p className="text-gray-500 mb-6">
-        We sent a confirmation link to <strong className="text-gray-900">{email || 'your email'}</strong>. Please click the link to verify your account so you can log in!
-      </p>
+      {!isEditingEmail ? (
+        <>
+          <p className="text-gray-500 mb-2 text-sm leading-relaxed">
+            We sent a confirmation link to:
+          </p>
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gray-50 border border-gray-200 text-xs sm:text-sm font-semibold text-gray-900 mb-4 max-w-full truncate">
+            <span className="truncate">{currentEmail || 'your email'}</span>
+            <button
+              type="button"
+              onClick={() => {
+                setNewEmailInput(currentEmail);
+                setIsEditingEmail(true);
+                setMessage(null);
+              }}
+              className="text-blue-600 hover:text-blue-700 underline text-xs font-medium cursor-pointer inline-flex items-center gap-1 shrink-0"
+            >
+              <Pencil size={12} />
+              Change
+            </button>
+          </div>
+
+          <p className="text-gray-500 mb-6 text-xs sm:text-sm leading-relaxed">
+            Please click the link in the email to verify your account so you can sign in.
+          </p>
+        </>
+      ) : (
+        /* Change Email Form */
+        <form onSubmit={handleChangeEmailSubmit} className="mb-6 p-4 rounded-xl bg-gray-50 border border-gray-200 text-left space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-gray-900">Correct Your Email Address</span>
+            <button
+              type="button"
+              onClick={() => {
+                setIsEditingEmail(false);
+                setMessage(null);
+              }}
+              className="text-xs text-gray-500 hover:text-gray-800"
+            >
+              Cancel
+            </button>
+          </div>
+
+          <Input
+            label="New Email Address"
+            type="email"
+            placeholder="you@example.com"
+            value={newEmailInput}
+            onChange={(e) => setNewEmailInput(e.target.value)}
+            required
+            autoFocus
+          />
+
+          <div className="flex items-center gap-2 pt-1">
+            <Button
+              type="submit"
+              variant="primary"
+              fullWidth
+              isLoading={isChangingEmail}
+              disabled={isChangingEmail || !newEmailInput.trim()}
+            >
+              Update & Resend Email
+            </Button>
+          </div>
+        </form>
+      )}
 
       {message && (
-        <div className={`mb-6 p-3 rounded-xl text-sm ${message.type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-600 border border-red-200'}`}>
-          {message.text}
+        <div className={`mb-6 p-3.5 rounded-xl text-xs sm:text-sm flex items-start gap-2.5 text-left ${message.type === 'success' ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-red-50 text-red-600 border border-red-200'}`}>
+          {message.type === 'success' ? (
+            <CheckCircle2 size={16} className="text-emerald-600 shrink-0 mt-0.5" />
+          ) : (
+            <AlertCircle size={16} className="text-red-600 shrink-0 mt-0.5" />
+          )}
+          <span>{message.text}</span>
         </div>
       )}
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         <Button 
           fullWidth 
           variant="secondary"
           onClick={handleResend}
-          disabled={isButtonDisabled}
+          disabled={isButtonDisabled || isEditingEmail}
           isLoading={isResending}
         >
-          <RefreshCw size={16} className={countdown > 0 ? "opacity-50" : ""} />
+          <RefreshCw size={15} className={countdown > 0 ? "opacity-50" : ""} />
           {countdown > 0 
             ? `Resend available in ${countdown}s` 
             : isLimitReached 
@@ -137,13 +258,13 @@ function VerifyEmailContent() {
 
         <Link 
           href="/login" 
-          className="block w-full py-3 px-4 bg-gray-900 text-white rounded-xl text-sm font-semibold hover:bg-gray-800 transition-colors"
+          className="block w-full py-2.5 px-4 bg-gray-900 text-white rounded-xl text-xs sm:text-sm font-semibold hover:bg-black transition-colors"
         >
           Return to Login
         </Link>
         
-        <p className="text-xs text-gray-400 pt-2">
-          Didn't receive an email? Check your spam folder or ensure you used a real email address.
+        <p className="text-[11px] text-gray-400 pt-1">
+          Didn&apos;t receive an email? Check your spam folder or verify you entered the correct address above.
         </p>
       </div>
     </div>

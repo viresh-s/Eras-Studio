@@ -1,6 +1,6 @@
 'use server';
 
-import { createClient } from '@/lib/supabase/server';
+import { createClient, getSupabaseAdmin } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
 import { z } from 'zod';
@@ -233,4 +233,116 @@ export async function updateUserPassword(newPassword: string): Promise<{ error?:
 
   if (error) return { error: error.message };
   return { success: true };
+}
+
+const changeEmailSchema = z.object({
+  oldEmail: z.string().email('Invalid current email address'),
+  newEmail: z.string().email('Invalid new email address'),
+});
+
+export async function changeVerificationEmail(
+  oldEmailRaw: string,
+  newEmailRaw: string
+): Promise<{ error?: string; success?: boolean; newEmail?: string }> {
+  const parsed = changeEmailSchema.safeParse({
+    oldEmail: oldEmailRaw?.trim(),
+    newEmail: newEmailRaw?.trim(),
+  });
+
+  if (!parsed.success) {
+    return { error: parsed.error.errors[0].message };
+  }
+
+  const { oldEmail, newEmail } = parsed.data;
+
+  if (oldEmail.toLowerCase() === newEmail.toLowerCase()) {
+    return { error: 'The new email address cannot be the same as the current email address.' };
+  }
+
+  const supabaseAdmin = getSupabaseAdmin();
+  if (!supabaseAdmin) {
+    return { error: 'Server configuration error. Please try again later.' };
+  }
+
+  // 1. Verify that newEmail is not already in use
+  const { data: existingTarget } = await supabaseAdmin
+    .from('profiles')
+    .select('id')
+    .ilike('email', newEmail)
+    .maybeSingle();
+
+  if (existingTarget) {
+    return { error: 'This new email address is already in use by another account.' };
+  }
+
+  // 2. Locate the existing user by oldEmail
+  const { data: oldProfile } = await supabaseAdmin
+    .from('profiles')
+    .select('id, full_name, role')
+    .ilike('email', oldEmail)
+    .maybeSingle();
+
+  let targetUserId = oldProfile?.id;
+
+  if (!targetUserId) {
+    const { data: usersData, error: listError } = await supabaseAdmin.auth.admin.listUsers();
+    if (!listError && usersData?.users) {
+      const matched = usersData.users.find(
+        (u) => u.email?.toLowerCase() === oldEmail.toLowerCase()
+      );
+      if (matched) {
+        targetUserId = matched.id;
+      }
+    }
+  }
+
+  if (!targetUserId) {
+    return {
+      error: 'Account not found for that email address. Please proceed to sign up with your correct email.',
+    };
+  }
+
+  // 3. Check if the user is already confirmed
+  const { data: userData, error: getUserError } = await supabaseAdmin.auth.admin.getUserById(targetUserId);
+  if (getUserError || !userData?.user) {
+    return { error: 'Unable to locate user credentials.' };
+  }
+
+  if (userData.user.email_confirmed_at) {
+    return { error: 'This account is already verified. Please log in directly.' };
+  }
+
+  // 4. Update the user email in Supabase Auth
+  const { error: updateAuthError } = await supabaseAdmin.auth.admin.updateUserById(targetUserId, {
+    email: newEmail,
+    email_confirm: false,
+  });
+
+  if (updateAuthError) {
+    return { error: updateAuthError.message };
+  }
+
+  // 5. Update the profiles table
+  await supabaseAdmin
+    .from('profiles')
+    .update({ email: newEmail })
+    .eq('id', targetUserId);
+
+  // 6. Send a new verification email to newEmail
+  const supabase = await createClient();
+  const origin = await getRequestOrigin();
+
+  const { error: resendError } = await supabase.auth.resend({
+    type: 'signup',
+    email: newEmail,
+    options: {
+      emailRedirectTo: `${origin}/auth/callback?next=/login?verified=true`,
+    },
+  });
+
+  if (resendError) {
+    console.warn('Notice while sending verification to updated email:', resendError);
+  }
+
+  return { success: true, newEmail };
 }
