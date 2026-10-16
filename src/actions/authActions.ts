@@ -111,6 +111,17 @@ export async function signup(formData: FormData): Promise<AuthResult> {
   const supabase = await createClient();
   const origin = await getRequestOrigin();
 
+  // 1. Pre-check if an account with this email already exists in the profiles database
+  const { data: existingProfile } = await supabase
+    .from('profiles')
+    .select('id')
+    .ilike('email', email.trim())
+    .maybeSingle();
+
+  if (existingProfile) {
+    return { error: 'This email is already in use. Please sign in or reset your password.' };
+  }
+
   const { data: authData, error } = await supabase.auth.signUp({
     email,
     password,
@@ -125,7 +136,17 @@ export async function signup(formData: FormData): Promise<AuthResult> {
   });
 
   if (error) {
+    const errorMsg = error.message.toLowerCase();
+    if (errorMsg.includes('already registered') || errorMsg.includes('already exists') || error.status === 422) {
+      return { error: 'This email is already in use. Please sign in or reset your password.' };
+    }
     return { error: error.message };
+  }
+
+  // 2. Check Supabase identities: when email enumeration protection is ON,
+  // Supabase returns an empty identities array [] if the email already belongs to an existing user.
+  if (authData.user && Array.isArray(authData.user.identities) && authData.user.identities.length === 0) {
+    return { error: 'This email is already in use. Please sign in or reset your password.' };
   }
 
   if (authData.user) {
