@@ -78,22 +78,35 @@ export default function NotificationBell() {
 
   useEffect(() => {
     let channel: any = null;
+    let isMounted = true;
     let pollTimer: NodeJS.Timeout | null = null;
     let clockTimer: NodeJS.Timeout | null = null;
 
     async function initUserNotifications() {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user || !isMounted) return;
 
       userIdRef.current = user.id;
 
       // Initial instant fetch
       await fetchNotificationsFast(user.id);
+      if (!isMounted) return;
       checkFreemiumOnce(user.id);
+
+      // Clean up any stale channels with the same topic before subscribing
+      const channelName = `user-notifications-${user.id}`;
+      const existingChannels = supabase.getChannels();
+      for (const ch of existingChannels) {
+        if (ch.topic === `realtime:${channelName}` || ch.topic === channelName) {
+          supabase.removeChannel(ch);
+        }
+      }
+
+      if (!isMounted) return;
 
       // 1. Supabase Realtime channel dedicated to this user's notifications
       channel = supabase
-        .channel(`user-notifications-${user.id}`)
+        .channel(channelName)
         .on(
           'postgres_changes',
           {
@@ -103,6 +116,7 @@ export default function NotificationBell() {
             filter: `user_id=eq.${user.id}`,
           },
           (payload) => {
+            if (!isMounted) return;
             const newNotif = payload.new as NotificationItem;
             setNotifications((prev) => {
               if (prev.some((n) => n.id === newNotif.id)) return prev;
@@ -110,24 +124,27 @@ export default function NotificationBell() {
             });
             setUnreadCount((prev) => prev + 1);
           }
-        )
-        .subscribe();
+        );
+
+      channel.subscribe();
 
       // 2. High-frequency 4s polling fallback (ensures notifications appear even if realtime websocket disconnects)
       pollTimer = setInterval(() => {
-        if (userIdRef.current && typeof document !== 'undefined' && !document.hidden) {
+        if (userIdRef.current && isMounted && typeof document !== 'undefined' && !document.hidden) {
           fetchNotificationsFast(userIdRef.current);
         }
       }, 4000);
 
-      clockTimer = setInterval(() => setCurrentTime(Date.now()), 60000);
+      clockTimer = setInterval(() => {
+        if (isMounted) setCurrentTime(Date.now());
+      }, 60000);
     }
 
     initUserNotifications();
 
     // 3. Instant re-fetch on window focus or tab visibility change
     const handleVisibilityOrFocus = () => {
-      if (userIdRef.current) {
+      if (userIdRef.current && isMounted) {
         fetchNotificationsFast(userIdRef.current);
       }
     };
@@ -136,6 +153,7 @@ export default function NotificationBell() {
     document.addEventListener('visibilitychange', handleVisibilityOrFocus);
 
     return () => {
+      isMounted = false;
       if (channel) supabase.removeChannel(channel);
       if (pollTimer) clearInterval(pollTimer);
       if (clockTimer) clearInterval(clockTimer);

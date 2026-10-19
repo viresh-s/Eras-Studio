@@ -7,6 +7,8 @@ import Link from 'next/link';
 import { Search, SlidersHorizontal, ChevronDown, X, Check, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createChatSession } from '@/actions/chatActions';
+import TopCreatorsRow from '@/components/features/discovery/TopCreatorsRow';
+import { getTopCreators, RankedCreator } from '@/lib/services/rankingService';
 
 const categoryPills = [
   { value: '', label: 'All works' },
@@ -65,6 +67,8 @@ export default function BrowsePage() {
   const [hasMore, setHasMore] = useState(true);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [requestedArtworkIds, setRequestedArtworkIds] = useState<Set<string>>(new Set());
+  const [topCreators, setTopCreators] = useState<RankedCreator[]>([]);
+  const [isLoadingCreators, setIsLoadingCreators] = useState(true);
 
   // Modal State for "Price on request"
   const [selectedArtworkForPrice, setSelectedArtworkForPrice] = useState<ArtworkItem | null>(null);
@@ -74,7 +78,7 @@ export default function BrowsePage() {
 
   const ITEMS_PER_PAGE = 16;
 
-  // Load user & previous requests on mount
+  // Load user, previous requests, and dynamic top creators on mount
   useEffect(() => {
     const supabase = createClient();
     supabase.auth.getUser().then(async ({ data: { user } }) => {
@@ -89,6 +93,13 @@ export default function BrowsePage() {
         }
       }
     });
+
+    // Real-time Top Creators Ranking calculation
+    setIsLoadingCreators(true);
+    getTopCreators(10)
+      .then((data) => setTopCreators(data))
+      .catch((err) => console.error('Failed to load top creators:', err))
+      .finally(() => setIsLoadingCreators(false));
   }, []);
 
   // Reset page when filters change
@@ -109,7 +120,7 @@ export default function BrowsePage() {
 
     let query = supabase
       .from('artworks')
-      .select('id, creator_id, title, art_type, artist_name, image_url, price, price_visibility, status, year, profiles(full_name)', { count: 'exact' })
+      .select('id, creator_id, title, art_type, artist_name, image_url, price, price_visibility, status, year, created_at, profiles(full_name)', { count: 'exact' })
       .eq('status', 'Available');
 
     // Sorting
@@ -149,19 +160,61 @@ export default function BrowsePage() {
     query = query.range(from, to);
 
     const { data, count } = await query;
-    
+
     if (data) {
+      let finalArtworks = data as any[];
+
+      // Dynamic Artwork Scoring for "Recommended for you"
+      if (sortBy === 'recommended' && finalArtworks.length > 0) {
+        try {
+          const artworkIds = finalArtworks.map((a: any) => a.id);
+          const [{ data: saves }, { data: inqs }] = await Promise.all([
+            (supabase as any).from('saved_artworks').select('artwork_id').in('artwork_id', artworkIds),
+            (supabase as any).from('inquiries_chats').select('artwork_id').in('artwork_id', artworkIds),
+          ]);
+
+          const saveMap = new Map<string, number>();
+          ((saves as any[]) || []).forEach((s: any) => saveMap.set(s.artwork_id, (saveMap.get(s.artwork_id) || 0) + 1));
+
+          const inqMap = new Map<string, number>();
+          ((inqs as any[]) || []).forEach((i: any) => inqMap.set(i.artwork_id, (inqMap.get(i.artwork_id) || 0) + 1));
+
+          finalArtworks = [...finalArtworks].sort((a: any, b: any) => {
+            const aSaves = saveMap.get(a.id) || 0;
+            const bSaves = saveMap.get(b.id) || 0;
+            const aInqs = inqMap.get(a.id) || 0;
+            const bInqs = inqMap.get(b.id) || 0;
+
+            const aDate = a.created_at ? new Date(a.created_at).getTime() : 0;
+            const bDate = b.created_at ? new Date(b.created_at).getTime() : 0;
+            const aAgeDays = (Date.now() - aDate) / (1000 * 60 * 60 * 24);
+            const bAgeDays = (Date.now() - bDate) / (1000 * 60 * 60 * 24);
+
+            const aFreshness = aAgeDays <= 7 ? 20 : aAgeDays <= 14 ? 10 : aAgeDays <= 30 ? 5 : 0;
+            const bFreshness = bAgeDays <= 7 ? 20 : bAgeDays <= 14 ? 10 : bAgeDays <= 30 ? 5 : 0;
+
+            const aScore = (aInqs * 10) + (aSaves * 6) + aFreshness;
+            const bScore = (bInqs * 10) + (bSaves * 6) + bFreshness;
+
+            if (bScore !== aScore) return bScore - aScore;
+            return bDate - aDate;
+          });
+        } catch (err) {
+          console.error('Error dynamic ranking artworks:', err);
+        }
+      }
+
       if (isReset) {
-        setArtworks(data as unknown as ArtworkItem[]);
+        setArtworks(finalArtworks as unknown as ArtworkItem[]);
       } else {
         setArtworks(prev => {
-          const newArtworks = data as unknown as ArtworkItem[];
+          const newArtworks = finalArtworks as unknown as ArtworkItem[];
           const existingIds = new Set(prev.map(a => a.id));
           const uniqueNewArtworks = newArtworks.filter(a => !existingIds.has(a.id));
           return [...prev, ...uniqueNewArtworks];
         });
       }
-      
+
       if (count !== null) {
         setHasMore(from + data.length < count);
       } else {
@@ -205,7 +258,7 @@ export default function BrowsePage() {
       // Add to requested Set
       setRequestedArtworkIds(prev => new Set(prev).add(selectedArtworkForPrice.id));
       setRequestSuccessMessage('Your price request has been sent to the creator!');
-      
+
       setTimeout(() => {
         setSelectedArtworkForPrice(null);
         setRequestSuccessMessage(null);
@@ -388,18 +441,16 @@ export default function BrowsePage() {
           <button
             type="button"
             onClick={() => setShowFilters(!showFilters)}
-            className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-semibold transition-all shrink-0 cursor-pointer ${
-              showFilters || activeFilterCount > 0
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-semibold transition-all shrink-0 cursor-pointer ${showFilters || activeFilterCount > 0
                 ? 'border-[#141413] bg-[#141413] text-white'
                 : 'border-[#E8E8E3] bg-white text-gray-700 hover:border-gray-400'
-            }`}
+              }`}
           >
             <SlidersHorizontal size={14} />
             <span>Filters</span>
             {activeFilterCount > 0 && (
-              <span className={`w-4 h-4 rounded-full text-[10px] font-bold flex items-center justify-center ${
-                showFilters || activeFilterCount > 0 ? 'bg-white text-[#141413]' : 'bg-[#141413] text-white'
-              }`}>
+              <span className={`w-4 h-4 rounded-full text-[10px] font-bold flex items-center justify-center ${showFilters || activeFilterCount > 0 ? 'bg-white text-[#141413]' : 'bg-[#141413] text-white'
+                }`}>
                 {activeFilterCount}
               </span>
             )}
@@ -416,11 +467,10 @@ export default function BrowsePage() {
               <button
                 key={cat.value}
                 onClick={() => setArtTypeFilter(cat.value)}
-                className={`px-4 py-2 rounded-full whitespace-nowrap text-xs font-medium transition-all duration-150 cursor-pointer ${
-                  isActive
+                className={`px-4 py-2 rounded-full whitespace-nowrap text-xs font-medium transition-all duration-150 cursor-pointer ${isActive
                     ? 'bg-[#141413] text-white shadow-xs'
                     : 'text-gray-600 hover:text-gray-900 hover:bg-black/5'
-                }`}
+                  }`}
               >
                 {cat.label}
               </button>
@@ -557,107 +607,127 @@ export default function BrowsePage() {
           </div>
         ) : artworks.length > 0 ? (
           <>
-            <motion.div 
+            <motion.div
               variants={containerVariants}
               initial="hidden"
               animate="show"
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
             >
-              {artworks.map((artwork) => {
-                const isPriceOnRequest =
-                  artwork.price_visibility === 'Price on Request' ||
-                  (!artwork.price &&
-                    artwork.price_visibility !== 'Hide Price' &&
-                    artwork.price_visibility !== 'Hidden');
+              {(() => {
+                const renderArtworkCard = (artwork: ArtworkItem) => {
+                  const isPriceOnRequest =
+                    artwork.price_visibility === 'Price on Request' ||
+                    (!artwork.price &&
+                      artwork.price_visibility !== 'Hide Price' &&
+                      artwork.price_visibility !== 'Hidden');
 
-                const isRequested = requestedArtworkIds.has(artwork.id);
+                  const isRequested = requestedArtworkIds.has(artwork.id);
+
+                  return (
+                    <motion.div key={artwork.id} variants={itemVariants} className="h-full">
+                      <Link href={`/artwork/${artwork.id}`} className="group block h-full cursor-pointer">
+                        <div className="flex flex-col h-full bg-white rounded-2xl border border-[#E8E8E3] p-3 shadow-soft hover:shadow-soft-md transition-all duration-300">
+                          {/* Artwork Image Container */}
+                          <div className="aspect-[4/5] bg-[#E8E8E3] overflow-hidden relative rounded-xl mb-3.5">
+                            <img
+                              src={artwork.image_url}
+                              alt={artwork.title}
+                              className="w-full h-full object-cover group-hover:scale-104 transition-transform duration-500 ease-out"
+                            />
+                            {/* Medium Badge */}
+                            <div className="absolute top-3 right-3 z-10">
+                              <span className="inline-block px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest rounded-full bg-white/90 backdrop-blur-md text-[#141413] shadow-xs">
+                                {artwork.art_type}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Artwork Metadata & Price Bar */}
+                          <div className="flex-1 flex flex-col justify-between px-1">
+                            <div className="mb-3">
+                              <h3 className="font-serif text-[18px] font-semibold text-[#141413] truncate leading-tight group-hover:text-[#B8532F] transition-colors">
+                                {artwork.title}
+                              </h3>
+                              <p className="text-gray-500 text-[11px] mt-1 uppercase tracking-wider font-medium truncate">
+                                {artwork.artist_name || artwork.profiles?.full_name}
+                                {artwork.year ? `, ${artwork.year}` : ''}
+                              </p>
+                            </div>
+
+                            {/* Price & Action Footer */}
+                            <div className="flex items-center justify-between border-t border-gray-100 pt-2.5">
+                              <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-400">
+                                {isPriceOnRequest ? 'Direct Inquiry' : 'Available'}
+                              </span>
+
+                              {artwork.price_visibility === 'Hide Price' || artwork.price_visibility === 'Hidden' ? (
+                                <span className="text-xs font-medium text-gray-400">
+                                  Disclosed on inquiry
+                                </span>
+                              ) : isPriceOnRequest ? (
+                                /* Interactive "Price on request" Button */
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    handleOpenPriceRequest(artwork);
+                                  }}
+                                  className={`px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all shadow-xs cursor-pointer ${
+                                    isRequested
+                                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100'
+                                      : 'bg-[#141413] text-[#FAF5EC] hover:bg-black active:scale-95'
+                                  }`}
+                                >
+                                  {isRequested ? 'Price Requested ✓' : 'Price on request'}
+                                </button>
+                              ) : artwork.price ? (
+                                <span className="font-bold text-[#141413] text-sm">
+                                  ₹{artwork.price.toLocaleString('en-IN')}
+                                </span>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    handleOpenPriceRequest(artwork);
+                                  }}
+                                  className={`px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all shadow-xs cursor-pointer ${
+                                    isRequested
+                                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                      : 'bg-[#141413] text-[#FAF5EC] hover:bg-black'
+                                  }`}
+                                >
+                                  {isRequested ? 'Price Requested ✓' : 'Price on request'}
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </Link>
+                    </motion.div>
+                  );
+                };
+
+                const firstBatch = artworks.slice(0, 4);
+                const remainingBatch = artworks.slice(4);
 
                 return (
-                  <motion.div key={artwork.id} variants={itemVariants} className="h-full">
-                    <Link href={`/artwork/${artwork.id}`} className="group block h-full cursor-pointer">
-                      <div className="flex flex-col h-full bg-white rounded-2xl border border-[#E8E8E3] p-3 shadow-soft hover:shadow-soft-md transition-all duration-300">
-                        {/* Artwork Image Container */}
-                        <div className="aspect-[4/5] bg-[#E8E8E3] overflow-hidden relative rounded-xl mb-3.5">
-                          <img
-                            src={artwork.image_url}
-                            alt={artwork.title}
-                            className="w-full h-full object-cover group-hover:scale-104 transition-transform duration-500 ease-out"
-                          />
-                          {/* Medium Badge */}
-                          <div className="absolute top-3 right-3 z-10">
-                            <span className="inline-block px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest rounded-full bg-white/90 backdrop-blur-md text-[#141413] shadow-xs">
-                              {artwork.art_type}
-                            </span>
-                          </div>
-                        </div>
-                        
-                        {/* Artwork Metadata & Price Bar */}
-                        <div className="flex-1 flex flex-col justify-between px-1">
-                          <div className="mb-3">
-                            <h3 className="font-serif text-[18px] font-semibold text-[#141413] truncate leading-tight group-hover:text-[#B8532F] transition-colors">
-                              {artwork.title}
-                            </h3>
-                            <p className="text-gray-500 text-[11px] mt-1 uppercase tracking-wider font-medium truncate">
-                              {artwork.artist_name || artwork.profiles?.full_name}
-                              {artwork.year ? `, ${artwork.year}` : ''}
-                            </p>
-                          </div>
+                  <>
+                    {/* First 4 Artwork Cards */}
+                    {firstBatch.map(renderArtworkCard)}
 
-                          {/* Price & Action Footer */}
-                          <div className="flex items-center justify-between border-t border-gray-100 pt-2.5">
-                            <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-400">
-                              {isPriceOnRequest ? 'Direct Inquiry' : 'Available'}
-                            </span>
+                    {/* Spotlight: Top 10 Creators Row (Inserted after 4th artwork card, spanning full grid width) */}
+                    <div className="col-span-1 sm:col-span-2 lg:col-span-3 xl:col-span-4 w-full">
+                      <TopCreatorsRow creators={topCreators} isLoading={isLoadingCreators} />
+                    </div>
 
-                            {artwork.price_visibility === 'Hide Price' || artwork.price_visibility === 'Hidden' ? (
-                              <span className="text-xs font-medium text-gray-400">
-                                Disclosed on inquiry
-                              </span>
-                            ) : isPriceOnRequest ? (
-                              /* Interactive "Price on request" Button */
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  handleOpenPriceRequest(artwork);
-                                }}
-                                className={`px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all shadow-xs cursor-pointer ${
-                                  isRequested
-                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100'
-                                    : 'bg-[#141413] text-[#FAF5EC] hover:bg-black active:scale-95'
-                                }`}
-                              >
-                                {isRequested ? 'Price Requested ✓' : 'Price on request'}
-                              </button>
-                            ) : artwork.price ? (
-                              <span className="font-bold text-[#141413] text-sm">
-                                ₹{artwork.price.toLocaleString('en-IN')}
-                              </span>
-                            ) : (
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  handleOpenPriceRequest(artwork);
-                                }}
-                                className={`px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all shadow-xs cursor-pointer ${
-                                  isRequested
-                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                    : 'bg-[#141413] text-[#FAF5EC] hover:bg-black'
-                                }`}
-                              >
-                                {isRequested ? 'Price Requested ✓' : 'Price on request'}
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </Link>
-                  </motion.div>
+                    {/* Remaining Artwork Cards */}
+                    {remainingBatch.map(renderArtworkCard)}
+                  </>
                 );
-              })}
+              })()}
             </motion.div>
 
             {hasMore && (
@@ -673,22 +743,25 @@ export default function BrowsePage() {
             )}
           </>
         ) : (
-          <div className="text-center py-24 bg-white rounded-3xl border border-[#E8E8E3] p-8 shadow-xs">
-            <h3 className="font-serif text-xl font-medium text-gray-900 mb-2">No artworks match your criteria</h3>
-            <p className="text-gray-500 text-sm max-w-sm mx-auto mb-6">
-              Try adjusting your search terms or clearing your filters to explore other works.
-            </p>
-            <button
-              onClick={() => {
-                setSearchQuery('');
-                setArtTypeFilter('');
-                setPriceFilter('all');
-                setSortBy('recommended');
-              }}
-              className="px-5 py-2.5 bg-[#141413] text-white text-xs font-semibold rounded-full hover:bg-black transition-colors"
-            >
-              Clear filters
-            </button>
+          <div className="space-y-8">
+            <TopCreatorsRow creators={topCreators} isLoading={isLoadingCreators} />
+            <div className="text-center py-20 bg-white rounded-3xl border border-[#E8E8E3] p-8 shadow-xs">
+              <h3 className="font-serif text-xl font-medium text-gray-900 mb-2">No artworks match your criteria</h3>
+              <p className="text-gray-500 text-sm max-w-sm mx-auto mb-6">
+                Try adjusting your search terms or clearing your filters to explore other works.
+              </p>
+              <button
+                onClick={() => {
+                  setSearchQuery('');
+                  setArtTypeFilter('');
+                  setPriceFilter('all');
+                  setSortBy('recommended');
+                }}
+                className="px-5 py-2.5 bg-[#141413] text-white text-xs font-semibold rounded-full hover:bg-black transition-colors"
+              >
+                Clear filters
+              </button>
+            </div>
           </div>
         )}
       </div>
@@ -697,11 +770,11 @@ export default function BrowsePage() {
       {/* 6. PRICE ON REQUEST MODAL                                                 */}
       {/* ========================================================================= */}
       {selectedArtworkForPrice && (
-        <div 
+        <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#141413]/40 backdrop-blur-xs animate-in fade-in duration-200"
           onClick={() => setSelectedArtworkForPrice(null)}
         >
-          <div 
+          <div
             className="bg-white rounded-3xl border border-[#E8E8E3] shadow-2xl w-full max-w-md overflow-hidden transform animate-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
@@ -722,15 +795,15 @@ export default function BrowsePage() {
                   </p>
                 </div>
               </div>
-              <button 
-                onClick={() => setSelectedArtworkForPrice(null)} 
+              <button
+                onClick={() => setSelectedArtworkForPrice(null)}
                 className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-400 hover:text-gray-600 hover:bg-gray-200 transition-colors cursor-pointer"
                 aria-label="Close dialog"
               >
                 <X size={16} />
               </button>
             </div>
-            
+
             {/* Modal Content */}
             <div className="p-6">
               {requestSuccessMessage ? (
@@ -758,7 +831,7 @@ export default function BrowsePage() {
                   <p className="text-xs text-gray-500 mb-6">
                     This inquiry will start a conversation with the creator directly in your Messages.
                   </p>
-                  
+
                   <div className="flex items-center justify-end gap-3 pt-2">
                     <button
                       type="button"
