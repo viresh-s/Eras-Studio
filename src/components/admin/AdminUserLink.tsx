@@ -46,6 +46,7 @@ export function AdminUserLink({
     >
       {avatar !== undefined ? (
         avatar ? (
+          /* eslint-disable-next-line @next/next/no-img-element */
           <img
             src={avatar}
             alt={name}

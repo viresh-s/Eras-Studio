@@ -175,7 +175,7 @@ export const reportsRepo = {
     let artworkImageUrl = "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=800";
     let artworkMedium = "Painting";
     let artworkDimensions = "80 × 100 cm";
-    let artworkStatus = "published" as const;
+    const artworkStatus = "published" as const;
     let ownerName = "Creator";
 
     // Lookup artwork metadata

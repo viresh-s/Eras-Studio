@@ -18,14 +18,7 @@ export default async function UserProfilePage() {
   if (!profile) redirect('/login');
 
   return (
-    <div>
-      <div className="mb-10">
-        <h1 className="text-5xl text-gray-900 mb-2 tracking-tight" style={{ fontFamily: "'Playfair Display', serif", fontStyle: 'italic' }}>
-          Your Profile
-        </h1>
-        <p className="text-gray-500 text-sm">The person and the practice behind the work</p>
-      </div>
-
+    <div className="py-2">
       <CollectorProfileForm profile={profile} email={user.email || ''} />
     </div>
   );

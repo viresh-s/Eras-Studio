@@ -143,8 +143,6 @@ export const usersRepo = {
         if (data.status !== undefined) {
           payload.status = data.status;
         }
-
-        let updatedData: any = null;
         let updateRes = await (supabase.from("profiles") as any)
           .update(payload)
           .eq("id", id)

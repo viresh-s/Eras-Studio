@@ -16,18 +16,19 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     const inputId = id || (label ? label.toLowerCase().replace(/\s+/g, '-') : undefined);
 
     return (
-      <div className="w-full space-y-1.5 text-left">
+      <div style={{ fontFamily: "'Poppins', sans-serif" }} className="w-full space-y-1 text-left">
         {label && (
           <label
             htmlFor={inputId}
-            className="block text-xs font-medium text-[#4A4A45] tracking-tight"
+            style={{ color: '#929292', fontWeight: 500 }}
+            className="block text-xs mb-1"
           >
             {label}
           </label>
         )}
         <div className="relative flex items-center">
           {leftIcon && (
-            <div className="absolute left-3 text-[#8A8A84] pointer-events-none flex items-center">
+            <div className="absolute left-3.5 text-[#8E8E88] pointer-events-none flex items-center">
               {leftIcon}
             </div>
           )}
@@ -35,23 +36,27 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             id={inputId}
             ref={ref}
             disabled={disabled}
-            className={`w-full bg-white text-[#141413] text-sm placeholder:text-[#9A9A94] border ${
-              error ? 'border-[#D94E4E]' : 'border-[#E8E8E3]'
-            } rounded-lg py-2.5 ${leftIcon ? 'pl-9' : 'pl-3.5'} ${
-              rightIcon ? 'pr-9' : 'pr-3.5'
-            } transition-colors duration-150 focus:outline-none focus:border-[#B8532F] focus:ring-1 focus:ring-[#B8532F] disabled:bg-[#F7F7F4] disabled:text-[#8E8E88] disabled:cursor-not-allowed ${className}`}
+            style={{
+              fontFamily: "'Poppins', sans-serif",
+              color: disabled ? '#8E8E88' : '#181A1F',
+            }}
+            className={`w-full bg-white text-sm placeholder:text-[#A1A1A1] border ${
+              error ? 'border-red-400 focus:border-red-500 focus:ring-1 focus:ring-red-500' : 'border-[#E2E2DC] focus:border-[#181A1F] focus:ring-1 focus:ring-[#181A1F]'
+            } rounded-[12px] py-2.5 ${leftIcon ? 'pl-10' : 'pl-3.5'} ${
+              rightIcon ? 'pr-10' : 'pr-3.5'
+            } transition-colors duration-150 outline-none disabled:bg-[#FAF9F6] disabled:border-[#E8E8E3] disabled:cursor-not-allowed ${className}`}
             {...props}
           />
           {rightIcon && (
-            <div className="absolute right-3 text-[#8A8A84] flex items-center">
+            <div className="absolute right-3.5 text-[#8E8E88] flex items-center">
               {rightIcon}
             </div>
           )}
         </div>
         {error ? (
-          <p className="text-xs text-[#B83838] font-medium">{error}</p>
+          <p className="text-[11px] text-red-500 font-normal mt-1">{error}</p>
         ) : helperText ? (
-          <p className="text-xs text-[#71716D]">{helperText}</p>
+          <p className="text-[11px] text-[#929292] mt-1">{helperText}</p>
         ) : null}
       </div>
     );

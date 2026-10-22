@@ -13,11 +13,12 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
     const textareaId = id || label?.toLowerCase().replace(/\s+/g, '-');
 
     return (
-      <div className="flex flex-col gap-1.5">
+      <div style={{ fontFamily: "'Poppins', sans-serif" }} className="w-full space-y-1 text-left">
         {label && (
           <label
             htmlFor={textareaId}
-            className="text-xs font-semibold text-[var(--color-cor-ink)]"
+            style={{ color: '#929292', fontWeight: 500 }}
+            className="block text-xs mb-1"
           >
             {label}
           </label>
@@ -26,11 +27,17 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
           ref={ref}
           id={textareaId}
           rows={4}
-          className={`w-full px-4 py-3 text-sm bg-white border rounded-xl outline-none resize-y transition-all duration-200 placeholder:text-[var(--color-cor-ink-light)] ${error ? 'border-red-300 focus:border-red-500 focus:ring-1 focus:ring-red-500' : 'border-[var(--color-cor-border)] focus:border-[var(--color-cor-ink)] focus:ring-1 focus:ring-[var(--color-cor-ink)]'} ${className}`}
+          style={{
+            fontFamily: "'Poppins', sans-serif",
+            color: '#181A1F',
+          }}
+          className={`w-full px-3.5 py-2.5 text-sm bg-white border ${
+            error ? 'border-red-400 focus:border-red-500 focus:ring-1 focus:ring-red-500' : 'border-[#E2E2DC] focus:border-[#181A1F] focus:ring-1 focus:ring-[#181A1F]'
+          } rounded-[12px] outline-none resize-y transition-colors duration-150 placeholder:text-[#A1A1A1] ${className}`}
           {...props}
         />
         {error && (
-          <span className="text-red-500 text-xs font-medium">{error}</span>
+          <p className="text-[11px] text-red-500 font-normal mt-1">{error}</p>
         )}
       </div>
     );

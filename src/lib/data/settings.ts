@@ -17,7 +17,7 @@ export const DEFAULT_PLATFORM_SETTINGS: PlatformSettings = {
 };
 
 let settingsStore: PlatformSettings = { ...DEFAULT_PLATFORM_SETTINGS };
-let settingsAuditLogsStore: SettingsAuditLog[] = [];
+const settingsAuditLogsStore: SettingsAuditLog[] = [];
 
 function mapFromSupabase(row: any): PlatformSettings {
   return {
