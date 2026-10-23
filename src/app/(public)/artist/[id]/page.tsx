@@ -42,7 +42,7 @@ export default async function ArtistProfilePage({ params }: ArtistProfilePagePro
   const isOwner = user?.id === profile.id;
 
   return (
-    <div className="min-h-screen bg-[#f4f5f5] pb-20">
+    <div className="min-h-screen bg-white pb-20">
       <div className="max-w-[1400px] mx-auto px-6 pt-10">
         
         {/* Cover Image (Rounded, not full width) */}
@@ -63,7 +63,7 @@ export default async function ArtistProfilePage({ params }: ArtistProfilePagePro
 
         {/* Centered Avatar */}
         <div className="relative -mt-10 flex justify-center z-10">
-          <div className="w-20 h-20 rounded-full bg-[#E5E5E5] flex items-center justify-center text-xl font-bold text-gray-700 overflow-hidden shadow-[0_4px_10px_rgba(0,0,0,0.1)] border-2 border-[#f4f5f5]" style={{ fontFamily: "'Playfair Display', serif" }}>
+          <div className="w-20 h-20 rounded-full bg-[#E5E5E5] flex items-center justify-center text-xl font-bold text-gray-700 overflow-hidden shadow-[0_4px_10px_rgba(0,0,0,0.1)] border-2 border-white" style={{ fontFamily: "'Playfair Display', serif" }}>
             {profile.profile_pic_url ? (
               <img src={profile.profile_pic_url} alt="Profile" className="w-full h-full object-cover" />
             ) : (

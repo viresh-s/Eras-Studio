@@ -14,8 +14,6 @@ import Select from '@/components/ui/Select';
 import MultiSelect from '@/components/ui/MultiSelect';
 import TextArea from '@/components/ui/TextArea';
 import type { FreemiumStatus } from '@/lib/freemium/check';
-import Modal from '@/components/ui/Modal';
-import UpgradePrompt from '@/components/features/creator/UpgradePrompt';
 
 const mediumOptions = [
   { value: 'Painting', label: 'Painting' },
@@ -107,22 +105,14 @@ export default function ArtworkUploadForm({ userId, freemiumStatus }: UploadForm
   const [error, setError] = useState<string | null>(null);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
-  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-
   const [customStyle, setCustomStyle] = useState('');
   const [customCollection, setCustomCollection] = useState('');
 
   useEffect(() => {
     if (freemiumStatus.isLocked) {
-      setShowUpgradeModal(true);
-      const timer = setTimeout(() => {
-        setShowUpgradeModal(false);
-      }, 5000);
-      return () => clearTimeout(timer);
-    } else {
-      setShowUpgradeModal(false);
+      router.replace('/subscription');
     }
-  }, [freemiumStatus.isLocked]);
+  }, [freemiumStatus.isLocked, router]);
 
   const {
     register,
@@ -425,9 +415,6 @@ export default function ArtworkUploadForm({ userId, freemiumStatus }: UploadForm
         </div>
       </form>
 
-      <Modal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} title="Premium Required" size="md">
-        <UpgradePrompt userId={userId} freemiumStatus={freemiumStatus} />
-      </Modal>
     </div>
   );
 }

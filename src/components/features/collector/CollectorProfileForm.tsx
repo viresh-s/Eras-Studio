@@ -138,10 +138,10 @@ export default function CollectorProfileForm({ profile, email }: CollectorProfil
       <div className="max-w-5xl mx-auto bg-white rounded-[24px] border border-[#E8E8E3] shadow-[0_10px_40px_rgba(0,0,0,0.03)] overflow-hidden">
         <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] min-h-[520px]">
           {/* Left Vertical Navigation Sidebar */}
-          <nav className="border-b md:border-b-0 md:border-r border-[#E8E8E3] bg-[#FAFAF8]/50 flex flex-col justify-between">
+          <nav className="border-b md:border-b-0 md:border-r border-[#E8E8E3] bg-white flex flex-col justify-between">
             <div>
               {/* 1. Collector Mini Identity Banner */}
-              <div className="p-5 border-b border-[#E8E8E3] flex items-center gap-3 bg-[#FAF9F5]">
+              <div className="p-5 border-b border-[#E8E8E3] flex items-center gap-3 bg-white">
                 <div className="w-11 h-11 rounded-full overflow-hidden bg-[#F3F3F3] border border-[#E2E2DC] shrink-0 flex items-center justify-center">
                   {avatarPreview ? (
                     /* eslint-disable-next-line @next/next/no-img-element */
@@ -167,8 +167,8 @@ export default function CollectorProfileForm({ profile, email }: CollectorProfil
                   onClick={() => setActiveTab('basic')}
                   className={`w-full text-left px-6 py-3.5 transition-colors cursor-pointer block relative focus:outline-none ${
                     activeTab === 'basic'
-                      ? 'bg-[#F7F7F5] text-[#181A1F] font-semibold border-l-2 border-[#181A1F]'
-                      : 'hover:bg-[#FAF9F6] text-[#7A7A78] hover:text-[#181A1F] font-normal border-l-2 border-transparent'
+                      ? 'bg-[#F3F3F3] text-[#181A1F] font-semibold border-l-2 border-[#181A1F]'
+                      : 'hover:bg-[#F8F8F8] text-[#7A7A78] hover:text-[#181A1F] font-normal border-l-2 border-transparent'
                   }`}
                 >
                   <span className="text-sm block">
@@ -182,8 +182,8 @@ export default function CollectorProfileForm({ profile, email }: CollectorProfil
                   onClick={() => setActiveTab('activity')}
                   className={`w-full text-left px-6 py-3.5 transition-colors cursor-pointer block relative focus:outline-none ${
                     activeTab === 'activity'
-                      ? 'bg-[#F7F7F5] text-[#181A1F] font-semibold border-l-2 border-[#181A1F]'
-                      : 'hover:bg-[#FAF9F6] text-[#7A7A78] hover:text-[#181A1F] font-normal border-l-2 border-transparent'
+                      ? 'bg-[#F3F3F3] text-[#181A1F] font-semibold border-l-2 border-[#181A1F]'
+                      : 'hover:bg-[#F8F8F8] text-[#7A7A78] hover:text-[#181A1F] font-normal border-l-2 border-transparent'
                   }`}
                 >
                   <span className="text-sm block">
@@ -193,7 +193,7 @@ export default function CollectorProfileForm({ profile, email }: CollectorProfil
               </div>
 
               {/* 3. Quick Collector Activity Shortcuts */}
-              <div className="p-5 border-t border-[#E8E8E3] bg-[#FAF9F5]/60 space-y-2">
+              <div className="p-5 border-t border-[#E8E8E3] bg-[#FAFAFA]/60 space-y-2">
                 <p className="text-[10px] font-semibold text-[#8E8E88] uppercase tracking-wider">
                   Quick Access
                 </p>
@@ -224,7 +224,7 @@ export default function CollectorProfileForm({ profile, email }: CollectorProfil
 
               {/* 4. Verified Status Box */}
               <div className="p-5 border-t border-[#E8E8E3]">
-                <div className="bg-[#FAF9F5] border border-[#E8E8E3] rounded-[14px] p-3.5 space-y-1.5">
+                <div className="bg-[#FAFAFA] border border-[#E8E8E3] rounded-[14px] p-3.5 space-y-1.5">
                   <div className="flex items-center gap-1.5 text-xs font-semibold text-[#181A1F]">
                     <CheckCircle2 size={13} className="text-emerald-600" />
                     <span>Verified Art Patron</span>
@@ -261,50 +261,7 @@ export default function CollectorProfileForm({ profile, email }: CollectorProfil
               <div>
                 {/* TAB 1: BASIC INFORMATION */}
                 {activeTab === 'basic' && (
-                  <section aria-labelledby="heading-collector-basic">
-                    <div className="mb-8">
-                      <span
-                        style={{
-                          fontFamily: "'Century Schoolbook', 'Playfair Display', Georgia, serif",
-                          color: '#123C83',
-                          fontWeight: 700,
-                          letterSpacing: '0.04em',
-                        }}
-                        className="text-[11px] uppercase tracking-widest block mb-1.5 select-none"
-                      >
-                        ERAS · COLLECTOR DOSSIER
-                      </span>
-                      <div className="flex items-baseline gap-2.5 flex-wrap">
-                        <h1
-                          id="heading-collector-basic"
-                          style={{
-                            fontFamily: "'Poppins', sans-serif",
-                            color: '#181A1F',
-                            fontWeight: 500,
-                          }}
-                          className="text-2xl sm:text-[28px] tracking-tight leading-tight"
-                        >
-                          Basic Information
-                        </h1>
-                        <span
-                          style={{
-                            fontFamily: "'Century Schoolbook', 'Playfair Display', Georgia, serif",
-                            color: '#71716D',
-                            fontStyle: 'italic',
-                            fontWeight: 700,
-                          }}
-                          className="text-lg sm:text-[20px]"
-                        >
-                          Patron Profile
-                        </span>
-                      </div>
-                      <p
-                        style={{ fontFamily: "'Poppins', sans-serif" }}
-                        className="text-xs text-[#8E8E88] mt-1"
-                      >
-                        Personal contact details, verification status, and delivery coordinates.
-                      </p>
-                    </div>
+                  <section aria-label="Basic Information">
 
                     <div className="flex flex-col sm:flex-row gap-8 items-start mb-6">
                       {/* Left Sub-column: Avatar Circle & Replace */}
@@ -397,7 +354,7 @@ export default function CollectorProfileForm({ profile, email }: CollectorProfil
                               fontFamily: "'Poppins', sans-serif",
                               color: '#8E8E88',
                             }}
-                            className="w-full px-3.5 py-2.5 bg-[#FAF9F6] border border-[#E8E8E3] rounded-[12px] text-sm cursor-not-allowed"
+                            className="w-full px-3.5 py-2.5 bg-[#F8F8F8] border border-[#E8E8E3] rounded-[12px] text-sm cursor-not-allowed"
                           />
                         </div>
 
@@ -450,7 +407,7 @@ export default function CollectorProfileForm({ profile, email }: CollectorProfil
                         </div>
 
                         {/* Advisory helper box with minimalist styling */}
-                        <div className="bg-[#FAF9F5] rounded-[16px] border border-[#E8E8E3] p-4 text-[11px] text-[#555555] space-y-1.5 mt-2">
+                        <div className="bg-[#FAFAFA] rounded-[16px] border border-[#E8E8E3] p-4 text-[11px] text-[#555555] space-y-1.5 mt-2">
                           <p className="font-semibold text-[#181A1F] flex items-center gap-1.5">
                             <User size={13} className="text-[#181A1F]" />
                             <span>Collector Verification Notice</span>
@@ -466,55 +423,11 @@ export default function CollectorProfileForm({ profile, email }: CollectorProfil
 
                 {/* TAB 2: ACCOUNT & ACTIVITY */}
                 {activeTab === 'activity' && (
-                  <section aria-labelledby="heading-collector-activity">
-                    <div className="mb-6">
-                      <span
-                        style={{
-                          fontFamily: "'Century Schoolbook', 'Playfair Display', Georgia, serif",
-                          color: '#123C83',
-                          fontWeight: 700,
-                          letterSpacing: '0.04em',
-                        }}
-                        className="text-[11px] uppercase tracking-widest block mb-1.5 select-none"
-                      >
-                        ERAS · COLLECTOR DOSSIER
-                      </span>
-                      <div className="flex items-baseline gap-2.5 flex-wrap">
-                        <h1
-                          id="heading-collector-activity"
-                          style={{
-                            fontFamily: "'Poppins', sans-serif",
-                            color: '#181A1F',
-                            fontWeight: 500,
-                          }}
-                          className="text-2xl sm:text-[28px] tracking-tight leading-tight"
-                        >
-                          Account & Activity
-                        </h1>
-                        <span
-                          style={{
-                            fontFamily: "'Century Schoolbook', 'Playfair Display', Georgia, serif",
-                            color: '#71716D',
-                            fontStyle: 'italic',
-                            fontWeight: 700,
-                          }}
-                          className="text-lg sm:text-[20px]"
-                        >
-                          Acquisitions & Feed
-                        </span>
-                      </div>
-                      <p
-                        style={{ fontFamily: "'Poppins', sans-serif" }}
-                        className="text-xs text-[#8E8E88] mt-1"
-                      >
-                        Quick shortcuts to your active inquiries, purchased pieces, and discovery feed.
-                      </p>
-                    </div>
-
+                  <section aria-label="Account & Activity" className="space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <Link
                         href="/messages"
-                        className="p-4 rounded-[16px] border border-[#E8E8E3] hover:border-[#181A1F] hover:bg-[#FAF9F5] transition-all flex items-start gap-3.5 group"
+                        className="p-4 rounded-[16px] border border-[#E8E8E3] hover:border-[#181A1F] hover:bg-[#FAFAFA] transition-all flex items-start gap-3.5 group"
                       >
                         <div className="w-10 h-10 rounded-[12px] bg-[#F3F3F3] text-[#181A1F] flex items-center justify-center shrink-0">
                           <MessageCircle size={18} />
@@ -531,7 +444,7 @@ export default function CollectorProfileForm({ profile, email }: CollectorProfil
 
                       <Link
                         href="/purchases"
-                        className="p-4 rounded-[16px] border border-[#E8E8E3] hover:border-[#181A1F] hover:bg-[#FAF9F5] transition-all flex items-start gap-3.5 group"
+                        className="p-4 rounded-[16px] border border-[#E8E8E3] hover:border-[#181A1F] hover:bg-[#FAFAFA] transition-all flex items-start gap-3.5 group"
                       >
                         <div className="w-10 h-10 rounded-[12px] bg-[#F3F3F3] text-[#181A1F] flex items-center justify-center shrink-0">
                           <ShoppingBag size={18} />
@@ -548,7 +461,7 @@ export default function CollectorProfileForm({ profile, email }: CollectorProfil
 
                       <Link
                         href="/discovery"
-                        className="p-4 rounded-[16px] border border-[#E8E8E3] hover:border-[#181A1F] hover:bg-[#FAF9F5] transition-all flex items-start gap-3.5 group sm:col-span-2"
+                        className="p-4 rounded-[16px] border border-[#E8E8E3] hover:border-[#181A1F] hover:bg-[#FAFAFA] transition-all flex items-start gap-3.5 group sm:col-span-2"
                       >
                         <div className="w-10 h-10 rounded-[12px] bg-[#F3F3F3] text-[#181A1F] flex items-center justify-center shrink-0">
                           <Compass size={18} />

@@ -23,7 +23,7 @@ export default function LandingHeroVisual() {
             alt="Cerulean Solitude" 
             className="w-full h-full object-cover"
           />
-          <div className="absolute top-3 right-3 px-2.5 py-1 bg-black/60 backdrop-blur-md rounded-full text-[9px] uppercase tracking-widest text-[#FAF5EC] font-semibold">
+          <div className="absolute top-3 right-3 px-2.5 py-1 bg-black/60 backdrop-blur-md rounded-full text-[9px] uppercase tracking-widest text-white font-semibold">
             Oil on Canvas
           </div>
         </div>
@@ -47,7 +47,7 @@ export default function LandingHeroVisual() {
             alt="Terra Incognita" 
             className="w-full h-full object-cover"
           />
-          <div className="absolute top-3 right-3 px-2.5 py-1 bg-black/60 backdrop-blur-md rounded-full text-[9px] uppercase tracking-widest text-[#FAF5EC] font-semibold">
+          <div className="absolute top-3 right-3 px-2.5 py-1 bg-black/60 backdrop-blur-md rounded-full text-[9px] uppercase tracking-widest text-white font-semibold">
             Mixed Media
           </div>
         </div>
@@ -89,7 +89,7 @@ export default function LandingHeroVisual() {
         initial={{ opacity: 0, scale: 0.6 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.7, delay: 0.6 }}
-        className="absolute z-40 -bottom-6 left-6 md:left-12 w-28 h-28 bg-[#FAF5EC] rounded-full flex items-center justify-center shadow-xl border border-[#E8E8E3]"
+        className="absolute z-40 -bottom-6 left-6 md:left-12 w-28 h-28 bg-white rounded-full flex items-center justify-center shadow-xl border border-[#E8E8E3]"
       >
         <div className="text-center p-3">
           <p className="text-[#141413] text-[13px] font-serif italic leading-tight">Art is a</p>

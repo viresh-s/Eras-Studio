@@ -44,18 +44,22 @@ export async function fetchTopCreatorsAction(limit: number = 10): Promise<Ranked
       return [];
     }
 
-    const { data: artworks } = await supabase
-      .from('artworks')
-      .select('id, creator_id, image_url, status, is_published, created_at')
-      .eq('is_published', true);
+    const [artworksRes, inquiriesRes, savesRes] = await Promise.all([
+      supabase
+        .from('artworks')
+        .select('id, creator_id, image_url, status, is_published, created_at')
+        .eq('is_published', true),
+      supabase
+        .from('inquiries_chats')
+        .select('id, creator_id, created_at'),
+      (supabase as any)
+        .from('saved_artworks')
+        .select('id, artwork_id'),
+    ]);
 
-    const { data: inquiries } = await supabase
-      .from('inquiries_chats')
-      .select('id, creator_id, created_at');
-
-    const { data: saves } = await (supabase as any)
-      .from('saved_artworks')
-      .select('id, artwork_id');
+    const artworks = artworksRes.data;
+    const inquiries = inquiriesRes.data;
+    const saves = savesRes.data;
 
     const artworkMap = new Map<string, any[]>();
     const artworkFeaturedImage = new Map<string, string>();

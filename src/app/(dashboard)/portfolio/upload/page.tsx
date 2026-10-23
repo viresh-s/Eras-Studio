@@ -2,7 +2,6 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { checkFreemiumStatus } from '@/lib/freemium/check';
 import ArtworkUploadForm from '@/components/features/creator/ArtworkUploadForm';
-import UpgradePrompt from '@/components/features/creator/UpgradePrompt';
 
 export default async function UploadPage() {
   const supabase = await createClient();
@@ -10,6 +9,9 @@ export default async function UploadPage() {
   if (!user) redirect('/login');
 
   const freemiumStatus = await checkFreemiumStatus(user.id);
+  if (freemiumStatus.isLocked) {
+    redirect('/subscription');
+  }
 
   return (
     <div>

@@ -18,7 +18,7 @@ export default async function PublicLayout({ children }: { children: React.React
   }
 
   return (
-    <div className="min-h-screen bg-[#FAF5EC] flex flex-col selection:bg-[#141413] selection:text-[#FAF5EC]">
+    <div className="min-h-screen bg-white flex flex-col selection:bg-[#141413] selection:text-white">
       {profile ? <DashboardNavbar profile={profile} /> : <PublicNavbar />}
       <main className="flex-1">{children}</main>
       <Footer />

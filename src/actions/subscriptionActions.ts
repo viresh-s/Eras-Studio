@@ -10,7 +10,10 @@ export type PlanTier = 'free' | 'lite' | 'pro';
  * Server action to update user subscription tier
  * Supports free, lite, and pro tiers (ready for Razorpay webhooks in future)
  */
-export async function upgradeUserPlanAction(targetPlan: PlanTier): Promise<{
+export async function upgradeUserPlanAction(
+  targetPlan: PlanTier,
+  paymentId?: string
+): Promise<{
   success: boolean;
   plan?: PlanTier;
   error?: string;
@@ -31,6 +34,10 @@ export async function upgradeUserPlanAction(targetPlan: PlanTier): Promise<{
     );
 
     const isPremium = targetPlan === 'pro';
+
+    if (paymentId) {
+      console.log(`[Subscription Upgrade] User ${user.id} activated ${targetPlan} with payment ${paymentId}`);
+    }
 
     const { error: updateError } = await adminClient
       .from('profiles')

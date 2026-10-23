@@ -75,7 +75,7 @@ export default function TopCreatorsRow({ creators, isLoading }: TopCreatorsRowPr
   }
 
   return (
-    <section className="w-full my-8 bg-gradient-to-b from-[#FAF5EC] via-white to-[#FAF5EC] border border-[#E8E8E3] rounded-3xl p-5 sm:p-7 shadow-[0_4px_24px_rgba(20,20,19,0.03)] overflow-hidden">
+    <section className="w-full my-8 bg-white border border-[#E8E8E3] rounded-3xl p-5 sm:p-7 shadow-[0_4px_24px_rgba(20,20,19,0.03)] overflow-hidden">
       {/* Header Bar */}
       <div className="flex items-center justify-between gap-4 mb-6">
         <div>
@@ -88,14 +88,14 @@ export default function TopCreatorsRow({ creators, isLoading }: TopCreatorsRowPr
         <div className="hidden sm:flex items-center gap-2 self-end">
           <button
             onClick={() => scroll('left')}
-            className="w-9 h-9 rounded-full bg-white border border-[#E8E8E3] flex items-center justify-center text-[#141413] hover:bg-[#141413] hover:text-[#FAF5EC] hover:border-[#141413] transition-colors shadow-xs cursor-pointer active:scale-95"
+            className="w-9 h-9 rounded-full bg-white border border-[#E8E8E3] flex items-center justify-center text-[#141413] hover:bg-[#141413] hover:text-white hover:border-[#141413] transition-colors shadow-xs cursor-pointer active:scale-95"
             aria-label="Scroll left"
           >
             <ChevronLeft size={16} />
           </button>
           <button
             onClick={() => scroll('right')}
-            className="w-9 h-9 rounded-full bg-white border border-[#E8E8E3] flex items-center justify-center text-[#141413] hover:bg-[#141413] hover:text-[#FAF5EC] hover:border-[#141413] transition-colors shadow-xs cursor-pointer active:scale-95"
+            className="w-9 h-9 rounded-full bg-white border border-[#E8E8E3] flex items-center justify-center text-[#141413] hover:bg-[#141413] hover:text-white hover:border-[#141413] transition-colors shadow-xs cursor-pointer active:scale-95"
             aria-label="Scroll right"
           >
             <ChevronRight size={16} />
@@ -116,7 +116,7 @@ export default function TopCreatorsRow({ creators, isLoading }: TopCreatorsRowPr
             {/* Top Rank & Score Bar */}
             <div className="flex items-center justify-between mb-4">
               {getRankBadge(creator.rank)}
-              <div className="inline-flex items-center gap-1 text-[11px] font-semibold text-gray-500 bg-[#FAF5EC] px-2 py-0.5 rounded-full border border-[#E8E8E3]">
+              <div className="inline-flex items-center gap-1 text-[11px] font-semibold text-gray-500 bg-[#F8F8F8] px-2 py-0.5 rounded-full border border-[#E8E8E3]">
                 <span className="text-amber-500">★</span>
                 <span>{creator.score} pts</span>
               </div>
@@ -138,7 +138,7 @@ export default function TopCreatorsRow({ creators, isLoading }: TopCreatorsRowPr
                     className="w-full h-full object-cover rounded-full group-hover:scale-105 transition-transform duration-300"
                   />
                 ) : (
-                  <div className="w-full h-full bg-[#2C4A5A] text-[#FAF5EC] flex items-center justify-center font-bold text-sm rounded-full">
+                  <div className="w-full h-full bg-[#2C4A5A] text-white flex items-center justify-center font-bold text-sm rounded-full">
                     {getInitials(creator.name)}
                   </div>
                 )}
@@ -171,7 +171,7 @@ export default function TopCreatorsRow({ creators, isLoading }: TopCreatorsRowPr
             </div>
 
             {/* Quick Stats Grid */}
-            <div className="grid grid-cols-2 gap-2 py-2.5 px-3 rounded-xl bg-[#FAF5EC]/80 border border-[#E8E8E3]/60 mb-4 text-center">
+            <div className="grid grid-cols-2 gap-2 py-2.5 px-3 rounded-xl bg-[#F8F8F8] border border-[#E8E8E3]/60 mb-4 text-center">
               <div>
                 <p className="text-[9px] uppercase font-bold tracking-wider text-gray-400">Works</p>
                 <p className="text-xs font-semibold text-[#141413] mt-0.5">
@@ -189,7 +189,7 @@ export default function TopCreatorsRow({ creators, isLoading }: TopCreatorsRowPr
             {/* View Profile Action Link */}
             <Link
               href={`/artist/${creator.id}`}
-              className="w-full inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-full text-xs font-semibold bg-[#141413] text-[#FAF5EC] hover:bg-black transition-all duration-200 group/btn"
+              className="w-full inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-full text-xs font-semibold bg-[#141413] text-white hover:bg-black transition-all duration-200 group/btn"
             >
               <span>View Portfolio</span>
               <ArrowRight size={13} className="group-hover/btn:translate-x-0.5 transition-transform duration-200" />

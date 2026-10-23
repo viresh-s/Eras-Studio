@@ -19,7 +19,7 @@ export default function Navbar() {
   const pathname = usePathname();
 
   return (
-    <nav className="sticky top-0 z-50 bg-[#FAF5EC]/90 backdrop-blur-md border-b border-[#E8E8E3]">
+    <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-[#E8E8E3]">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="font-serif text-2xl font-bold tracking-tight text-[#141413] hover:opacity-80 transition-opacity flex items-center gap-2">
@@ -35,7 +35,7 @@ export default function Navbar() {
               href={link.href}
               className={`px-4 py-2 text-sm font-medium rounded-full transition-colors duration-200 ${
                 pathname === link.href
-                  ? 'bg-[#141413] text-[#FAF5EC]'
+                  ? 'bg-[#141413] text-white'
                   : 'text-[#6E6E69] hover:text-[#141413] hover:bg-black/5'
               }`}
             >
@@ -49,7 +49,7 @@ export default function Navbar() {
           <Link href="/login" className="px-4 py-1.5 text-xs uppercase tracking-[0.08em] font-medium text-[#6E6E69] hover:text-[#141413] transition-colors">
             Log In
           </Link>
-          <Link href="/signup" className="px-5 py-2 text-xs uppercase tracking-[0.08em] font-medium bg-[#141413] text-[#FAF5EC] border border-[#141413] rounded-full hover:bg-transparent hover:text-[#141413] transition-all duration-200">
+          <Link href="/signup" className="px-5 py-2 text-xs uppercase tracking-[0.08em] font-medium bg-[#141413] text-white border border-[#141413] rounded-full hover:bg-transparent hover:text-[#141413] transition-all duration-200">
             Sign Up
           </Link>
         </div>
@@ -65,7 +65,7 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-[#E8E8E3] bg-[#FAF5EC] px-6 py-4 space-y-1">
+        <div className="md:hidden border-t border-[#E8E8E3] bg-white px-6 py-4 space-y-1">
           {navLinks.map((link) => (
             <Link
               key={link.href}
@@ -73,7 +73,7 @@ export default function Navbar() {
               onClick={() => setMobileOpen(false)}
               className={`block px-4 py-3 text-sm font-medium rounded-xl transition-colors ${
                 pathname === link.href
-                  ? 'bg-[#141413] text-[#FAF5EC]'
+                  ? 'bg-[#141413] text-white'
                   : 'text-[#6E6E69] hover:bg-black/5'
               }`}
             >
@@ -84,7 +84,7 @@ export default function Navbar() {
             <Link href="/login" className="flex-1 text-center px-4 py-2 text-xs uppercase tracking-[0.08em] font-medium rounded-full border border-[#E8E8E3] text-[#141413] hover:bg-black/5 transition-colors">
               Log In
             </Link>
-            <Link href="/signup" className="flex-1 text-center px-4 py-2 text-xs uppercase tracking-[0.08em] font-medium rounded-full bg-[#141413] text-[#FAF5EC] border border-[#141413] hover:bg-transparent hover:text-[#141413] transition-colors">
+            <Link href="/signup" className="flex-1 text-center px-4 py-2 text-xs uppercase tracking-[0.08em] font-medium rounded-full bg-[#141413] text-white border border-[#141413] hover:bg-transparent hover:text-[#141413] transition-colors">
               Sign Up
             </Link>
           </div>

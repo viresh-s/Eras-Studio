@@ -139,7 +139,7 @@ export async function GET(request: NextRequest) {
 
   // Failed exchange or direct access without tokens
   if (isPasswordRecovery) {
-    return NextResponse.redirect(`${origin}/forgot-password?error=recovery_failed`);
+    return NextResponse.redirect(`${origin}/forgot-password?mode=reset`);
   }
 
   const oauthError = searchParams.get('error_description') || searchParams.get('error');

@@ -105,14 +105,14 @@ export default async function HomePage() {
               <div className="flex flex-wrap items-center gap-3">
                 <Link
                   href="/discovery"
-                  className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#141413] text-[#FAF5EC] border border-[#141413] rounded-full text-xs uppercase tracking-[0.08em] font-medium hover:bg-black transition-all duration-200 group"
+                  className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#141413] text-white border border-[#141413] rounded-full text-xs uppercase tracking-[0.08em] font-medium hover:bg-black transition-all duration-200 group"
                 >
                   <span>Explore the Gallery</span>
                   <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform duration-200" />
                 </Link>
                 <Link
                   href="/signup"
-                  className="inline-flex items-center gap-2 px-6 py-2.5 bg-transparent text-[#141413] border border-[#141413]/25 rounded-full text-xs uppercase tracking-[0.08em] font-medium hover:border-[#141413] hover:bg-[#141413] hover:text-[#FAF5EC] transition-all duration-200"
+                  className="inline-flex items-center gap-2 px-6 py-2.5 bg-transparent text-[#141413] border border-[#141413]/25 rounded-full text-xs uppercase tracking-[0.08em] font-medium hover:border-[#141413] hover:bg-[#141413] hover:text-white transition-all duration-200"
                 >
                   <span>Join as Creator</span>
                 </Link>
@@ -129,22 +129,22 @@ export default async function HomePage() {
       </section>
 
       {/* 2. Curated Discipline Ribbon */}
-      <section className="bg-[#141413] text-[#FAF5EC] py-4 border-y border-[#262624]">
+      <section className="bg-[#141413] text-white py-4 border-y border-[#262624]">
         <Marquee speed={36} gradient={false} autoFill>
           <div className="flex items-center gap-10 font-serif text-xs tracking-[0.25em] uppercase px-4 select-none">
-            <span className="text-[#FAF5EC]">Original Oil & Acrylic</span>
+            <span className="text-white">Original Oil & Acrylic</span>
             <span className="text-[#865E16] text-sm">◆</span>
             <span className="text-[#9E9E98]">Contemporary Sculpture</span>
             <span className="text-[#865E16] text-sm">◆</span>
-            <span className="text-[#FAF5EC]">Fine Art Photography</span>
+            <span className="text-white">Fine Art Photography</span>
             <span className="text-[#865E16] text-sm">◆</span>
             <span className="text-[#9E9E98]">Mixed Media & Collage</span>
             <span className="text-[#865E16] text-sm">◆</span>
-            <span className="text-[#FAF5EC]">Direct Studio Acquisition</span>
+            <span className="text-white">Direct Studio Acquisition</span>
             <span className="text-[#865E16] text-sm">◆</span>
             <span className="text-[#9E9E98]">Certified Provenance</span>
             <span className="text-[#865E16] text-sm">◆</span>
-            <span className="text-[#FAF5EC]">Zero Middlemen</span>
+            <span className="text-white">Zero Middlemen</span>
             <span className="text-[#865E16] text-sm">◆</span>
           </div>
         </Marquee>
@@ -229,7 +229,7 @@ export default async function HomePage() {
       </section>
 
       {/* 4. The Eras Standard (Pillars) */}
-      <section className="py-24 md:py-32 bg-[#F3ECE0] border-y border-[#E8E8E3]">
+      <section className="py-24 md:py-32 bg-[#FAFAFA] border-y border-[#E8E8E3]">
         <div className="max-w-[1400px] mx-auto px-6">
           <div className="max-w-2xl mb-16">
             <p className="text-xs font-semibold tracking-[0.2em] text-[#6E6E69] uppercase mb-3 flex items-center gap-2">
@@ -246,12 +246,12 @@ export default async function HomePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Pillar 1 */}
-            <div className="bg-[#FAF5EC] rounded-3xl p-10 border border-[#E8E8E3] shadow-[0_4px_24px_rgba(0,0,0,0.02)] flex flex-col justify-between">
+            <div className="bg-white rounded-3xl p-10 border border-[#E8E8E3] shadow-[0_4px_24px_rgba(0,0,0,0.02)] flex flex-col justify-between">
               <div>
                 <span className="text-xs font-mono font-bold tracking-widest text-[#865E16] uppercase block mb-6">
                   01 / CREATOR AUTONOMY
                 </span>
-                <div className="w-12 h-12 rounded-2xl bg-white border border-[#E8E8E3] flex items-center justify-center mb-6">
+                <div className="w-12 h-12 rounded-2xl bg-[#F7F7F7] border border-[#E8E8E3] flex items-center justify-center mb-6">
                   <Palette size={22} className="text-[#141413]" />
                 </div>
                 <h3 className="text-2xl font-serif font-bold text-[#141413] mb-3">
@@ -264,12 +264,12 @@ export default async function HomePage() {
             </div>
 
             {/* Pillar 2 */}
-            <div className="bg-[#FAF5EC] rounded-3xl p-10 border border-[#E8E8E3] shadow-[0_4px_24px_rgba(0,0,0,0.02)] flex flex-col justify-between">
+            <div className="bg-white rounded-3xl p-10 border border-[#E8E8E3] shadow-[0_4px_24px_rgba(0,0,0,0.02)] flex flex-col justify-between">
               <div>
                 <span className="text-xs font-mono font-bold tracking-widest text-[#865E16] uppercase block mb-6">
                   02 / CERTIFIED PROVENANCE
                 </span>
-                <div className="w-12 h-12 rounded-2xl bg-white border border-[#E8E8E3] flex items-center justify-center mb-6">
+                <div className="w-12 h-12 rounded-2xl bg-[#F7F7F7] border border-[#E8E8E3] flex items-center justify-center mb-6">
                   <ShieldCheck size={22} className="text-[#141413]" />
                 </div>
                 <h3 className="text-2xl font-serif font-bold text-[#141413] mb-3">
@@ -282,12 +282,12 @@ export default async function HomePage() {
             </div>
 
             {/* Pillar 3 */}
-            <div className="bg-[#FAF5EC] rounded-3xl p-10 border border-[#E8E8E3] shadow-[0_4px_24px_rgba(0,0,0,0.02)] flex flex-col justify-between">
+            <div className="bg-white rounded-3xl p-10 border border-[#E8E8E3] shadow-[0_4px_24px_rgba(0,0,0,0.02)] flex flex-col justify-between">
               <div>
                 <span className="text-xs font-mono font-bold tracking-widest text-[#865E16] uppercase block mb-6">
                   03 / INTIMATE DIALOGUE
                 </span>
-                <div className="w-12 h-12 rounded-2xl bg-white border border-[#E8E8E3] flex items-center justify-center mb-6">
+                <div className="w-12 h-12 rounded-2xl bg-[#F7F7F7] border border-[#E8E8E3] flex items-center justify-center mb-6">
                   <MessageCircle size={22} className="text-[#141413]" />
                 </div>
                 <h3 className="text-2xl font-serif font-bold text-[#141413] mb-3">
@@ -305,7 +305,7 @@ export default async function HomePage() {
       {/* 5. Curatorial Pull-Quote */}
       <section className="py-24 md:py-32">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <div className="w-10 h-10 rounded-full bg-[#EFE8DC] flex items-center justify-center mx-auto mb-8 text-[#865E16]">
+          <div className="w-10 h-10 rounded-full bg-[#F5F5F5] flex items-center justify-center mx-auto mb-8 text-[#865E16]">
             <Compass size={20} />
           </div>
           <blockquote className="font-serif text-3xl sm:text-4xl md:text-5xl font-normal italic text-[#141413] leading-snug mb-8">
@@ -344,7 +344,7 @@ export default async function HomePage() {
       {/* 7. Grand Exhibition Salon CTA */}
       <section className="py-24 md:py-32">
         <div className="max-w-[1400px] mx-auto px-6">
-          <div className="bg-[#141413] text-[#FAF5EC] rounded-[36px] md:rounded-[44px] p-12 md:p-24 relative overflow-hidden shadow-2xl">
+          <div className="bg-[#141413] text-white rounded-[36px] md:rounded-[44px] p-12 md:p-24 relative overflow-hidden shadow-2xl">
             
             {/* Subtle background glow */}
             <div className="absolute top-0 right-0 w-96 h-96 bg-[#865E16] opacity-10 blur-3xl pointer-events-none rounded-full" />
@@ -357,7 +357,7 @@ export default async function HomePage() {
 
               <h2 className="text-4xl sm:text-6xl font-serif font-bold tracking-tight mb-6 leading-tight">
                 Begin your collection.<br />
-                <span className="italic font-normal text-[#FAF5EC]/80">Or share your craft.</span>
+                <span className="italic font-normal text-white/80">Or share your craft.</span>
               </h2>
 
               <p className="text-base md:text-lg text-[#9E9E98] leading-relaxed mb-10 max-w-xl mx-auto">
@@ -367,14 +367,14 @@ export default async function HomePage() {
               <div className="flex flex-wrap items-center justify-center gap-3">
                 <Link
                   href="/signup"
-                  className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#FAF5EC] text-[#141413] border border-[#FAF5EC] rounded-full text-xs uppercase tracking-[0.08em] font-medium hover:bg-white transition-all duration-200 group"
+                  className="inline-flex items-center gap-2 px-6 py-2.5 bg-white text-[#141413] border border-white rounded-full text-xs uppercase tracking-[0.08em] font-medium hover:bg-white/90 transition-all duration-200 group"
                 >
                   <span>Create Your Account</span>
                   <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform duration-200" />
                 </Link>
                 <Link
                   href="/discovery"
-                  className="inline-flex items-center gap-2 px-6 py-2.5 bg-transparent text-[#FAF5EC] border border-[#FAF5EC]/30 rounded-full text-xs uppercase tracking-[0.08em] font-medium hover:border-[#FAF5EC] hover:bg-[#FAF5EC] hover:text-[#141413] transition-all duration-200"
+                  className="inline-flex items-center gap-2 px-6 py-2.5 bg-transparent text-white border border-white/30 rounded-full text-xs uppercase tracking-[0.08em] font-medium hover:border-white hover:bg-white hover:text-[#141413] transition-all duration-200"
                 >
                   <span>Browse the Gallery</span>
                 </Link>

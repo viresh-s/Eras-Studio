@@ -66,8 +66,16 @@ export async function updateProfile(data: UpdateProfileData) {
   }
 
   const supabase = await createClient();
-  
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    throw new Error('Unauthorized: Authentication required.');
+  }
+
   const { userId, ...updateData } = data;
+
+  if (user.id !== userId) {
+    throw new Error('Unauthorized: You can only edit your own profile.');
+  }
 
   // Remove undefined values so we don't overwrite with null accidentally
   const cleanedData = Object.fromEntries(
@@ -77,7 +85,7 @@ export async function updateProfile(data: UpdateProfileData) {
   const { error } = await supabase
     .from('profiles')
     .update(cleanedData)
-    .eq('id', userId);
+    .eq('id', user.id);
 
   if (error) {
     throw new Error(error.message);
@@ -96,11 +104,15 @@ export async function updateProfileAvatar(userId: string, avatarUrl: string) {
   }
 
   const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user || user.id !== userId) {
+    throw new Error('Unauthorized: You can only update your own avatar.');
+  }
   
   const { error } = await supabase
     .from('profiles')
     .update({ profile_pic_url: avatarUrl })
-    .eq('id', userId);
+    .eq('id', user.id);
 
   if (error) {
     throw new Error(error.message);
@@ -112,18 +124,22 @@ export async function upgradeToPremiumServer(userId: string) {
   if (!parsedUserId.success) throw new Error('Validation Error: Invalid user ID');
 
   const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user || user.id !== userId) {
+    throw new Error('Unauthorized: You can only upgrade your own account.');
+  }
 
   const { error } = await supabase
     .from('profiles')
     .update({ is_premium: true })
-    .eq('id', userId);
+    .eq('id', user.id);
 
   if (error) {
     throw new Error(error.message);
   }
   
   await createNotification(
-    userId,
+    user.id,
     'Welcome to Premium!',
     'You have successfully upgraded your account. You can now upload unlimited artworks.',
     'UPGRADE'
@@ -136,5 +152,9 @@ export async function getFreemiumStatusAction(userId: string) {
   const parsedUserId = uuidSchema.safeParse(userId);
   if (!parsedUserId.success) throw new Error('Validation Error: Invalid user ID');
   
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Unauthorized');
+
   return await checkFreemiumStatus(userId);
 }

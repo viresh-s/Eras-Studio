@@ -14,7 +14,7 @@ export async function checkFreemiumStatus(userId: string): Promise<FreemiumStatu
   // Get profile
   const { data: profile } = await supabase
     .from('profiles')
-    .select('is_premium, created_at')
+    .select('is_premium, plan, created_at')
     .eq('id', userId)
     .maybeSingle();
 
@@ -28,8 +28,9 @@ export async function checkFreemiumStatus(userId: string): Promise<FreemiumStatu
     };
   }
 
-  // Premium users are never locked
-  if (profile.is_premium) {
+  // Premium or Pro users are never locked
+  const isPro = Boolean(profile.is_premium || profile.plan === 'pro' || profile.plan === 'elite');
+  if (isPro) {
     return {
       isLocked: false,
       reason: '',
@@ -46,15 +47,19 @@ export async function checkFreemiumStatus(userId: string): Promise<FreemiumStatu
     .eq('creator_id', userId);
 
   const artworksUsed = count || 0;
-  const isArtworkLocked = artworksUsed >= 3;
+  const isLite = profile.plan === 'lite' || profile.plan === 'light';
+  const limit = isLite ? 50 : 3;
+  const isArtworkLocked = artworksUsed >= limit;
 
   if (isArtworkLocked) {
     return {
       isLocked: true,
-      reason: 'You\'ve used all 3 free uploads. Upgrade to Premium for unlimited uploads.',
+      reason: isLite
+        ? 'You have reached the 50-artwork allowance of your Lite plan. Upgrade to Pro for unlimited uploads.'
+        : 'You have reached the 3-artwork limit of your Free plan. Upgrade to Lite (50 artworks) or Pro (unlimited) to exhibit more work.',
       daysRemaining: -1,
       artworksUsed,
-      artworksLimit: 3,
+      artworksLimit: limit,
     };
   }
 
@@ -63,7 +68,7 @@ export async function checkFreemiumStatus(userId: string): Promise<FreemiumStatu
     reason: '',
     daysRemaining: -1,
     artworksUsed,
-    artworksLimit: 3,
+    artworksLimit: limit,
   };
 }
 

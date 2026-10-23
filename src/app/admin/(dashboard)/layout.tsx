@@ -193,9 +193,9 @@ export default function DashboardLayout({
 
   return (
     <ToastProvider>
-      <div className="min-h-screen bg-[#FAFAF8] text-[#141413] flex flex-col lg:flex-row font-sans selection:bg-[#F0DFD7] selection:text-[#9E4323]">
+      <div className="min-h-screen bg-white text-[#141413] flex flex-col lg:flex-row font-sans selection:bg-[#F0DFD7] selection:text-[#9E4323]">
         {/* Mobile Top Navigation Header */}
-        <header className="lg:hidden sticky top-0 z-40 bg-[#FAFAF8]/95 backdrop-blur-sm border-b border-[#E8E8E3] px-4 py-3 flex items-center justify-between">
+        <header className="lg:hidden sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-[#E8E8E3] px-4 py-3 flex items-center justify-between">
           <Link
           href="/admin/overview"
           onClick={closeMobileDrawer}
@@ -241,7 +241,7 @@ export default function DashboardLayout({
             onClick={closeMobileDrawer}
           />
 
-          <div className="relative bg-[#FAFAF8] border-b border-[#E8E8E3] px-4 py-6 shadow-sm space-y-6 animate-in slide-in-from-top-2 duration-200">
+          <div className="relative bg-white border-b border-[#E8E8E3] px-4 py-6 shadow-sm space-y-6 animate-in slide-in-from-top-2 duration-200">
               {navItems.map((item) => {
                 const Icon = item.icon;
                 const isCor = item.href === "/admin/cor";
@@ -364,7 +364,7 @@ export default function DashboardLayout({
       )}
 
       {/* Desktop Persistent Left Sidebar */}
-      <aside className="hidden lg:flex flex-col w-64 shrink-0 border-r border-[#E8E8E3] bg-[#FAFAF8] min-h-screen sticky top-0 h-screen select-none">
+      <aside className="hidden lg:flex flex-col w-64 shrink-0 border-r border-[#E8E8E3] bg-white min-h-screen sticky top-0 h-screen select-none">
         {/* Top Brand Header */}
         <div className="p-6 border-b border-[#E8E8E3] flex items-center justify-between">
           <Link href="/admin/overview" className="flex items-center gap-1.5 group">
@@ -499,7 +499,7 @@ export default function DashboardLayout({
         </div>
 
         {/* Sidebar Footer with Session & Logout */}
-        <div className="p-4 border-t border-[#E8E8E3] bg-[#FAFAF8]">
+        <div className="p-4 border-t border-[#E8E8E3] bg-white">
           <div className="flex items-center justify-between p-2 rounded-lg border border-transparent hover:border-[#E8E8E3] hover:bg-white transition-all">
             <div className="flex items-center gap-2.5 min-w-0">
               <div className="w-8 h-8 rounded-full bg-[#EAEAE5] border border-[#DCDCD6] flex items-center justify-center text-xs font-semibold text-[#141413] shrink-0">
@@ -535,7 +535,7 @@ export default function DashboardLayout({
       {/* Main Content Area with Dynamic Top Bar */}
       <main className="flex-1 flex flex-col min-w-0">
         {/* Desktop Top Bar */}
-        <header className="hidden lg:flex items-center justify-between h-16 px-8 border-b border-[#E8E8E3] bg-[#FAFAF8]/95 backdrop-blur-sm sticky top-0 z-20">
+        <header className="hidden lg:flex items-center justify-between h-16 px-8 border-b border-[#E8E8E3] bg-white/95 backdrop-blur-sm sticky top-0 z-20">
           {/* Active Page Title */}
           <div>
             <h1 className="text-lg font-medium tracking-tight text-[#141413]">

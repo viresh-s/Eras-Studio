@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { useForm, Controller, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -22,6 +22,8 @@ import {
 } from 'lucide-react';
 import { updateProfile, updateProfileAvatar } from '@/actions/profileActions';
 import Input from '@/components/ui/Input';
+import Select from '@/components/ui/Select';
+import SingleSelect from '@/components/ui/SingleSelect';
 import TextArea from '@/components/ui/TextArea';
 import MultiSelect from '@/components/ui/MultiSelect';
 import { useRouter } from 'next/navigation';
@@ -30,15 +32,35 @@ import type { Profile } from '@/types/database';
 
 const artFormsOptions = [
   { value: 'Painting', label: 'Painting' },
+  { value: 'Drawing', label: 'Drawing & Sketching' },
   { value: 'Sculpture', label: 'Sculpture' },
-  { value: 'Photography', label: 'Photography' },
-  { value: 'Digital Art', label: 'Digital Art' },
-  { value: 'Illustration', label: 'Illustration' },
-  { value: 'Mixed Media', label: 'Mixed Media' },
-  { value: 'Drawing', label: 'Drawing' },
+  { value: 'Photography', label: 'Fine Art Photography' },
   { value: 'Printmaking', label: 'Printmaking' },
-  { value: 'Textile Arts', label: 'Textile Arts' },
-  { value: 'Installation', label: 'Installation' },
+  { value: 'Mixed Media', label: 'Mixed Media' },
+  { value: 'Illustration', label: 'Illustration' },
+  { value: 'Digital Art', label: 'Digital Art' },
+  { value: 'Ceramic & Pottery', label: 'Ceramic & Pottery' },
+  { value: 'Textile & Fiber Art', label: 'Textile & Fiber Art' },
+];
+
+const primaryMediumOptions = [
+  { value: 'Oil on Canvas', label: 'Oil on Canvas' },
+  { value: 'Acrylic on Canvas', label: 'Acrylic on Canvas' },
+  { value: 'Watercolor on Paper', label: 'Watercolor on Paper' },
+  { value: 'Gouache on Paper', label: 'Gouache on Paper' },
+  { value: 'Ink on Paper', label: 'Ink on Paper' },
+  { value: 'Charcoal / Graphite on Paper', label: 'Charcoal / Graphite on Paper' },
+  { value: 'Pastel on Paper / Board', label: 'Pastel on Paper / Board' },
+  { value: 'Mixed Media', label: 'Mixed Media' },
+  { value: 'Bronze Sculpture', label: 'Bronze Sculpture' },
+  { value: 'Stone / Marble Sculpture', label: 'Stone / Marble Sculpture' },
+  { value: 'Wood Sculpture / Carving', label: 'Wood Sculpture / Carving' },
+  { value: 'Ceramic & Clay', label: 'Ceramic & Clay' },
+  { value: 'Fine Art Photography', label: 'Fine Art Photography' },
+  { value: 'Digital Painting', label: 'Digital Painting' },
+  { value: 'Printmaking / Screenprint', label: 'Printmaking / Screenprint' },
+  { value: 'Textile / Fiber Art', label: 'Textile / Fiber Art' },
+  { value: 'Other Medium', label: 'Other Medium' },
 ];
 
 const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
@@ -67,9 +89,10 @@ const editProfileSchema = z.object({
 
 type EditProfileFormData = z.infer<typeof editProfileSchema>;
 
-// Compact, elegant Document Uploader Row (PDF Max 10MB)
+// Clean, spacious Document Uploader Card for 2-Column Grid (PDF Max 10MB)
 interface DocumentUploaderProps {
   label: string;
+  description?: string;
   required?: boolean;
   docKey: string;
   fileUrl: string | null;
@@ -80,6 +103,7 @@ interface DocumentUploaderProps {
 
 function DocumentUploader({
   label,
+  description,
   required,
   docKey,
   fileUrl,
@@ -149,68 +173,71 @@ function DocumentUploader({
   return (
     <div
       style={{ fontFamily: "'Poppins', sans-serif" }}
-      className={`rounded-[14px] border transition-all p-3.5 bg-white shadow-2xs hover:shadow-xs ${
-        fileUrl ? 'border-emerald-200 bg-emerald-50/20' : 'border-[#E8E8E3] hover:border-[#181A1F]'
+      className={`rounded-[14px] border transition-all p-3.5 sm:p-4 bg-white flex flex-col justify-between shadow-2xs hover:shadow-xs ${
+        fileUrl ? 'border-emerald-200 bg-emerald-50/15' : 'border-[#E8E8E3] hover:border-[#181A1F]'
       }`}
     >
-      <div className="flex items-center justify-between gap-3">
-        {/* Left: Icon & Label */}
-        <div className="flex items-center gap-3 min-w-0 flex-1">
-          <div className={`w-9 h-9 rounded-[10px] flex items-center justify-center shrink-0 ${
-            fileUrl ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-[#FAF9F5] text-[#71716D] border border-[#E8E8E3]'
-          }`}>
-            <FileText size={16} />
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-1.5">
-              <span className="text-xs font-semibold text-[#181A1F] truncate">
-                {label}
-              </span>
-              {required && <span className="text-red-500 text-xs">*</span>}
-            </div>
-            <p className="text-[11px] text-[#929292] mt-0.5 truncate">
-              {fileUrl ? 'PDF uploaded · Max 10 MB' : 'PDF · Max 10 MB'}
-            </p>
-          </div>
+      {/* Top Section: Icon, Title with Red Star & Description */}
+      <div className="flex items-start gap-3">
+        <div className={`w-8 h-8 rounded-[8px] flex items-center justify-center shrink-0 mt-0.5 ${
+          fileUrl ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-[#F8F8F8] text-[#181A1F] border border-[#E8E8E3]'
+        }`}>
+          <FileText size={15} />
         </div>
 
-        {/* Right: Actions */}
-        <div className="shrink-0 flex items-center gap-2">
+        <div className="min-w-0 flex-1">
+          <h4 className="text-xs sm:text-[13px] font-semibold text-[#181A1F] leading-tight flex items-center">
+            <span>{label}</span>
+            {required && <span className="text-red-500 ml-1 font-bold text-xs">*</span>}
+          </h4>
+          {description && (
+            <p className="text-[11px] text-[#71716D] mt-1 leading-snug line-clamp-1">
+              {description}
+            </p>
+          )}
+        </div>
+      </div>
+
+      {/* Bottom Section: File Info & Actions */}
+      <div className="mt-3 pt-2.5 border-t border-[#F0F0EB] flex items-center justify-between gap-2 flex-wrap">
+        <span className="text-[10.5px] text-[#929292]">
+          {fileUrl ? 'PDF attached · Max 10 MB' : 'PDF · Max 10 MB'}
+        </span>
+
+        <div>
           {isUploading ? (
-            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F3F3F3] text-[#71716D] text-[11px] font-medium">
-              <Loader2 size={12} className="animate-spin" />
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] bg-[#F3F3F3] text-[#71716D] text-[11px] font-medium">
+              <Loader2 size={11} className="animate-spin text-[#181A1F]" />
               <span>Uploading...</span>
             </div>
           ) : fileUrl ? (
             <div className="flex items-center gap-1">
-              <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 mr-1">
-                <CheckCircle2 size={11} />
-                Uploaded
-              </span>
               <a
                 href={fileUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-1.5 rounded-lg text-[#71716D] hover:text-[#181A1F] hover:bg-[#F3F3F3] transition-colors"
+                className="px-2 py-1 rounded-[6px] text-[11px] font-medium text-[#181A1F] bg-[#F3F3F3] hover:bg-[#E8E8E8] transition-colors inline-flex items-center gap-1"
                 title="View document"
               >
-                <ExternalLink size={14} />
+                <ExternalLink size={11} />
+                <span>View</span>
               </a>
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="p-1.5 rounded-lg text-[#71716D] hover:text-[#181A1F] hover:bg-[#F3F3F3] transition-colors cursor-pointer"
+                className="px-2 py-1 rounded-[6px] text-[11px] font-medium text-[#181A1F] bg-[#F3F3F3] hover:bg-[#E8E8E8] transition-colors inline-flex items-center gap-1 cursor-pointer"
                 title="Replace document"
               >
-                <RefreshCw size={13} />
+                <RefreshCw size={10} />
+                <span>Replace</span>
               </button>
               <button
                 type="button"
                 onClick={onRemoved}
-                className="p-1.5 rounded-lg text-[#71716D] hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                className="p-1 rounded-[6px] text-[#8E8E88] hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
                 title="Remove document"
               >
-                <Trash2 size={14} />
+                <Trash2 size={12} />
               </button>
             </div>
           ) : (
@@ -218,9 +245,9 @@ function DocumentUploader({
               type="button"
               onClick={() => fileInputRef.current?.click()}
               style={{ fontFamily: "'Poppins', sans-serif" }}
-              className="px-3.5 py-1.5 rounded-[10px] border border-[#E2E2DC] bg-[#F7F7F5] hover:bg-[#181A1F] text-[#343434] hover:text-white hover:border-[#181A1F] text-xs font-medium transition-all inline-flex items-center gap-1.5 cursor-pointer shadow-2xs"
+              className="px-3 py-1 rounded-[7px] border border-[#E2E2DC] bg-[#F8F8F8] hover:bg-[#181A1F] text-[#181A1F] hover:text-white hover:border-[#181A1F] text-[11px] font-medium transition-all inline-flex items-center gap-1.5 cursor-pointer shadow-2xs"
             >
-              <Upload size={12} />
+              <Upload size={11} />
               <span>Choose PDF</span>
             </button>
           )}
@@ -228,7 +255,7 @@ function DocumentUploader({
       </div>
 
       {uploadError && (
-        <div className="mt-2 pt-2 border-t border-red-100 text-[11px] text-red-600 flex items-center gap-1.5">
+        <div className="mt-2 pt-1.5 border-t border-red-100 text-xs text-red-600 flex items-center gap-1.5">
           <AlertCircle size={12} className="shrink-0" />
           <span>{uploadError}</span>
         </div>
@@ -315,6 +342,13 @@ export default function EditProfileForm({ userProfile }: { userProfile: Profile 
   const [customProposalText, setCustomProposalText] = useState<string>(
     isInitialOther ? initialProposalValue.replace(/^Other:\s*/, '') : ''
   );
+
+  const resolvedMediumOptions = useMemo(() => {
+    if (userProfile.primary_medium && !primaryMediumOptions.some(opt => opt.value === userProfile.primary_medium)) {
+      return [{ value: userProfile.primary_medium, label: userProfile.primary_medium }, ...primaryMediumOptions];
+    }
+    return primaryMediumOptions;
+  }, [userProfile.primary_medium]);
 
   const { register, handleSubmit, control, formState: { errors } } = useForm<EditProfileFormData>({
     resolver: zodResolver(editProfileSchema),
@@ -532,11 +566,11 @@ export default function EditProfileForm({ userProfile }: { userProfile: Profile 
       {/* Main Behance-style Card Container with Minimalist Aesthetic */}
       <div className="max-w-5xl mx-auto bg-white rounded-[24px] border border-[#E8E8E3] shadow-[0_10px_40px_rgba(0,0,0,0.03)] overflow-hidden">
         <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] min-h-[620px]">
-          {/* Left Vertical Navigation Sidebar */}
-          <nav className="border-b md:border-b-0 md:border-r border-[#E8E8E3] bg-[#FAFAF8]/50 flex flex-col justify-between">
+          {/* Left Vertical Navigation Sidebar - Clean White Minimalist */}
+          <nav className="border-b md:border-b-0 md:border-r border-[#E8E8E3] bg-white flex flex-col justify-between">
             <div>
               {/* 1. Artist Mini Identity Banner */}
-              <div className="p-5 border-b border-[#E8E8E3] flex items-center gap-3 bg-[#FAF9F5]">
+              <div className="p-5 border-b border-[#E8E8E3] flex items-center gap-3 bg-white">
                 <div className="w-11 h-11 rounded-full overflow-hidden bg-[#F3F3F3] border border-[#E2E2DC] shrink-0 flex items-center justify-center">
                   {avatarPreview ? (
                     /* eslint-disable-next-line @next/next/no-img-element */
@@ -554,7 +588,7 @@ export default function EditProfileForm({ userProfile }: { userProfile: Profile 
                 </div>
               </div>
 
-              {/* 2. Menu Item Buttons (Clean text only, minimalist design) */}
+              {/* 2. Menu Item Buttons (Clean neutral grey, no cream) */}
               <div className="py-2 divide-y divide-[#E8E8E3]/60 bg-white">
                 {CREATOR_TABS.map((tab) => {
                   const isActive = activeTab === tab.key;
@@ -565,8 +599,8 @@ export default function EditProfileForm({ userProfile }: { userProfile: Profile 
                       onClick={() => setActiveTab(tab.key)}
                       className={`w-full text-left px-6 py-3.5 transition-colors cursor-pointer block relative focus:outline-none ${
                         isActive
-                          ? 'bg-[#F7F7F5] text-[#181A1F] font-semibold border-l-2 border-[#181A1F]'
-                          : 'hover:bg-[#FAF9F6] text-[#7A7A78] hover:text-[#181A1F] font-normal border-l-2 border-transparent'
+                          ? 'bg-[#F3F3F3] text-[#181A1F] font-semibold border-l-2 border-[#181A1F]'
+                          : 'hover:bg-[#F8F8F8] text-[#7A7A78] hover:text-[#181A1F] font-normal border-l-2 border-transparent'
                       }`}
                     >
                       <span className="text-sm block">
@@ -577,13 +611,13 @@ export default function EditProfileForm({ userProfile }: { userProfile: Profile 
                 })}
               </div>
 
-              {/* 3. Simple Profile Completeness Progress Bar (Minimalist) */}
-              <div className="p-5 border-t border-[#E8E8E3] bg-[#FAF9F5]/60 space-y-2">
+              {/* 3. Simple Profile Completeness Progress Bar (Clean White) */}
+              <div className="p-5 border-t border-[#E8E8E3] bg-white space-y-2">
                 <div className="flex items-center justify-between text-xs">
                   <span className="font-medium text-[#71716D]">Profile Completeness</span>
                   <span className="font-semibold text-[#181A1F]">{readinessScore}%</span>
                 </div>
-                <div className="w-full bg-[#EBEBE8] rounded-full h-1.5 overflow-hidden">
+                <div className="w-full bg-[#EFEFEF] rounded-full h-1.5 overflow-hidden">
                   <div
                     className="bg-[#181A1F] h-1.5 rounded-full transition-all duration-500"
                     style={{ width: `${readinessScore}%` }}
@@ -596,7 +630,7 @@ export default function EditProfileForm({ userProfile }: { userProfile: Profile 
 
               {/* 4. Curatorial Indexing Note */}
               <div className="p-5 border-t border-[#E8E8E3]">
-                <div className="bg-[#FAF9F5] rounded-[16px] border border-[#E8E8E3] p-3.5 text-[11px] text-[#555555] space-y-1.5">
+                <div className="bg-[#F8F8F8] rounded-[16px] border border-[#E8E8E3] p-3.5 text-[11px] text-[#555555] space-y-1.5">
                   <p className="font-semibold text-[#181A1F] flex items-center gap-1.5">
                     <Sparkles size={12} className="text-[#181A1F]" />
                     <span>Curatorial Indexing</span>
@@ -639,51 +673,7 @@ export default function EditProfileForm({ userProfile }: { userProfile: Profile 
               <div>
                 {/* TAB 1: BASIC INFORMATION (with Socials & Website) */}
                 {activeTab === 'basic' && (
-                  <section aria-labelledby="heading-basic-info" className="space-y-6">
-                    <div className="mb-8">
-                      <span
-                        style={{
-                          fontFamily: "'Century Schoolbook', 'Playfair Display', Georgia, serif",
-                          color: '#123C83',
-                          fontWeight: 700,
-                          letterSpacing: '0.04em',
-                        }}
-                        className="text-[11px] uppercase tracking-widest block mb-1.5 select-none"
-                      >
-                        ERAS · CREATOR DOSSIER
-                      </span>
-                      <div className="flex items-baseline gap-2.5 flex-wrap">
-                        <h1
-                          id="heading-basic-info"
-                          style={{
-                            fontFamily: "'Poppins', sans-serif",
-                            color: '#181A1F',
-                            fontWeight: 500,
-                          }}
-                          className="text-2xl sm:text-[28px] tracking-tight leading-tight"
-                        >
-                          Basic Information
-                        </h1>
-                        <span
-                          style={{
-                            fontFamily: "'Century Schoolbook', 'Playfair Display', Georgia, serif",
-                            color: '#71716D',
-                            fontStyle: 'italic',
-                            fontWeight: 700,
-                          }}
-                          className="text-lg sm:text-[20px]"
-                        >
-                          Identity & Socials
-                        </span>
-                      </div>
-                      <p
-                        style={{ fontFamily: "'Poppins', sans-serif" }}
-                        className="text-xs text-[#8E8E88] mt-1"
-                      >
-                        Your public artist identity, contact, links, and profile visuals.
-                      </p>
-                    </div>
-
+                  <section aria-label="Basic Information" className="space-y-6">
                     {/* Top Row: Avatar on Left + Name & Email on Right */}
                     <div className="flex flex-col sm:flex-row gap-6 sm:gap-8 items-start">
                       {/* Left: Avatar Circle + Replace Link */}
@@ -754,11 +744,21 @@ export default function EditProfileForm({ userProfile }: { userProfile: Profile 
                         error={errors.location?.message}
                         {...register('location')}
                       />
-                      <Input
-                        label="Primary Medium"
-                        placeholder="e.g. Oil on Canvas, Bronze, Digital"
-                        error={errors.primary_medium?.message}
-                        {...register('primary_medium')}
+                      <Controller
+                        name="primary_medium"
+                        control={control}
+                        render={({ field }) => (
+                          <SingleSelect
+                            label="Primary Medium"
+                            placeholder="Select Primary Medium"
+                            options={resolvedMediumOptions}
+                            value={field.value || ''}
+                            onChange={field.onChange}
+                            error={errors.primary_medium?.message}
+                            searchable
+                            clearable
+                          />
+                        )}
                       />
                     </div>
 
@@ -787,7 +787,7 @@ export default function EditProfileForm({ userProfile }: { userProfile: Profile 
                     />
 
                     {/* Cover Banner Uploader Box */}
-                    <div className="bg-[#FAF9F5] rounded-[16px] border border-[#E8E8E3] p-4 flex items-center justify-between gap-3 shadow-2xs">
+                    <div className="bg-white rounded-[16px] border border-[#E8E8E3] p-4 flex items-center justify-between gap-3 shadow-2xs">
                       <div className="flex items-center gap-3 min-w-0">
                         <div className="relative w-16 h-12 rounded-[10px] overflow-hidden border border-[#E8E8E3] bg-white shrink-0 flex items-center justify-center">
                           {coverPreview ? (
@@ -830,52 +830,7 @@ export default function EditProfileForm({ userProfile }: { userProfile: Profile 
 
                 {/* TAB 2: ABOUT & PRACTICE */}
                 {activeTab === 'practice' && (
-                  <section aria-labelledby="heading-practice" className="space-y-6">
-                    <div className="mb-8">
-                      <span
-                        style={{
-                          fontFamily: "'Century Schoolbook', 'Playfair Display', Georgia, serif",
-                          color: '#123C83',
-                          fontWeight: 700,
-                          letterSpacing: '0.04em',
-                        }}
-                        className="text-[11px] uppercase tracking-widest block mb-1.5 select-none"
-                      >
-                        ERAS · CREATOR DOSSIER
-                      </span>
-                      <div className="flex items-baseline gap-2.5 flex-wrap">
-                        <h1
-                          id="heading-practice"
-                          style={{
-                            fontFamily: "'Poppins', sans-serif",
-                            color: '#181A1F',
-                            fontWeight: 500,
-                          }}
-                          className="text-2xl sm:text-[28px] tracking-tight leading-tight"
-                        >
-                          About & Practice
-                        </h1>
-                        <span
-                          style={{
-                            fontFamily: "'Century Schoolbook', 'Playfair Display', Georgia, serif",
-                            color: '#71716D',
-                            fontStyle: 'italic',
-                            fontWeight: 700,
-                          }}
-                          className="text-lg sm:text-[20px]"
-                        >
-                          Artist Statement
-                        </span>
-                      </div>
-                      <p
-                        style={{ fontFamily: "'Poppins', sans-serif" }}
-                        className="text-xs text-[#8E8E88] mt-1"
-                      >
-                        Context, mediums, conceptual statements, and career recognition for curators and collectors.
-                      </p>
-                    </div>
-
-                    <div className="space-y-4">
+                  <section aria-label="About & Practice" className="space-y-4">
                       <TextArea
                         label="Brief Biography"
                         placeholder="Exploring the quiet relationship between place, memory and everyday life..."
@@ -913,176 +868,90 @@ export default function EditProfileForm({ userProfile }: { userProfile: Profile 
                         error={errors.awards?.message}
                         {...register('awards')}
                       />
-                    </div>
                   </section>
                 )}
 
                 {/* TAB 3: DOCUMENTS & ARTWORKS ARCHIVE */}
                 {activeTab === 'documents' && (
-                  <section aria-labelledby="heading-documents" className="space-y-6">
-                    <div className="mb-8">
-                      <span
-                        style={{
-                          fontFamily: "'Century Schoolbook', 'Playfair Display', Georgia, serif",
-                          color: '#123C83',
-                          fontWeight: 700,
-                          letterSpacing: '0.04em',
-                        }}
-                        className="text-[11px] uppercase tracking-widest block mb-1.5 select-none"
-                      >
-                        ERAS · CREATOR DOSSIER
-                      </span>
-                      <div className="flex items-baseline gap-2.5 flex-wrap">
-                        <h1
-                          id="heading-documents"
-                          style={{
-                            fontFamily: "'Poppins', sans-serif",
-                            color: '#181A1F',
-                            fontWeight: 500,
-                          }}
-                          className="text-2xl sm:text-[28px] tracking-tight leading-tight"
-                        >
-                          Documents & Archive
-                        </h1>
-                        <span
-                          style={{
-                            fontFamily: "'Century Schoolbook', 'Playfair Display', Georgia, serif",
-                            color: '#71716D',
-                            fontStyle: 'italic',
-                            fontWeight: 700,
-                          }}
-                          className="text-lg sm:text-[20px]"
-                        >
-                          Institutional Files
-                        </span>
-                      </div>
-                      <p
-                        style={{ fontFamily: "'Poppins', sans-serif" }}
-                        className="text-xs text-[#8E8E88] mt-1"
-                      >
-                        Upload your required institutional documents (PDF, Max 10 MB each) and your top 25 artworks folder archive.
-                      </p>
-                    </div>
+                  <section aria-label="Documents & Archive" className="space-y-6">
+                    {/* Section A: Institutional Documents Grid - 2 columns (2 boxes per row) */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-3.5">
+                      <DocumentUploader
+                        label="Artist Biography"
+                        description="1–2 page narrative of your artistic journey & career milestones."
+                        required
+                        docKey="artist_biography"
+                        fileUrl={bioUrl}
+                        onUploaded={setBioUrl}
+                        onRemoved={() => setBioUrl(null)}
+                        userId={userProfile.id}
+                      />
 
-                    {/* Section A: Institutional Documents Grid */}
-                    <div className="space-y-3">
-                      <h3
-                        style={{ fontFamily: "'Poppins', sans-serif", color: '#929292' }}
-                        className="text-xs font-medium uppercase tracking-wider"
-                      >
-                        Institutional Dossier Files
-                      </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-                        <DocumentUploader
-                          label="Upload your Artist Biography"
-                          required
-                          docKey="artist_biography"
-                          fileUrl={bioUrl}
-                          onUploaded={setBioUrl}
-                          onRemoved={() => setBioUrl(null)}
-                          userId={userProfile.id}
-                        />
+                      <DocumentUploader
+                        label="Curriculum Vitae (CV)"
+                        description="Complete CV detailing exhibitions, education, and grants."
+                        required
+                        docKey="latest_cv"
+                        fileUrl={cvUrl}
+                        onUploaded={setCvUrl}
+                        onRemoved={() => setCvUrl(null)}
+                        userId={userProfile.id}
+                      />
 
-                        <DocumentUploader
-                          label="Upload your latest CV"
-                          required
-                          docKey="latest_cv"
-                          fileUrl={cvUrl}
-                          onUploaded={setCvUrl}
-                          onRemoved={() => setCvUrl(null)}
-                          userId={userProfile.id}
-                        />
+                      <DocumentUploader
+                        label="Artist Statement"
+                        description="Conceptual premise and themes behind your creative practice."
+                        required
+                        docKey="artist_statement"
+                        fileUrl={statementUrl}
+                        onUploaded={setStatementUrl}
+                        onRemoved={() => setStatementUrl(null)}
+                        userId={userProfile.id}
+                      />
 
-                        <DocumentUploader
-                          label="Upload your Artist Statement"
-                          required
-                          docKey="artist_statement"
-                          fileUrl={statementUrl}
-                          onUploaded={setStatementUrl}
-                          onRemoved={() => setStatementUrl(null)}
-                          userId={userProfile.id}
-                        />
+                      <DocumentUploader
+                        label="Short Portfolio"
+                        description="Curated preview of 5–10 highlight artworks with details."
+                        required
+                        docKey="short_portfolio"
+                        fileUrl={shortPortfolioUrl}
+                        onUploaded={setShortPortfolioUrl}
+                        onRemoved={() => setShortPortfolioUrl(null)}
+                        userId={userProfile.id}
+                      />
 
-                        <DocumentUploader
-                          label="Upload your short portfolio"
-                          required
-                          docKey="short_portfolio"
-                          fileUrl={shortPortfolioUrl}
-                          onUploaded={setShortPortfolioUrl}
-                          onRemoved={() => setShortPortfolioUrl(null)}
-                          userId={userProfile.id}
-                        />
-
-                        <div className="md:col-span-2">
-                          <DocumentUploader
-                            label="Upload your long portfolio"
-                            required
-                            docKey="long_portfolio"
-                            fileUrl={longPortfolioUrl}
-                            onUploaded={setLongPortfolioUrl}
-                            onRemoved={() => setLongPortfolioUrl(null)}
-                            userId={userProfile.id}
-                          />
-                        </div>
-                      </div>
+                      <DocumentUploader
+                        label="Comprehensive Portfolio"
+                        description="Complete institutional archive of your artistic body of work."
+                        required
+                        docKey="long_portfolio"
+                        fileUrl={longPortfolioUrl}
+                        onUploaded={setLongPortfolioUrl}
+                        onRemoved={() => setLongPortfolioUrl(null)}
+                        userId={userProfile.id}
+                      />
                     </div>
 
                     {/* Section B: Top 25 Artworks Archive */}
-                    <div className="pt-2 border-t border-[#E8E8E3] space-y-3.5">
-                      <div className="flex items-start gap-3">
-                        <div className="w-9 h-9 rounded-[10px] bg-[#181A1F] text-white flex items-center justify-center shrink-0 mt-0.5">
-                          <FolderArchive size={16} />
-                        </div>
-                        <div>
-                          <h3
-                            style={{ fontFamily: "'Poppins', sans-serif" }}
-                            className="text-xs font-semibold text-[#181A1F]"
-                          >
-                            Top 25 Artworks Archive Link <span className="text-red-500">*</span>
-                          </h3>
-                          <p
-                            style={{ fontFamily: "'Poppins', sans-serif" }}
-                            className="text-[11px] text-[#8E8E88] mt-0.5"
-                          >
-                            Please create a Google Drive folder containing your 25 best artworks and share the folder link below.
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Instruction Callout Box */}
-                      <div className="bg-[#FAF9F5] border border-[#E8E8E3] rounded-[14px] p-4 text-[11px] text-[#555555] space-y-2.5">
-                        <div className="flex items-start gap-2.5">
-                          <span className="w-4 h-4 rounded-full bg-[#181A1F] text-white flex items-center justify-center text-[9px] font-semibold shrink-0 mt-0.5">
-                            1
-                          </span>
-                          <div>
-                            <span className="font-semibold text-[#181A1F]">
-                              Arrange/rank your artworks from 1-25 (1 = Best/strongest, 2 = Second best, up to 25).
-                            </span>
-                          </div>
-                        </div>
-
-                        <div className="flex items-start gap-2.5">
-                          <span className="w-4 h-4 rounded-full bg-[#181A1F] text-white flex items-center justify-center text-[9px] font-semibold shrink-0 mt-0.5">
-                            2
-                          </span>
-                          <p className="text-[#71716D]">
-                            When adding new artwork in the future, please upload it to the same folder with the appropriate ranking.
-                          </p>
-                        </div>
-
-                        <div className="flex items-start gap-2.5">
-                          <span className="w-4 h-4 rounded-full bg-[#181A1F] text-white flex items-center justify-center text-[9px] font-semibold shrink-0 mt-0.5">
-                            3
-                          </span>
-                          <p className="text-[#71716D]">
-                            Please ensure that Eras has access to the folder. Keep the artwork images high-resolution and clearly labelled.
-                          </p>
-                        </div>
+                    <div className="pt-6 border-t border-[#E8E8E3] space-y-3">
+                      <div>
+                        <h3
+                          style={{ fontFamily: "'Poppins', sans-serif" }}
+                          className="text-sm font-semibold text-[#181A1F] flex items-center gap-2"
+                        >
+                          <FolderArchive size={16} className="text-[#181A1F]" />
+                          <span>Top 25 Artworks Archive Link</span>
+                          <span className="text-red-500 text-xs">*</span>
+                        </h3>
+                        <p
+                          style={{ fontFamily: "'Poppins', sans-serif" }}
+                          className="text-xs text-[#71716D] mt-1"
+                        >
+                          Share a Google Drive folder link containing your 25 best artworks, ranked 1 to 25. Please make sure folder access is set to &ldquo;Anyone with the link can view&rdquo;.
+                        </p>
                       </div>
 
                       <Input
-                        label="Google Drive Folder Link *"
                         placeholder="https://drive.google.com/drive/folders/..."
                         error={errors.top_artworks_drive_url?.message}
                         {...register('top_artworks_drive_url')}
@@ -1093,51 +962,7 @@ export default function EditProfileForm({ userProfile }: { userProfile: Profile 
 
                 {/* TAB 4: PROJECT PROPOSALS */}
                 {activeTab === 'proposals' && (
-                  <section aria-labelledby="heading-proposals" className="space-y-6">
-                    <div className="mb-8">
-                      <span
-                        style={{
-                          fontFamily: "'Century Schoolbook', 'Playfair Display', Georgia, serif",
-                          color: '#123C83',
-                          fontWeight: 700,
-                          letterSpacing: '0.04em',
-                        }}
-                        className="text-[11px] uppercase tracking-widest block mb-1.5 select-none"
-                      >
-                        ERAS · CREATOR DOSSIER
-                      </span>
-                      <div className="flex items-baseline gap-2.5 flex-wrap">
-                        <h1
-                          id="heading-proposals"
-                          style={{
-                            fontFamily: "'Poppins', sans-serif",
-                            color: '#181A1F',
-                            fontWeight: 500,
-                          }}
-                          className="text-2xl sm:text-[28px] tracking-tight leading-tight"
-                        >
-                          Project Proposals
-                        </h1>
-                        <span
-                          style={{
-                            fontFamily: "'Century Schoolbook', 'Playfair Display', Georgia, serif",
-                            color: '#71716D',
-                            fontStyle: 'italic',
-                            fontWeight: 700,
-                          }}
-                          className="text-lg sm:text-[20px]"
-                        >
-                          Curatorial Readiness
-                        </span>
-                      </div>
-                      <p
-                        style={{ fontFamily: "'Poppins', sans-serif" }}
-                        className="text-xs text-[#8E8E88] mt-1"
-                      >
-                        Let curators and institutions know if you have ready project, exhibition, or residency proposals.
-                      </p>
-                    </div>
-
+                  <section aria-label="Project Proposals" className="space-y-6">
                     <div className="bg-white rounded-[16px] border border-[#E8E8E3] p-5 shadow-2xs space-y-4">
                       <div>
                         <label
@@ -1206,7 +1031,8 @@ export default function EditProfileForm({ userProfile }: { userProfile: Profile 
                       {proposalChoice === 'Yes' && (
                         <div className="pt-3 border-t border-[#E8E8E3]">
                           <DocumentUploader
-                            label="Upload your latest proposal document (PDF)"
+                            label="Project / Residency Proposal"
+                            description="Upload your latest project proposal, residency application, or exhibition concept dossier (PDF)."
                             required
                             docKey="project_proposal"
                             fileUrl={latestProposalUrl}
@@ -1214,15 +1040,12 @@ export default function EditProfileForm({ userProfile }: { userProfile: Profile 
                             onRemoved={() => setLatestProposalUrl(null)}
                             userId={userProfile.id}
                           />
-                          <p className="text-[10px] text-gray-400 mt-1.5 italic">
-                            (This may include project proposal, residency proposal, or other completed project document.)
-                          </p>
                         </div>
                       )}
                     </div>
 
                     {/* Proposal Guidelines & Review Criteria Card to fill space purposefully */}
-                    <div className="bg-[#FAF9F5] rounded-[16px] border border-[#E8E8E3] p-5 shadow-2xs space-y-3">
+                    <div className="bg-white rounded-[16px] border border-[#E8E8E3] p-5 shadow-2xs space-y-3">
                       <h3 className="text-xs font-semibold text-[#181A1F] flex items-center gap-2">
                         <Sparkles size={14} className="text-[#181A1F]" />
                         <span>Curatorial Proposal Guidelines</span>

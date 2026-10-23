@@ -110,7 +110,7 @@ export default function MultiSelect({
                   key={option.value}
                   onClick={() => toggleOption(option.value)}
                   className={`flex items-center justify-between px-3.5 py-2 text-xs cursor-pointer transition-colors ${
-                    isSelected ? 'bg-[#F7F7F5] text-[#181A1F] font-semibold' : 'text-[#343434] hover:bg-[#FAF9F6]'
+                    isSelected ? 'bg-[#F3F3F3] text-[#181A1F] font-semibold' : 'text-[#343434] hover:bg-[#F8F8F8]'
                   }`}
                 >
                   <span>{option.label}</span>

@@ -1,55 +1,100 @@
 'use client';
 
-import { useState, useEffect, useMemo, useRef, Suspense } from 'react';
+import { useState, useEffect, useMemo, useRef, Suspense, memo } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Mail,
-  KeyRound,
-  Lock,
   Eye,
   EyeOff,
   CheckCircle2,
   ArrowLeft,
   RefreshCw,
+  Lock,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { sendPasswordResetOtp, updateUserPassword } from '@/actions/authActions';
-import Button from '@/components/ui/Button';
-import Input from '@/components/ui/Input';
 
 type Step = 'email' | 'otp' | 'password' | 'success';
 
+interface ResendCountdownButtonProps {
+  onResend: () => Promise<void>;
+  disabled?: boolean;
+}
+
+/**
+ * Isolated Countdown Button: Only this small button re-renders every 1s,
+ * preventing the entire page and inputs from re-rendering!
+ */
+const ResendCountdownButton = memo(function ResendCountdownButton({
+  onResend,
+  disabled = false,
+}: ResendCountdownButtonProps) {
+  const [countdown, setCountdown] = useState(60);
+
+  useEffect(() => {
+    if (countdown <= 0) return;
+    const timer = setInterval(() => {
+      setCountdown((prev) => Math.max(0, prev - 1));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [countdown]);
+
+  const handleClick = async () => {
+    if (countdown > 0 || disabled) return;
+    setCountdown(60);
+    await onResend();
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={handleClick}
+      disabled={countdown > 0 || disabled}
+      style={{ fontFamily: "'Poppins', sans-serif" }}
+      className={`transition-colors flex items-center gap-1.5 cursor-pointer ${
+        countdown > 0 ? 'text-[#A1A1A1] cursor-not-allowed' : 'text-[#181A1F] hover:underline font-medium'
+      }`}
+    >
+      <RefreshCw size={13} className={countdown > 0 ? 'opacity-40' : ''} />
+      {countdown > 0 ? `Resend in ${countdown}s` : 'Resend code'}
+    </button>
+  );
+});
+
 interface OtpInputProps {
   value: string;
+  length?: number;
   onChange: (otp: string) => void;
   onComplete?: (otp: string) => void;
+  onLengthChange?: (len: number) => void;
   disabled?: boolean;
   hasError?: boolean;
 }
 
-/**
- * High-end 6-Box OTP Input Component
- * Features: auto-advance, backspace navigation, paste handling, arrow keys, numeric mobile keypad
- */
-function OtpBoxes({
+const OtpBoxes = memo(function OtpBoxes({
   value,
+  length = 8,
   onChange,
   onComplete,
+  onLengthChange,
   disabled = false,
   hasError = false,
 }: OtpInputProps) {
   const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
 
-  // Array of 6 single-digit strings
-  const digits = Array.from({ length: 6 }, (_, i) => value[i] || '');
+  const digits = Array.from({ length }, (_, i) => value[i] || '');
+
+  useEffect(() => {
+    inputsRef.current[0]?.focus();
+  }, []);
 
   const handleChange = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const rawVal = e.target.value;
     const sanitized = rawVal.replace(/\D/g, '');
 
     if (!sanitized) {
-      // Clear this digit
       const updated = [...digits];
       updated[index] = '';
       const newOtp = updated.join('');
@@ -57,34 +102,32 @@ function OtpBoxes({
       return;
     }
 
-    // If multiple characters typed or autofilled
     if (sanitized.length > 1) {
-      const chars = sanitized.slice(0, 6).split('');
-      const updated = [...digits];
-      for (let i = 0; i < chars.length && index + i < 6; i++) {
-        updated[index + i] = chars[i];
+      const targetLen = sanitized.length === 6 ? 6 : (sanitized.length >= 8 ? 8 : length);
+      if (targetLen !== length && onLengthChange) {
+        onLengthChange(targetLen);
       }
+      const chars = sanitized.slice(0, targetLen).split('');
+      const updated = Array.from({ length: targetLen }, (_, i) => chars[i] || '');
       const newOtp = updated.join('');
       onChange(newOtp);
-      const nextFocus = Math.min(index + chars.length, 5);
-      inputsRef.current[nextFocus]?.focus();
-      if (newOtp.length === 6) onComplete?.(newOtp);
+      const nextFocus = Math.min(chars.length, targetLen - 1);
+      setTimeout(() => inputsRef.current[nextFocus]?.focus(), 10);
+      if (newOtp.length === targetLen) onComplete?.(newOtp);
       return;
     }
 
-    // Single digit input
     const char = sanitized[sanitized.length - 1];
     const updated = [...digits];
     updated[index] = char;
     const newOtp = updated.join('');
     onChange(newOtp);
 
-    // Auto-advance to next box
-    if (index < 5) {
+    if (index < length - 1) {
       inputsRef.current[index + 1]?.focus();
     }
 
-    if (newOtp.length === 6) {
+    if (newOtp.length === length) {
       onComplete?.(newOtp);
     }
   };
@@ -92,7 +135,6 @@ function OtpBoxes({
   const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Backspace') {
       if (!digits[index] && index > 0) {
-        // Move focus backward and delete
         const updated = [...digits];
         updated[index - 1] = '';
         onChange(updated.join(''));
@@ -105,7 +147,7 @@ function OtpBoxes({
     } else if (e.key === 'ArrowLeft' && index > 0) {
       e.preventDefault();
       inputsRef.current[index - 1]?.focus();
-    } else if (e.key === 'ArrowRight' && index < 5) {
+    } else if (e.key === 'ArrowRight' && index < length - 1) {
       e.preventDefault();
       inputsRef.current[index + 1]?.focus();
     }
@@ -113,30 +155,36 @@ function OtpBoxes({
 
   const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
     e.preventDefault();
-    const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
+    const pasted = e.clipboardData.getData('text').replace(/\D/g, '');
     if (!pasted) return;
 
-    const chars = pasted.split('');
-    const updated = Array.from({ length: 6 }, (_, i) => chars[i] || '');
+    const targetLen = pasted.length === 6 ? 6 : 8;
+    if (targetLen !== length && onLengthChange) {
+      onLengthChange(targetLen);
+    }
+    const chars = pasted.slice(0, targetLen).split('');
+    const updated = Array.from({ length: targetLen }, (_, i) => chars[i] || '');
     const newOtp = updated.join('');
     onChange(newOtp);
 
-    const focusIdx = Math.min(chars.length, 5);
-    inputsRef.current[focusIdx]?.focus();
+    const focusIdx = Math.min(chars.length, targetLen - 1);
+    setTimeout(() => inputsRef.current[focusIdx]?.focus(), 10);
 
-    if (newOtp.length === 6) {
+    if (newOtp.length === targetLen) {
       onComplete?.(newOtp);
     }
   };
 
+  const dividerIndex = length === 8 ? 4 : 3;
+
   return (
-    <div className="flex items-center justify-center gap-1.5 sm:gap-2.5 my-3 select-none">
+    <div className="flex items-center justify-center gap-1.5 sm:gap-2 my-3 select-none flex-nowrap overflow-x-auto py-1">
       {digits.map((digit, index) => {
         const isFilled = digit.length > 0;
         return (
-          <div key={index} className="flex items-center">
-            {index === 3 && (
-              <span className="w-2 sm:w-3 h-0.5 bg-gray-300 rounded-full mx-1 sm:mx-1.5" />
+          <div key={index} className="flex items-center shrink-0">
+            {index === dividerIndex && (
+              <span className="w-1.5 sm:w-2 h-0.5 bg-[#A1A1A1] rounded-full mx-0.5 sm:mx-1 shrink-0" />
             )}
             <input
               ref={(el) => {
@@ -152,18 +200,18 @@ function OtpBoxes({
               onKeyDown={(e) => handleKeyDown(index, e)}
               onPaste={handlePaste}
               onFocus={(e) => e.target.select()}
-              autoFocus={index === 0}
               aria-label={`Digit ${index + 1}`}
+              style={{ fontFamily: "'Poppins', sans-serif" }}
               className={`
-                w-10 h-13 sm:w-12 sm:h-14
-                text-center text-xl sm:text-2xl font-bold font-mono
-                rounded-xl border-2 transition-all duration-150 outline-none
+                ${length === 8 ? 'w-8.5 h-11 sm:w-10 sm:h-12.5 text-base sm:text-lg' : 'w-10 h-12 sm:w-11 sm:h-13 text-lg sm:text-xl'}
+                text-center font-semibold shrink-0
+                rounded-[12px] sm:rounded-[14px] border transition-all duration-150 outline-none
                 ${
                   hasError
-                    ? 'border-red-400 bg-red-50/50 text-red-700 focus:border-red-500 focus:ring-4 focus:ring-red-100'
+                    ? 'border-red-400 bg-red-50/40 text-red-700 focus:border-red-500'
                     : isFilled
-                    ? 'border-[#141413] bg-white text-gray-900 shadow-sm focus:ring-4 focus:ring-gray-900/10'
-                    : 'border-gray-200 bg-gray-50/70 text-gray-900 hover:border-gray-300 focus:border-[#141413] focus:bg-white focus:ring-4 focus:ring-gray-900/10'
+                    ? 'border-[#181A1F] bg-white text-[#181A1F] shadow-2xs'
+                    : 'border-[#E5E5E5] bg-white text-[#181A1F] hover:border-[#CBCBCB] focus:border-[#181A1F] focus:bg-white'
                 }
                 ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
               `}
@@ -173,7 +221,7 @@ function OtpBoxes({
       })}
     </div>
   );
-}
+});
 
 function ForgotPasswordContent() {
   const router = useRouter();
@@ -183,6 +231,7 @@ function ForgotPasswordContent() {
   const [step, setStep] = useState<Step>('email');
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
+  const [otpLength, setOtpLength] = useState<number>(8);
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
@@ -194,14 +243,17 @@ function ForgotPasswordContent() {
   const [error, setError] = useState<string | null>(null);
   const [infoMessage, setInfoMessage] = useState<string | null>(null);
 
-  const [countdown, setCountdown] = useState(0);
+  // Guard to ensure initial URL verification runs strictly once on mount
+  const hasInitializedRef = useRef(false);
 
-  // Check URL query parameters and hash fragments on mount
+  // Check URL query parameters and listen for recovery events on mount
   useEffect(() => {
-    const mode = searchParams.get('mode');
-    const type = searchParams.get('type');
+    if (hasInitializedRef.current) return;
+    hasInitializedRef.current = true;
+
     const code = searchParams.get('code');
     const token_hash = searchParams.get('token_hash');
+    const type = searchParams.get('type');
     const errParam = searchParams.get('error');
     const errDesc = searchParams.get('error_description');
 
@@ -209,95 +261,63 @@ function ForgotPasswordContent() {
       setError(
         errDesc
           ? decodeURIComponent(errDesc)
-          : 'Your password reset link is invalid or has expired. Please request a new one below.'
+          : 'Your password reset link is invalid or has expired. Please enter your email to get a new code.'
       );
       setStep('email');
       return;
     }
 
-    const verifySessionAndTokens = async () => {
-      // 1. If code was passed directly in query param
-      if (code) {
-        setIsLoading(true);
-        const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+    // 1. If code was passed directly in query param (e.g. PKCE email redirect)
+    if (code) {
+      setIsLoading(true);
+      supabase.auth.exchangeCodeForSession(code).then(({ data, error: exchangeError }) => {
         setIsLoading(false);
         if (!exchangeError && data?.session) {
           setStep('password');
-          setInfoMessage('Email link verified successfully! Please enter your new password.');
-          return;
+          setInfoMessage('Email verification successful! Please enter your new password.');
+        } else {
+          setError('The password reset link is invalid or has expired. Please enter your email to get a new code.');
+          setStep('email');
         }
-      }
+      });
+      return;
+    }
 
-      // 2. If token_hash was passed directly
-      if (token_hash && type) {
-        setIsLoading(true);
-        const { data, error: verifyError } = await supabase.auth.verifyOtp({ token_hash, type });
+    // 2. If token_hash was passed directly in query param
+    if (token_hash && type) {
+      setIsLoading(true);
+      supabase.auth.verifyOtp({ token_hash, type }).then(({ data, error: verifyError }) => {
         setIsLoading(false);
         if (!verifyError && data?.session) {
           setStep('password');
-          setInfoMessage('Email link verified successfully! Please enter your new password.');
-          return;
+          setInfoMessage('Email verification successful! Please enter your new password.');
+        } else {
+          setError('The password reset link is invalid or has expired. Please enter your email to get a new code.');
+          setStep('email');
         }
-      }
+      });
+      return;
+    }
 
-      // 3. Check active session (from cookies or storage)
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        setStep('password');
-        setInfoMessage('Session verified. Please enter your new password below.');
-      } else if (mode === 'reset' || type === 'recovery') {
-        // mode=reset was requested, but no active session exists
-        setError(
-          'Your password reset session could not be verified or has expired. Please enter your email to request a new link, or enter your 6-digit code.'
-        );
-        setStep('email');
-      }
-    };
-
-    verifySessionAndTokens();
-
-    // Listen for Supabase password recovery events (from hash tokens or auth state changes)
+    // 3. Listen ONLY for explicit PASSWORD_RECOVERY event (when Supabase client processes #access_token)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session && (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN')) {
+      if (event === 'PASSWORD_RECOVERY' && session) {
         setStep('password');
         setError(null);
-        setInfoMessage('Authentication verified. Please enter your new password.');
+        setInfoMessage('Password recovery link verified! Please enter your new password.');
       }
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [searchParams, supabase]);
-
-  // While waiting on the OTP step, auto-detect if the user clicked the reset link in another tab
-  useEffect(() => {
-    if (step !== 'otp') return;
-
-    const interval = setInterval(async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        setStep('password');
-        setInfoMessage('Email link verified! You can now set your new password.');
-        clearInterval(interval);
-      }
-    }, 2500);
-
-    return () => clearInterval(interval);
-  }, [step, supabase]);
-
-  // Resend countdown timer
-  useEffect(() => {
-    if (countdown > 0) {
-      const timer = setTimeout(() => setCountdown((c) => c - 1), 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [countdown]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Helper to obtain redirect URL for email links
   const getRedirectUrl = () => {
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
-    return `${origin}/auth/callback?next=/forgot-password?mode=reset`;
+    return `${origin}/forgot-password?mode=reset`;
   };
 
   // STEP 1: Send Reset Link & Code
@@ -315,10 +335,8 @@ function ForgotPasswordContent() {
     setIsLoading(true);
 
     try {
-      // 1. Try server action
       const result = await sendPasswordResetOtp(trimmedEmail);
       if (result.error) {
-        // Fallback to client SDK if server action fails
         const { error: clientError } = await supabase.auth.resetPasswordForEmail(trimmedEmail, {
           redirectTo: getRedirectUrl(),
         });
@@ -329,11 +347,11 @@ function ForgotPasswordContent() {
         }
       }
 
-      setCountdown(60);
-      setInfoMessage(`We've dispatched password reset instructions to ${trimmedEmail}`);
+      setInfoMessage(`We've sent password reset instructions to ${trimmedEmail}`);
       setStep('otp');
-    } catch (err: any) {
-      setError(err?.message || 'Failed to send password reset request. Please try again.');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to send password reset request. Please try again.';
+      setError(msg);
     } finally {
       setIsLoading(false);
     }
@@ -341,7 +359,7 @@ function ForgotPasswordContent() {
 
   // Resend Reset Email / Code
   const handleResendOtp = async () => {
-    if (countdown > 0 || !email) return;
+    if (!email) return;
     setError(null);
     setIsLoading(true);
 
@@ -358,10 +376,10 @@ function ForgotPasswordContent() {
         }
       }
 
-      setCountdown(60);
-      setInfoMessage('A new reset link and verification code have been dispatched to your email.');
-    } catch (err: any) {
-      setError(err?.message || 'Failed to resend. Please try again.');
+      setInfoMessage('A new reset link and verification code have been sent to your email.');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to resend. Please try again.';
+      setError(msg);
     } finally {
       setIsLoading(false);
     }
@@ -378,39 +396,37 @@ function ForgotPasswordContent() {
         setInfoMessage('Session verified! You can now set your new password.');
       } else {
         setError(
-          'No active reset session detected on this browser yet. Make sure you clicked the "Reset Password" link in the email on this device. If you opened the email on another phone or browser, please open it here or enter the 6-digit code below.'
+          'No active reset session detected on this browser yet. Make sure you clicked the "Reset Password" link in the email on this device. If you opened the email on another phone or browser, please open it here or enter the verification code below.'
         );
       }
     } catch {
-      setError('Unable to verify session. Please click the link in your email or enter the 6-digit code.');
+      setError('Unable to verify session. Please click the link in your email or enter your verification code.');
     } finally {
       setIsCheckingSession(false);
     }
   };
 
-  // STEP 2: Verify 6-digit OTP code
+  // STEP 2: Verify OTP code (supports 8-digit and 6-digit codes)
   const handleVerifyOtp = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     setError(null);
     setInfoMessage(null);
 
     const trimmedOtp = otp.trim();
-    if (!trimmedOtp || trimmedOtp.length < 6) {
-      setError('Please enter the complete 6-digit verification code');
+    if (!trimmedOtp || trimmedOtp.length < otpLength) {
+      setError(`Please enter the complete ${otpLength}-digit verification code`);
       return;
     }
 
     setIsLoading(true);
 
     try {
-      // 1. Try 'recovery' type
-      let { data, error: verifyError } = await supabase.auth.verifyOtp({
+      let { error: verifyError } = await supabase.auth.verifyOtp({
         email: email.trim(),
         token: trimmedOtp,
         type: 'recovery',
       });
 
-      // 2. Fallback to 'email' type if template was configured as magic link / email OTP
       if (verifyError) {
         const fallback = await supabase.auth.verifyOtp({
           email: email.trim(),
@@ -420,7 +436,6 @@ function ForgotPasswordContent() {
 
         if (!fallback.error) {
           verifyError = null;
-          data = fallback.data;
         }
       }
 
@@ -430,11 +445,11 @@ function ForgotPasswordContent() {
         return;
       }
 
-      // Success, move to Step 3
       setStep('password');
       setInfoMessage('Verification successful! Now set your new password.');
-    } catch (err: any) {
-      setError(err?.message || 'Verification failed. Please check the code.');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Verification failed. Please check the code.';
+      setError(msg);
     } finally {
       setIsLoading(false);
     }
@@ -459,10 +474,8 @@ function ForgotPasswordContent() {
     setIsLoading(true);
 
     try {
-      // Check if session exists on client
       const { data: { session } } = await supabase.auth.getSession();
 
-      // 1. Try client SDK first if session is present
       let updated = false;
       if (session) {
         const { error: clientError } = await supabase.auth.updateUser({
@@ -473,7 +486,6 @@ function ForgotPasswordContent() {
         }
       }
 
-      // 2. If client failed or session not in storage, attempt server action
       if (!updated) {
         const serverResult = await updateUserPassword(newPassword);
         if (serverResult.success) {
@@ -484,7 +496,7 @@ function ForgotPasswordContent() {
             serverResult.error.includes('session missing')
           ) {
             setError(
-              'Your password reset session has expired or could not be found. Please request a new reset email or enter the 6-digit verification code.'
+              'Your password reset session has expired or could not be found. Please request a new reset email or enter the verification code.'
             );
             setIsLoading(false);
             return;
@@ -501,162 +513,208 @@ function ForgotPasswordContent() {
         return;
       }
 
-      // Successfully updated!
       setStep('success');
-    } catch (err: any) {
-      setError(err?.message || 'An error occurred while updating your password');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'An error occurred while updating your password';
+      setError(msg);
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div>
-      <div className="bg-white rounded-2xl shadow-[0_4px_24px_rgb(0,0,0,0.06)] p-6 sm:p-8">
+    <div
+      style={{ fontFamily: "'Poppins', sans-serif" }}
+      className="min-h-screen bg-white flex items-center justify-center p-4 sm:p-6 md:p-10 lg:p-12"
+    >
+      <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16 items-center">
         
-        {/* Step Indicator Header */}
-        <div className="mb-6">
-          <div className="flex items-center gap-2 mb-3">
-            <span className={`w-2.5 h-2.5 rounded-full transition-colors ${step === 'email' ? 'bg-[#141413]' : 'bg-gray-300'}`} />
-            <span className={`w-2.5 h-2.5 rounded-full transition-colors ${step === 'otp' ? 'bg-[#141413]' : 'bg-gray-300'}`} />
-            <span className={`w-2.5 h-2.5 rounded-full transition-colors ${step === 'password' ? 'bg-[#141413]' : 'bg-gray-300'}`} />
-            <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-widest ml-1">
-              {step === 'email' && 'Step 1 of 3: Identify'}
-              {step === 'otp' && 'Step 2 of 3: Verification'}
-              {step === 'password' && 'Step 3 of 3: New Password'}
-              {step === 'success' && 'Complete'}
+        {/* Left Column: Artwork Card (exact match with Sign In page) */}
+        <div className="relative w-full aspect-[4/5] max-h-[580px] md:max-h-[640px] rounded-[24px] sm:rounded-[28px] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.08)] bg-neutral-900 select-none">
+          <Image
+            src="/images/blue-lily-artwork.jpg"
+            alt="Blue Lily Botanical Art"
+            fill
+            priority
+            sizes="(max-width: 768px) 100vw, 50vw"
+            className="object-cover object-center"
+          />
+
+          {/* Floating Pill Badge */}
+          <div className="absolute bottom-6 left-6 z-10 bg-white border border-[#C7C7C7] px-4 py-1.5 sm:px-5 sm:py-2 rounded-full shadow-[0_4px_16px_rgba(0,0,0,0.08)] flex items-center">
+            <span
+              style={{
+                fontFamily: "'Poppins', sans-serif",
+                color: '#323232',
+                fontWeight: 500,
+              }}
+              className="text-[10px] sm:text-[11px] uppercase tracking-wider"
+            >
+              BLUE LILY BOTANICAL ART
+            </span>
+          </div>
+        </div>
+
+        {/* Right Column: Form & Brand */}
+        <div className="w-full max-w-[390px] mx-auto flex flex-col justify-center">
+          
+          {/* Brand Header: ERAS */}
+          <div className="text-center mb-2">
+            <span
+              style={{
+                fontFamily: "'Century Schoolbook', 'Playfair Display', Georgia, serif",
+                color: '#123C83',
+                fontWeight: 700,
+                letterSpacing: '0.04em',
+              }}
+              className="text-2xl sm:text-[26px] uppercase block select-none"
+            >
+              ERAS
             </span>
           </div>
 
-          <h1 className="text-2xl font-extrabold text-gray-900 mb-1 font-serif">
-            {step === 'email' && 'Reset your password'}
-            {step === 'otp' && 'Check your email'}
-            {step === 'password' && 'Set a new password'}
-            {step === 'success' && 'Password updated!'}
-          </h1>
-          <p className="text-gray-500 text-sm">
-            {step === 'email' && 'Enter your registered email and we will send you a reset link and verification code.'}
-            {step === 'otp' && `Instructions dispatched to ${email}`}
-            {step === 'password' && 'Your identity has been verified. Choose a strong new password.'}
-            {step === 'success' && 'Your password has been changed. You can now sign in.'}
-          </p>
-        </div>
-
-        {/* Status Messages */}
-        {error && (
-          <div className="mb-5 bg-red-50 border border-red-200 rounded-xl p-3.5 text-red-600 text-sm flex items-start gap-2.5">
-            <div className="w-1.5 h-1.5 rounded-full bg-red-500 mt-2 flex-shrink-0" />
-            <span className="leading-snug">{error}</span>
+          {/* Main Title */}
+          <div className="text-center mb-6">
+            <h1
+              style={{
+                fontFamily: "'Poppins', sans-serif",
+                color: '#181A1F',
+                fontWeight: 500,
+              }}
+              className="text-lg sm:text-[20px] tracking-tight leading-tight"
+            >
+              {step === 'password'
+                ? 'New Password'
+                : step === 'success'
+                ? 'Password Reset'
+                : 'Forgot Password'}
+            </h1>
           </div>
-        )}
 
-        {infoMessage && !error && (
-          <div className="mb-5 bg-emerald-50 border border-emerald-200 rounded-xl p-3.5 text-emerald-800 text-sm flex items-start gap-2.5">
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-2 flex-shrink-0" />
-            <span className="leading-snug">{infoMessage}</span>
-          </div>
-        )}
-
-        {/* STEP 1 FORM: EMAIL */}
-        {step === 'email' && (
-          <form onSubmit={handleSendOtp} className="space-y-4">
-            <div className="relative">
-              <Input
-                label="Registered Email"
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                autoFocus
-              />
-              <Mail className="absolute right-3 top-9 text-gray-400" size={16} />
+          {/* Error Message */}
+          {error && (
+            <div
+              style={{ fontFamily: "'Poppins', sans-serif" }}
+              className="mb-5 bg-red-50 border border-red-200 rounded-xl p-3 text-red-600 text-xs"
+            >
+              {error}
             </div>
+          )}
 
-            <Button type="submit" fullWidth isLoading={isLoading}>
-              <KeyRound size={16} />
-              Send Reset Link & Code
-            </Button>
-          </form>
-        )}
-
-        {/* STEP 2 FORM: OTP CODE OR LINK CLICK */}
-        {step === 'otp' && (
-          <div className="space-y-5">
-            
-            {/* Primary Guidance Card: Email Reset Link */}
-            <div className="bg-gradient-to-br from-amber-50/90 to-orange-50/50 border border-amber-200/90 rounded-2xl p-4 sm:p-5 text-amber-950 shadow-sm">
-              <div className="flex items-start gap-3.5">
-                <div className="w-9 h-9 rounded-xl bg-amber-100/90 text-amber-900 flex items-center justify-center flex-shrink-0 mt-0.5 shadow-sm">
-                  <Mail size={18} />
-                </div>
-                <div className="space-y-2 flex-1">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-bold text-gray-900">
-                      Option 1: Click Link in Email
-                    </h3>
-                    <span className="text-[10px] font-bold uppercase tracking-wider bg-amber-200/70 text-amber-900 px-2 py-0.5 rounded-full">
-                      Recommended
-                    </span>
-                  </div>
-                  <p className="text-xs text-gray-600 leading-relaxed">
-                    Supabase sent a direct reset link to <strong className="text-gray-900 font-semibold">{email}</strong>. Open your email and click the button or link to proceed immediately without entering a code.
-                  </p>
-                  <div className="pt-1">
-                    <button
-                      type="button"
-                      onClick={handleCheckSessionAfterLinkClick}
-                      disabled={isCheckingSession}
-                      className="inline-flex items-center gap-1.5 text-xs font-bold text-gray-900 bg-white hover:bg-gray-50 border border-amber-300 shadow-sm rounded-lg px-3 py-1.5 transition-all"
-                    >
-                      {isCheckingSession ? (
-                        <>
-                          <RefreshCw size={12} className="animate-spin text-gray-600" />
-                          Checking reset link...
-                        </>
-                      ) : (
-                        <>
-                          <CheckCircle2 size={13} className="text-emerald-600" />
-                          I clicked the link — Set New Password →
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </div>
-              </div>
+          {/* Info / Success Message */}
+          {infoMessage && !error && (
+            <div
+              style={{ fontFamily: "'Poppins', sans-serif" }}
+              className="mb-5 bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-emerald-800 text-xs flex items-center gap-2"
+            >
+              <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
+              <span>{infoMessage}</span>
             </div>
+          )}
 
-            {/* Subtle Divider */}
-            <div className="relative py-1">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-200" />
+          {/* STEP 1: EMAIL */}
+          {step === 'email' && (
+            <form onSubmit={handleSendOtp} className="space-y-5">
+              <div>
+                <label
+                  htmlFor="email"
+                  style={{
+                    fontFamily: "'Poppins', sans-serif",
+                    color: '#929292',
+                    fontWeight: 500,
+                  }}
+                  className="block text-xs mb-1"
+                >
+                  Email
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  placeholder=""
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  autoFocus
+                  style={{
+                    fontFamily: "'Poppins', sans-serif",
+                    color: '#343434',
+                  }}
+                  className="w-full bg-transparent border-0 border-b border-[#A1A1A1] focus:border-black focus:ring-0 text-sm py-2 outline-none transition-colors"
+                />
               </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white px-3 text-gray-400 font-semibold tracking-wider text-[11px]">
-                  Or Option 2: Enter 6-Digit Code
-                </span>
-              </div>
-            </div>
 
-            {/* 6-Box OTP Entry */}
+              {/* Increased Size Primary Action Button with Poppins Font */}
+              <div className="pt-2">
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  style={{
+                    background: '#181A1F',
+                    borderRadius: 16.22,
+                    fontFamily: "'Poppins', sans-serif",
+                    color: 'white',
+                    fontWeight: 600,
+                  }}
+                  className="w-full h-12 sm:h-[52px] px-6 hover:bg-black active:scale-[0.99] text-[15px] transition-all duration-200 shadow-sm flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {isLoading ? (
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>Sending link...</span>
+                    </div>
+                  ) : (
+                    <span>Send Reset Link & Code</span>
+                  )}
+                </button>
+              </div>
+            </form>
+          )}
+
+          {/* STEP 2: OTP / VERIFICATION */}
+          {step === 'otp' && (
             <form onSubmit={handleVerifyOtp} className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1 text-center">
-                  If your email includes a 6-digit code, enter it here:
+                <label
+                  style={{
+                    fontFamily: "'Poppins', sans-serif",
+                    color: '#929292',
+                    fontWeight: 500,
+                  }}
+                  className="block text-xs mb-1 text-center"
+                >
+                  Enter {otpLength}-Digit Verification Code
                 </label>
                 
                 <OtpBoxes
                   value={otp}
+                  length={otpLength}
                   onChange={setOtp}
-                  onComplete={() => {
-                    // Smooth auto-submit feel when user fills all 6 digits
+                  onLengthChange={(len) => {
+                    setOtpLength(len);
                   }}
                   disabled={isLoading}
                   hasError={Boolean(error)}
                 />
+
+                <div className="flex justify-center -mt-1 mb-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newLen = otpLength === 8 ? 6 : 8;
+                      setOtpLength(newLen);
+                      setOtp('');
+                      setError(null);
+                    }}
+                    style={{ fontFamily: "'Poppins', sans-serif" }}
+                    className="text-[11px] text-[#71717A] hover:text-[#181A1F] transition-colors underline cursor-pointer"
+                  >
+                    {otpLength === 8 ? 'Got a 6-digit code instead? Click here' : 'Got an 8-digit code instead? Click here'}
+                  </button>
+                </div>
               </div>
 
-              <div className="flex items-center justify-between text-xs text-gray-500 pt-1">
+              <div className="flex items-center justify-between text-xs pt-0.5">
                 <button
                   type="button"
                   onClick={() => {
@@ -664,132 +722,240 @@ function ForgotPasswordContent() {
                     setError(null);
                     setOtp('');
                   }}
-                  className="text-gray-500 hover:text-gray-900 transition-colors font-medium flex items-center gap-1"
+                  style={{ fontFamily: "'Poppins', sans-serif" }}
+                  className="text-[#8E8E88] hover:text-[#181A1F] transition-colors flex items-center gap-1 cursor-pointer"
                 >
                   <ArrowLeft size={13} /> Change email
                 </button>
 
+                <ResendCountdownButton
+                  onResend={handleResendOtp}
+                  disabled={isLoading}
+                />
+              </div>
+
+              {/* Increased Size Primary Action Button with Poppins Font */}
+              <div className="pt-2">
                 <button
-                  type="button"
-                  onClick={handleResendOtp}
-                  disabled={countdown > 0 || isLoading}
-                  className={`font-semibold transition-colors flex items-center gap-1.5 ${
-                    countdown > 0 ? 'text-gray-400 cursor-not-allowed' : 'text-[#141413] hover:underline'
-                  }`}
+                  type="submit"
+                  disabled={isLoading || otp.length < otpLength}
+                  style={{
+                    background: '#181A1F',
+                    borderRadius: 16.22,
+                    fontFamily: "'Poppins', sans-serif",
+                    color: 'white',
+                    fontWeight: 600,
+                  }}
+                  className="w-full h-12 sm:h-[52px] px-6 hover:bg-black active:scale-[0.99] text-[15px] transition-all duration-200 shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  <RefreshCw size={13} className={countdown > 0 ? 'opacity-40' : ''} />
-                  {countdown > 0 ? `Resend in ${countdown}s` : 'Resend email / code'}
+                  {isLoading ? (
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>Verifying code...</span>
+                    </div>
+                  ) : (
+                    <span>Verify Code & Continue</span>
+                  )}
                 </button>
               </div>
 
-              <Button
-                type="submit"
-                fullWidth
-                isLoading={isLoading}
-                disabled={otp.length < 6}
-              >
-                Verify Code & Set New Password
-              </Button>
+              <div className="text-center pt-1">
+                <button
+                  type="button"
+                  onClick={handleCheckSessionAfterLinkClick}
+                  disabled={isCheckingSession}
+                  style={{ fontFamily: "'Poppins', sans-serif" }}
+                  className="text-xs text-[#8E8E88] hover:text-[#181A1F] transition-colors cursor-pointer"
+                >
+                  {isCheckingSession ? 'Checking email link...' : 'Clicked the link in your email? Set password →'}
+                </button>
+              </div>
             </form>
-          </div>
-        )}
+          )}
 
-        {/* STEP 3 FORM: NEW PASSWORD */}
-        {step === 'password' && (
-          <form onSubmit={handleUpdatePassword} className="space-y-4">
-            <div className="relative">
-              <Input
-                label="New Password"
-                type={showPassword ? 'text' : 'password'}
-                placeholder="At least 6 characters"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                required
-                autoFocus
-              />
+          {/* STEP 3: NEW PASSWORD */}
+          {step === 'password' && (
+            <form onSubmit={handleUpdatePassword} className="space-y-5">
+              <div>
+                <label
+                  htmlFor="new-password"
+                  style={{
+                    fontFamily: "'Poppins', sans-serif",
+                    color: '#929292',
+                    fontWeight: 500,
+                  }}
+                  className="block text-xs mb-1"
+                >
+                  New Password
+                </label>
+                <div className="relative">
+                  <input
+                    id="new-password"
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder=""
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    required
+                    autoFocus
+                    style={{
+                      fontFamily: "'Poppins', sans-serif",
+                      color: '#343434',
+                    }}
+                    className="w-full bg-transparent border-0 border-b border-[#A1A1A1] focus:border-black focus:ring-0 text-sm py-2 pr-8 outline-none transition-colors"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-0 bottom-2 text-[#343434] hover:text-black transition-colors cursor-pointer p-0.5"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    tabIndex={-1}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="confirm-password"
+                  style={{
+                    fontFamily: "'Poppins', sans-serif",
+                    color: '#929292',
+                    fontWeight: 500,
+                  }}
+                  className="block text-xs mb-1"
+                >
+                  Confirm Password
+                </label>
+                <div className="relative">
+                  <input
+                    id="confirm-password"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    placeholder=""
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                    style={{
+                      fontFamily: "'Poppins', sans-serif",
+                      color: '#343434',
+                    }}
+                    className="w-full bg-transparent border-0 border-b border-[#A1A1A1] focus:border-black focus:ring-0 text-sm py-2 pr-8 outline-none transition-colors"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-0 bottom-2 text-[#343434] hover:text-black transition-colors cursor-pointer p-0.5"
+                    aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                    tabIndex={-1}
+                  >
+                    {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Increased Size Primary Action Button with Poppins Font */}
+              <div className="pt-2">
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  style={{
+                    background: '#181A1F',
+                    borderRadius: 16.22,
+                    fontFamily: "'Poppins', sans-serif",
+                    color: 'white',
+                    fontWeight: 600,
+                  }}
+                  className="w-full h-12 sm:h-[52px] px-6 hover:bg-black active:scale-[0.99] text-[15px] transition-all duration-200 shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {isLoading ? (
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>Saving password...</span>
+                    </div>
+                  ) : (
+                    <>
+                      <Lock size={15} />
+                      <span>Save New Password</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
+              <div className="text-center pt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setStep('email');
+                    setError(null);
+                    setInfoMessage(null);
+                  }}
+                  style={{ fontFamily: "'Poppins', sans-serif" }}
+                  className="text-xs text-[#8E8E88] hover:text-[#181A1F] transition-colors cursor-pointer"
+                >
+                  Need to request a new link? Start over
+                </button>
+              </div>
+            </form>
+          )}
+
+          {/* STEP 4: SUCCESS STATE */}
+          {step === 'success' && (
+            <div className="text-center py-4 space-y-6">
+              <div className="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto shadow-2xs">
+                <CheckCircle2 size={36} />
+              </div>
+
+              <div>
+                <p
+                  style={{ fontFamily: "'Poppins', sans-serif" }}
+                  className="text-[#71716D] text-xs leading-relaxed"
+                >
+                  Your password has been successfully updated. You can now sign in with your new credentials.
+                </p>
+              </div>
+
+              {/* Increased Size Primary Action Button with Poppins Font */}
               <button
                 type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-9 text-gray-400 hover:text-gray-600 transition-colors"
-                tabIndex={-1}
-              >
-                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-              </button>
-            </div>
-
-            <div className="relative">
-              <Input
-                label="Confirm New Password"
-                type={showConfirmPassword ? 'text' : 'password'}
-                placeholder="Re-enter new password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 top-9 text-gray-400 hover:text-gray-600 transition-colors"
-                tabIndex={-1}
-              >
-                {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-              </button>
-            </div>
-
-            <Button type="submit" fullWidth isLoading={isLoading}>
-              <Lock size={16} />
-              Save New Password
-            </Button>
-
-            <div className="pt-2 text-center">
-              <button
-                type="button"
-                onClick={() => {
-                  setStep('email');
-                  setError(null);
-                  setInfoMessage(null);
+                onClick={() => router.push('/login')}
+                style={{
+                  background: '#181A1F',
+                  borderRadius: 16.22,
+                  fontFamily: "'Poppins', sans-serif",
+                  color: 'white',
+                  fontWeight: 600,
                 }}
-                className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+                className="w-full h-12 sm:h-[52px] px-6 hover:bg-black active:scale-[0.99] text-[15px] transition-all duration-200 shadow-sm flex items-center justify-center gap-2 cursor-pointer"
               >
-                Need to request a new link? Start over
+                Sign In to Your Account
               </button>
             </div>
-          </form>
-        )}
+          )}
 
-        {/* STEP 4: SUCCESS STATE */}
-        {step === 'success' && (
-          <div className="text-center py-4 space-y-6">
-            <div className="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto shadow-sm">
-              <CheckCircle2 size={36} />
-            </div>
-
-            <div>
-              <p className="text-gray-600 text-sm">
-                Your password has been successfully updated. You can now sign in with your new credentials.
-              </p>
-            </div>
-
-            <Button
-              type="button"
-              fullWidth
-              onClick={() => router.push('/login')}
+          {/* Footer Link (Matching Login/Signup) */}
+          <div className="text-center mt-9 text-xs">
+            <span
+              style={{
+                fontFamily: "'Poppins', sans-serif",
+                color: '#929292',
+                fontWeight: 500,
+              }}
             >
-              Sign In to Your Account
-            </Button>
+              Remember your password?{' '}
+            </span>
+            <Link
+              href="/login"
+              style={{
+                fontFamily: "'Poppins', sans-serif",
+                color: '#343434',
+                fontWeight: 700,
+              }}
+              className="hover:underline ml-1"
+            >
+              Log in
+            </Link>
           </div>
-        )}
-
-      </div>
-
-      {/* Footer Navigation */}
-      <div className="mt-4 bg-white rounded-2xl shadow-[0_2px_20px_rgb(0,0,0,0.04)] p-4 text-center">
-        <p className="text-sm text-gray-500">
-          Remembered your password?{' '}
-          <Link href="/login" className="font-semibold text-gray-900 hover:text-gray-700 transition-colors">
-            Return to Sign In
-          </Link>
-        </p>
+        </div>
       </div>
     </div>
   );
@@ -797,22 +963,16 @@ function ForgotPasswordContent() {
 
 function ForgotPasswordLoading() {
   return (
-    <div className="bg-white rounded-2xl shadow-[0_4px_24px_rgb(0,0,0,0.06)] p-8 text-center animate-pulse">
-      <div className="w-10 h-10 bg-gray-200 rounded-full mx-auto mb-4" />
-      <div className="h-6 bg-gray-200 rounded w-48 mx-auto mb-2" />
-      <div className="h-4 bg-gray-100 rounded w-64 mx-auto" />
+    <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="w-6 h-6 border-2 border-gray-900 border-t-transparent rounded-full animate-spin" />
     </div>
   );
 }
 
 export default function ForgotPasswordPage() {
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center items-center p-6 py-12">
-      <div className="w-full max-w-md">
-        <Suspense fallback={<ForgotPasswordLoading />}>
-          <ForgotPasswordContent />
-        </Suspense>
-      </div>
-    </div>
+    <Suspense fallback={<ForgotPasswordLoading />}>
+      <ForgotPasswordContent />
+    </Suspense>
   );
 }

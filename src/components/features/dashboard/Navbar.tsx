@@ -164,7 +164,7 @@ export default function Navbar({ profile }: NavbarProps) {
                 <Link
                   href={profile.role === 'Creator' ? '/profile' : '/user/profile'}
                   onClick={() => setDropdownOpen(false)}
-                  className="flex items-center gap-2 px-4 py-2 text-sm text-[var(--color-cor-ink)] hover:bg-[#F4F4ED] transition-colors w-full text-left"
+                  className="flex items-center gap-2 px-4 py-2 text-sm text-[var(--color-cor-ink)] hover:bg-[#F5F5F5] transition-colors w-full text-left"
                 >
                   <User size={16} /> Edit Profile
                 </Link>
@@ -172,7 +172,7 @@ export default function Navbar({ profile }: NavbarProps) {
                 <Link
                   href="/settings"
                   onClick={() => setDropdownOpen(false)}
-                  className="flex items-center gap-2 px-4 py-2 text-sm text-[var(--color-cor-ink)] hover:bg-[#F4F4ED] transition-colors w-full text-left"
+                  className="flex items-center gap-2 px-4 py-2 text-sm text-[var(--color-cor-ink)] hover:bg-[#F5F5F5] transition-colors w-full text-left"
                 >
                   <Settings size={16} /> Account Settings
                 </Link>
@@ -180,7 +180,7 @@ export default function Navbar({ profile }: NavbarProps) {
                 <Link
                   href="/subscription"
                   onClick={() => setDropdownOpen(false)}
-                  className="flex items-center gap-2 px-4 py-2 text-sm text-[var(--color-cor-ink)] hover:bg-[#F4F4ED] transition-colors w-full text-left"
+                  className="flex items-center gap-2 px-4 py-2 text-sm text-[var(--color-cor-ink)] hover:bg-[#F5F5F5] transition-colors w-full text-left"
                 >
                   <Sparkles size={16} className="text-[#865E16]" /> Subscription
                 </Link>
@@ -190,7 +190,7 @@ export default function Navbar({ profile }: NavbarProps) {
                 <form action={logout}>
                   <button
                     type="submit"
-                    className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-[#FAF5EC] transition-colors w-full text-left"
+                    className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-[#FDF2F2] transition-colors w-full text-left"
                   >
                     <LogOut size={16} /> Sign out
                   </button>

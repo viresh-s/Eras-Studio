@@ -2,14 +2,14 @@ import Link from 'next/link';
 
 export default function Footer() {
   return (
-    <footer className="bg-[#141413] text-[#FAF5EC]">
+    <footer className="bg-[#141413] text-white">
       {/* Links Grid */}
       <div className="border-t border-[#262624]">
         <div className="max-w-7xl mx-auto px-6 py-14">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {/* Brand */}
             <div className="col-span-2 md:col-span-1">
-              <Link href="/" className="font-serif text-2xl font-bold tracking-tight text-[#FAF5EC] flex items-center gap-2">
+              <Link href="/" className="font-serif text-2xl font-bold tracking-tight text-white flex items-center gap-2">
                 <span>Eras Studio</span>
                 <span className="w-1.5 h-1.5 rounded-full bg-[#865E16] inline-block mb-1"></span>
               </Link>

@@ -168,7 +168,7 @@ export default function AccountSettingsForm({
         {/* Profile Card */}
         <div className="bg-white rounded-2xl p-6 border border-[#E8E8E3] shadow-xs">
           <div className="flex items-center gap-4">
-            <div className="relative w-14 h-14 rounded-full overflow-hidden bg-[#FAF5EC] border border-[#E8E8E3] flex items-center justify-center text-[#141413] font-serif font-bold text-lg shrink-0">
+            <div className="relative w-14 h-14 rounded-full overflow-hidden bg-[#F5F5F5] border border-[#E8E8E3] flex items-center justify-center text-[#141413] font-serif font-bold text-lg shrink-0">
               {userProfile?.profile_pic_url ? (
                 <Image
                   src={userProfile.profile_pic_url}
@@ -230,8 +230,8 @@ export default function AccountSettingsForm({
             }}
             className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all ${
               activeTab === 'credentials'
-                ? 'bg-[#141413] text-[#FAF5EC]'
-                : 'text-[#4A4A45] hover:bg-[#F5F5F0] hover:text-[#141413]'
+                ? 'bg-[#141413] text-white'
+                : 'text-[#4A4A45] hover:bg-[#F5F5F5] hover:text-[#141413]'
             }`}
           >
             <div className="flex items-center gap-2.5">
@@ -249,8 +249,8 @@ export default function AccountSettingsForm({
             }}
             className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all ${
               activeTab === 'password'
-                ? 'bg-[#141413] text-[#FAF5EC]'
-                : 'text-[#4A4A45] hover:bg-[#F5F5F0] hover:text-[#141413]'
+                ? 'bg-[#141413] text-white'
+                : 'text-[#4A4A45] hover:bg-[#F5F5F5] hover:text-[#141413]'
             }`}
           >
             <div className="flex items-center gap-2.5">
@@ -268,8 +268,8 @@ export default function AccountSettingsForm({
             }}
             className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all ${
               activeTab === 'security'
-                ? 'bg-[#141413] text-[#FAF5EC]'
-                : 'text-[#4A4A45] hover:bg-[#F5F5F0] hover:text-[#141413]'
+                ? 'bg-[#141413] text-white'
+                : 'text-[#4A4A45] hover:bg-[#F5F5F5] hover:text-[#141413]'
             }`}
           >
             <div className="flex items-center gap-2.5">
@@ -300,9 +300,9 @@ export default function AccountSettingsForm({
         </div>
 
         {/* Security Assurance Badge */}
-        <div className="p-4 rounded-2xl bg-[#FAF5EC] border border-[#ECDDBB] text-xs text-[#865E16] space-y-1.5">
-          <div className="font-semibold flex items-center gap-1.5">
-            <ShieldCheck className="w-4 h-4" /> Encrypted Credentials
+        <div className="p-4 rounded-2xl bg-[#F8F9FA] border border-[#E5E7EB] text-xs text-gray-800 space-y-1.5">
+          <div className="font-semibold flex items-center gap-1.5 text-[#141413]">
+            <ShieldCheck className="w-4 h-4 text-emerald-600" /> Encrypted Credentials
           </div>
           <p className="text-[11px] text-[#6E6E69] leading-relaxed">
             Your login sessions and credentials are authenticated via SSL with zero-knowledge cryptographic hashing.
@@ -320,7 +320,7 @@ export default function AccountSettingsForm({
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-[#F0F0EB] pb-5">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                <span className="p-1.5 rounded-lg bg-[#FAF5EC] text-[#865E16] border border-[#ECDDBB]">
+                <span className="p-1.5 rounded-lg bg-[#F5F5F5] text-[#141413] border border-[#E5E5E5]">
                   <Mail className="w-4 h-4" />
                 </span>
                 <h3 className="font-serif text-lg font-bold text-[#141413]">Email Address</h3>
@@ -336,7 +336,7 @@ export default function AccountSettingsForm({
           </div>
 
           {/* Current Email Display */}
-          <div className="p-4 rounded-xl bg-[#FAF5EC]/70 border border-[#E8E8E3] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="p-4 rounded-xl bg-[#F8F9FA] border border-[#E8E8E3] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <span className="text-[11px] uppercase tracking-wider font-semibold text-[#8A8A85] block">
                 Current Email
@@ -401,7 +401,7 @@ export default function AccountSettingsForm({
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-[#F0F0EB] pb-5">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                <span className="p-1.5 rounded-lg bg-[#FAF5EC] text-[#865E16] border border-[#ECDDBB]">
+                <span className="p-1.5 rounded-lg bg-[#F5F5F5] text-[#141413] border border-[#E5E5E5]">
                   <KeyRound className="w-4 h-4" />
                 </span>
                 <h3 className="font-serif text-lg font-bold text-[#141413]">Password & Security</h3>
@@ -482,7 +482,7 @@ export default function AccountSettingsForm({
 
             {/* Password Validation Helper Indicators */}
             {password.length > 0 && (
-              <div className="p-3.5 rounded-xl bg-[#FAF5EC]/70 border border-[#E8E8E3] space-y-2 text-xs">
+              <div className="p-3.5 rounded-xl bg-[#F8F9FA] border border-[#E8E8E3] space-y-2 text-xs">
                 <div className="flex items-center justify-between">
                   <span className="text-[#6E6E69]">Password Strength</span>
                   <span
@@ -556,7 +556,7 @@ export default function AccountSettingsForm({
         >
           <div className="space-y-1 border-b border-[#F0F0EB] pb-4">
             <div className="flex items-center gap-2">
-              <span className="p-1.5 rounded-lg bg-[#FAF5EC] text-[#865E16] border border-[#ECDDBB]">
+              <span className="p-1.5 rounded-lg bg-[#F5F5F5] text-[#141413] border border-[#E5E5E5]">
                 <Shield className="w-4 h-4" />
               </span>
               <h3 className="font-serif text-lg font-bold text-[#141413]">Security & Authentication</h3>
@@ -567,7 +567,7 @@ export default function AccountSettingsForm({
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
-            <div className="p-4 rounded-xl border border-[#E8E8E3] bg-[#FAF5EC]/40 space-y-1.5">
+            <div className="p-4 rounded-xl border border-[#E8E8E3] bg-[#F8F9FA] space-y-1.5">
               <div className="flex items-center gap-2 text-xs font-semibold text-[#141413]">
                 <ShieldCheck className="w-4 h-4 text-[#28633B]" /> Encrypted Session Storage
               </div>
@@ -576,9 +576,9 @@ export default function AccountSettingsForm({
               </p>
             </div>
 
-            <div className="p-4 rounded-xl border border-[#E8E8E3] bg-[#FAF5EC]/40 space-y-1.5">
+            <div className="p-4 rounded-xl border border-[#E8E8E3] bg-[#F8F9FA] space-y-1.5">
               <div className="flex items-center gap-2 text-xs font-semibold text-[#141413]">
-                <Fingerprint className="w-4 h-4 text-[#865E16]" /> Row Level Security (RLS)
+                <Fingerprint className="w-4 h-4 text-[#141413]" /> Row Level Security (RLS)
               </div>
               <p className="text-[11px] text-[#6E6E69] leading-relaxed">
                 Database policies ensure your private dossier documents, consultation logs, and client messages are accessible strictly by you.

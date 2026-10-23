@@ -14,4 +14,5 @@ export * from "./FilterBar";
 export * from "./Toast";
 export * from "./icons";
 export { default as MultiSelect } from "./MultiSelect";
+export { default as SingleSelect } from "./SingleSelect";
 export { default as TextArea } from "./TextArea";

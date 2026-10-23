@@ -1,29 +1,31 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600;1,700&family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600;1,700&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap');
 @import "tailwindcss";
 
 @theme inline {
-  /* --- COR Aesthetic Colors --- */
-  --color-cor-bg: #FAF5EC;
+  /* --- Clean White Minimalist Colors (matching login & signup) --- */
+  --color-cor-bg: #FFFFFF;
   --color-cor-surface: #FFFFFF;
   --color-cor-ink: #141413;
   --color-cor-ink-light: #6E6E69;
   --color-cor-border: #E8E8E3;
   --color-cor-border-light: #F0F0EB;
-  --color-cor-accent: #865E16; /* Gold/sparkle accent used in COR */
+  --color-cor-accent: #865E16;
 
-  /* --- Legacy Colors (Will be phased out) --- */
-  --color-accent-coral: #C84B31; /* Deepened coral */
-  --color-accent-yellow: #E8C382; /* Muted gold */
-  --color-accent-rose: #9A3B3B; /* Deep rose/burgundy */
-  --color-accent-violet: #472D2D; /* Very dark brownish-violet */
-  --color-accent-emerald: #557153; /* Sage green */
-  --color-background: var(--color-cor-bg); 
-  --color-surface: var(--color-cor-surface);
-  --color-ink: var(--color-cor-ink);
+  /* --- Brand & System Colors --- */
+  --color-accent-coral: #C84B31;
+  --color-accent-yellow: #E8C382;
+  --color-accent-rose: #9A3B3B;
+  --color-accent-violet: #472D2D;
+  --color-accent-emerald: #557153;
+  --color-background: #FFFFFF;
+  --color-surface: #FFFFFF;
+  --color-ink: #141413;
 
-  /* --- Font --- */
-  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-  --font-heading: 'Playfair Display', Georgia, serif;
+  /* --- Font: Strictly Poppins & Century Schoolbook --- */
+  --font-sans: 'Poppins', sans-serif;
+  --font-heading: 'Century Schoolbook', 'Playfair Display', Georgia, serif;
+  --font-serif: 'Century Schoolbook', 'Playfair Display', Georgia, serif;
+  --font-mono: 'Poppins', sans-serif;
 
   /* --- Shadows --- */
   --shadow-soft: 0 2px 20px rgb(0 0 0 / 0.04);
@@ -41,7 +43,7 @@ html {
 }
 
 body {
-  background-color: var(--color-background);
+  background-color: #FFFFFF;
   color: var(--color-ink);
   font-family: var(--font-sans);
   min-height: 100vh;
@@ -51,7 +53,7 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
-  font-weight: 600; /* Adjusted from 800 for COR aesthetic luxury minimal */
+  font-weight: 600;
   letter-spacing: -0.01em;
 }
 
@@ -86,5 +88,5 @@ h1, h2, h3, h4, h5, h6 {
 /* --- Selection --- */
 ::selection {
   background-color: var(--color-cor-ink);
-  color: var(--color-cor-surface);
+  color: #FFFFFF;
 }

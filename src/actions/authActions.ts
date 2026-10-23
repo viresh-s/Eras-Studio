@@ -208,7 +208,7 @@ export async function sendPasswordResetOtp(emailRaw: string): Promise<{ error?: 
   const supabase = await createClient();
   const origin = await getRequestOrigin();
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${origin}/auth/callback?next=/forgot-password?mode=reset`,
+    redirectTo: `${origin}/forgot-password?mode=reset`,
   });
 
   if (error) return { error: error.message };
@@ -224,7 +224,7 @@ export async function updateUserPassword(newPassword: string): Promise<{ error?:
   const { data: { user }, error: userError } = await supabase.auth.getUser();
 
   if (userError || !user) {
-    return { error: 'Auth session missing! Please verify via your email link or enter the 6-digit verification code.' };
+    return { error: 'Auth session missing! Please verify via your email link or enter your verification code.' };
   }
 
   const { error } = await supabase.auth.updateUser({
