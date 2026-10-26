@@ -65,12 +65,12 @@ export function ExportDropdown({ exportType, filters }: ExportDropdownProps) {
       type="button"
       onClick={handleExportCSV}
       disabled={isExporting}
-      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E8E8E3] bg-white text-xs font-medium text-[#141413] hover:bg-[#F3F3EE] transition-colors focus:outline-none focus:ring-1 focus:ring-[#B8532F] shadow-2xs disabled:opacity-50"
+      className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#E8E8E3] bg-white text-xs uppercase tracking-[0.08em] font-medium text-[#141413] hover:bg-[#FAF5EC] hover:border-[#D5D3CE] transition-all focus:outline-none focus:ring-1 focus:ring-[#141413] shadow-xs disabled:opacity-50 cursor-pointer"
     >
       {isExporting ? (
         <Loader2 className="w-3.5 h-3.5 text-[#141413] animate-spin" />
       ) : (
-        <Download className="w-3.5 h-3.5 text-[#6E6E69]" />
+        <Download className="w-3.5 h-3.5 text-[#865E16]" />
       )}
       <span>{isExporting ? "Preparing CSV..." : "Download CSV"}</span>
     </button>

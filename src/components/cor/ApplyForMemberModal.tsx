@@ -127,14 +127,14 @@ export function ApplyForMemberModal({
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* Member Selector */}
         <div>
-          <label className="block text-xs font-semibold uppercase tracking-wider text-[#6E6E69] mb-1.5">
+          <label className="block text-xs font-medium uppercase tracking-[0.1em] text-[#6E6E69] mb-1.5">
             Select COR Member (Candidate)
           </label>
           <div className="relative">
             <select
               value={selectedMemberId}
               onChange={(e) => setSelectedMemberId(e.target.value)}
-              className="w-full text-sm bg-white border border-[#E8E8E3] rounded-lg px-3 py-2 text-[#141413] focus:outline-none focus:ring-1 focus:ring-[#B8532F]"
+              className="w-full text-xs md:text-sm bg-[#FAF5EC]/40 border border-[#E8E8E3] rounded-xl px-3.5 py-2.5 text-[#141413] focus:outline-none focus:bg-white focus:border-[#865E16] transition-colors"
             >
               {availableMembers.map((m) => (
                 <option key={m.id} value={m.id}>
@@ -147,13 +147,13 @@ export function ApplyForMemberModal({
 
         {/* Opportunity Selector */}
         <div>
-          <label className="block text-xs font-semibold uppercase tracking-wider text-[#6E6E69] mb-1.5">
+          <label className="block text-xs font-medium uppercase tracking-[0.1em] text-[#6E6E69] mb-1.5">
             Select Opportunity / Job
           </label>
           <select
             value={selectedOpportunityId}
             onChange={(e) => setSelectedOpportunityId(e.target.value)}
-            className="w-full text-sm bg-white border border-[#E8E8E3] rounded-lg px-3 py-2 text-[#141413] focus:outline-none focus:ring-1 focus:ring-[#B8532F]"
+            className="w-full text-xs md:text-sm bg-[#FAF5EC]/40 border border-[#E8E8E3] rounded-xl px-3.5 py-2.5 text-[#141413] focus:outline-none focus:bg-white focus:border-[#865E16] transition-colors"
           >
             {availableOpportunities.map((o) => (
               <option key={o.id} value={o.id}>
@@ -165,21 +165,21 @@ export function ApplyForMemberModal({
 
         {/* Transparent Rule-Based Match Breakdown Box */}
         {matchResult && selectedMember && selectedOpportunity && (
-          <div className="p-4 rounded-xl border border-[#E8E8E3] bg-[#F7F7F4] space-y-3">
+          <div className="p-5 rounded-2xl border border-[#E8E8E3] bg-[#FAF5EC]/60 space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-[#B8532F]" />
-                <span className="text-xs font-semibold uppercase tracking-wider text-[#141413]">
+                <Sparkles className="w-4 h-4 text-[#865E16]" />
+                <span className="text-xs font-medium uppercase tracking-[0.1em] text-[#141413]">
                   Rule-based Match Profile
                 </span>
               </div>
               <span
-                className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+                className={`text-xs font-medium px-2.5 py-0.5 rounded-full border ${
                   matchResult.scorePercentage >= 75
-                    ? "bg-[#E6F4EA] text-[#137333]"
+                    ? "bg-[#FAF5EC] text-[#865E16] border-[#865E16]/30"
                     : matchResult.scorePercentage >= 50
-                    ? "bg-[#FEF7E0] text-[#B06000]"
-                    : "bg-[#F1F3F4] text-[#5F6368]"
+                    ? "bg-[#FAF5EC] text-[#141413] border-[#E8E8E3]"
+                    : "bg-white text-[#6E6E69] border-[#E8E8E3]"
                 }`}
               >
                 {matchResult.scorePercentage}% Compatibility
@@ -190,15 +190,15 @@ export function ApplyForMemberModal({
               {matchResult.reasons.map((r, i) => (
                 <div
                   key={i}
-                  className="flex items-start gap-2 p-2 rounded-lg bg-white border border-[#E8E8E3]"
+                  className="flex items-start gap-2 p-2.5 rounded-xl bg-white border border-[#E8E8E3]"
                 >
                   {r.matched ? (
-                    <CheckCircle2 className="w-4 h-4 text-[#137333] shrink-0 mt-0.5" />
+                    <CheckCircle2 className="w-4 h-4 text-[#865E16] shrink-0 mt-0.5" />
                   ) : (
                     <AlertCircle className="w-4 h-4 text-[#8A8A85] shrink-0 mt-0.5" />
                   )}
                   <div>
-                    <div className="font-semibold text-[#141413]">{r.title}</div>
+                    <div className="font-medium text-[#141413]">{r.title}</div>
                     <div className="text-[11px] text-[#6E6E69] leading-relaxed">
                       {r.detail}
                     </div>
@@ -212,13 +212,13 @@ export function ApplyForMemberModal({
         {/* Application Status & Dates */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#6E6E69] mb-1.5">
+            <label className="block text-xs font-medium uppercase tracking-[0.1em] text-[#6E6E69] mb-1.5">
               Initial Status
             </label>
             <select
               value={status}
               onChange={(e) => setStatus(e.target.value as CorApplicationStatus)}
-              className="w-full text-sm bg-white border border-[#E8E8E3] rounded-lg px-3 py-2 text-[#141413] focus:outline-none focus:ring-1 focus:ring-[#B8532F]"
+              className="w-full text-xs md:text-sm bg-[#FAF5EC]/40 border border-[#E8E8E3] rounded-xl px-3.5 py-2.5 text-[#141413] focus:outline-none focus:bg-white focus:border-[#865E16] transition-colors"
             >
               {STATUS_OPTIONS.map((opt) => (
                 <option key={opt} value={opt}>
@@ -229,33 +229,33 @@ export function ApplyForMemberModal({
           </div>
 
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#6E6E69] mb-1.5">
+            <label className="block text-xs font-medium uppercase tracking-[0.1em] text-[#6E6E69] mb-1.5">
               Applied Date
             </label>
             <input
               type="date"
               value={appliedDate}
               onChange={(e) => setAppliedDate(e.target.value)}
-              className="w-full text-sm bg-white border border-[#E8E8E3] rounded-lg px-3 py-2 text-[#141413] focus:outline-none focus:ring-1 focus:ring-[#B8532F]"
+              className="w-full text-xs md:text-sm bg-[#FAF5EC]/40 border border-[#E8E8E3] rounded-xl px-3.5 py-2.5 text-[#141413] focus:outline-none focus:bg-white focus:border-[#865E16] transition-colors"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#6E6E69] mb-1.5">
+            <label className="block text-xs font-medium uppercase tracking-[0.1em] text-[#6E6E69] mb-1.5">
               Interview Date (Optional)
             </label>
             <input
               type="date"
               value={interviewDate}
               onChange={(e) => setInterviewDate(e.target.value)}
-              className="w-full text-sm bg-white border border-[#E8E8E3] rounded-lg px-3 py-2 text-[#141413] focus:outline-none focus:ring-1 focus:ring-[#B8532F]"
+              className="w-full text-xs md:text-sm bg-[#FAF5EC]/40 border border-[#E8E8E3] rounded-xl px-3.5 py-2.5 text-[#141413] focus:outline-none focus:bg-white focus:border-[#865E16] transition-colors"
             />
           </div>
         </div>
 
         {/* Consultant & Strategy Note */}
         <div>
-          <label className="block text-xs font-semibold uppercase tracking-wider text-[#6E6E69] mb-1.5">
+          <label className="block text-xs font-medium uppercase tracking-[0.1em] text-[#6E6E69] mb-1.5">
             Assigned Consultant / Admin
           </label>
           <input
@@ -263,12 +263,12 @@ export function ApplyForMemberModal({
             value={consultant}
             onChange={(e) => setConsultant(e.target.value)}
             placeholder="e.g. Elena Rostova"
-            className="w-full text-sm bg-white border border-[#E8E8E3] rounded-lg px-3 py-2 text-[#141413] focus:outline-none focus:ring-1 focus:ring-[#B8532F]"
+            className="w-full text-xs md:text-sm bg-[#FAF5EC]/40 border border-[#E8E8E3] rounded-xl px-3.5 py-2.5 text-[#141413] focus:outline-none focus:bg-white focus:border-[#865E16] transition-colors"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-semibold uppercase tracking-wider text-[#6E6E69] mb-1.5">
+          <label className="block text-xs font-medium uppercase tracking-[0.1em] text-[#6E6E69] mb-1.5">
             Initial Application Note / Strategy (Internal)
           </label>
           <textarea
@@ -276,19 +276,28 @@ export function ApplyForMemberModal({
             value={adminNote}
             onChange={(e) => setAdminNote(e.target.value)}
             placeholder="e.g. Portfolio tailored for Kyoto pavilion. Direct submission via lead recruiter."
-            className="w-full text-sm bg-white border border-[#E8E8E3] rounded-lg px-3 py-2 text-[#141413] focus:outline-none focus:ring-1 focus:ring-[#B8532F]"
+            className="w-full text-xs md:text-sm bg-[#FAF5EC]/40 border border-[#E8E8E3] rounded-xl p-3 text-[#141413] focus:outline-none focus:bg-white focus:border-[#865E16] transition-colors"
           />
         </div>
 
         {/* Actions */}
-        <div className="pt-3 border-t border-[#E8E8E3] flex flex-col-reverse sm:flex-row sm:items-center justify-end gap-2.5">
-          <Button type="button" variant="secondary" onClick={onClose} disabled={isSubmitting} className="w-full sm:w-auto justify-center">
+        <div className="pt-4 border-t border-[#E8E8E3] flex flex-col-reverse sm:flex-row sm:items-center justify-end gap-2.5">
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={isSubmitting}
+            className="px-4 py-2 rounded-full border border-[#E8E8E3] bg-white text-xs font-medium text-[#6E6E69] hover:text-[#141413] hover:bg-[#FAF5EC] transition-all"
+          >
             Cancel
-          </Button>
-          <Button type="submit" variant="primary" isLoading={isSubmitting} className="w-full sm:w-auto inline-flex items-center justify-center">
-            <span>Submit Application on Behalf</span>
-            <ArrowRight className="w-4 h-4 ml-1.5 shrink-0" />
-          </Button>
+          </button>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="px-5 py-2 rounded-full bg-[#141413] text-white text-xs font-medium hover:bg-[#2A2A28] transition-all shadow-soft-sm tracking-[0.04em] inline-flex items-center justify-center"
+          >
+            <span>{isSubmitting ? "Submitting..." : "Submit Application on Behalf"}</span>
+            <ArrowRight className="w-3.5 h-3.5 ml-1.5 shrink-0" />
+          </button>
         </div>
       </form>
     </Modal>

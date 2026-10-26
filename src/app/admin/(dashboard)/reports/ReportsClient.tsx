@@ -465,24 +465,32 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
   return (
     <div className="space-y-6 pb-16 animate-in fade-in duration-150">
       {/* ========================================================================= */}
-      {/* 1. PAGE HEADER (ERAS Studio Editorial Style)                              */}
+      {/* 1. PAGE HEADER (Eras Studio Editorial Style)                              */}
       {/* ========================================================================= */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl sm:text-4xl font-serif text-[#141413] tracking-tight">
-            Reports & moderation
-          </h1>
-          <p className="mt-1 text-sm text-[#6E6E69]">
-            Keep the community safe, considered and respectful.
-          </p>
+      <div className="border-b border-[#E8E8E3] pb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#865E16]" />
+              <span className="text-[11px] uppercase tracking-[0.14em] font-medium text-[#71716D]">
+                Curatorial Integrity & Safety
+              </span>
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-serif text-[#141413] tracking-tight">
+              Reports & Moderation<span className="italic font-normal">.</span>
+            </h1>
+            <p className="mt-1 text-xs md:text-sm text-[#71716D] font-light">
+              Community moderation, content disputes, copyright protection, and member conduct reviews.
+            </p>
+          </div>
+          <ExportDropdown exportType="reports" filters={{ query: debouncedSearch, status: activeTab === "all" ? undefined : activeTab }} />
         </div>
-        <ExportDropdown exportType="reports" filters={{ query: debouncedSearch, status: activeTab === "all" ? undefined : activeTab }} />
       </div>
 
       {/* ========================================================================= */}
-      {/* 2. REPORT FILTER TABS & SEARCH                                            */}
+      {/* 2. REPORT FILTER TABS & SEARCH (Eras Studio Design System)                */}
       {/* ========================================================================= */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-1">
+      <div className="bg-white rounded-2xl border border-[#E8E8E3] p-4 shadow-soft-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         {/* Tabs */}
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
           {(["all", "pending", "resolved", "dismissed"] as const).map((tab) => {
@@ -498,10 +506,10 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
                   setActiveTab(tab);
                   setCurrentPage(1);
                 }}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer select-none whitespace-nowrap ${
+                className={`px-3.5 py-1 rounded-full text-xs font-medium transition-all cursor-pointer select-none whitespace-nowrap ${
                   isActive
-                    ? "bg-[#141413] text-white shadow-2xs"
-                    : "text-[#6E6E69] hover:text-[#141413] hover:bg-neutral-100"
+                    ? "bg-[#141413] text-white shadow-soft-sm"
+                    : "bg-white text-[#71716D] border border-[#E8E8E3] hover:text-[#141413] hover:border-[#141413]"
                 }`}
               >
                 {label} <span className="opacity-75">({count})</span>
@@ -512,13 +520,13 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
 
         {/* Search Bar */}
         <div className="relative w-full sm:w-72">
-          <Search className="w-3.5 h-3.5 text-[#8A8A85] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <Search className="w-4 h-4 text-[#8A8A85] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             type="text"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            placeholder="Search reports by content, user, reporter..."
-            className="w-full text-xs pl-8 pr-7 py-2 rounded-full border border-[#E8E8E3] bg-white text-[#141413] placeholder:text-[#8A8A85] focus:outline-none focus:border-[#141413] transition-all shadow-2xs"
+            placeholder="Search reports..."
+            className="w-full text-xs pl-9 pr-8 py-2 rounded-full border border-[#E8E8E3] bg-[#FAF5EC]/40 focus:bg-white text-[#141413] placeholder:text-[#8A8A85] focus:outline-none focus:border-[#865E16] focus:ring-1 focus:ring-[#865E16] transition-all shadow-2xs"
           />
           {searchInput && (
             <button
@@ -527,16 +535,16 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
                 setSearchInput("");
                 setDebouncedSearch("");
               }}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#8A8A85] hover:text-[#141413] p-0.5 cursor-pointer"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8A8A85] hover:text-[#141413] p-0.5 cursor-pointer"
             >
-              <X className="w-3 h-3" />
+              <X className="w-3.5 h-3.5" />
             </button>
           )}
         </div>
       </div>
 
       {/* ========================================================================= */}
-      {/* 3. REPORTS TABLE (Matching Reference Image)                               */}
+      {/* 3. REPORTS TABLE (Matching Eras Studio Aesthetic)                         */}
       {/* ========================================================================= */}
       {filteredReports.length === 0 ? (
         <EmptyState
@@ -562,6 +570,7 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
               <Button
                 variant="outline"
                 size="sm"
+                className="rounded-full"
                 onClick={() => {
                   setSearchInput("");
                   setDebouncedSearch("");
@@ -574,19 +583,19 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
         />
       ) : (
         <div className="space-y-4">
-          <div className="bg-white rounded-2xl border border-[#E8E8E3] overflow-visible shadow-2xs min-h-[360px]">
+          <div className="bg-white rounded-2xl border border-[#E8E8E3] overflow-visible shadow-soft-sm min-h-[360px]">
             <Table containerClassName="overflow-visible min-h-[360px] border-none bg-transparent">
               <TableHeader>
-                <tr>
-                  <TableHead className="py-3.5 pl-6 font-medium text-xs text-[#8A8A85]">
+                <tr className="bg-[#FAF5EC]/60 border-b border-[#E8E8E3]">
+                  <TableHead className="py-3.5 pl-6 font-medium text-xs uppercase tracking-[0.08em] text-[#71716D]">
                     Reported content
                   </TableHead>
-                  <TableHead className="py-3.5 font-medium text-xs text-[#8A8A85]">User</TableHead>
-                  <TableHead className="py-3.5 font-medium text-xs text-[#8A8A85]">Reason</TableHead>
-                  <TableHead className="py-3.5 font-medium text-xs text-[#8A8A85]">Reporter</TableHead>
-                  <TableHead className="py-3.5 font-medium text-xs text-[#8A8A85]">Date</TableHead>
-                  <TableHead className="py-3.5 font-medium text-xs text-[#8A8A85]">Status</TableHead>
-                  <TableHead className="py-3.5 pr-6 text-right font-medium text-xs text-[#8A8A85]">
+                  <TableHead className="py-3.5 font-medium text-xs uppercase tracking-[0.08em] text-[#71716D]">User</TableHead>
+                  <TableHead className="py-3.5 font-medium text-xs uppercase tracking-[0.08em] text-[#71716D]">Reason</TableHead>
+                  <TableHead className="py-3.5 font-medium text-xs uppercase tracking-[0.08em] text-[#71716D]">Reporter</TableHead>
+                  <TableHead className="py-3.5 font-medium text-xs uppercase tracking-[0.08em] text-[#71716D]">Date</TableHead>
+                  <TableHead className="py-3.5 font-medium text-xs uppercase tracking-[0.08em] text-[#71716D]">Status</TableHead>
+                  <TableHead className="py-3.5 pr-6 text-right font-medium text-xs uppercase tracking-[0.08em] text-[#71716D]">
                     Actions
                   </TableHead>
                 </tr>
@@ -596,7 +605,7 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
                   <TableRow
                     key={rep.id}
                     onClick={() => handleOpenDetail(rep)}
-                    className="cursor-pointer hover:bg-[#FAF9F5] transition-colors"
+                    className="cursor-pointer hover:bg-[#FAF5EC]/40 transition-colors border-b border-[#F0F0EB] last:border-0"
                   >
                     {/* 1. Reported Content */}
                     <TableCell className="pl-6 py-4 font-normal text-sm text-[#141413]">
@@ -606,14 +615,14 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
                           e.stopPropagation();
                           handleOpenDetail(rep);
                         }}
-                        className="hover:underline text-left cursor-pointer font-normal text-[#141413]"
+                        className="hover:underline text-left cursor-pointer font-serif font-semibold text-[#141413] block"
                       >
                         {rep.artworkTitle || "Untitled Artwork"}
                       </button>
                     </TableCell>
 
                     {/* 2. User (Creator) */}
-                    <TableCell className="py-4 text-sm whitespace-nowrap">
+                    <TableCell className="py-4 text-xs whitespace-nowrap">
                       <div onClick={(e) => e.stopPropagation()}>
                         <AdminUserLink
                           userId={rep.artworkOwnerId || ""}
@@ -626,12 +635,12 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
                     </TableCell>
 
                     {/* 3. Reason */}
-                    <TableCell className="py-4 text-sm text-[#141413] max-w-xs truncate">
+                    <TableCell className="py-4 text-xs text-[#141413] max-w-xs truncate">
                       {rep.reason}
                     </TableCell>
 
                     {/* 4. Reporter */}
-                    <TableCell className="py-4 text-sm whitespace-nowrap">
+                    <TableCell className="py-4 text-xs whitespace-nowrap">
                       <div onClick={(e) => e.stopPropagation()}>
                         <AdminUserLink
                           userId={rep.reporterUserId}
@@ -644,7 +653,7 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
                     </TableCell>
 
                     {/* 5. Date */}
-                    <TableCell className="py-4 text-sm text-[#141413] whitespace-nowrap">
+                    <TableCell className="py-4 text-xs text-[#71716D] whitespace-nowrap">
                       {formatDate(rep.createdAt)}
                     </TableCell>
 
@@ -659,24 +668,24 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
                         <button
                           type="button"
                           onClick={() => setActiveDropdownId(activeDropdownId === rep.id ? null : rep.id)}
-                          className="px-3.5 py-1.5 rounded-full border border-[#D5D5D0] text-xs font-normal text-[#141413] bg-white hover:bg-[#F5F5F3] hover:border-[#141413] transition-colors cursor-pointer inline-flex items-center gap-1.5 select-none shadow-2xs"
+                          className="px-3.5 py-1.5 rounded-full border border-[#E8E8E3] text-xs font-medium text-[#141413] bg-white hover:bg-[#FAF5EC] hover:border-[#141413] transition-colors cursor-pointer inline-flex items-center gap-1.5 select-none shadow-soft-sm"
                           aria-expanded={activeDropdownId === rep.id}
                         >
                           <span>Actions</span>
-                          <ChevronDown className={`w-3.5 h-3.5 text-[#6E6E69] transition-transform duration-150 ${activeDropdownId === rep.id ? "rotate-180" : ""}`} />
+                          <ChevronDown className={`w-3.5 h-3.5 text-[#71716D] transition-transform duration-150 ${activeDropdownId === rep.id ? "rotate-180" : ""}`} />
                         </button>
 
                         {activeDropdownId === rep.id && (
-                          <div className="absolute right-0 mt-1.5 w-48 rounded-xl bg-white border border-[#E8E8E3] shadow-lg py-1.5 z-50 text-left">
+                          <div className="absolute right-0 mt-1.5 w-48 rounded-2xl bg-white border border-[#E8E8E3] shadow-soft-md py-1.5 z-50 text-left">
                             <button
                               type="button"
                               onClick={() => {
                                 setActiveDropdownId(null);
                                 handleOpenDetail(rep);
                               }}
-                              className="w-full px-3.5 py-2 text-xs text-[#141413] hover:bg-[#F7F6F2] flex items-center gap-2 cursor-pointer transition-colors"
+                              className="w-full px-3.5 py-2 text-xs text-[#141413] hover:bg-[#FAF5EC] flex items-center gap-2 cursor-pointer transition-colors"
                             >
-                              <Eye className="w-3.5 h-3.5 text-[#6E6E69]" />
+                              <Eye className="w-3.5 h-3.5 text-[#71716D]" />
                               <span>View Details</span>
                             </button>
 
@@ -844,7 +853,7 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="text-amber-700 border-amber-300 hover:bg-amber-50"
+                  className="rounded-full text-amber-700 border-amber-300 hover:bg-amber-50"
                   onClick={() => {
                     handleReopenDirect(selectedReport);
                     setIsDrawerOpen(false);
@@ -859,7 +868,7 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="text-emerald-700 border-emerald-300 hover:bg-emerald-50"
+                    className="rounded-full text-emerald-700 border-emerald-300 hover:bg-emerald-50"
                     onClick={() => {
                       handleConfirmUnhide(selectedReport);
                     }}
@@ -870,6 +879,7 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
                   <Button
                     variant="outline"
                     size="sm"
+                    className="rounded-full"
                     onClick={() => {
                       setHideTarget(selectedReport);
                       setIsDrawerOpen(false);
@@ -883,7 +893,7 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="text-emerald-700 border-emerald-300 hover:bg-emerald-50"
+                    className="rounded-full text-emerald-700 border-emerald-300 hover:bg-emerald-50"
                     onClick={() => {
                       handleConfirmRevertSuspend(selectedReport);
                     }}
@@ -894,7 +904,7 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="text-red-600 border-red-200 hover:bg-red-50"
+                    className="rounded-full text-red-600 border-red-200 hover:bg-red-50"
                     onClick={() => {
                       setSuspendTarget(selectedReport);
                       setIsDrawerOpen(false);
@@ -907,6 +917,7 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
                 <Button
                   variant="danger"
                   size="sm"
+                  className="rounded-full"
                   onClick={() => {
                     setRemoveTarget(selectedReport);
                     setIsDrawerOpen(false);
@@ -919,6 +930,7 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
                   <Button
                     variant="primary"
                     size="sm"
+                    className="rounded-full"
                     onClick={() => {
                       handleResolveDirect(selectedReport);
                       setIsDrawerOpen(false);
@@ -930,6 +942,7 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
                   <Button
                     variant="outline"
                     size="sm"
+                    className="rounded-full"
                     onClick={() => {
                       handleReopenDirect(selectedReport);
                       setIsDrawerOpen(false);
@@ -946,8 +959,8 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
         {selectedReport && (
           <div className="space-y-6">
             {/* Artwork Preview Card */}
-            <div className="rounded-xl border border-[#E8E8E3] overflow-hidden bg-[#FAF9F5]">
-              <div className="relative aspect-16/9 w-full bg-[#E5E2DC]">
+            <div className="rounded-2xl border border-[#E8E8E3] overflow-hidden bg-white shadow-soft-sm">
+              <div className="relative aspect-16/9 w-full bg-[#FAF5EC]">
                 <Image
                   src={selectedReport.artworkImageUrl || "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=800"}
                   alt={selectedReport.artworkTitle || "Artwork"}
@@ -957,14 +970,14 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
               </div>
               <div className="p-4 space-y-1">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-semibold text-[#141413] text-base">
+                  <h3 className="font-serif font-semibold text-[#141413] text-base">
                     {selectedReport.artworkTitle}
                   </h3>
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-[#EFEFEF] text-[#4A4A48] capitalize">
+                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#FAF5EC] text-[#865E16] border border-[#ECDDBB] capitalize font-medium">
                     {selectedReport.artworkStatus || "published"}
                   </span>
                 </div>
-                <div className="text-xs text-[#6E6E69] flex items-center gap-1 mt-1">
+                <div className="text-xs text-[#71716D] flex items-center gap-1 mt-1">
                   by
                   <AdminUserLink
                     userId={selectedReport.artworkOwnerId || ""}
@@ -983,7 +996,7 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
             </div>
 
             {/* Report Metadata Specs */}
-            <div className="rounded-xl border border-[#E8E8E3] p-4 space-y-3 bg-white text-xs">
+            <div className="rounded-2xl border border-[#E8E8E3] p-4 space-y-3 bg-white text-xs shadow-soft-sm">
               <div className="flex justify-between py-1 border-b border-[#F0F0EB]">
                 <span className="text-[#8A8A85]">Reported by</span>
                 <span className="font-medium text-[#141413] flex items-center gap-1">
@@ -1033,7 +1046,7 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
               <span className="text-xs font-semibold text-[#141413] uppercase tracking-wider">
                 Reason for report
               </span>
-              <div className="p-3 rounded-lg border border-[#ECDDBB] bg-[#FAF5EC] text-xs font-medium text-[#865E16]">
+              <div className="p-3.5 rounded-2xl border border-[#ECDDBB] bg-[#FAF5EC] text-xs font-medium text-[#865E16] shadow-soft-sm">
                 {selectedReport.reason}
               </div>
             </div>
@@ -1043,7 +1056,7 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
                 <span className="text-xs font-semibold text-[#141413] uppercase tracking-wider">
                   Reporter Message / Details
                 </span>
-                <div className="p-3.5 rounded-lg border border-[#E8E8E3] bg-[#FAFAF8] text-xs text-[#52524E] leading-relaxed">
+                <div className="p-4 rounded-2xl border border-[#E8E8E3] bg-[#FAF5EC]/40 text-xs text-[#52524E] leading-relaxed shadow-soft-sm">
                   {selectedReport.details}
                 </div>
               </div>
@@ -1064,16 +1077,16 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
         description="This will mark the report as dismissed without taking moderation action on the artwork."
         footer={
           <>
-            <Button variant="outline" size="sm" onClick={() => setDismissTarget(null)}>
+            <Button variant="outline" size="sm" className="rounded-full" onClick={() => setDismissTarget(null)}>
               Cancel
             </Button>
-            <Button variant="primary" size="sm" onClick={handleConfirmDismiss} isLoading={isActionLoading}>
+            <Button variant="primary" size="sm" className="rounded-full" onClick={handleConfirmDismiss} isLoading={isActionLoading}>
               Dismiss Report
             </Button>
           </>
         }
       >
-        <p className="text-xs text-[#6E6E69] leading-relaxed">
+        <p className="text-xs text-[#71716D] leading-relaxed">
           The reported artwork <span className="font-medium text-[#141413]">"{dismissTarget?.artworkTitle}"</span> will remain visible in the public catalog, and the report will be archived as dismissed.
         </p>
       </Modal>
@@ -1086,16 +1099,16 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
         description="The artwork will no longer be publicly visible, but it will remain in the system."
         footer={
           <>
-            <Button variant="outline" size="sm" onClick={() => setHideTarget(null)}>
+            <Button variant="outline" size="sm" className="rounded-full" onClick={() => setHideTarget(null)}>
               Cancel
             </Button>
-            <Button variant="primary" size="sm" onClick={handleConfirmHide} isLoading={isActionLoading}>
+            <Button variant="primary" size="sm" className="rounded-full" onClick={handleConfirmHide} isLoading={isActionLoading}>
               Hide Artwork
             </Button>
           </>
         }
       >
-        <p className="text-xs text-[#6E6E69] leading-relaxed">
+        <p className="text-xs text-[#71716D] leading-relaxed">
           Artwork <span className="font-medium text-[#141413]">"{hideTarget?.artworkTitle}"</span> by <span className="font-medium text-[#141413]">{hideTarget?.ownerName}</span> will be switched to draft status and hidden from public discovery.
         </p>
       </Modal>
@@ -1108,16 +1121,16 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
         description="This action will remove the artwork from public availability. This action may affect the creator and cannot be easily reversed."
         footer={
           <>
-            <Button variant="outline" size="sm" onClick={() => setRemoveTarget(null)}>
+            <Button variant="outline" size="sm" className="rounded-full" onClick={() => setRemoveTarget(null)}>
               Cancel
             </Button>
-            <Button variant="danger" size="sm" onClick={handleConfirmRemove} isLoading={isActionLoading}>
+            <Button variant="danger" size="sm" className="rounded-full" onClick={handleConfirmRemove} isLoading={isActionLoading}>
               Remove Artwork
             </Button>
           </>
         }
       >
-        <p className="text-xs text-[#6E6E69] leading-relaxed">
+        <p className="text-xs text-[#71716D] leading-relaxed">
           Are you sure you want to permanently remove <span className="font-medium text-[#141413]">"{removeTarget?.artworkTitle}"</span> from the catalog?
         </p>
       </Modal>
@@ -1130,18 +1143,18 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
         description="Restrict access for this creator account."
         footer={
           <>
-            <Button variant="outline" size="sm" onClick={() => setSuspendTarget(null)}>
+            <Button variant="outline" size="sm" className="rounded-full" onClick={() => setSuspendTarget(null)}>
               Cancel
             </Button>
-            <Button variant="danger" size="sm" onClick={handleConfirmSuspend} isLoading={isActionLoading}>
+            <Button variant="danger" size="sm" className="rounded-full" onClick={handleConfirmSuspend} isLoading={isActionLoading}>
               Suspend User
             </Button>
           </>
         }
       >
         {suspendTarget && (
-          <div className="space-y-3 text-xs text-[#6E6E69]">
-            <div className="p-3 rounded-lg border border-[#E8E8E3] bg-[#FAFAF8] space-y-1.5">
+          <div className="space-y-3 text-xs text-[#71716D]">
+            <div className="p-3.5 rounded-2xl border border-[#E8E8E3] bg-[#FAF5EC]/40 space-y-1.5">
               <p>
                 <span className="font-semibold text-[#141413]">User:</span> {suspendTarget.ownerName}
               </p>

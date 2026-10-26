@@ -138,26 +138,29 @@ export function SettingsClient({ initialSettings }: SettingsClientProps) {
       {/* ========================================================================= */}
       {/* 1. PAGE HEADER (ERAS Studio Editorial Style)                              */}
       {/* ========================================================================= */}
-      <div className="border-b border-[#E8E8E3] pb-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div className="border-b border-[#E8E8E3] pb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl sm:text-4xl font-serif text-[#141413] tracking-tight">
-            Studio settings
+          <p className="text-[11px] font-medium tracking-[0.2em] uppercase text-[#865E16] mb-1">
+            Configuration & Rules
+          </p>
+          <h1 className="text-3xl sm:text-4xl font-serif font-normal text-[#141413] tracking-tight">
+            Studio Settings.
           </h1>
-          <p className="mt-1 text-sm text-[#6E6E69]">
-            Configure rules and controls. Saved changes apply to the live platform.
+          <p className="mt-1 text-xs sm:text-sm text-[#6E6E69]">
+            Configure rules and platform controls. Saved changes apply to the live marketplace.
           </p>
         </div>
 
         {/* Live sync & status tag */}
         <div className="flex items-center gap-2 self-start sm:self-auto">
           {isDirty ? (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-[#FFF3DC] text-[#975A16] border border-[#F6E0B5]">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#D97706] animate-pulse" />
+            <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-medium bg-[#FAF5EC] text-[#865E16] border border-[#865E16]/30 shadow-soft-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#865E16] animate-pulse" />
               Unsaved changes
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-[#F5F5F3] text-[#71716D] border border-[#E8E8E3]">
-              <Check className="w-3 h-3 text-[#28633B]" />
+            <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-medium bg-white text-[#6E6E69] border border-[#E8E8E3] shadow-soft-sm">
+              <Check className="w-3 h-3 text-[#865E16]" />
               Platform synchronized
             </span>
           )}
@@ -168,7 +171,7 @@ export function SettingsClient({ initialSettings }: SettingsClientProps) {
       {/* 2. MAIN SETTINGS CARD                                                     */}
       {/* ========================================================================= */}
       <form onSubmit={handleSave} className="space-y-8">
-        <div className="bg-white rounded-2xl border border-[#E8E8E3] p-6 sm:p-8 shadow-2xs space-y-8">
+        <div className="bg-white rounded-2xl border border-[#E8E8E3] p-6 sm:p-8 shadow-soft-sm space-y-8">
           {/* SECTION A: ARTWORK ALLOWANCES */}
           <div className="space-y-4">
             <div>
@@ -381,9 +384,9 @@ export function SettingsClient({ initialSettings }: SettingsClientProps) {
               }
               maxLength={1000}
               placeholder="Enter studio-wide announcement shown to members..."
-              className={`w-full bg-white text-[#141413] text-sm placeholder:text-[#9A9A94] border ${
+              className={`w-full bg-[#FAF5EC]/30 text-[#141413] text-xs md:text-sm placeholder:text-[#9A9A94] border ${
                 fieldErrors.platformAnnouncement ? "border-[#D94E4E]" : "border-[#E8E8E3]"
-              } rounded-xl p-3.5 transition-colors focus:outline-none focus:border-[#141413] focus:ring-1 focus:ring-[#141413] leading-relaxed`}
+              } rounded-xl p-3.5 transition-colors focus:outline-none focus:bg-white focus:border-[#865E16] leading-relaxed`}
             />
             {fieldErrors.platformAnnouncement && (
               <p className="text-xs text-[#D94E4E]">{fieldErrors.platformAnnouncement}</p>
@@ -419,27 +422,23 @@ export function SettingsClient({ initialSettings }: SettingsClientProps) {
           {/* SECTION E: SAVE ACTION & FOOTER */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-2">
             <div className="flex items-center gap-3">
-              <Button
+              <button
                 type="submit"
-                size="md"
-                isLoading={isSaving}
                 disabled={!isDirty || isSaving}
-                className="bg-[#141413] hover:bg-[#2A2A28] text-white px-6 font-medium cursor-pointer shadow-xs disabled:opacity-40 disabled:cursor-not-allowed"
+                className="px-6 py-2.5 rounded-full bg-[#141413] hover:bg-[#2A2A28] text-white text-xs font-medium tracking-[0.04em] shadow-soft-sm transition-all disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                Save Settings
-              </Button>
+                {isSaving ? "Saving Settings..." : "Save Settings"}
+              </button>
 
               {isDirty && (
-                <Button
+                <button
                   type="button"
-                  variant="outline"
-                  size="md"
                   onClick={handleReset}
                   disabled={isSaving}
-                  className="cursor-pointer text-[#6E6E69] hover:text-[#141413]"
+                  className="px-5 py-2.5 rounded-full border border-[#E8E8E3] bg-white text-xs font-medium text-[#6E6E69] hover:text-[#141413] hover:bg-[#FAF5EC] transition-all shadow-soft-sm"
                 >
                   Reset
-                </Button>
+                </button>
               )}
             </div>
 

@@ -42,7 +42,7 @@ export function AdminUserLink({
   return (
     <Link
       href={route}
-      className={`group inline-flex items-center gap-2 cursor-pointer transition-colors hover:text-blue-600 ${className}`}
+      className={`group inline-flex items-center gap-2 cursor-pointer transition-colors hover:text-[#865E16] ${className}`}
     >
       {avatar !== undefined ? (
         avatar ? (
@@ -53,16 +53,16 @@ export function AdminUserLink({
             className="w-7 h-7 rounded-full object-cover border border-[#E8E8E3]"
           />
         ) : (
-          <div className="w-7 h-7 rounded-full bg-[#EAEAE5] border border-[#DCDCD6] flex items-center justify-center text-xs font-semibold text-[#141413] shrink-0">
+          <div className="w-7 h-7 rounded-full bg-[#FAF5EC] border border-[#ECDDBB] flex items-center justify-center text-xs font-semibold text-[#141413] shrink-0">
             {getInitials(name)}
           </div>
         )
       ) : null}
-      <span className="font-medium text-[#141413] group-hover:text-blue-600 group-hover:underline decoration-1 underline-offset-2">
+      <span className="font-medium text-[#141413] group-hover:text-[#865E16] group-hover:underline decoration-1 underline-offset-2">
         {name}
       </span>
       {showIcon && (
-        <ArrowUpRight className="w-3.5 h-3.5 text-[#8A8A85] transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-blue-600" />
+        <ArrowUpRight className="w-3.5 h-3.5 text-[#8A8A85] transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[#865E16]" />
       )}
     </Link>
   );

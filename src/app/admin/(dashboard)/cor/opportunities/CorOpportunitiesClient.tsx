@@ -219,10 +219,13 @@ export function CorOpportunitiesClient({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="border-b border-[#E8E8E3] pb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="border-b border-[#E8E8E3] pb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#141413]">
-            Opportunities
+          <p className="text-[11px] font-medium tracking-[0.2em] uppercase text-[#865E16] mb-1">
+            Institutional Representation
+          </p>
+          <h1 className="text-3xl font-serif font-normal tracking-tight text-[#141413]">
+            Institutional Opportunities.
           </h1>
           <p className="text-xs sm:text-sm text-[#6E6E69] mt-1 max-w-2xl">
             Curate and manage exclusive commissions, residencies, and roles. Match verified COR creators and submit representations.
@@ -231,14 +234,13 @@ export function CorOpportunitiesClient({
 
         <div className="flex items-center gap-3 shrink-0">
           <ExportDropdown exportType="cor-opportunities" filters={{ query: searchQuery, status: statusFilter === "all" ? undefined : statusFilter }} />
-          <Button
-            variant="primary"
+          <button
             onClick={() => setIsAddModalOpen(true)}
-            className="shrink-0 whitespace-nowrap inline-flex items-center gap-1.5 bg-[#141413] hover:bg-[#2A2A28] text-white"
+            className="shrink-0 whitespace-nowrap inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#141413] hover:bg-[#2A2A28] text-white text-xs font-medium tracking-[0.04em] shadow-soft-sm transition-all"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Add Opportunity</span>
-          </Button>
+          </button>
         </div>
       </div>
 
@@ -246,9 +248,9 @@ export function CorOpportunitiesClient({
       <CorNavTabs counts={counts} />
 
       {/* Filter and Search Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="p-2 sm:p-2.5 rounded-2xl border border-[#E8E8E3] bg-white shadow-soft-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         {/* Status Pill Tabs */}
-        <div className="flex items-center gap-1 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
           {(
             [
               { label: "All Opportunities", value: "all", count: opportunities.length },
@@ -265,16 +267,16 @@ export function CorOpportunitiesClient({
                   setStatusFilter(tab.value);
                   setCurrentPage(1);
                 }}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
                   active
-                    ? "bg-[#141413] text-white shadow-xs"
-                    : "bg-white text-[#6E6E69] border border-[#E8E8E3] hover:text-[#141413] hover:bg-[#F7F7F4]"
+                    ? "bg-[#141413] text-white shadow-soft-sm"
+                    : "text-[#6E6E69] hover:text-[#141413] hover:bg-[#FAF5EC]"
                 }`}
               >
                 <span>{tab.label}</span>
                 <span
-                  className={`text-[11px] px-1.5 py-0.2 rounded-full ${
-                    active ? "bg-white/20 text-white" : "bg-[#F3F3EE] text-[#6E6E69]"
+                  className={`text-[11px] px-2 py-0.2 rounded-full ${
+                    active ? "bg-white/20 text-white" : "bg-[#FAF5EC] text-[#865E16]"
                   }`}
                 >
                   {tab.count}
@@ -286,7 +288,7 @@ export function CorOpportunitiesClient({
 
         {/* Search Input */}
         <div className="relative w-full sm:w-72">
-          <Search className="w-4 h-4 text-[#8A8A85] absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-3.5 h-3.5 text-[#8A8A85] absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             placeholder="Search role, company, skills..."
@@ -295,32 +297,32 @@ export function CorOpportunitiesClient({
               setSearchQuery(e.target.value);
               setCurrentPage(1);
             }}
-            className="w-full text-xs md:text-sm bg-white border border-[#E8E8E3] rounded-lg pl-9 pr-3 py-1.5 text-[#141413] placeholder-[#8A8A85] focus:outline-none focus:ring-1 focus:ring-[#B8532F]"
+            className="w-full text-xs bg-[#FAF5EC]/50 border border-[#E8E8E3] rounded-full pl-9 pr-3.5 py-2 text-[#141413] placeholder-[#8A8A85] focus:outline-none focus:bg-white focus:border-[#865E16] transition-colors"
           />
         </div>
       </div>
 
       {/* Opportunities Table */}
-      <div className="bg-white border border-[#E8E8E3] rounded-xl overflow-hidden shadow-xs">
+      <div className="bg-white border border-[#E8E8E3] rounded-2xl overflow-hidden shadow-soft-sm">
         <Table>
           <TableHeader>
-            <TableRow className="bg-[#FAFAF8] border-b border-[#E8E8E3]">
-              <TableHead className="py-3 px-4 text-xs font-semibold text-[#6E6E69] uppercase tracking-wider">
+            <TableRow className="bg-[#FAF5EC]/70 border-b border-[#E8E8E3]">
+              <TableHead className="py-3 px-5 text-[11px] font-medium text-[#8A8A85] uppercase tracking-wider">
                 Opportunity
               </TableHead>
-              <TableHead className="py-3 px-4 text-xs font-semibold text-[#6E6E69] uppercase tracking-wider">
+              <TableHead className="py-3 px-5 text-[11px] font-medium text-[#8A8A85] uppercase tracking-wider">
                 Location
               </TableHead>
-              <TableHead className="py-3 px-4 text-xs font-semibold text-[#6E6E69] uppercase tracking-wider">
+              <TableHead className="py-3 px-5 text-[11px] font-medium text-[#8A8A85] uppercase tracking-wider">
                 Salary
               </TableHead>
-              <TableHead className="py-3 px-4 text-xs font-semibold text-[#6E6E69] uppercase tracking-wider">
+              <TableHead className="py-3 px-5 text-[11px] font-medium text-[#8A8A85] uppercase tracking-wider">
                 Skills
               </TableHead>
-              <TableHead className="py-3 px-4 text-xs font-semibold text-[#6E6E69] uppercase tracking-wider">
+              <TableHead className="py-3 px-5 text-[11px] font-medium text-[#8A8A85] uppercase tracking-wider">
                 Status
               </TableHead>
-              <TableHead className="py-3 px-4 text-xs font-semibold text-[#6E6E69] uppercase tracking-wider text-right">
+              <TableHead className="py-3 px-5 text-[11px] font-medium text-[#8A8A85] uppercase tracking-wider text-right">
                 Action
               </TableHead>
             </TableRow>
@@ -339,14 +341,14 @@ export function CorOpportunitiesClient({
               paginatedOpportunities.map((opp) => (
                 <TableRow
                   key={opp.id}
-                  className="hover:bg-[#FBFBFA] transition-colors border-b border-[#E8E8E3] last:border-none"
+                  className="hover:bg-[#FAF5EC]/40 transition-colors border-b border-[#E8E8E3] last:border-none"
                 >
-                  <TableCell className="py-3 px-4">
+                  <TableCell className="py-3.5 px-5">
                     <Link
                       href={`/admin/cor/opportunities/${opp.id}`}
                       className="group block"
                     >
-                      <div className="font-semibold text-sm text-[#141413] group-hover:text-[#B8532F] transition-colors">
+                      <div className="font-serif text-base text-[#141413] group-hover:text-[#865E16] transition-colors">
                         {opp.title}
                       </div>
                       <div className="text-xs text-[#6E6E69]">
@@ -355,7 +357,7 @@ export function CorOpportunitiesClient({
                     </Link>
                   </TableCell>
 
-                  <TableCell className="py-3 px-4">
+                  <TableCell className="py-3.5 px-5">
                     <div className="text-xs font-medium text-[#141413]">
                       {opp.location}
                     </div>
@@ -364,40 +366,40 @@ export function CorOpportunitiesClient({
                     </div>
                   </TableCell>
 
-                  <TableCell className="py-3 px-4">
-                    <div className="text-xs font-semibold text-[#141413]">
+                  <TableCell className="py-3.5 px-5">
+                    <div className="font-serif text-sm text-[#141413]">
                       {opp.salary || "Competitive"}
                     </div>
                   </TableCell>
 
-                  <TableCell className="py-3 px-4">
-                    <div className="flex flex-wrap gap-1">
+                  <TableCell className="py-3.5 px-5">
+                    <div className="flex flex-wrap gap-1.5">
                       {opp.requiredSkills.slice(0, 3).map((s) => (
                         <span
                           key={s}
-                          className="px-1.5 py-0.5 rounded bg-[#F3F3EE] text-[10px] font-medium text-[#5E5E59]"
+                          className="px-2.5 py-0.5 rounded-full bg-[#FAF5EC] border border-[#E8E8E3] text-[11px] font-medium text-[#141413]"
                         >
                           {s}
                         </span>
                       ))}
                       {opp.requiredSkills.length > 3 && (
-                        <span className="text-[10px] text-[#8A8A85]">
+                        <span className="text-[10px] text-[#8A8A85] self-center">
                           +{opp.requiredSkills.length - 3}
                         </span>
                       )}
                     </div>
                   </TableCell>
 
-                  <TableCell className="py-3 px-4">
+                  <TableCell className="py-3.5 px-5">
                     <CorOpportunityBadge status={opp.status} />
                   </TableCell>
 
-                  <TableCell className="py-3 px-4 text-right">
+                  <TableCell className="py-3.5 px-5 text-right">
                     <div className="flex items-center justify-end gap-2">
                       <button
                         type="button"
                         onClick={() => handleOpenMatching(opp)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#FDF8F6] text-[#B8532F] border border-[#F5D7CC] hover:bg-[#FBEBE5] transition-colors whitespace-nowrap shadow-2xs"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-[#FAF5EC] text-[#865E16] border border-[#865E16]/30 hover:bg-[#FAF5EC]/80 transition-colors whitespace-nowrap shadow-soft-sm"
                         title="Match Candidates"
                       >
                         <Sparkles className="w-3.5 h-3.5" />
@@ -406,7 +408,7 @@ export function CorOpportunitiesClient({
 
                       <Link
                         href={`/admin/cor/opportunities/${opp.id}`}
-                        className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[#E8E8E3] bg-white text-[#141413] hover:bg-[#F3F3EE] transition-colors whitespace-nowrap inline-flex items-center gap-1 shadow-2xs"
+                        className="px-3.5 py-1.5 rounded-full text-xs font-medium border border-[#E8E8E3] bg-white text-[#141413] hover:bg-[#FAF5EC] transition-colors whitespace-nowrap inline-flex items-center gap-1 shadow-soft-sm"
                       >
                         <span>Details</span>
                         <span>&rarr;</span>
@@ -439,23 +441,23 @@ export function CorOpportunitiesClient({
       >
         {selectedOpportunityForMatching && (
           <div className="space-y-5 text-[#141413]">
-            <div className="p-4 rounded-xl border border-[#E8E8E3] bg-[#FAFAF8] space-y-1">
-              <div className="font-bold text-base text-[#141413]">
+            <div className="p-5 rounded-2xl border border-[#E8E8E3] bg-[#FAF5EC]/60 space-y-2">
+              <div className="font-serif text-lg text-[#141413]">
                 {selectedOpportunityForMatching.company}
               </div>
               <div className="text-xs text-[#6E6E69]">
                 {selectedOpportunityForMatching.location} · {selectedOpportunityForMatching.workplaceType} · {selectedOpportunityForMatching.salary || "Competitive"}
               </div>
-              <div className="flex flex-wrap gap-1 pt-2">
+              <div className="flex flex-wrap gap-1.5 pt-2">
                 {selectedOpportunityForMatching.requiredSkills.map((s) => (
-                  <span key={s} className="px-2 py-0.5 rounded bg-white border border-[#E8E8E3] text-[11px] font-medium text-[#141413]">
+                  <span key={s} className="px-2.5 py-0.5 rounded-full bg-white border border-[#E8E8E3] text-[11px] font-medium text-[#141413]">
                     {s}
                   </span>
                 ))}
               </div>
             </div>
 
-            <div className="text-xs font-bold uppercase tracking-wider text-[#6E6E69]">
+            <div className="text-xs font-medium uppercase tracking-[0.1em] text-[#6E6E69]">
               Ranked COR Members ({rankedMembers.length})
             </div>
 
@@ -463,7 +465,7 @@ export function CorOpportunitiesClient({
               {rankedMembers.map((match) => (
                 <div
                   key={match.member.id}
-                  className="p-4 rounded-xl border border-[#E8E8E3] bg-white shadow-xs space-y-3"
+                  className="p-5 rounded-2xl border border-[#E8E8E3] bg-white shadow-soft-sm space-y-3"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-3">
@@ -474,12 +476,12 @@ export function CorOpportunitiesClient({
                           className="w-10 h-10 rounded-full object-cover border border-[#E8E8E3]"
                         />
                       ) : (
-                        <div className="w-10 h-10 rounded-full bg-[#EAEAE5] flex items-center justify-center text-xs font-semibold text-[#141413]">
+                        <div className="w-10 h-10 rounded-full bg-[#FAF5EC] border border-[#E8E8E3] flex items-center justify-center text-xs font-serif text-[#141413]">
                           {match.member.name.slice(0, 2).toUpperCase()}
                         </div>
                       )}
                       <div>
-                        <div className="font-bold text-sm text-[#141413]">
+                        <div className="font-serif text-base text-[#141413]">
                           {match.member.name}
                         </div>
                         <div className="text-xs text-[#6E6E69]">
@@ -490,12 +492,12 @@ export function CorOpportunitiesClient({
 
                     <div className="flex items-center gap-2">
                       <span
-                        className={`text-xs font-bold px-2.5 py-1 rounded-full ${
+                        className={`text-xs font-medium px-2.5 py-1 rounded-full border ${
                           match.scorePercentage >= 75
-                            ? "bg-[#E6F4EA] text-[#137333]"
+                            ? "bg-[#FAF5EC] text-[#865E16] border-[#865E16]/30"
                             : match.scorePercentage >= 50
-                            ? "bg-[#FEF7E0] text-[#B06000]"
-                            : "bg-[#F1F3F4] text-[#5F6368]"
+                            ? "bg-[#FAF5EC] text-[#141413] border-[#E8E8E3]"
+                            : "bg-white text-[#6E6E69] border-[#E8E8E3]"
                         }`}
                       >
                         {match.scorePercentage}% Match
@@ -504,11 +506,11 @@ export function CorOpportunitiesClient({
                   </div>
 
                   {/* Reasons breakdown */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs pt-2 border-t border-[#E8E8E3]">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs pt-3 border-t border-[#E8E8E3]">
                     {match.reasons.map((r, i) => (
                       <div key={i} className="flex items-start gap-1.5">
                         {r.matched ? (
-                          <CheckCircle2 className="w-3.5 h-3.5 text-[#137333] shrink-0 mt-0.5" />
+                          <CheckCircle2 className="w-3.5 h-3.5 text-[#865E16] shrink-0 mt-0.5" />
                         ) : (
                           <span className="w-1.5 h-1.5 rounded-full bg-[#8A8A85] shrink-0 mt-1.5 mr-1 ml-0.5" />
                         )}
@@ -521,18 +523,17 @@ export function CorOpportunitiesClient({
 
                   {/* Apply action */}
                   <div className="pt-2 flex justify-end">
-                    <Button
-                      size="sm"
-                      variant="primary"
+                    <button
                       onClick={() => {
                         setApplyMemberId(match.member.id);
                         setApplyOppId(selectedOpportunityForMatching.id);
                         setIsApplyModalOpen(true);
                       }}
+                      className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#141413] text-white text-xs font-medium hover:bg-[#2A2A28] transition-all shadow-soft-sm"
                     >
                       <Send className="w-3 h-3" />
                       <span>Apply for {match.member.name}</span>
-                    </Button>
+                    </button>
                   </div>
                 </div>
               ))}
@@ -714,19 +715,23 @@ export function CorOpportunitiesClient({
 
           {/* ── Footer ── */}
           <div className="flex items-center justify-between pt-5 mt-1 border-t border-[#E8E8E3]">
-            <p className="text-[11px] text-[#8A8A85]"><span className="text-[#B8532F]">*</span> Required fields</p>
+            <p className="text-[11px] text-[#8A8A85]"><span className="text-[#865E16]">*</span> Required fields</p>
             <div className="flex items-center gap-2.5">
-              <Button
+              <button
                 type="button"
-                variant="secondary"
                 onClick={() => { setIsAddModalOpen(false); setFormErrors({}); }}
                 disabled={isCreating}
+                className="px-4 py-2 rounded-full border border-[#E8E8E3] bg-white text-xs font-medium text-[#6E6E69] hover:text-[#141413] hover:bg-[#FAF5EC] transition-all"
               >
                 Cancel
-              </Button>
-              <Button type="submit" variant="primary" isLoading={isCreating}>
-                Create Opportunity
-              </Button>
+              </button>
+              <button
+                type="submit"
+                disabled={isCreating}
+                className="px-5 py-2 rounded-full bg-[#141413] text-white text-xs font-medium hover:bg-[#2A2A28] transition-all shadow-soft-sm tracking-[0.04em]"
+              >
+                {isCreating ? "Creating..." : "Create Opportunity"}
+              </button>
             </div>
           </div>
         </form>

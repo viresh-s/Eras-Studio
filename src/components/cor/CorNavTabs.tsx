@@ -57,7 +57,7 @@ export function CorNavTabs({ counts }: CorNavTabsProps) {
   ];
 
   return (
-    <div className="flex items-center gap-1 overflow-x-auto pb-1 border-b border-[#E8E8E3] select-none scrollbar-none">
+    <div className="flex items-center gap-1.5 overflow-x-auto pb-1 select-none scrollbar-none">
       {tabs.map((tab) => {
         const Icon = tab.icon;
         const isActive = tab.exact
@@ -68,26 +68,28 @@ export function CorNavTabs({ counts }: CorNavTabsProps) {
           <Link
             key={tab.href}
             href={tab.href}
-            className={`group inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs md:text-sm font-medium transition-all whitespace-nowrap ${
+            className={`group inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium transition-all whitespace-nowrap cursor-pointer ${
               isActive
-                ? "bg-white text-[#141413] shadow-xs border border-[#E8E8E3]"
-                : "text-[#6E6E69] hover:text-[#141413] hover:bg-white/60"
+                ? "bg-[#141413] text-white shadow-soft-sm"
+                : "bg-white text-[#71716D] border border-[#E8E8E3] hover:text-[#141413] hover:border-[#141413] hover:bg-[#FAF5EC]"
             }`}
           >
             <Icon
-              className={`w-4 h-4 stroke-[1.75] transition-colors ${
-                isActive ? "text-[#B8532F]" : "text-[#8A8A85] group-hover:text-[#141413]"
+              className={`w-3.5 h-3.5 stroke-[1.75] transition-colors ${
+                isActive ? "text-[#ECDDBB]" : "text-[#8A8A85] group-hover:text-[#141413]"
               }`}
             />
             <span>{tab.name}</span>
             {typeof tab.count === "number" && (
               <span
-                className={`ml-1 px-1.5 py-0.5 rounded-full text-[11px] font-semibold transition-colors ${
+                className={`ml-0.5 px-2 py-0.5 rounded-full text-[10px] font-semibold transition-colors ${
                   tab.highlightCount
-                    ? "bg-[#B8532F] text-white"
+                    ? isActive
+                      ? "bg-[#ECDDBB] text-[#141413]"
+                      : "bg-[#865E16] text-white"
                     : isActive
-                    ? "bg-[#F3F3EE] text-[#141413]"
-                    : "bg-[#EAEAE5] text-[#6E6E69]"
+                    ? "bg-white/20 text-white"
+                    : "bg-[#FAF5EC] text-[#71716D] border border-[#E8E8E3]"
                 }`}
               >
                 {tab.count}

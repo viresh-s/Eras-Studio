@@ -240,36 +240,37 @@ export function CollectorDetailClient({
   }, [interestsState]);
 
   return (
-    <div className="space-y-6 text-[#141413]">
+    <div className="space-y-6 text-[#141413] animate-in fade-in duration-150">
       {/* Back button */}
       <div>
         <Link
           href="/admin/collectors"
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-[#6E6E69] hover:text-[#141413] transition-colors"
+          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-[#E8E8E3] bg-white text-xs font-medium text-[#141413] hover:bg-[#FAF5EC] transition-colors shadow-2xs"
         >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          <span>Back to Collectors</span>
+          <ArrowLeft className="w-3.5 h-3.5 text-[#865E16]" />
+          <span>Back to Patron Directory</span>
         </Link>
       </div>
 
       {/* Collector Banner Card */}
-      <div className="p-6 rounded-2xl border border-[#E8E8E3] bg-white shadow-xs space-y-4">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="p-6 sm:p-7 rounded-2xl border border-[#E8E8E3] bg-white shadow-soft-sm space-y-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-5">
           <div className="flex items-center gap-4">
             {collectorState.profilePicUrl ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
               <img
                 src={collectorState.profilePicUrl}
                 alt={collectorState.name}
-                className="w-16 h-16 rounded-full object-cover border-2 border-[#E8E8E3]"
+                className="w-16 h-16 rounded-full object-cover border-2 border-[#ECDDBB]"
               />
             ) : (
-              <div className="w-16 h-16 rounded-full bg-[#EAEAE5] flex items-center justify-center text-lg font-bold text-[#141413]">
+              <div className="w-16 h-16 rounded-full bg-[#FAF5EC] border border-[#ECDDBB] flex items-center justify-center text-xl font-serif font-bold text-[#141413]">
                 {collectorState.name.slice(0, 2).toUpperCase()}
               </div>
             )}
             <div>
-              <div className="flex items-center gap-2.5">
-                <h1 className="text-xl md:text-2xl font-bold tracking-tight text-[#141413]">
+              <div className="flex items-center gap-3">
+                <h1 className="font-serif text-2xl sm:text-3xl font-semibold tracking-tight text-[#141413]">
                   {collectorState.name}
                 </h1>
                 <Badge
@@ -282,44 +283,49 @@ export function CollectorDetailClient({
                   }
                   size="sm"
                   dot
+                  className="rounded-full capitalize font-medium"
                 >
                   {collectorState.status}
                 </Badge>
               </div>
-              <p className="text-xs md:text-sm text-[#6E6E69] mt-0.5">
+              <p className="text-xs md:text-sm text-[#6E6E69] mt-1">
                 {collectorState.email || "No email"} · {collectorState.location || "Remote"} · Joined {formatDate(collectorState.createdAt)}
               </p>
-              <div className="flex items-center gap-2.5 mt-1">
-                <span className="text-xs font-semibold text-[#B8532F]">
-                  {collectorState.preferences || "Various Art Forms"}
+              <div className="flex items-center gap-2.5 mt-2">
+                <span className="text-xs font-semibold text-[#865E16] uppercase tracking-wider font-sans">
+                  {collectorState.preferences || "Contemporary Art"}
                 </span>
                 <span className="text-[#C4C4BD]">·</span>
-                <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                  <Sparkles className="w-3 h-3 text-emerald-600" />
+                <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#28633B] bg-[#F0F5F1] px-2.5 py-0.5 rounded-full border border-[#CDE3D4]">
+                  <Sparkles className="w-3 h-3 text-[#28633B]" />
                   {interestsState.length} {interestsState.length === 1 ? "Artwork Interest" : "Artworks of Interest"}
                 </span>
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5 flex-wrap">
             <Button
               variant="outline"
+              size="sm"
               onClick={() => setIsSuspendModalOpen(true)}
-              className={isSuspended ? "text-emerald-700 hover:text-emerald-800" : ""}
+              className="rounded-full px-4 text-xs uppercase tracking-[0.08em]"
             >
               {isSuspended ? "Revert Suspension" : "Suspend"}
             </Button>
             <Button
               variant="outline"
+              size="sm"
               onClick={() => setIsArchiveModalOpen(true)}
-              className={isArchived ? "text-amber-700 hover:text-amber-800" : ""}
+              className="rounded-full px-4 text-xs uppercase tracking-[0.08em]"
             >
               {isArchived ? "Revert Archive" : "Archive"}
             </Button>
             <Button
               variant="danger"
+              size="sm"
               onClick={() => setIsDeleteModalOpen(true)}
+              className="rounded-full px-4 text-xs uppercase tracking-[0.08em]"
             >
               Delete Account
             </Button>
@@ -343,6 +349,7 @@ export function CollectorDetailClient({
                 size="sm"
                 onClick={() => setIsSuspendModalOpen(false)}
                 disabled={isActionLoading}
+                className="rounded-full px-5"
               >
                 Cancel
               </Button>
@@ -351,16 +358,17 @@ export function CollectorDetailClient({
                 size="sm"
                 onClick={handleConfirmSuspendToggle}
                 isLoading={isActionLoading}
+                className="rounded-full px-5"
               >
-                {isSuspended ? "Revert Suspension" : "Suspend Collector"}
+                {isSuspended ? "Revert Suspension" : "Suspend Account"}
               </Button>
             </>
           }
         >
-          <div className="p-3 bg-[#F9F9F8] border border-[#E8E8E3] rounded-lg text-xs text-[#6E6E69] space-y-1">
-            <p className="font-semibold text-[#141413]">Collector Profile:</p>
-            <p>• User: {collectorState.name} ({collectorState.email || "No email"})</p>
-            <p>• Status change: {isSuspended ? "active (reverted)" : "suspended"}</p>
+          <div className="p-4 bg-[#FAF5EC] border border-[#ECDDBB] rounded-2xl text-xs text-[#865E16] space-y-1">
+            <p className="font-semibold text-[#141413]">Account Impact:</p>
+            <p>• Profile: {collectorState.name} ({collectorState.email || "No email"})</p>
+            <p>• Target status: {isSuspended ? "active (reverted)" : "suspended"}</p>
           </div>
         </Modal>
 
@@ -377,6 +385,7 @@ export function CollectorDetailClient({
                 size="sm"
                 onClick={() => setIsDeleteModalOpen(false)}
                 disabled={isActionLoading}
+                className="rounded-full px-5"
               >
                 Cancel
               </Button>
@@ -385,17 +394,18 @@ export function CollectorDetailClient({
                 size="sm"
                 onClick={handleConfirmDelete}
                 isLoading={isActionLoading}
+                className="rounded-full px-5"
               >
                 Delete Account Permanently
               </Button>
             </>
           }
         >
-          <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-xs text-red-700 flex items-start gap-2">
-            <AlertTriangle className="w-4 h-4 shrink-0 text-red-600 mt-0.5" />
+          <div className="p-4 bg-[#FDF2F2] border border-[#F2C6C6] rounded-2xl text-xs text-[#9E3333] flex items-start gap-2.5">
+            <AlertTriangle className="w-4 h-4 shrink-0 text-[#B83838] mt-0.5" />
             <div>
-              <p className="font-semibold text-red-800">Critical Warning</p>
-              <p>Removing this profile will delete collector access, past inquiry relations, and associated user records.</p>
+              <p className="font-semibold text-[#9E3333]">Critical Warning</p>
+              <p>Removing this profile will delete collector credentials and associated profile metadata.</p>
             </div>
           </div>
         </Modal>
@@ -417,6 +427,7 @@ export function CollectorDetailClient({
                 size="sm"
                 onClick={() => setIsArchiveModalOpen(false)}
                 disabled={isActionLoading}
+                className="rounded-full px-5"
               >
                 Cancel
               </Button>
@@ -425,20 +436,21 @@ export function CollectorDetailClient({
                 size="sm"
                 onClick={handleConfirmArchive}
                 isLoading={isActionLoading}
+                className="rounded-full px-5"
               >
                 {isArchived ? "Revert Archive" : "Archive Collector"}
               </Button>
             </>
           }
         >
-          <div className="p-3 bg-[#F9F9F8] border border-[#E8E8E3] rounded-lg text-xs text-[#6E6E69]">
+          <div className="p-4 bg-[#FAF5EC] border border-[#ECDDBB] rounded-2xl text-xs text-[#6E6E69]">
             <p>Archiving preserves existing inquiries, messages, and transactional records.</p>
           </div>
         </Modal>
       </div>
 
       {/* Tabs navigation */}
-      <div className="flex items-center gap-1 border-b border-[#E8E8E3] overflow-x-auto scrollbar-none">
+      <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none select-none">
         {(
           [
             { id: "overview", label: "Profile Overview", icon: Sparkles },
@@ -456,20 +468,20 @@ export function CollectorDetailClient({
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium transition-all cursor-pointer whitespace-nowrap shadow-2xs ${
                 active
-                  ? "border-[#141413] text-[#141413]"
-                  : "border-transparent text-[#6E6E69] hover:text-[#141413]"
+                  ? "bg-[#141413] text-white shadow-xs"
+                  : "bg-white text-[#6E6E69] border border-[#E8E8E3] hover:text-[#141413] hover:bg-[#FAF5EC]"
               }`}
             >
-              <Icon className="w-4 h-4" />
+              <Icon className="w-3.5 h-3.5" />
               <span>{tab.label}</span>
               {"count" in tab && typeof tab.count === "number" && tab.count > 0 && (
                 <span
-                  className={`ml-1 text-xs px-2 py-0.5 rounded-full font-semibold ${
+                  className={`ml-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${
                     active
-                      ? "bg-[#141413] text-white"
-                      : "bg-[#EAEAE5] text-[#141413]"
+                      ? "bg-white text-[#141413]"
+                      : "bg-[#FAF5EC] text-[#865E16] border border-[#ECDDBB]"
                   }`}
                 >
                   {tab.count}

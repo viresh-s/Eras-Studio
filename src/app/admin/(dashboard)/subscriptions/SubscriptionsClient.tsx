@@ -209,71 +209,88 @@ export function SubscriptionsClient({ initialSubscribers, stats }: Subscriptions
 
   return (
     <div className="space-y-7 pb-16 animate-in fade-in duration-150">
-      <div>
+      <div className="border-b border-[#E8E8E3] pb-6">
+        <div className="flex items-center gap-2 mb-1">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#865E16]" />
+          <span className="text-[11px] uppercase tracking-[0.14em] font-medium text-[#71716D]">
+            Membership & Privileges
+          </span>
+        </div>
         <h1 className="text-3xl sm:text-4xl font-serif text-[#141413] tracking-tight">
-          Subscriptions
+          Patronage & Subscriptions<span className="italic font-normal">.</span>
         </h1>
-        <p className="mt-1 text-sm text-[#6E6E69]">
-          Platform membership administration. Manage creator tiers and privileges.
+        <p className="mt-1 text-xs md:text-sm text-[#71716D] font-light">
+          Platform membership administration, creator tier privileges, and active subscriber ledger.
         </p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white border border-[#E8E8E3] rounded-xl p-5 shadow-2xs hover:border-[#CFCFC9] transition-all">
-          <p className="text-xs font-medium text-[#6E6E69]">Free creators</p>
+        <div className="bg-white border border-[#E8E8E3] rounded-2xl p-5 shadow-soft-sm hover:shadow-soft-md transition-all">
+          <div className="flex items-center justify-between">
+            <p className="text-xs uppercase tracking-[0.1em] font-medium text-[#71716D]">Free Tier</p>
+            <span className="w-2 h-2 rounded-full bg-[#8A8A85]" />
+          </div>
           <p className="mt-2 text-4xl font-serif font-semibold text-[#141413]">{stats.freeCount}</p>
-          <p className="mt-1.5 text-[11px] text-[#8A8A85]">Prototype data</p>
+          <p className="mt-1.5 text-[11px] text-[#8A8A85]">Standard catalog creators</p>
         </div>
-        <div className="bg-white border border-[#E8E8E3] rounded-xl p-5 shadow-2xs hover:border-[#CFCFC9] transition-all">
-          <p className="text-xs font-medium text-[#6E6E69]">Lite creators</p>
+        <div className="bg-white border border-[#E8E8E3] rounded-2xl p-5 shadow-soft-sm hover:shadow-soft-md transition-all">
+          <div className="flex items-center justify-between">
+            <p className="text-xs uppercase tracking-[0.1em] font-medium text-[#71716D]">Lite Tier</p>
+            <span className="w-2 h-2 rounded-full bg-[#3B5BDB]" />
+          </div>
           <p className="mt-2 text-4xl font-serif font-semibold text-[#141413]">{stats.liteCount}</p>
-          <p className="mt-1.5 text-[11px] text-[#8A8A85]">Prototype data</p>
+          <p className="mt-1.5 text-[11px] text-[#8A8A85]">Emerging talent members</p>
         </div>
-        <div className="bg-white border border-[#E8E8E3] rounded-xl p-5 shadow-2xs hover:border-[#CFCFC9] transition-all">
-          <p className="text-xs font-medium text-[#6E6E69]">Pro creators</p>
+        <div className="bg-white border border-[#E8E8E3] rounded-2xl p-5 shadow-soft-sm hover:shadow-soft-md transition-all">
+          <div className="flex items-center justify-between">
+            <p className="text-xs uppercase tracking-[0.1em] font-medium text-[#71716D]">Pro & Elite Tier</p>
+            <span className="w-2 h-2 rounded-full bg-[#865E16]" />
+          </div>
           <p className="mt-2 text-4xl font-serif font-semibold text-[#141413]">{stats.proCount}</p>
-          <p className="mt-1.5 text-[11px] text-[#8A8A85]">Prototype data</p>
+          <p className="mt-1.5 text-[11px] text-[#865E16] font-medium">Curated featured creators</p>
         </div>
       </div>
 
-      <div className="relative w-full">
-        <Search className="w-3.5 h-3.5 text-[#8A8A85] absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
-        <input
-          type="text"
-          value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
-          placeholder="Search by name, email, location or discipline"
-          className="w-full text-sm pl-10 pr-9 py-2.5 rounded-xl border border-[#E8E8E3] bg-white text-[#141413] placeholder:text-[#8A8A85] focus:outline-none focus:border-[#141413] transition-all shadow-2xs"
-        />
-        {searchInput && (
-          <button
-            type="button"
-            onClick={() => { setSearchInput(""); setDebouncedSearch(""); }}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8A8A85] hover:text-[#141413] p-0.5 cursor-pointer"
-          >
-            <X className="w-3.5 h-3.5" />
-          </button>
-        )}
-      </div>
-
-      <div className="flex items-center gap-1 overflow-x-auto">
-        {tabs.map((tab) => {
-          const isActive = activeTab === tab.key;
-          return (
+      <div className="bg-white rounded-2xl border border-[#E8E8E3] p-4 shadow-soft-sm space-y-3">
+        <div className="relative w-full">
+          <Search className="w-4 h-4 text-[#8A8A85] absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <input
+            type="text"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            placeholder="Search by name, email, location or discipline..."
+            className="w-full text-xs md:text-sm pl-11 pr-9 py-2.5 rounded-full border border-[#E8E8E3] bg-[#FAF5EC]/40 focus:bg-white text-[#141413] placeholder:text-[#8A8A85] focus:outline-none focus:border-[#865E16] focus:ring-1 focus:ring-[#865E16] transition-all shadow-2xs"
+          />
+          {searchInput && (
             <button
-              key={tab.key}
               type="button"
-              onClick={() => { setActiveTab(tab.key); setCurrentPage(1); }}
-              className={`px-4 py-2 rounded-full text-xs font-medium transition-all cursor-pointer whitespace-nowrap select-none ${
-                isActive
-                  ? "bg-[#141413] text-white shadow-2xs"
-                  : "text-[#6E6E69] hover:text-[#141413] hover:bg-neutral-100"
-              }`}
+              onClick={() => { setSearchInput(""); setDebouncedSearch(""); }}
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#8A8A85] hover:text-[#141413] p-0.5 cursor-pointer"
             >
-              {tab.label}
+              <X className="w-3.5 h-3.5" />
             </button>
-          );
-        })}
+          )}
+        </div>
+
+        <div className="flex items-center gap-1.5 overflow-x-auto pt-1">
+          {tabs.map((tab) => {
+            const isActive = activeTab === tab.key;
+            return (
+              <button
+                key={tab.key}
+                type="button"
+                onClick={() => { setActiveTab(tab.key); setCurrentPage(1); }}
+                className={`px-3.5 py-1 rounded-full text-xs font-medium transition-all cursor-pointer whitespace-nowrap select-none ${
+                  isActive
+                    ? "bg-[#141413] text-white shadow-soft-sm"
+                    : "bg-white text-[#71716D] border border-[#E8E8E3] hover:text-[#141413] hover:border-[#141413]"
+                }`}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {filtered.length === 0 ? (
@@ -284,16 +301,16 @@ export function SubscriptionsClient({ initialSubscribers, stats }: Subscriptions
         />
       ) : (
         <div className="space-y-4">
-          <div className="bg-white rounded-2xl border border-[#E8E8E3] overflow-visible shadow-2xs">
+          <div className="bg-white rounded-2xl border border-[#E8E8E3] overflow-visible shadow-soft-sm">
             <Table containerClassName="overflow-visible border-none bg-transparent">
               <TableHeader>
-                <tr>
-                  <TableHead className="py-3.5 pl-6 font-medium text-xs text-[#8A8A85]">Name / Email</TableHead>
-                  <TableHead className="py-3.5 font-medium text-xs text-[#8A8A85]">Role</TableHead>
-                  <TableHead className="py-3.5 font-medium text-xs text-[#8A8A85]">Plan</TableHead>
-                  <TableHead className="py-3.5 font-medium text-xs text-[#8A8A85]">Status</TableHead>
-                  <TableHead className="py-3.5 font-medium text-xs text-[#8A8A85]">Joined</TableHead>
-                  <TableHead className="py-3.5 pr-6 text-right font-medium text-xs text-[#8A8A85]">Actions</TableHead>
+                <tr className="bg-[#FAF5EC]/60 border-b border-[#E8E8E3]">
+                  <TableHead className="py-3.5 pl-6 font-medium text-xs uppercase tracking-[0.08em] text-[#71716D]">Name / Email</TableHead>
+                  <TableHead className="py-3.5 font-medium text-xs uppercase tracking-[0.08em] text-[#71716D]">Role</TableHead>
+                  <TableHead className="py-3.5 font-medium text-xs uppercase tracking-[0.08em] text-[#71716D]">Plan</TableHead>
+                  <TableHead className="py-3.5 font-medium text-xs uppercase tracking-[0.08em] text-[#71716D]">Status</TableHead>
+                  <TableHead className="py-3.5 font-medium text-xs uppercase tracking-[0.08em] text-[#71716D]">Joined</TableHead>
+                  <TableHead className="py-3.5 pr-6 text-right font-medium text-xs uppercase tracking-[0.08em] text-[#71716D]">Actions</TableHead>
                 </tr>
               </TableHeader>
               <TableBody>
@@ -306,7 +323,7 @@ export function SubscriptionsClient({ initialSubscribers, stats }: Subscriptions
                   const isPlanDropdownOpen = activePlanDropdownId === sub.id;
 
                   return (
-                    <TableRow key={sub.id} className="hover:bg-[#FAF9F5] transition-colors">
+                    <TableRow key={sub.id} className="hover:bg-[#FAF5EC]/40 transition-colors border-b border-[#F0F0EB] last:border-0">
                       <TableCell className="pl-6 py-3.5">
                         <div className="flex items-center gap-3">
                           <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold shrink-0 ${avatarColor}`}>
@@ -314,12 +331,12 @@ export function SubscriptionsClient({ initialSubscribers, stats }: Subscriptions
                           </div>
                           <div className="min-w-0">
                             <p className="text-sm font-medium text-[#141413] truncate">{sub.name}</p>
-                            <p className="text-xs text-[#6E6E69] truncate">{sub.email}</p>
+                            <p className="text-xs text-[#71716D] truncate">{sub.email}</p>
                           </div>
                         </div>
                       </TableCell>
 
-                      <TableCell className="py-3.5 text-sm text-[#4A4A48] capitalize">{sub.role}</TableCell>
+                      <TableCell className="py-3.5 text-xs text-[#71716D] capitalize">{sub.role}</TableCell>
 
                       <TableCell className="py-3.5" onClick={(e) => e.stopPropagation()}>
                         <div className="relative inline-block">
@@ -329,15 +346,15 @@ export function SubscriptionsClient({ initialSubscribers, stats }: Subscriptions
                               e.stopPropagation();
                               setActivePlanDropdownId(isPlanDropdownOpen ? null : sub.id);
                             }}
-                            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded border text-xs font-medium cursor-pointer transition-all ${planColorClass} hover:opacity-80`}
+                            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-medium cursor-pointer transition-all ${planColorClass} hover:opacity-85`}
                           >
-                            {plan}
+                            <span>{plan}</span>
                             <ChevronDown className="w-3 h-3 opacity-60" />
                           </button>
                           {isPlanDropdownOpen && (
                             <div
                               onClick={(e) => e.stopPropagation()}
-                              className="absolute left-0 z-50 mt-1 w-28 rounded-xl bg-white border border-[#E8E8E3] shadow-lg py-1 animate-in fade-in zoom-in-95 duration-100"
+                              className="absolute left-0 z-50 mt-1 w-28 rounded-2xl bg-white border border-[#E8E8E3] shadow-soft-md py-1 animate-in fade-in zoom-in-95 duration-100"
                             >
                               {["Free", "Lite", "Pro", "Elite"].map((p) => (
                                 <button
@@ -346,8 +363,8 @@ export function SubscriptionsClient({ initialSubscribers, stats }: Subscriptions
                                   onClick={() => handlePlanChange(sub, p.toLowerCase())}
                                   className={`w-full px-3 py-1.5 text-left text-xs font-medium transition-colors cursor-pointer ${
                                     plan === p
-                                      ? "bg-[#F5F5F3] text-[#141413]"
-                                      : "text-[#4A4A48] hover:bg-[#F5F5F3] hover:text-[#141413]"
+                                      ? "bg-[#FAF5EC] text-[#865E16]"
+                                      : "text-[#141413] hover:bg-[#FAF5EC]"
                                   }`}
                                 >
                                   {p}
@@ -359,16 +376,17 @@ export function SubscriptionsClient({ initialSubscribers, stats }: Subscriptions
                       </TableCell>
 
                       <TableCell className="py-3.5">
-                        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium select-none ${
+                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium select-none ${
                           isActive
-                            ? "bg-[#EAF2EC] text-[#28633B]"
-                            : "bg-[#FDF2F2] text-[#C0392B]"
+                            ? "bg-[#EAF2EC] text-[#28633B] border border-[#D4E6D8]"
+                            : "bg-[#FDF2F2] text-[#9E3333] border border-[#F4CDCD]"
                         }`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${isActive ? "bg-[#28633B]" : "bg-[#9E3333]"}`} />
                           {isActive ? "Active" : "Suspended"}
                         </span>
                       </TableCell>
 
-                      <TableCell className="py-3.5 text-sm text-[#6E6E69] whitespace-nowrap">
+                      <TableCell className="py-3.5 text-xs text-[#71716D] whitespace-nowrap">
                         {formatDate(sub.createdAt)}
                       </TableCell>
 
@@ -376,17 +394,11 @@ export function SubscriptionsClient({ initialSubscribers, stats }: Subscriptions
                         <div className="inline-flex items-center gap-1.5 justify-end">
                           <button
                             type="button"
-                            className="px-2.5 py-1 text-xs font-medium text-[#141413] border border-[#D5D5CF] rounded-lg hover:bg-[#F5F5F3] transition-all cursor-pointer whitespace-nowrap"
-                          >
-                            View / Edit
-                          </button>
-                          <button
-                            type="button"
                             onClick={() => handleSuspend(sub)}
-                            className={`px-2.5 py-1 text-xs font-medium rounded-lg transition-all cursor-pointer whitespace-nowrap border ${
+                            className={`px-3 py-1 text-xs font-medium rounded-full transition-all cursor-pointer whitespace-nowrap border ${
                               sub.status === "suspended"
-                                ? "text-emerald-700 border-emerald-300 hover:bg-emerald-50"
-                                : "text-[#6E6E69] border-[#D5D5CF] hover:bg-[#F5F5F3] hover:text-[#141413]"
+                                ? "text-emerald-700 border-emerald-300 bg-emerald-50 hover:bg-emerald-100"
+                                : "text-[#71716D] border-[#E8E8E3] bg-white hover:bg-[#FAF5EC] hover:text-[#141413]"
                             }`}
                           >
                             {sub.status === "suspended" ? "Revert Suspension" : "Suspend"}
@@ -395,7 +407,7 @@ export function SubscriptionsClient({ initialSubscribers, stats }: Subscriptions
                             type="button"
                             onClick={() => handleCancelToFree(sub)}
                             disabled={!sub.plan || sub.plan === "free"}
-                            className="px-2.5 py-1 text-xs font-medium text-[#6E6E69] border border-[#D5D5CF] rounded-lg hover:bg-[#F5F5F3] hover:text-[#141413] transition-all cursor-pointer whitespace-nowrap disabled:opacity-40 disabled:cursor-not-allowed"
+                            className="px-3 py-1 text-xs font-medium text-[#71716D] border border-[#E8E8E3] rounded-full bg-white hover:bg-[#FAF5EC] hover:text-[#141413] transition-all cursor-pointer whitespace-nowrap disabled:opacity-40 disabled:cursor-not-allowed"
                           >
                             Cancel to Free
                           </button>
@@ -410,7 +422,7 @@ export function SubscriptionsClient({ initialSubscribers, stats }: Subscriptions
 
           {filtered.length > pageSize && (
             <div className="flex justify-between items-center pt-2">
-              <span className="text-xs text-[#8A8A85]">
+              <span className="text-xs text-[#71716D]">
                 Showing {(currentPage - 1) * pageSize + 1} to{" "}
                 {Math.min(currentPage * pageSize, filtered.length)} of {filtered.length} members
               </span>

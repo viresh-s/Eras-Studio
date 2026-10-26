@@ -153,7 +153,7 @@ export function CorMemberDetailClient({
       <div>
         <Link
           href="/admin/cor/members"
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-[#6E6E69] hover:text-[#141413] transition-colors"
+          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#E8E8E3] bg-white text-xs font-medium text-[#6E6E69] hover:text-[#141413] hover:bg-[#FAF5EC] transition-all shadow-soft-sm"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>Back to COR Members</span>
@@ -161,70 +161,71 @@ export function CorMemberDetailClient({
       </div>
 
       {/* Member Banner Card */}
-      <div className="p-6 rounded-2xl border border-[#E8E8E3] bg-white shadow-xs space-y-4">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
+      <div className="p-6 md:p-8 rounded-2xl border border-[#E8E8E3] bg-white shadow-soft-sm space-y-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="flex items-center gap-5">
             {member.creatorAvatar ? (
               <img
                 src={member.creatorAvatar}
                 alt={member.name}
-                className="w-16 h-16 rounded-full object-cover border-2 border-[#E8E8E3]"
+                className="w-16 h-16 md:w-20 md:h-20 rounded-full object-cover border border-[#E8E8E3] shadow-soft-sm"
               />
             ) : (
-              <div className="w-16 h-16 rounded-full bg-[#EAEAE5] flex items-center justify-center text-lg font-bold text-[#141413]">
+              <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-[#FAF5EC] border border-[#E8E8E3] flex items-center justify-center text-xl font-serif text-[#141413]">
                 {member.name.slice(0, 2).toUpperCase()}
               </div>
             )}
             <div>
-              <div className="flex items-center gap-2.5">
-                <h1 className="text-xl md:text-2xl font-bold tracking-tight text-[#141413]">
+              <div className="flex items-center gap-3 flex-wrap">
+                <h1 className="text-2xl md:text-3xl font-serif font-normal tracking-tight text-[#141413]">
                   {member.name}
                 </h1>
                 <CorMemberBadge status={member.status} />
               </div>
-              <p className="text-xs md:text-sm text-[#6E6E69] mt-0.5">
+              <p className="text-xs md:text-sm text-[#6E6E69] mt-1">
                 {member.creatorEmail} · {member.location || "Remote"} · Joined {formatDate(member.joinedAt)}
               </p>
-              <div className="text-xs font-semibold text-[#B8532F] mt-1">
-                Target Role: {member.desiredRole || "Spatial Media & Design"}
+              <div className="inline-flex items-center gap-1.5 text-xs font-medium text-[#865E16] bg-[#FAF5EC] px-2.5 py-0.5 rounded-full border border-[#E8E8E3] mt-2">
+                <span>Target Role:</span>
+                <span className="font-semibold">{member.desiredRole || "Spatial Media & Design"}</span>
               </div>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <Button
-              variant="primary"
+            <button
               onClick={() => handleOpenApplyWithOpportunity()}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#141413] text-white text-xs font-medium hover:bg-[#2A2A28] transition-all shadow-soft-sm tracking-[0.04em]"
             >
               <Send className="w-3.5 h-3.5" />
               <span>Apply for Opportunity</span>
-            </Button>
+            </button>
           </div>
         </div>
 
         {/* Quick summary stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-[#E8E8E3] text-xs">
-          <div>
-            <span className="text-[#8A8A85]">Active Applications:</span>
-            <div className="font-bold text-sm text-[#141413] mt-0.5">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-5 border-t border-[#E8E8E3] text-xs">
+          <div className="p-3.5 rounded-xl bg-[#FAF5EC]/70 border border-[#E8E8E3]/60">
+            <span className="text-[#8A8A85] text-[11px] uppercase tracking-wider block">Active Applications</span>
+            <div className="font-serif text-xl font-normal text-[#141413] mt-0.5">
               {initialApplications.length}
             </div>
           </div>
-          <div>
-            <span className="text-[#8A8A85]">Experience Level:</span>
-            <div className="font-semibold text-sm text-[#141413] mt-0.5">
+          <div className="p-3.5 rounded-xl bg-[#FAF5EC]/70 border border-[#E8E8E3]/60">
+            <span className="text-[#8A8A85] text-[11px] uppercase tracking-wider block">Experience Level</span>
+            <div className="font-serif text-lg font-normal text-[#141413] mt-0.5">
               {member.experienceYears || request?.experienceYears || "Established"}
             </div>
           </div>
-          <div>
-            <span className="text-[#8A8A85]">Workplace Preference:</span>
-            <div className="font-semibold text-sm text-[#141413] mt-0.5">
+          <div className="p-3.5 rounded-xl bg-[#FAF5EC]/70 border border-[#E8E8E3]/60">
+            <span className="text-[#8A8A85] text-[11px] uppercase tracking-wider block">Workplace Preference</span>
+            <div className="font-serif text-lg font-normal text-[#141413] mt-0.5">
               {member.preferredWorkType || "Hybrid"}
             </div>
           </div>
-          <div>
-            <span className="text-[#8A8A85]">Matched Opportunities:</span>
-            <div className="font-bold text-sm text-[#B8532F] mt-0.5">
+          <div className="p-3.5 rounded-xl bg-[#FAF5EC]/70 border border-[#E8E8E3]/60">
+            <span className="text-[#8A8A85] text-[11px] uppercase tracking-wider block">Matched Opportunities</span>
+            <div className="font-serif text-xl font-normal text-[#865E16] mt-0.5">
               {rankedOpportunities.filter((r) => r.scorePercentage >= 50).length} Suitable
             </div>
           </div>
@@ -232,7 +233,7 @@ export function CorMemberDetailClient({
       </div>
 
       {/* Tabs navigation */}
-      <div className="flex items-center gap-1 border-b border-[#E8E8E3] overflow-x-auto scrollbar-none">
+      <div className="inline-flex items-center gap-1.5 p-1 rounded-full bg-white border border-[#E8E8E3] shadow-soft-sm overflow-x-auto max-w-full">
         {(
           [
             { id: "overview", label: "Career Overview" },
@@ -248,13 +249,13 @@ export function CorMemberDetailClient({
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`inline-flex items-center gap-1.5 px-4 py-2.5 text-xs md:text-sm font-medium border-b-2 transition-all whitespace-nowrap ${
+              className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium transition-all whitespace-nowrap ${
                 active
-                  ? "border-[#B8532F] text-[#B8532F]"
-                  : "border-transparent text-[#6E6E69] hover:text-[#141413]"
+                  ? "bg-[#141413] text-white shadow-soft-sm"
+                  : "text-[#6E6E69] hover:text-[#141413] hover:bg-[#FAF5EC]"
               }`}
             >
-              {Icon && <Icon className="w-3.5 h-3.5 text-[#B8532F]" />}
+              {Icon && <Icon className={`w-3 h-3 ${active ? "text-white" : "text-[#865E16]"}`} />}
               <span>{tab.label}</span>
             </button>
           );
@@ -266,16 +267,16 @@ export function CorMemberDetailClient({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-2 space-y-6">
             {/* Skills Card */}
-            <div className="p-5 rounded-xl border border-[#E8E8E3] bg-white space-y-3">
-              <h2 className="text-xs font-bold uppercase tracking-wider text-[#6E6E69] flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-[#B8532F]" />
+            <div className="p-6 rounded-2xl border border-[#E8E8E3] bg-white shadow-soft-sm space-y-3">
+              <h2 className="text-xs font-medium uppercase tracking-[0.1em] text-[#6E6E69] flex items-center gap-2">
+                <Sparkles className="w-3.5 h-3.5 text-[#865E16]" />
                 <span>Skills & Disciplines</span>
               </h2>
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex flex-wrap gap-2">
                 {(member.skills || request?.skills || []).map((s) => (
                   <span
                     key={s}
-                    className="px-2.5 py-1 rounded-lg bg-[#F3F3EE] text-xs font-medium text-[#141413]"
+                    className="px-3.5 py-1.5 rounded-full bg-[#FAF5EC] border border-[#E8E8E3] text-xs font-medium text-[#141413]"
                   >
                     {s}
                   </span>
@@ -284,19 +285,19 @@ export function CorMemberDetailClient({
             </div>
 
             {/* Experience & Work History */}
-            <div className="p-5 rounded-xl border border-[#E8E8E3] bg-white space-y-3">
-              <h2 className="text-xs font-bold uppercase tracking-wider text-[#6E6E69] flex items-center gap-2">
-                <Briefcase className="w-4 h-4 text-[#B8532F]" />
+            <div className="p-6 rounded-2xl border border-[#E8E8E3] bg-white shadow-soft-sm space-y-3">
+              <h2 className="text-xs font-medium uppercase tracking-[0.1em] text-[#6E6E69] flex items-center gap-2">
+                <Briefcase className="w-3.5 h-3.5 text-[#865E16]" />
                 <span>Work Experience & Studio Background</span>
               </h2>
               {request?.workHistory && request.workHistory.length > 0 ? (
                 <div className="space-y-3">
                   {request.workHistory.map((wh, idx) => (
-                    <div key={idx} className="p-3 rounded-lg bg-[#FAFAF8] border border-[#E8E8E3] space-y-1">
-                      <div className="font-semibold text-sm text-[#141413]">
-                        {wh.role} — {wh.company}
+                    <div key={idx} className="p-4 rounded-xl bg-[#FAF5EC]/50 border border-[#E8E8E3] space-y-1">
+                      <div className="font-serif text-base text-[#141413]">
+                        {wh.role} — <span className="font-sans text-xs text-[#6E6E69]">{wh.company}</span>
                       </div>
-                      <div className="text-xs text-[#8A8A85]">{wh.dates}</div>
+                      <div className="text-[11px] text-[#8A8A85]">{wh.dates}</div>
                       <div className="text-xs text-[#5E5E59] leading-relaxed pt-1">
                         {wh.responsibilities}
                       </div>
@@ -312,16 +313,16 @@ export function CorMemberDetailClient({
 
             {/* Education */}
             {request?.education && (
-              <div className="p-5 rounded-xl border border-[#E8E8E3] bg-white space-y-2">
-                <h2 className="text-xs font-bold uppercase tracking-wider text-[#6E6E69] flex items-center gap-2">
-                  <GraduationCap className="w-4 h-4 text-[#B8532F]" />
+              <div className="p-6 rounded-2xl border border-[#E8E8E3] bg-white shadow-soft-sm space-y-2">
+                <h2 className="text-xs font-medium uppercase tracking-[0.1em] text-[#6E6E69] flex items-center gap-2">
+                  <GraduationCap className="w-3.5 h-3.5 text-[#865E16]" />
                   <span>Education & Credentials</span>
                 </h2>
                 <div className="text-xs">
-                  <div className="font-semibold text-[#141413]">
+                  <div className="font-serif text-base text-[#141413]">
                     {request.education.degree || "Formal Fine Arts Degree"}
                   </div>
-                  <div className="text-[#6E6E69]">
+                  <div className="text-[#6E6E69] text-xs mt-0.5">
                     {request.education.institution} ({request.education.year || "Completed"})
                   </div>
                 </div>
@@ -332,26 +333,26 @@ export function CorMemberDetailClient({
           {/* Right Column: Links, Career Goals, & Private Strategy */}
           <div className="space-y-6">
             {/* Career Goals */}
-            <div className="p-5 rounded-xl border border-[#E8E8E3] bg-white space-y-3 text-xs">
-              <h2 className="font-bold uppercase tracking-wider text-[#6E6E69]">
+            <div className="p-6 rounded-2xl border border-[#E8E8E3] bg-white shadow-soft-sm space-y-4 text-xs">
+              <h2 className="text-xs font-medium uppercase tracking-[0.1em] text-[#6E6E69]">
                 Career Goals & Preferences
               </h2>
-              <div className="space-y-2">
-                <div>
-                  <span className="text-[#8A8A85] block">Expected Salary / Rates:</span>
-                  <div className="font-semibold text-[#141413]">
+              <div className="space-y-3">
+                <div className="p-3 rounded-xl bg-[#FAF5EC]/60 border border-[#E8E8E3]/60">
+                  <span className="text-[#8A8A85] text-[11px] block">Expected Compensation:</span>
+                  <div className="font-serif text-base text-[#141413] mt-0.5">
                     {request?.careerGoals?.expectedSalary || "Negotiable"}
                   </div>
                 </div>
-                <div>
-                  <span className="text-[#8A8A85] block">Desired Role:</span>
-                  <div className="font-semibold text-[#B8532F]">
+                <div className="p-3 rounded-xl bg-[#FAF5EC]/60 border border-[#E8E8E3]/60">
+                  <span className="text-[#8A8A85] text-[11px] block">Desired Role:</span>
+                  <div className="font-serif text-base text-[#865E16] mt-0.5">
                     {member.desiredRole || "Creative Director"}
                   </div>
                 </div>
-                <div>
-                  <span className="text-[#8A8A85] block">Workplace Preference:</span>
-                  <div className="font-semibold text-[#141413]">
+                <div className="p-3 rounded-xl bg-[#FAF5EC]/60 border border-[#E8E8E3]/60">
+                  <span className="text-[#8A8A85] text-[11px] block">Workplace Preference:</span>
+                  <div className="font-serif text-base text-[#141413] mt-0.5">
                     {member.preferredWorkType || "Hybrid"}
                   </div>
                 </div>
@@ -359,20 +360,20 @@ export function CorMemberDetailClient({
             </div>
 
             {/* Professional Links */}
-            <div className="p-5 rounded-xl border border-[#E8E8E3] bg-white space-y-3 text-xs">
-              <h2 className="font-bold uppercase tracking-wider text-[#6E6E69]">
+            <div className="p-6 rounded-2xl border border-[#E8E8E3] bg-white shadow-soft-sm space-y-3 text-xs">
+              <h2 className="text-xs font-medium uppercase tracking-[0.1em] text-[#6E6E69]">
                 Portfolio & Links
               </h2>
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 {request?.links?.portfolio && (
                   <a
                     href={request.links.portfolio}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex items-center justify-between p-2 rounded-lg bg-[#FAFAF8] hover:bg-[#F3F3EE] transition-colors"
+                    className="flex items-center justify-between p-2.5 rounded-xl bg-[#FAF5EC] border border-[#E8E8E3] hover:border-[#865E16] transition-colors"
                   >
-                    <span>Portfolio</span>
-                    <ExternalLink className="w-3.5 h-3.5 text-[#8A8A85]" />
+                    <span className="font-medium text-[#141413]">Portfolio</span>
+                    <ExternalLink className="w-3.5 h-3.5 text-[#865E16]" />
                   </a>
                 )}
                 {request?.links?.website && (
@@ -380,10 +381,10 @@ export function CorMemberDetailClient({
                     href={request.links.website}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex items-center justify-between p-2 rounded-lg bg-[#FAFAF8] hover:bg-[#F3F3EE] transition-colors"
+                    className="flex items-center justify-between p-2.5 rounded-xl bg-[#FAF5EC] border border-[#E8E8E3] hover:border-[#865E16] transition-colors"
                   >
-                    <span>Website</span>
-                    <ExternalLink className="w-3.5 h-3.5 text-[#8A8A85]" />
+                    <span className="font-medium text-[#141413]">Website</span>
+                    <ExternalLink className="w-3.5 h-3.5 text-[#865E16]" />
                   </a>
                 )}
                 {request?.links?.linkedin && (
@@ -391,39 +392,39 @@ export function CorMemberDetailClient({
                     href={request.links.linkedin}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex items-center justify-between p-2 rounded-lg bg-[#FAFAF8] hover:bg-[#F3F3EE] transition-colors"
+                    className="flex items-center justify-between p-2.5 rounded-xl bg-[#FAF5EC] border border-[#E8E8E3] hover:border-[#865E16] transition-colors"
                   >
-                    <span>LinkedIn</span>
-                    <ExternalLink className="w-3.5 h-3.5 text-[#8A8A85]" />
+                    <span className="font-medium text-[#141413]">LinkedIn</span>
+                    <ExternalLink className="w-3.5 h-3.5 text-[#865E16]" />
                   </a>
                 )}
               </div>
             </div>
 
             {/* Internal Strategy (Admin Only) */}
-            <div className="p-5 rounded-xl border border-[#E8E8E3] bg-[#FAFAF8] space-y-3 text-xs">
+            <div className="p-6 rounded-2xl border border-[#E8E8E3] bg-[#FAF5EC]/60 space-y-3 text-xs shadow-soft-sm">
               <div className="flex items-center justify-between">
-                <span className="font-bold uppercase tracking-wider text-[#9E4323] flex items-center gap-1.5">
+                <span className="text-xs font-medium uppercase tracking-[0.08em] text-[#865E16] flex items-center gap-1.5">
                   <Lock className="w-3.5 h-3.5" />
                   <span>Admin Career Strategy</span>
                 </span>
-                <span className="text-[10px] text-[#8A8A85]">Private</span>
+                <span className="text-[10px] text-[#8A8A85] px-2 py-0.5 rounded-full bg-white border border-[#E8E8E3]">Private</span>
               </div>
               <textarea
                 rows={3}
                 value={careerStrategy}
                 onChange={(e) => setCareerStrategy(e.target.value)}
                 placeholder="Internal placement strategy, targeted institutions, or advisory notes..."
-                className="w-full text-xs bg-white border border-[#E8E8E3] rounded-lg p-2.5 text-[#141413] focus:outline-none focus:ring-1 focus:ring-[#B8532F]"
+                className="w-full text-xs bg-white border border-[#E8E8E3] rounded-xl p-3 text-[#141413] focus:outline-none focus:border-[#865E16] shadow-soft-sm"
               />
-              <Button
-                size="sm"
-                variant="primary"
+              <button
+                type="button"
                 onClick={handleSaveProfileNotes}
-                isLoading={isSavingNotes}
+                disabled={isSavingNotes}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#141413] text-white text-xs font-medium hover:bg-[#2A2A28] transition-all shadow-soft-sm"
               >
-                Save Strategy
-              </Button>
+                <span>{isSavingNotes ? "Saving..." : "Save Strategy"}</span>
+              </button>
             </div>
           </div>
         </div>
@@ -431,35 +432,34 @@ export function CorMemberDetailClient({
 
       {/* TAB 2: Application History */}
       {activeTab === "applications" && (
-        <div className="bg-white border border-[#E8E8E3] rounded-xl overflow-hidden shadow-xs">
-          <div className="p-4 border-b border-[#E8E8E3] flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-[#141413]">
+        <div className="bg-white border border-[#E8E8E3] rounded-2xl overflow-hidden shadow-soft-sm">
+          <div className="p-5 border-b border-[#E8E8E3] flex items-center justify-between">
+            <h2 className="font-serif text-lg text-[#141413]">
               Application History for {member.name}
             </h2>
-            <Button
-              size="sm"
-              variant="primary"
+            <button
               onClick={() => handleOpenApplyWithOpportunity()}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#141413] text-white text-xs font-medium hover:bg-[#2A2A28] transition-all shadow-soft-sm"
             >
               <Send className="w-3 h-3" />
               <span>Apply for New Opportunity</span>
-            </Button>
+            </button>
           </div>
 
           <div className="divide-y divide-[#E8E8E3]">
             {initialApplications.length === 0 ? (
-              <div className="p-8 text-center text-xs text-[#6E6E69]">
+              <div className="p-12 text-center text-xs text-[#6E6E69]">
                 No applications submitted yet for this member.
               </div>
             ) : (
               initialApplications.map((app) => (
                 <div
                   key={app.id}
-                  className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-[#FAFAF8] transition-colors"
+                  className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-[#FAF5EC]/40 transition-colors"
                 >
                   <div className="space-y-1">
-                    <div className="font-semibold text-sm text-[#141413]">
-                      {app.company} — {app.opportunityTitle}
+                    <div className="font-serif text-base text-[#141413]">
+                      {app.company} — <span className="font-sans text-xs text-[#6E6E69]">{app.opportunityTitle}</span>
                     </div>
                     <div className="text-xs text-[#6E6E69]">
                       Applied: {formatDate(app.appliedDate)} · Consultant: {app.consultant}
@@ -471,7 +471,7 @@ export function CorMemberDetailClient({
                     <CorApplicationBadge status={app.status} />
                     <Link
                       href={`/admin/cor/applications/${app.id}`}
-                      className="px-2.5 py-1 rounded-lg text-xs font-medium border border-[#E8E8E3] bg-white text-[#141413] hover:bg-[#F3F3EE]"
+                      className="px-3.5 py-1.5 rounded-full text-xs font-medium border border-[#E8E8E3] bg-white text-[#141413] hover:bg-[#FAF5EC] transition-all shadow-soft-sm"
                     >
                       View Details →
                     </Link>
@@ -486,16 +486,16 @@ export function CorMemberDetailClient({
       {/* TAB 3: Opportunity Matches */}
       {activeTab === "matches" && (
         <div className="space-y-4">
-          <div className="p-4 rounded-xl border border-[#E8E8E3] bg-white flex items-center justify-between">
+          <div className="p-5 rounded-2xl border border-[#E8E8E3] bg-white shadow-soft-sm flex items-center justify-between">
             <div>
-              <h2 className="text-sm font-semibold text-[#141413]">
-                Rule-based Opportunity Matching
+              <h2 className="font-serif text-lg text-[#141413]">
+                Curated Opportunity Matching
               </h2>
               <p className="text-xs text-[#6E6E69] mt-0.5">
                 Opportunities ranked according to skills overlap, target role, location, and workplace compatibility.
               </p>
             </div>
-            <div className="text-xs font-semibold text-[#B8532F]">
+            <div className="text-xs font-medium text-[#865E16] bg-[#FAF5EC] px-3 py-1 rounded-full border border-[#E8E8E3]">
               {rankedOpportunities.length} Available Opportunities
             </div>
           </div>
@@ -504,26 +504,26 @@ export function CorMemberDetailClient({
             {rankedOpportunities.map((match) => (
               <div
                 key={match.opportunity.id}
-                className="p-5 rounded-xl border border-[#E8E8E3] bg-white shadow-xs space-y-3 flex flex-col justify-between"
+                className="p-6 rounded-2xl border border-[#E8E8E3] bg-white shadow-soft-sm space-y-4 flex flex-col justify-between"
               >
                 <div>
-                  <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-start justify-between gap-3">
                     <div>
-                      <div className="text-base font-bold text-[#141413]">
+                      <div className="font-serif text-lg text-[#141413]">
                         {match.opportunity.title}
                       </div>
-                      <div className="text-xs font-medium text-[#6E6E69]">
+                      <div className="text-xs text-[#6E6E69] mt-0.5">
                         {match.opportunity.company} · {match.opportunity.location} ({match.opportunity.workplaceType})
                       </div>
                     </div>
 
                     <span
-                      className={`text-xs font-bold px-2 py-0.5 rounded-full shrink-0 ${
+                      className={`text-xs font-medium px-3 py-1 rounded-full shrink-0 border ${
                         match.scorePercentage >= 75
-                          ? "bg-[#E6F4EA] text-[#137333]"
+                          ? "bg-[#FAF5EC] text-[#865E16] border-[#865E16]/30"
                           : match.scorePercentage >= 50
-                          ? "bg-[#FEF7E0] text-[#B06000]"
-                          : "bg-[#F1F3F4] text-[#5F6368]"
+                          ? "bg-[#FAF5EC] text-[#141413] border-[#E8E8E3]"
+                          : "bg-white text-[#6E6E69] border-[#E8E8E3]"
                       }`}
                     >
                       {match.scorePercentage}% Match
@@ -531,11 +531,11 @@ export function CorMemberDetailClient({
                   </div>
 
                   {/* Reasons list */}
-                  <div className="space-y-1.5 mt-3 pt-3 border-t border-[#E8E8E3] text-xs">
+                  <div className="space-y-2 mt-4 pt-4 border-t border-[#E8E8E3] text-xs">
                     {match.reasons.map((r, i) => (
                       <div key={i} className="flex items-center gap-2">
                         {r.matched ? (
-                          <CheckCircle2 className="w-3.5 h-3.5 text-[#137333] shrink-0" />
+                          <CheckCircle2 className="w-3.5 h-3.5 text-[#865E16] shrink-0" />
                         ) : (
                           <span className="w-1.5 h-1.5 rounded-full bg-[#8A8A85] shrink-0 ml-1 mr-1" />
                         )}
@@ -545,18 +545,17 @@ export function CorMemberDetailClient({
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-[#E8E8E3] flex items-center justify-between">
-                  <span className="text-xs font-semibold text-[#141413]">
+                <div className="pt-4 border-t border-[#E8E8E3] flex items-center justify-between">
+                  <span className="font-serif text-sm text-[#141413]">
                     {match.opportunity.salary || "Competitive"}
                   </span>
-                  <Button
-                    size="sm"
-                    variant="primary"
+                  <button
                     onClick={() => handleOpenApplyWithOpportunity(match.opportunity.id)}
+                    className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#141413] text-white text-xs font-medium hover:bg-[#2A2A28] transition-all shadow-soft-sm"
                   >
                     <Send className="w-3 h-3" />
                     <span>Apply for Member</span>
-                  </Button>
+                  </button>
                 </div>
               </div>
             ))}
@@ -567,7 +566,7 @@ export function CorMemberDetailClient({
       {/* TAB 4: Internal Admin Notes (CRITICAL PRIVACY: ADMIN ONLY) */}
       {activeTab === "notes" && (
         <div className="space-y-5">
-          <div className="p-4 rounded-xl border border-[#FDE68A] bg-[#FFFBEB] flex items-start gap-2.5 text-xs text-[#92400E]">
+          <div className="p-4 rounded-2xl border border-[#865E16]/30 bg-[#FAF5EC] flex items-start gap-2.5 text-xs text-[#865E16]">
             <Lock className="w-4 h-4 shrink-0 mt-0.5" />
             <div>
               <strong>Private Administrative Zone:</strong> These notes and observations are strictly visible to the Career Operations admin team. They are never exposed to candidates or creators.
@@ -577,9 +576,9 @@ export function CorMemberDetailClient({
           {/* Add Note Form */}
           <form
             onSubmit={handleAddNote}
-            className="p-4 rounded-xl border border-[#E8E8E3] bg-white shadow-xs space-y-3"
+            className="p-6 rounded-2xl border border-[#E8E8E3] bg-white shadow-soft-sm space-y-3"
           >
-            <label className="block text-xs font-bold uppercase tracking-wider text-[#6E6E69]">
+            <label className="block text-xs font-medium uppercase tracking-[0.1em] text-[#6E6E69]">
               Add Internal Admin Note
             </label>
             <textarea
@@ -587,31 +586,35 @@ export function CorMemberDetailClient({
               value={newNoteContent}
               onChange={(e) => setNewNoteContent(e.target.value)}
               placeholder="e.g. Discussed candidate with Kenji at Atelier Kōra. Recruiter responded positively to their kinetic installation catalog..."
-              className="w-full text-xs md:text-sm bg-white border border-[#E8E8E3] rounded-lg p-3 text-[#141413] focus:outline-none focus:ring-1 focus:ring-[#B8532F]"
+              className="w-full text-xs md:text-sm bg-[#FAF5EC]/40 border border-[#E8E8E3] rounded-xl p-3.5 text-[#141413] focus:outline-none focus:border-[#865E16] shadow-soft-sm"
             />
             <div className="flex justify-end">
-              <Button type="submit" variant="primary" size="sm" isLoading={isAddingNote}>
+              <button
+                type="submit"
+                disabled={isAddingNote}
+                className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-[#141413] text-white text-xs font-medium hover:bg-[#2A2A28] transition-all shadow-soft-sm"
+              >
                 <Plus className="w-3.5 h-3.5" />
-                <span>Save Note</span>
-              </Button>
+                <span>{isAddingNote ? "Saving..." : "Save Note"}</span>
+              </button>
             </div>
           </form>
 
           {/* Existing Notes List */}
           <div className="space-y-3">
             {notes.length === 0 ? (
-              <div className="p-8 text-center text-xs text-[#6E6E69] bg-white rounded-xl border border-[#E8E8E3]">
+              <div className="p-12 text-center text-xs text-[#6E6E69] bg-white rounded-2xl border border-[#E8E8E3]">
                 No internal notes recorded yet for this member.
               </div>
             ) : (
               notes.map((note) => (
                 <div
                   key={note.id}
-                  className="p-4 rounded-xl border border-[#E8E8E3] bg-white space-y-2 shadow-xs"
+                  className="p-5 rounded-2xl border border-[#E8E8E3] bg-white space-y-2 shadow-soft-sm"
                 >
                   <div className="flex items-center justify-between text-xs">
-                    <span className="font-semibold text-[#141413] flex items-center gap-1.5">
-                      <Lock className="w-3 h-3 text-[#B8532F]" />
+                    <span className="font-medium text-[#141413] flex items-center gap-2">
+                      <Lock className="w-3 h-3 text-[#865E16]" />
                       <span>{note.authorName}</span>
                     </span>
                     <div className="flex items-center gap-2">
@@ -621,7 +624,7 @@ export function CorMemberDetailClient({
                       <button
                         type="button"
                         onClick={() => handleDeleteNote(note.id)}
-                        className="text-[#8A8A85] hover:text-[#B91C1C] p-1"
+                        className="text-[#8A8A85] hover:text-[#B91C1C] p-1 transition-colors"
                         title="Delete note"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -640,8 +643,8 @@ export function CorMemberDetailClient({
 
       {/* TAB 5: Activity Log */}
       {activeTab === "activity" && (
-        <div className="p-5 rounded-xl border border-[#E8E8E3] bg-white shadow-xs space-y-4">
-          <h2 className="text-sm font-semibold text-[#141413]">
+        <div className="p-6 rounded-2xl border border-[#E8E8E3] bg-white shadow-soft-sm space-y-4">
+          <h2 className="font-serif text-lg text-[#141413]">
             Activity & Event Timeline
           </h2>
           <div className="space-y-3 text-xs">
@@ -651,9 +654,9 @@ export function CorMemberDetailClient({
               activity.map((act) => (
                 <div
                   key={act.id}
-                  className="flex items-start gap-3 p-3 rounded-lg bg-[#FAFAF8] border border-[#E8E8E3]"
+                  className="flex items-start gap-3.5 p-4 rounded-xl bg-[#FAF5EC]/40 border border-[#E8E8E3]"
                 >
-                  <div className="w-2 h-2 rounded-full bg-[#B8532F] mt-1.5 shrink-0" />
+                  <div className="w-2 h-2 rounded-full bg-[#865E16] mt-1.5 shrink-0" />
                   <div>
                     <div className="text-[#141413] font-medium">{act.description}</div>
                     <div className="text-[11px] text-[#8A8A85] mt-0.5">

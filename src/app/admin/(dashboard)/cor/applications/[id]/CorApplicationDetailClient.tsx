@@ -176,7 +176,7 @@ export function CorApplicationDetailClient({
       <div>
         <Link
           href="/admin/cor/applications"
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-[#6E6E69] hover:text-[#141413] transition-colors"
+          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#E8E8E3] bg-white text-xs font-medium text-[#6E6E69] hover:text-[#141413] hover:bg-[#FAF5EC] transition-all shadow-soft-sm"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>Back to Applications</span>
@@ -184,24 +184,24 @@ export function CorApplicationDetailClient({
       </div>
 
       {/* Main Application Header Card */}
-      <div className="p-6 rounded-2xl border border-[#E8E8E3] bg-white shadow-xs space-y-4">
-        <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+      <div className="p-6 md:p-8 rounded-2xl border border-[#E8E8E3] bg-white shadow-soft-sm space-y-6">
+        <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
           <div>
-            <div className="flex items-center gap-2.5">
-              <h1 className="text-xl md:text-2xl font-bold tracking-tight text-[#141413]">
-                {application.company} — {application.opportunityTitle}
+            <div className="flex items-center gap-3 flex-wrap">
+              <h1 className="text-2xl md:text-3xl font-serif font-normal tracking-tight text-[#141413]">
+                {application.company} — <span className="italic">{application.opportunityTitle}</span>
               </h1>
               <CorApplicationBadge status={application.status} />
             </div>
-            <p className="text-xs md:text-sm text-[#6E6E69] mt-1">
-              Creator: <strong>{application.creatorName}</strong> ({application.creatorEmail}) · Applied on {formatDate(application.appliedDate)} · Assigned to: {application.consultant}
+            <p className="text-xs md:text-sm text-[#6E6E69] mt-1.5">
+              Creator: <strong className="text-[#141413]">{application.creatorName}</strong> ({application.creatorEmail}) · Applied on {formatDate(application.appliedDate)} · Assigned to: {application.consultant}
             </p>
           </div>
 
           <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 shrink-0">
             <Link
               href={`/admin/cor/members/${application.corMemberId}`}
-              className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[#E8E8E3] bg-white text-[#141413] hover:bg-[#F3F3EE] transition-colors whitespace-nowrap inline-flex items-center gap-1 shadow-2xs"
+              className="px-3.5 py-1.5 rounded-full text-xs font-medium border border-[#E8E8E3] bg-white text-[#141413] hover:bg-[#FAF5EC] transition-all whitespace-nowrap inline-flex items-center gap-1 shadow-soft-sm"
             >
               <span>Creator Profile</span>
               <span aria-hidden="true">→</span>
@@ -209,7 +209,7 @@ export function CorApplicationDetailClient({
             {opportunity && (
               <Link
                 href={`/admin/cor/opportunities/${application.opportunityId}`}
-                className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[#E8E8E3] bg-white text-[#141413] hover:bg-[#F3F3EE] transition-colors whitespace-nowrap inline-flex items-center gap-1 shadow-2xs"
+                className="px-3.5 py-1.5 rounded-full text-xs font-medium border border-[#E8E8E3] bg-white text-[#141413] hover:bg-[#FAF5EC] transition-all whitespace-nowrap inline-flex items-center gap-1 shadow-soft-sm"
               >
                 <span>Opportunity Scope</span>
                 <span aria-hidden="true">→</span>
@@ -226,7 +226,7 @@ export function CorApplicationDetailClient({
               value={application.status}
               disabled={isUpdatingStatus}
               onChange={(e) => handleUpdateStatus(e.target.value as CorApplicationStatus)}
-              className="text-xs font-semibold rounded-lg px-3 py-1.5 border border-[#E8E8E3] bg-white text-[#141413] focus:outline-none focus:ring-1 focus:ring-[#B8532F]"
+              className="text-xs font-medium rounded-full px-3.5 py-1.5 border border-[#E8E8E3] bg-[#FAF5EC]/50 text-[#141413] focus:outline-none focus:border-[#865E16]"
             >
               {ALL_STATUSES.map((st) => (
                 <option key={st} value={st}>
@@ -239,26 +239,22 @@ export function CorApplicationDetailClient({
           {/* Quick Action Buttons */}
           <div className="flex items-center gap-2 shrink-0">
             {application.status !== "Offer" && (
-              <Button
-                size="sm"
-                variant="primary"
+              <button
                 onClick={() => handleUpdateStatus("Offer")}
                 disabled={isUpdatingStatus}
-                className="whitespace-nowrap inline-flex items-center"
+                className="px-4 py-2 rounded-full bg-[#141413] text-white text-xs font-medium hover:bg-[#2A2A28] transition-all shadow-soft-sm whitespace-nowrap inline-flex items-center"
               >
                 Mark as Offer
-              </Button>
+              </button>
             )}
             {application.status !== "Rejected" && (
-              <Button
-                size="sm"
-                variant="danger"
+              <button
                 onClick={() => handleUpdateStatus("Rejected")}
                 disabled={isUpdatingStatus}
-                className="whitespace-nowrap inline-flex items-center"
+                className="px-4 py-2 rounded-full border border-[#FECACA] bg-[#FEF2F2] text-[#B91C1C] text-xs font-medium hover:bg-[#FEE2E2] transition-all whitespace-nowrap inline-flex items-center"
               >
                 Mark Rejected
-              </Button>
+              </button>
             )}
           </div>
         </div>
@@ -267,21 +263,21 @@ export function CorApplicationDetailClient({
       {/* Main Grid: Candidate & Opportunity Summaries */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Candidate Card */}
-        <div className="p-5 rounded-xl border border-[#E8E8E3] bg-white shadow-xs space-y-3">
-          <div className="flex items-center justify-between border-b border-[#E8E8E3] pb-2.5">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-[#6E6E69] flex items-center gap-2">
-              <User className="w-3.5 h-3.5 text-[#B8532F]" />
+        <div className="p-6 rounded-2xl border border-[#E8E8E3] bg-white shadow-soft-sm space-y-4">
+          <div className="flex items-center justify-between border-b border-[#E8E8E3] pb-3">
+            <h2 className="text-xs font-medium uppercase tracking-[0.1em] text-[#6E6E69] flex items-center gap-2">
+              <User className="w-3.5 h-3.5 text-[#865E16]" />
               <span>Creator Details</span>
             </h2>
             <Link
               href={`/admin/cor/members/${application.corMemberId}`}
-              className="text-xs font-semibold text-[#B8532F] hover:underline"
+              className="text-xs font-medium text-[#865E16] hover:underline"
             >
               View Full Profile →
             </Link>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             {application.creatorAvatar ? (
               <img
                 src={application.creatorAvatar}
@@ -289,18 +285,18 @@ export function CorApplicationDetailClient({
                 className="w-12 h-12 rounded-full object-cover border border-[#E8E8E3]"
               />
             ) : (
-              <div className="w-12 h-12 rounded-full bg-[#EAEAE5] flex items-center justify-center text-sm font-semibold text-[#141413]">
+              <div className="w-12 h-12 rounded-full bg-[#FAF5EC] border border-[#E8E8E3] flex items-center justify-center text-sm font-serif text-[#141413]">
                 {application.creatorName.slice(0, 2).toUpperCase()}
               </div>
             )}
             <div>
-              <div className="font-bold text-sm text-[#141413]">
+              <div className="font-serif text-lg text-[#141413]">
                 {application.creatorName}
               </div>
               <div className="text-xs text-[#6E6E69]">
                 {application.creatorEmail}
               </div>
-              <div className="text-xs font-medium text-[#B8532F] mt-0.5">
+              <div className="text-xs font-medium text-[#865E16] mt-0.5">
                 Target Role: {member?.desiredRole || application.creatorRole || "Creative Practitioner"}
               </div>
             </div>
@@ -308,12 +304,12 @@ export function CorApplicationDetailClient({
 
           {member?.skills && member.skills.length > 0 && (
             <div className="pt-2">
-              <span className="text-[11px] text-[#8A8A85] block mb-1">Key Disciplines:</span>
-              <div className="flex flex-wrap gap-1">
+              <span className="text-[11px] text-[#8A8A85] block mb-1.5 uppercase tracking-wider">Key Disciplines:</span>
+              <div className="flex flex-wrap gap-1.5">
                 {member.skills.map((s) => (
                   <span
                     key={s}
-                    className="px-2 py-0.5 rounded-md bg-[#F3F3EE] text-[11px] font-medium text-[#141413]"
+                    className="px-2.5 py-0.5 rounded-full bg-[#FAF5EC] border border-[#E8E8E3] text-[11px] font-medium text-[#141413]"
                   >
                     {s}
                   </span>
@@ -324,31 +320,31 @@ export function CorApplicationDetailClient({
         </div>
 
         {/* Opportunity Card */}
-        <div className="p-5 rounded-xl border border-[#E8E8E3] bg-white shadow-xs space-y-3">
-          <div className="flex items-center justify-between border-b border-[#E8E8E3] pb-2.5">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-[#6E6E69] flex items-center gap-2">
-              <Building className="w-3.5 h-3.5 text-[#B8532F]" />
+        <div className="p-6 rounded-2xl border border-[#E8E8E3] bg-white shadow-soft-sm space-y-4">
+          <div className="flex items-center justify-between border-b border-[#E8E8E3] pb-3">
+            <h2 className="text-xs font-medium uppercase tracking-[0.1em] text-[#6E6E69] flex items-center gap-2">
+              <Building className="w-3.5 h-3.5 text-[#865E16]" />
               <span>Opportunity Overview</span>
             </h2>
             {opportunity && (
               <Link
                 href={`/admin/cor/opportunities/${opportunity.id}`}
-                className="text-xs font-semibold text-[#B8532F] hover:underline"
+                className="text-xs font-medium text-[#865E16] hover:underline"
               >
                 View Opportunity →
               </Link>
             )}
           </div>
 
-          <div className="space-y-1.5 text-xs">
-            <div className="font-bold text-sm text-[#141413]">
+          <div className="space-y-2 text-xs">
+            <div className="font-serif text-lg text-[#141413]">
               {application.opportunityTitle}
             </div>
             <div className="text-[#6E6E69]">
               {application.company} · {application.location || opportunity?.location || "Remote"} ({application.workplaceType || opportunity?.workplaceType || "Remote"})
             </div>
-            <div className="font-semibold text-[#141413] pt-1">
-              Salary / Budget: {application.salary || opportunity?.salary || "Competitive"}
+            <div className="font-medium text-[#141413] pt-1">
+              Salary / Budget: <span className="font-serif text-sm">{application.salary || opportunity?.salary || "Competitive"}</span>
             </div>
             {opportunity?.recruiterContact && (
               <div className="text-[#5E5E59] pt-1">
@@ -360,18 +356,18 @@ export function CorApplicationDetailClient({
       </div>
 
       {/* CHRONOLOGICAL EVENT TIMELINE (Phase 14) */}
-      <div className="p-6 rounded-xl border border-[#E8E8E3] bg-white shadow-xs space-y-4">
-        <div className="flex items-center justify-between border-b border-[#E8E8E3] pb-3">
+      <div className="p-6 md:p-8 rounded-2xl border border-[#E8E8E3] bg-white shadow-soft-sm space-y-6">
+        <div className="flex items-center justify-between border-b border-[#E8E8E3] pb-4">
           <div>
-            <h2 className="text-sm font-bold text-[#141413] flex items-center gap-2">
-              <Clock className="w-4 h-4 text-[#B8532F]" />
+            <h2 className="font-serif text-lg text-[#141413] flex items-center gap-2">
+              <Clock className="w-4 h-4 text-[#865E16]" />
               <span>Application Timeline & Events</span>
             </h2>
             <p className="text-xs text-[#6E6E69] mt-0.5">
               Complete chronological audit trail. Events are database-backed and never overwritten.
             </p>
           </div>
-          <span className="text-xs font-semibold text-[#B8532F]">
+          <span className="text-xs font-medium text-[#865E16] bg-[#FAF5EC] px-3 py-1 rounded-full border border-[#E8E8E3]">
             {events.length} Timeline Events
           </span>
         </div>
@@ -381,9 +377,9 @@ export function CorApplicationDetailClient({
           {events.map((ev, index) => (
             <div key={ev.id || index} className="relative group">
               {/* Dot */}
-              <div className="absolute -left-[23px] top-1 w-3.5 h-3.5 rounded-full border-2 border-white bg-[#B8532F] shadow-xs" />
+              <div className="absolute -left-[23px] top-1 w-3.5 h-3.5 rounded-full border-2 border-white bg-[#865E16] shadow-xs" />
 
-              <div className="space-y-1 text-xs">
+              <div className="space-y-1.5 text-xs">
                 <div className="flex items-center gap-2">
                   <CorApplicationBadge status={ev.newStatus} />
                   {ev.previousStatus && (
@@ -397,13 +393,13 @@ export function CorApplicationDetailClient({
                 </div>
 
                 {ev.note && (
-                  <p className="text-[#141413] bg-[#FAFAF8] p-2.5 rounded-lg border border-[#E8E8E3] mt-1.5 leading-relaxed">
+                  <p className="text-[#141413] bg-[#FAF5EC]/50 p-3 rounded-xl border border-[#E8E8E3] mt-1.5 leading-relaxed">
                     {ev.note}
                   </p>
                 )}
 
                 {ev.scheduledDate && (
-                  <div className="flex items-center gap-1.5 text-[11px] font-medium text-[#B8532F] pt-0.5">
+                  <div className="flex items-center gap-1.5 text-[11px] font-medium text-[#865E16] pt-0.5">
                     <Calendar className="w-3 h-3" />
                     <span>Scheduled for {formatDate(ev.scheduledDate)}</span>
                   </div>
@@ -418,15 +414,15 @@ export function CorApplicationDetailClient({
         </div>
 
         {/* Update / Advance Stage Box */}
-        <div className="pt-4 border-t border-[#E8E8E3] space-y-3">
-          <label className="block text-xs font-bold uppercase tracking-wider text-[#6E6E69]">
+        <div className="pt-5 border-t border-[#E8E8E3] space-y-3">
+          <label className="block text-xs font-medium uppercase tracking-[0.1em] text-[#6E6E69]">
             Advance Application Stage or Record Interview
           </label>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <select
               value={application.status}
               onChange={(e) => handleUpdateStatus(e.target.value as CorApplicationStatus)}
-              className="text-xs bg-white border border-[#E8E8E3] rounded-lg px-3 py-2 text-[#141413] focus:outline-none focus:ring-1 focus:ring-[#B8532F]"
+              className="text-xs bg-[#FAF5EC]/40 border border-[#E8E8E3] rounded-xl px-3.5 py-2.5 text-[#141413] focus:outline-none focus:border-[#865E16]"
             >
               {ALL_STATUSES.map((st) => (
                 <option key={st} value={st}>
@@ -440,7 +436,7 @@ export function CorApplicationDetailClient({
               placeholder="Schedule interview date"
               value={interviewDate}
               onChange={(e) => setInterviewDate(e.target.value)}
-              className="text-xs bg-white border border-[#E8E8E3] rounded-lg px-3 py-2 text-[#141413] focus:outline-none focus:ring-1 focus:ring-[#B8532F]"
+              className="text-xs bg-[#FAF5EC]/40 border border-[#E8E8E3] rounded-xl px-3.5 py-2.5 text-[#141413] focus:outline-none focus:border-[#865E16]"
             />
 
             <input
@@ -448,25 +444,25 @@ export function CorApplicationDetailClient({
               placeholder="Timeline note / update details..."
               value={statusNote}
               onChange={(e) => setStatusNote(e.target.value)}
-              className="text-xs bg-white border border-[#E8E8E3] rounded-lg px-3 py-2 text-[#141413] focus:outline-none focus:ring-1 focus:ring-[#B8532F]"
+              className="text-xs bg-[#FAF5EC]/40 border border-[#E8E8E3] rounded-xl px-3.5 py-2.5 text-[#141413] focus:outline-none focus:border-[#865E16]"
             />
           </div>
         </div>
       </div>
 
       {/* INTERNAL TEAM NOTES (PRIVACY: ADMIN ONLY) */}
-      <div className="p-6 rounded-xl border border-[#E8E8E3] bg-white shadow-xs space-y-4">
-        <div className="flex items-center justify-between border-b border-[#E8E8E3] pb-3">
+      <div className="p-6 md:p-8 rounded-2xl border border-[#E8E8E3] bg-white shadow-soft-sm space-y-6">
+        <div className="flex items-center justify-between border-b border-[#E8E8E3] pb-4">
           <div>
-            <h2 className="text-sm font-bold text-[#141413] flex items-center gap-2">
-              <Lock className="w-4 h-4 text-[#B8532F]" />
+            <h2 className="font-serif text-lg text-[#141413] flex items-center gap-2">
+              <Lock className="w-4 h-4 text-[#865E16]" />
               <span>Internal Team Notes & Application Strategy</span>
             </h2>
             <p className="text-xs text-[#6E6E69] mt-0.5">
               Private notes between career advisors, recruiters, and admins. Never exposed to candidates.
             </p>
           </div>
-          <span className="text-[11px] font-semibold text-[#9E4323] px-2 py-0.5 rounded-full bg-[#FDF8F6] border border-[#F5D7CC]">
+          <span className="text-[11px] font-medium text-[#865E16] px-2.5 py-0.5 rounded-full bg-[#FAF5EC] border border-[#865E16]/30">
             Admin Only
           </span>
         </div>
@@ -478,31 +474,35 @@ export function CorApplicationDetailClient({
             value={newNote}
             onChange={(e) => setNewNote(e.target.value)}
             placeholder="Add internal note on recruiter follow-up, candidate prep, salary negotiation strategy..."
-            className="w-full text-xs md:text-sm bg-white border border-[#E8E8E3] rounded-lg p-3 text-[#141413] focus:outline-none focus:ring-1 focus:ring-[#B8532F]"
+            className="w-full text-xs md:text-sm bg-[#FAF5EC]/40 border border-[#E8E8E3] rounded-xl p-3.5 text-[#141413] focus:outline-none focus:border-[#865E16]"
           />
           <div className="flex justify-end">
-            <Button size="sm" variant="primary" type="submit" isLoading={isAddingNote}>
+            <button
+              type="submit"
+              disabled={isAddingNote}
+              className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-[#141413] text-white text-xs font-medium hover:bg-[#2A2A28] transition-all shadow-soft-sm"
+            >
               <Plus className="w-3.5 h-3.5" />
-              <span>Add Team Note</span>
-            </Button>
+              <span>{isAddingNote ? "Adding..." : "Add Team Note"}</span>
+            </button>
           </div>
         </form>
 
         {/* Notes List */}
         <div className="space-y-3 pt-2">
           {notes.length === 0 ? (
-            <div className="p-6 text-center text-xs text-[#6E6E69] bg-[#FAFAF8] rounded-xl border border-[#E8E8E3]">
+            <div className="p-8 text-center text-xs text-[#6E6E69] bg-[#FAF5EC]/40 rounded-2xl border border-[#E8E8E3]">
               No internal notes recorded yet for this application.
             </div>
           ) : (
             notes.map((note) => (
               <div
                 key={note.id}
-                className="p-3.5 rounded-xl border border-[#E8E8E3] bg-[#FAFAF8] space-y-1.5 text-xs shadow-xs"
+                className="p-4 rounded-2xl border border-[#E8E8E3] bg-[#FAF5EC]/40 space-y-2 text-xs shadow-soft-sm"
               >
                 <div className="flex items-center justify-between">
-                  <span className="font-semibold text-[#141413] flex items-center gap-1.5">
-                    <Lock className="w-3 h-3 text-[#B8532F]" />
+                  <span className="font-medium text-[#141413] flex items-center gap-2">
+                    <Lock className="w-3 h-3 text-[#865E16]" />
                     <span>{note.authorName}</span>
                   </span>
                   <div className="flex items-center gap-2">
@@ -512,7 +512,7 @@ export function CorApplicationDetailClient({
                     <button
                       type="button"
                       onClick={() => handleDeleteNote(note.id)}
-                      className="text-[#8A8A85] hover:text-[#B91C1C] p-1"
+                      className="text-[#8A8A85] hover:text-[#B91C1C] p-1 transition-colors"
                       title="Delete note"
                     >
                       <Trash2 className="w-3.5 h-3.5" />

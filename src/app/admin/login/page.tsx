@@ -56,33 +56,39 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFAF8] text-[#141413] flex flex-col justify-center items-center px-4 py-12 selection:bg-[#F0DFD7] selection:text-[#9E4323]">
-      <div className="w-full max-w-sm space-y-6">
+    <div className="min-h-screen bg-[#FAF5EC] text-[#141413] flex flex-col justify-center items-center px-4 py-12 selection:bg-[#FAF5EC] selection:text-[#865E16]">
+      <div className="w-full max-w-md space-y-6">
         {/* Top Wordmark */}
-        <div className="text-center space-y-1.5">
-          <h1 className="text-2xl font-medium tracking-tight text-[#141413]">
-            ErasStudio<span className="text-sm align-super font-normal text-[#6E6E69]">®</span>
-          </h1>
-          <p className="text-xs uppercase tracking-wider text-[#6E6E69]">
-            Admin Console
+        <div className="text-center space-y-2">
+          <div className="flex items-center justify-center gap-2.5">
+            <span className="font-serif text-3xl font-normal tracking-tight text-[#141413]">
+              Eras Studio
+            </span>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#865E16]" />
+            <span className="text-[10px] tracking-[0.2em] uppercase font-medium text-[#865E16] px-2.5 py-0.5 rounded-full bg-white border border-[#E8E8E3] shadow-soft-sm">
+              Admin
+            </span>
+          </div>
+          <p className="text-[11px] font-medium tracking-[0.2em] uppercase text-[#865E16]">
+            A Space for the Creative Spirit
           </p>
         </div>
 
         {/* Minimal Login Card */}
-        <div className="bg-white border border-[#E8E8E3] rounded-lg p-6 sm:p-7 space-y-5">
-          <div className="space-y-1">
-            <h2 className="text-sm font-medium text-[#141413]">Sign in</h2>
-            <p className="text-xs text-[#71716D] leading-relaxed">
-              Enter your admin credentials to access curatorial & community operations.
+        <div className="bg-white border border-[#E8E8E3] rounded-2xl p-7 sm:p-9 shadow-soft-sm space-y-6">
+          <div className="space-y-1 text-center">
+            <h2 className="font-serif text-xl font-normal text-[#141413]">Curatorial Sign In</h2>
+            <p className="text-xs text-[#6E6E69] leading-relaxed">
+              Enter administrative credentials to manage gallery roster, community operations, and curatorial workflows.
             </p>
           </div>
 
           {error && (
             <div
               role="alert"
-              className="flex items-start gap-2.5 p-3 rounded-lg bg-[#FDF2F2] border border-[#F2C6C6] text-[#9E3333] text-xs leading-relaxed"
+              className="flex items-start gap-2.5 p-3.5 rounded-xl bg-[#FEF2F2] border border-[#FECACA] text-[#B91C1C] text-xs leading-relaxed"
             >
-              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-[#B83838]" />
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-[#B91C1C]" />
               <div className="flex-1">{error}</div>
             </div>
           )}
@@ -97,7 +103,7 @@ export default function LoginPage() {
               value={username}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
               disabled={isLoading}
-              leftIcon={<User className="w-3.5 h-3.5" />}
+              leftIcon={<User className="w-3.5 h-3.5 text-[#865E16]" />}
               required
             />
 
@@ -110,7 +116,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
               disabled={isLoading}
-              leftIcon={<Lock className="w-3.5 h-3.5" />}
+              leftIcon={<Lock className="w-3.5 h-3.5 text-[#865E16]" />}
               rightIcon={
                 <button
                   type="button"
@@ -130,21 +136,20 @@ export default function LoginPage() {
             />
 
             <div className="pt-2">
-              <Button
+              <button
                 type="submit"
-                variant="primary"
-                fullWidth
-                isLoading={isLoading}
+                disabled={isLoading}
+                className="w-full py-3 rounded-full bg-[#141413] hover:bg-[#2A2A28] text-white text-xs font-medium tracking-[0.08em] uppercase transition-all shadow-soft-sm disabled:opacity-50"
               >
                 {isLoading ? "Signing in..." : "Enter Studio"}
-              </Button>
+              </button>
             </div>
           </form>
         </div>
 
         <div className="text-center text-xs text-[#8A8A85]">
           <span>Protected curatorial platform • </span>
-          <span className="text-[#6E6E69]">ErasStudio</span>
+          <span className="text-[#865E16] font-medium">Eras Studio</span>
         </div>
       </div>
     </div>

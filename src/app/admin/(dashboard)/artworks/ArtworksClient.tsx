@@ -602,18 +602,18 @@ export function ArtworksClient({
           <button
             type="button"
             onClick={() => setViewingArtwork(null)}
-            className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full border border-[#D5D3CE] bg-white text-xs font-medium text-[#141413] hover:bg-[#F7F6F2] transition-colors shadow-2xs cursor-pointer select-none"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#E8E8E3] bg-white text-xs uppercase tracking-[0.08em] font-medium text-[#141413] hover:bg-[#FAF5EC] hover:border-[#141413] transition-colors shadow-soft-sm cursor-pointer select-none"
           >
             <span>←</span>
-            <span>Back to discovery</span>
+            <span>Back to gallery</span>
           </button>
         </div>
 
-        {/* 2-Column Discovery Detail Layout matching Screenshot 2 */}
+        {/* 2-Column Discovery Detail Layout matching Eras Studio aesthetic */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-start max-w-6xl mx-auto pt-2">
-          {/* Left Column: Artwork Image framed in soft sand/beige container */}
-          <div className="lg:col-span-6 bg-[#EFECE6] p-6 sm:p-10 md:p-12 rounded-2xl sm:rounded-3xl flex items-center justify-center">
-            <div className="relative w-full aspect-4/5 max-w-md rounded-xl sm:rounded-2xl overflow-hidden shadow-sm bg-neutral-100">
+          {/* Left Column: Artwork Image framed in soft canvas container */}
+          <div className="lg:col-span-6 bg-[#FAF5EC] p-6 sm:p-10 md:p-12 rounded-2xl border border-[#E8E8E3] shadow-soft-sm flex items-center justify-center">
+            <div className="relative w-full aspect-4/5 max-w-md rounded-2xl overflow-hidden shadow-soft-md bg-white border border-[#E8E8E3]">
               <Image
                 src={viewingArtwork.imageUrl}
                 alt={viewingArtwork.title}
@@ -626,14 +626,15 @@ export function ArtworksClient({
           </div>
 
           {/* Right Column: Metadata, Specifications & Actions */}
-          <div className="lg:col-span-6 space-y-5 pt-1">
+          <div className="lg:col-span-6 space-y-5 pt-1 bg-white p-6 sm:p-8 rounded-2xl border border-[#E8E8E3] shadow-soft-sm">
             {/* Category / Year */}
-            <p className="text-xs uppercase tracking-wider text-[#73736C] font-medium">
+            <p className="text-xs uppercase tracking-[0.1em] text-[#865E16] font-medium flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#865E16]" />
               {viewingArtwork.medium} / {viewingArtwork.year || "2026"}
             </p>
 
             {/* Title */}
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif text-[#141413] tracking-tight leading-tight">
+            <h1 className="text-3xl sm:text-4xl font-serif text-[#141413] tracking-tight leading-tight">
               {viewingArtwork.title}
             </h1>
 
@@ -643,43 +644,43 @@ export function ArtworksClient({
                 userId={viewingArtwork.creatorId}
                 name={viewingArtwork.creatorName}
                 role="Creator"
-                avatar={null as any} // we'll rely on the default initials rendered internally or can pass false
-                className="text-sm"
+                avatar={null as any}
+                className="text-sm font-medium"
               />
             </div>
 
             {/* Description */}
-            <p className="text-xs sm:text-sm text-[#5A5A55] leading-relaxed max-w-xl font-normal pt-1">
+            <p className="text-xs sm:text-sm text-[#71716D] leading-relaxed font-normal pt-1">
               {viewingArtwork.description ||
-                "A study of changing light across urban landscapes. Layered forms reveal fragments of memory and a quieter way of seeing."}
+                "A curated study of changing light across landscapes. Layered forms reveal fragments of memory and a quieter way of seeing."}
             </p>
 
             {/* Specifications Table */}
-            <div className="border-t border-b border-[#E8E6E1] divide-y divide-[#E8E6E1] text-xs sm:text-sm my-6">
+            <div className="border-t border-b border-[#E8E8E3] divide-y divide-[#E8E8E3] text-xs sm:text-sm my-6">
               <div className="py-2.5 flex justify-between items-center">
-                <span className="text-[#73736C]">Medium</span>
+                <span className="text-[#71716D]">Medium</span>
                 <span className="text-[#141413] font-medium">{viewingArtwork.medium}</span>
               </div>
               <div className="py-2.5 flex justify-between items-center">
-                <span className="text-[#73736C]">Dimensions</span>
+                <span className="text-[#71716D]">Dimensions</span>
                 <span className="text-[#141413] font-medium">{viewingArtwork.dimensions}</span>
               </div>
               <div className="py-2.5 flex justify-between items-center">
-                <span className="text-[#73736C]">Year</span>
+                <span className="text-[#71716D]">Year</span>
                 <span className="text-[#141413] font-medium">{viewingArtwork.year || "2026"}</span>
               </div>
               <div className="py-2.5 flex justify-between items-center">
-                <span className="text-[#73736C]">Location</span>
+                <span className="text-[#71716D]">Location</span>
                 <span className="text-[#141413] font-medium">{viewingArtwork.location || "Mumbai"}</span>
               </div>
               <div className="py-2.5 flex justify-between items-center">
-                <span className="text-[#73736C]">Collection</span>
+                <span className="text-[#71716D]">Collection</span>
                 <span className="text-[#141413] font-medium">
                   {viewingArtwork.collection || "Monsoon Studies"}
                 </span>
               </div>
               <div className="py-2.5 flex justify-between items-center">
-                <span className="text-[#73736C]">Availability</span>
+                <span className="text-[#71716D]">Availability</span>
                 <span className="text-[#141413] font-medium">
                   {viewingArtwork.availability ||
                     (viewingArtwork.status === "published" ? "Available" : "Not for sale")}
@@ -689,7 +690,7 @@ export function ArtworksClient({
 
             {/* Price */}
             <div className="pt-1">
-              <p className="text-sm font-semibold text-[#141413]">
+              <p className="text-xl font-serif font-bold text-[#141413]">
                 {viewingArtwork.price > 0
                   ? formatCurrency(viewingArtwork.price)
                   : "Price on request"}
@@ -701,30 +702,30 @@ export function ArtworksClient({
               <Button
                 variant="danger"
                 size="sm"
-                className="inline-flex items-center justify-center gap-2"
+                className="rounded-full inline-flex items-center justify-center gap-2"
                 onClick={() => {
                   setSelectedArtwork(viewingArtwork);
                   setIsDeleteModalOpen(true);
                 }}
               >
-                <Trash2 className="w-4 h-4" />
+                <Trash2 className="w-3.5 h-3.5" />
                 Remove
               </Button>
 
               <Button
                 variant={viewingArtwork.isFeatured ? "primary" : "outline"}
                 size="sm"
-                className="inline-flex items-center justify-center gap-2"
+                className="rounded-full inline-flex items-center justify-center gap-2"
                 onClick={() => handleToggleFeature(viewingArtwork)}
               >
-                <Star className={`w-4 h-4 ${viewingArtwork.isFeatured ? "fill-current" : ""}`} />
+                <Star className={`w-3.5 h-3.5 ${viewingArtwork.isFeatured ? "fill-current" : ""}`} />
                 {viewingArtwork.isFeatured ? "Featured" : "Feature"}
               </Button>
 
               <Button
                 variant={viewingArtwork.status === "draft" || viewingArtwork.status === "rejected" ? "outline" : "outline"}
                 size="sm"
-                className={`inline-flex items-center justify-center gap-2 ${
+                className={`rounded-full inline-flex items-center justify-center gap-2 ${
                   viewingArtwork.status === "draft" || viewingArtwork.status === "rejected"
                     ? "text-emerald-700 border-emerald-300 hover:bg-emerald-50"
                     : ""
@@ -733,12 +734,12 @@ export function ArtworksClient({
               >
                 {viewingArtwork.status === "draft" || viewingArtwork.status === "rejected" ? (
                   <>
-                    <Eye className="w-4 h-4 text-emerald-600" />
+                    <Eye className="w-3.5 h-3.5 text-emerald-600" />
                     <span>Revert (Unhide)</span>
                   </>
                 ) : (
                   <>
-                    <EyeOff className="w-4 h-4" />
+                    <EyeOff className="w-3.5 h-3.5" />
                     Hide
                   </>
                 )}
@@ -822,46 +823,51 @@ export function ArtworksClient({
       {/* ========================================================================= */}
       {/* 1. MAIN HEADER & ADD ARTWORK ACTION */}
       {/* ========================================================================= */}
-      <div className="border-b border-[#E8E8E3] pb-5">
+      <div className="border-b border-[#E8E8E3] pb-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <div className="text-[11px] uppercase tracking-wider font-semibold text-[#8A8A85] mb-1">
-              Workspace / Artworks
+            <div className="flex items-center gap-2 mb-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#865E16]" />
+              <span className="text-[11px] uppercase tracking-[0.14em] font-medium text-[#71716D]">
+                Curatorial Catalog & Moderation
+              </span>
             </div>
-            <h2 className="text-2xl md:text-3xl font-medium tracking-tight text-[#141413]">
-              Artworks
-            </h2>
-            <p className="mt-1 text-xs md:text-sm text-[#6E6E69]">
-              Catalog of community submissions, editorial features, and media moderation.
+            <h1 className="text-3xl sm:text-4xl font-serif text-[#141413] tracking-tight">
+              Curatorial Gallery<span className="italic font-normal">.</span>
+            </h1>
+            <p className="mt-1 text-xs md:text-sm text-[#71716D] font-light">
+              Catalog of creator submissions, editorial features, medium specifications, and publication review.
             </p>
           </div>
 
           <div className="flex items-center gap-2.5 self-start sm:self-auto">
             {/* View Mode Switcher */}
-            <div className="inline-flex items-center p-1 rounded-lg border border-[#E8E8E3] bg-white">
+            <div className="inline-flex items-center p-1 rounded-full border border-[#E8E8E3] bg-white shadow-soft-sm">
               <button
                 type="button"
                 onClick={() => setViewMode("grid")}
                 aria-label="Grid view"
-                className={`p-1.5 rounded-md text-xs font-medium transition-colors cursor-pointer ${
+                className={`p-1.5 px-3 rounded-full text-xs font-medium transition-colors cursor-pointer flex items-center gap-1.5 ${
                   viewMode === "grid"
-                    ? "bg-[#141413] text-white"
-                    : "text-[#6E6E69] hover:text-[#141413]"
+                    ? "bg-[#141413] text-white shadow-soft-sm"
+                    : "text-[#71716D] hover:text-[#141413]"
                 }`}
               >
                 <LayoutGrid className="w-3.5 h-3.5" />
+                <span className="text-[11px] hidden sm:inline">Grid</span>
               </button>
               <button
                 type="button"
                 onClick={() => setViewMode("table")}
                 aria-label="Table view"
-                className={`p-1.5 rounded-md text-xs font-medium transition-colors cursor-pointer ${
+                className={`p-1.5 px-3 rounded-full text-xs font-medium transition-colors cursor-pointer flex items-center gap-1.5 ${
                   viewMode === "table"
-                    ? "bg-[#141413] text-white"
-                    : "text-[#6E6E69] hover:text-[#141413]"
+                    ? "bg-[#141413] text-white shadow-soft-sm"
+                    : "text-[#71716D] hover:text-[#141413]"
                 }`}
               >
                 <List className="w-3.5 h-3.5" />
+                <span className="text-[11px] hidden sm:inline">Table</span>
               </button>
             </div>
 
@@ -871,7 +877,7 @@ export function ArtworksClient({
             <button
               type="button"
               onClick={() => setIsAddModalOpen(true)}
-              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-[#141413] text-white text-xs font-medium hover:bg-[#2A2A28] active:bg-[#000000] transition-colors shadow-xs cursor-pointer select-none"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#141413] text-white text-xs uppercase tracking-[0.08em] font-medium hover:bg-[#2A2A28] active:bg-[#000000] transition-colors shadow-soft-sm cursor-pointer select-none"
             >
               <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
               <span>Add Artwork</span>
@@ -881,9 +887,9 @@ export function ArtworksClient({
       </div>
 
       {/* ========================================================================= */}
-      {/* 2. SEARCH & FILTER BAR (ERAS Studio Prototype Style) */}
+      {/* 2. SEARCH & FILTER BAR (Eras Studio Design System) */}
       {/* ========================================================================= */}
-      <div className="space-y-3">
+      <div className="bg-white rounded-2xl border border-[#E8E8E3] p-4 shadow-soft-sm space-y-3">
         {/* Search Bar */}
         <div className="relative w-full">
           <Search className="w-4 h-4 text-[#8A8A85] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -892,7 +898,7 @@ export function ArtworksClient({
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Search artworks by title, creator, or medium..."
-            className="w-full text-xs md:text-sm pl-10 pr-9 py-2.5 rounded-lg border border-[#E8E8E3] bg-white text-[#141413] placeholder:text-[#8A8A85] focus:outline-none focus:border-[#B8532F] focus:ring-1 focus:ring-[#B8532F] transition-all shadow-2xs"
+            className="w-full text-xs md:text-sm pl-10 pr-9 py-2.5 rounded-full border border-[#E8E8E3] bg-[#FAF5EC]/40 focus:bg-white text-[#141413] placeholder:text-[#8A8A85] focus:outline-none focus:border-[#865E16] focus:ring-1 focus:ring-[#865E16] transition-all shadow-2xs"
           />
           {searchInput && (
             <button
@@ -901,7 +907,7 @@ export function ArtworksClient({
                 setSearchInput("");
                 setDebouncedSearch("");
               }}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8A8A85] hover:text-[#141413] p-0.5 cursor-pointer"
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#8A8A85] hover:text-[#141413] p-0.5 cursor-pointer"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -922,10 +928,10 @@ export function ArtworksClient({
                     setStatusFilter(pill.value);
                     setCurrentPage(1);
                   }}
-                  className={`px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer select-none ${
+                  className={`px-3.5 py-1 rounded-full text-xs font-medium transition-all cursor-pointer select-none ${
                     isActive
-                      ? "bg-[#141413] text-white shadow-2xs"
-                      : "bg-white text-[#6E6E69] border border-[#E8E8E3] hover:text-[#141413] hover:border-[#D0D0CA]"
+                      ? "bg-[#141413] text-white shadow-soft-sm"
+                      : "bg-white text-[#71716D] border border-[#E8E8E3] hover:text-[#141413] hover:border-[#141413]"
                   }`}
                 >
                   {pill.label}
@@ -936,8 +942,6 @@ export function ArtworksClient({
 
           {/* Creators & Media Dropdowns */}
           <div className="flex items-center gap-2">
-
-
             {/* Medium Dropdown */}
             <select
               value={mediumFilter}
@@ -946,7 +950,7 @@ export function ArtworksClient({
                 setCurrentPage(1);
               }}
               aria-label="Filter by medium"
-              className="text-xs px-2.5 py-1.5 rounded-lg border border-[#E8E8E3] bg-white text-[#141413] focus:outline-none focus:border-[#B8532F] cursor-pointer"
+              className="text-xs px-3 py-1.5 rounded-full border border-[#E8E8E3] bg-white text-[#141413] focus:outline-none focus:border-[#865E16] cursor-pointer"
             >
               <option value="all">All Media</option>
               {distinctMedia.map((medium) => (
@@ -960,7 +964,7 @@ export function ArtworksClient({
               <button
                 type="button"
                 onClick={handleResetFilters}
-                className="text-xs text-[#B8532F] hover:text-[#9E4323] font-medium px-2 py-1 cursor-pointer"
+                className="text-xs text-[#865E16] hover:text-[#141413] font-medium px-2 py-1 cursor-pointer"
               >
                 Reset
               </button>
@@ -977,9 +981,9 @@ export function ArtworksClient({
       {/* 3. BULK ACTION BAR (Table mode) */}
       {/* ========================================================================= */}
       {viewMode === "table" && selectedIds.size > 0 && (
-        <div className="flex items-center justify-between p-3 px-4 bg-[#FAFAF8] border border-[#B8532F]/40 rounded-lg animate-in fade-in duration-150">
+        <div className="flex items-center justify-between p-3 px-4 bg-[#FAF5EC] border border-[#ECDDBB] rounded-2xl shadow-soft-sm animate-in fade-in duration-150">
           <div className="flex items-center gap-2 text-xs font-medium text-[#141413]">
-            <CheckSquare className="w-4 h-4 text-[#B8532F]" />
+            <CheckSquare className="w-4 h-4 text-[#865E16]" />
             <span>
               {selectedIds.size} {selectedIds.size === 1 ? "artwork" : "artworks"} selected
             </span>
@@ -989,6 +993,7 @@ export function ArtworksClient({
             <Button
               variant="outline"
               size="sm"
+              className="rounded-full"
               onClick={() => setSelectedIds(new Set())}
             >
               Deselect All
@@ -996,6 +1001,7 @@ export function ArtworksClient({
             <Button
               variant="primary"
               size="sm"
+              className="rounded-full"
               onClick={() => handleBulkUpdateStatus("published")}
               leftIcon={<Check className="w-3.5 h-3.5" />}
             >
@@ -1004,6 +1010,7 @@ export function ArtworksClient({
             <Button
               variant="danger"
               size="sm"
+              className="rounded-full"
               onClick={() => handleBulkUpdateStatus("rejected")}
               leftIcon={<X className="w-3.5 h-3.5" />}
             >
@@ -1052,17 +1059,17 @@ export function ArtworksClient({
               <div
                 key={art.id}
                 onClick={() => setViewingArtwork(art)}
-                className="group bg-white border border-[#E8E8E3] hover:border-[#141413] rounded-lg overflow-hidden flex flex-col cursor-pointer transition-all duration-150 shadow-2xs hover:shadow-xs"
+                className="group bg-white border border-[#E8E8E3] hover:border-[#141413] rounded-2xl overflow-hidden flex flex-col cursor-pointer transition-all duration-200 shadow-soft-sm hover:shadow-soft-md"
               >
                 {/* Fixed Dimension Image Container with Next.js Optimization */}
-                <div className="relative aspect-4/3 w-full bg-[#ECECE7] overflow-hidden">
+                <div className="relative aspect-4/3 w-full bg-[#FAF5EC] overflow-hidden">
                   <Image
                     src={art.imageUrl}
                     alt={art.title}
                     fill
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
                     loading="lazy"
-                    className="object-cover group-hover:scale-[1.02] transition-transform duration-200"
+                    className="object-cover group-hover:scale-[1.03] transition-transform duration-300"
                   />
                   {/* Subtle Status Pill */}
                   <div className="absolute top-2.5 right-2.5">
@@ -1070,30 +1077,30 @@ export function ArtworksClient({
                   </div>
 
                   {/* Subtle Hover Action Pill */}
-                  <div className="absolute inset-0 bg-[#141413]/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/95 text-[#141413] text-[11px] font-medium shadow-sm backdrop-blur-xs">
-                      <Eye className="w-3 h-3 text-[#B8532F]" />
+                  <div className="absolute inset-0 bg-[#141413]/15 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/95 text-[#141413] text-[11px] uppercase tracking-[0.06em] font-medium shadow-soft-sm backdrop-blur-xs">
+                      <Eye className="w-3 h-3 text-[#865E16]" />
                       <span>View Specs</span>
                     </span>
                   </div>
                 </div>
 
                 {/* Card Text Content */}
-                <div className="p-3.5 flex-1 flex flex-col justify-between space-y-2.5">
+                <div className="p-4 flex-1 flex flex-col justify-between space-y-2.5">
                   <div>
-                    <h4 className="text-xs font-semibold text-[#141413] group-hover:text-[#B8532F] transition-colors truncate">
+                    <h4 className="text-sm font-serif font-semibold text-[#141413] group-hover:text-[#865E16] transition-colors truncate">
                       {art.title}
                     </h4>
-                    <p className="text-[11px] text-[#6E6E69] truncate mt-0.5">
+                    <p className="text-xs text-[#71716D] truncate mt-0.5">
                       by <span className="font-medium text-[#141413]">{art.creatorName}</span>
                     </p>
                   </div>
 
                   <div className="pt-2 border-t border-[#F0F0EB] flex items-center justify-between text-xs">
-                    <span className="text-[11px] text-[#8A8A85] truncate max-w-[120px]">
+                    <span className="text-[11px] text-[#71716D] truncate max-w-[120px]">
                       {art.medium}
                     </span>
-                    <span className="font-semibold text-[#141413]">
+                    <span className="font-serif font-semibold text-[#141413]">
                       {art.price ? formatCurrency(art.price) : "—"}
                     </span>
                   </div>
@@ -1104,7 +1111,7 @@ export function ArtworksClient({
 
           {/* Pagination */}
           <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-[#E8E8E3]">
-            <span className="text-xs text-[#6E6E69]">
+            <span className="text-xs text-[#71716D]">
               Showing {Math.min((currentPage - 1) * pageSize + 1, filteredArtworks.length)}–
               {Math.min(currentPage * pageSize, filteredArtworks.length)} of {filteredArtworks.length} artworks
             </span>
@@ -1121,155 +1128,160 @@ export function ArtworksClient({
         /* TABLE VIEW (Alternative view mode)                                    */
         /* ===================================================================== */
         <div className="space-y-4">
-          <Table>
-            <TableHeader>
-              <tr>
-                <TableHead className="w-10">
-                  <button
-                    type="button"
-                    onClick={handleToggleSelectAll}
-                    className="text-[#6E6E69] hover:text-[#141413] cursor-pointer"
-                    aria-label="Select all on this page"
-                  >
-                    {selectedIds.size === paginatedArtworks.length && paginatedArtworks.length > 0 ? (
-                      <CheckSquare className="w-4 h-4 text-[#B8532F]" />
-                    ) : selectedIds.size > 0 ? (
-                      <MinusSquare className="w-4 h-4 text-[#B8532F]" />
-                    ) : (
-                      <Square className="w-4 h-4" />
-                    )}
-                  </button>
-                </TableHead>
-                <TableHead>Artwork</TableHead>
-                <TableHead>Artist</TableHead>
-                <TableHead>Medium</TableHead>
-                <TableHead>Availability</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right pr-6">Actions</TableHead>
-              </tr>
-            </TableHeader>
-            <TableBody>
-              {paginatedArtworks.map((art) => {
-                const isSelected = selectedIds.has(art.id);
-                return (
-                  <TableRow
-                    key={art.id}
-                    onClick={() => setViewingArtwork(art)}
-                    className="cursor-pointer hover:bg-[#FAF9F5] transition-colors"
-                  >
-                    <TableCell onClick={(e) => handleToggleSelectRow(art.id, e)}>
-                      <button
-                        type="button"
-                        className="text-[#6E6E69] hover:text-[#141413] cursor-pointer flex items-center"
-                        aria-label={`Select ${art.title}`}
-                      >
-                        {isSelected ? (
-                          <CheckSquare className="w-4 h-4 text-[#B8532F]" />
-                        ) : (
-                          <Square className="w-4 h-4" />
-                        )}
-                      </button>
-                    </TableCell>
+          <div className="rounded-2xl border border-[#E8E8E3] bg-white overflow-hidden shadow-soft-sm">
+            <Table>
+              <TableHeader>
+                <tr className="bg-[#FAF5EC]/60 border-b border-[#E8E8E3]">
+                  <TableHead className="w-10">
+                    <button
+                      type="button"
+                      onClick={handleToggleSelectAll}
+                      className="text-[#71716D] hover:text-[#141413] cursor-pointer"
+                      aria-label="Select all on this page"
+                    >
+                      {selectedIds.size === paginatedArtworks.length && paginatedArtworks.length > 0 ? (
+                        <CheckSquare className="w-4 h-4 text-[#865E16]" />
+                      ) : selectedIds.size > 0 ? (
+                        <MinusSquare className="w-4 h-4 text-[#865E16]" />
+                      ) : (
+                        <Square className="w-4 h-4" />
+                      )}
+                    </button>
+                  </TableHead>
+                  <TableHead className="text-xs uppercase tracking-[0.08em] text-[#71716D] font-medium">Artwork</TableHead>
+                  <TableHead className="text-xs uppercase tracking-[0.08em] text-[#71716D] font-medium">Artist</TableHead>
+                  <TableHead className="text-xs uppercase tracking-[0.08em] text-[#71716D] font-medium">Medium</TableHead>
+                  <TableHead className="text-xs uppercase tracking-[0.08em] text-[#71716D] font-medium">Availability</TableHead>
+                  <TableHead className="text-xs uppercase tracking-[0.08em] text-[#71716D] font-medium">Date</TableHead>
+                  <TableHead className="text-xs uppercase tracking-[0.08em] text-[#71716D] font-medium">Status</TableHead>
+                  <TableHead className="text-right pr-6 text-xs uppercase tracking-[0.08em] text-[#71716D] font-medium">Actions</TableHead>
+                </tr>
+              </TableHeader>
+              <TableBody>
+                {paginatedArtworks.map((art) => {
+                  const isSelected = selectedIds.has(art.id);
+                  return (
+                    <TableRow
+                      key={art.id}
+                      onClick={() => setViewingArtwork(art)}
+                      className="cursor-pointer hover:bg-[#FAF5EC]/40 transition-colors border-b border-[#F0F0EB] last:border-0"
+                    >
+                      <TableCell onClick={(e) => handleToggleSelectRow(art.id, e)}>
+                        <button
+                          type="button"
+                          className="text-[#71716D] hover:text-[#141413] cursor-pointer flex items-center"
+                          aria-label={`Select ${art.title}`}
+                        >
+                          {isSelected ? (
+                            <CheckSquare className="w-4 h-4 text-[#865E16]" />
+                          ) : (
+                            <Square className="w-4 h-4" />
+                          )}
+                        </button>
+                      </TableCell>
 
-                    <TableCell>
-                      <div className="flex items-center gap-3.5">
-                        <div className="relative w-12 h-12 rounded-lg bg-[#ECECE7] overflow-hidden shrink-0">
-                          <Image
-                            src={art.imageUrl}
-                            alt={art.title}
-                            fill
-                            sizes="48px"
-                            loading="lazy"
-                            className="object-cover"
-                          />
+                      <TableCell>
+                        <div className="flex items-center gap-3.5">
+                          <div className="relative w-12 h-12 rounded-xl bg-[#FAF5EC] overflow-hidden shrink-0 border border-[#E8E8E3]">
+                            <Image
+                              src={art.imageUrl}
+                              alt={art.title}
+                              fill
+                              sizes="48px"
+                              loading="lazy"
+                              className="object-cover"
+                            />
+                          </div>
+                          <div>
+                            <span className="font-serif font-semibold text-sm text-[#141413] whitespace-nowrap block">
+                              {art.title}
+                            </span>
+                            <span className="text-xs text-[#71716D] font-serif">
+                              {art.price ? formatCurrency(art.price) : "—"}
+                            </span>
+                          </div>
                         </div>
-                        <span className="font-semibold text-sm text-[#141413] whitespace-nowrap">
-                          {art.title}
-                        </span>
-                      </div>
-                    </TableCell>
+                      </TableCell>
 
-                    <TableCell className="text-sm text-[#141413] whitespace-nowrap">
-                      {art.creatorName}
-                    </TableCell>
+                      <TableCell className="text-sm text-[#141413] whitespace-nowrap">
+                        {art.creatorName}
+                      </TableCell>
 
-                    <TableCell className="text-sm text-[#141413] whitespace-nowrap">
-                      {art.medium}
-                    </TableCell>
+                      <TableCell className="text-xs text-[#71716D] whitespace-nowrap">
+                        {art.medium}
+                      </TableCell>
 
-                    <TableCell className="text-sm text-[#141413] whitespace-nowrap">
-                      {art.availability || (art.status === "published" ? "Available" : "Not for sale")}
-                    </TableCell>
+                      <TableCell className="text-xs text-[#141413] whitespace-nowrap">
+                        {art.availability || (art.status === "published" ? "Available" : "Not for sale")}
+                      </TableCell>
 
-                    <TableCell className="text-sm text-[#141413] whitespace-nowrap">
-                      {formatDate(art.createdAt)}
-                    </TableCell>
+                      <TableCell className="text-xs text-[#71716D] whitespace-nowrap">
+                        {formatDate(art.createdAt)}
+                      </TableCell>
 
-                    <TableCell>
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-[#EFEFEF] text-[#4A4A48] select-none capitalize">
-                        {art.status === "published" ? "Published" : art.status}
-                      </span>
-                    </TableCell>
+                      <TableCell>
+                        {renderStatusBadge(art.status)}
+                      </TableCell>
 
-                    <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
-                      <div className="inline-flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => setViewingArtwork(art)}
-                          className="px-3.5 py-1 rounded-full border border-[#D5D5D0] text-xs font-normal text-[#141413] bg-white hover:bg-[#F5F5F3] transition-colors cursor-pointer select-none"
-                        >
-                          View
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleToggleFeature(art)}
-                          className="px-3.5 py-1 rounded-full border border-[#D5D5D0] text-xs font-normal text-[#141413] bg-white hover:bg-[#F5F5F3] transition-colors cursor-pointer select-none"
-                        >
-                          {art.isFeatured ? "Unfeature" : "Feature"}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleToggleHide(art)}
-                          className={`px-3.5 py-1 rounded-full border text-xs font-normal transition-colors cursor-pointer select-none ${
-                            art.status === "published"
-                              ? "border-[#D5D5D0] text-[#141413] bg-white hover:bg-[#F5F5F3]"
-                              : "border-emerald-300 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 font-medium"
-                          }`}
-                        >
-                          {art.status === "published" ? "Hide" : "Revert (Unhide)"}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setSelectedArtwork(art);
-                            setIsDeleteModalOpen(true);
-                          }}
-                          className="px-3.5 py-1 rounded-full border border-[#D5D5D0] text-xs font-normal text-[#141413] bg-white hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors cursor-pointer select-none"
-                        >
-                          Remove
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleToggleFlag(art)}
-                          className={`px-3.5 py-1 rounded-full border text-xs font-normal transition-colors cursor-pointer select-none ${
-                            art.isFlagged
-                              ? "bg-amber-50 text-amber-700 border-amber-300"
-                              : "border-[#D5D5D0] text-[#141413] bg-white hover:bg-amber-50 hover:text-amber-700 hover:border-amber-200"
-                          }`}
-                        >
-                          {art.isFlagged ? "Flagged" : "Flag"}
-                        </button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
+                      <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
+                        <div className="inline-flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => setViewingArtwork(art)}
+                            className="px-3 py-1 rounded-full border border-[#E8E8E3] text-xs font-medium text-[#141413] bg-white hover:bg-[#FAF5EC] transition-colors cursor-pointer select-none"
+                          >
+                            View
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleToggleFeature(art)}
+                            className="px-3 py-1 rounded-full border border-[#E8E8E3] text-xs font-medium text-[#141413] bg-white hover:bg-[#FAF5EC] transition-colors cursor-pointer select-none"
+                          >
+                            {art.isFeatured ? "Unfeature" : "Feature"}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleToggleHide(art)}
+                            className={`px-3 py-1 rounded-full border text-xs font-medium transition-colors cursor-pointer select-none ${
+                              art.status === "published"
+                                ? "border-[#E8E8E3] text-[#141413] bg-white hover:bg-[#FAF5EC]"
+                                : "border-emerald-300 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 font-medium"
+                            }`}
+                          >
+                            {art.status === "published" ? "Hide" : "Revert"}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedArtwork(art);
+                              setIsDeleteModalOpen(true);
+                            }}
+                            className="px-3 py-1 rounded-full border border-[#E8E8E3] text-xs font-medium text-[#9E3333] bg-white hover:bg-red-50 hover:border-red-200 transition-colors cursor-pointer select-none"
+                          >
+                            Remove
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleToggleFlag(art)}
+                            className={`px-3 py-1 rounded-full border text-xs font-medium transition-colors cursor-pointer select-none ${
+                              art.isFlagged
+                                ? "bg-amber-50 text-amber-700 border-amber-300"
+                                : "border-[#E8E8E3] text-[#71716D] bg-white hover:bg-amber-50 hover:text-amber-700 hover:border-amber-200"
+                            }`}
+                          >
+                            {art.isFlagged ? "Flagged" : "Flag"}
+                          </button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
 
           <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-[#E8E8E3]">
-            <span className="text-xs text-[#6E6E69]">
+            <span className="text-xs text-[#71716D]">
               Showing {Math.min((currentPage - 1) * pageSize + 1, filteredArtworks.length)}–
               {Math.min(currentPage * pageSize, filteredArtworks.length)} of {filteredArtworks.length} artworks
             </span>
@@ -1284,7 +1296,7 @@ export function ArtworksClient({
       )}
 
       {/* ========================================================================= */}
-      {/* 5. RIGHT DETAIL DRAWER (ERAS Studio Prototype Style)                      */}
+      {/* 5. RIGHT DETAIL DRAWER (Eras Studio Design Language)                      */}
       {/* ========================================================================= */}
       <Drawer
         isOpen={isDrawerOpen}
@@ -1298,6 +1310,7 @@ export function ArtworksClient({
               <Button
                 variant="danger"
                 size="sm"
+                className="rounded-full"
                 onClick={() => setIsDeleteModalOpen(true)}
                 leftIcon={<Trash2 className="w-3.5 h-3.5" />}
               >
@@ -1309,6 +1322,7 @@ export function ArtworksClient({
                   <Button
                     variant="outline"
                     size="sm"
+                    className="rounded-full"
                     onClick={() => handleUpdateStatus("draft")}
                     isLoading={isActionLoading}
                     leftIcon={<Archive className="w-3.5 h-3.5" />}
@@ -1319,6 +1333,7 @@ export function ArtworksClient({
                   <Button
                     variant="primary"
                     size="sm"
+                    className="rounded-full"
                     onClick={() => handleUpdateStatus("published")}
                     isLoading={isActionLoading}
                     leftIcon={<CheckCircle2 className="w-3.5 h-3.5" />}
@@ -1331,6 +1346,7 @@ export function ArtworksClient({
                   <Button
                     variant="outline"
                     size="sm"
+                    className="rounded-full"
                     onClick={() => setShowRejectForm((prev) => !prev)}
                     leftIcon={<XCircle className="w-3.5 h-3.5" />}
                   >
@@ -1345,7 +1361,7 @@ export function ArtworksClient({
         {selectedArtwork && (
           <div className="space-y-6">
             {/* Artwork Image Container */}
-            <div className="relative aspect-16/10 w-full rounded-lg bg-[#ECECE7] overflow-hidden border border-[#E8E8E3]">
+            <div className="relative aspect-16/10 w-full rounded-2xl bg-[#FAF5EC] overflow-hidden border border-[#E8E8E3]">
               <Image
                 src={selectedArtwork.imageUrl}
                 alt={selectedArtwork.title}
@@ -1360,26 +1376,26 @@ export function ArtworksClient({
             </div>
 
             {/* Title, Creator & Price Header */}
-            <div className="p-4 bg-[#FAFAF8] border border-[#E8E8E3] rounded-lg space-y-3">
+            <div className="p-4 bg-white border border-[#E8E8E3] rounded-2xl shadow-soft-sm space-y-3">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <h4 className="text-base font-semibold text-[#141413]">
+                  <h4 className="text-base font-serif font-semibold text-[#141413]">
                     {selectedArtwork.title}
                   </h4>
-                  <p className="text-xs text-[#6E6E69] mt-0.5">
+                  <p className="text-xs text-[#71716D] mt-0.5">
                     by <span className="font-medium text-[#141413]">{selectedArtwork.creatorName}</span>
                   </p>
                 </div>
 
                 <div className="text-right shrink-0">
-                  <span className="text-base font-semibold text-[#141413]">
+                  <span className="text-base font-serif font-semibold text-[#141413]">
                     {selectedArtwork.price ? formatCurrency(selectedArtwork.price) : "Price on request"}
                   </span>
                   <div className="mt-1">
                     <button
                       type="button"
                       onClick={() => setIsEditing((prev) => !prev)}
-                      className="inline-flex items-center gap-1 text-[11px] text-[#B8532F] hover:text-[#9E4323] cursor-pointer"
+                      className="inline-flex items-center gap-1 text-[11px] text-[#865E16] hover:text-[#141413] font-medium cursor-pointer"
                     >
                       <Edit3 className="w-3 h-3" />
                       <span>{isEditing ? "Close Edit" : "Edit Details"}</span>
@@ -1418,6 +1434,7 @@ export function ArtworksClient({
                     <Button
                       variant="ghost"
                       size="sm"
+                      className="rounded-full"
                       onClick={() => setIsEditing(false)}
                     >
                       Cancel
@@ -1425,6 +1442,7 @@ export function ArtworksClient({
                     <Button
                       variant="primary"
                       size="sm"
+                      className="rounded-full"
                       onClick={handleSaveEdits}
                       isLoading={isActionLoading}
                     >
@@ -1437,7 +1455,7 @@ export function ArtworksClient({
 
             {/* Rejection Form */}
             {showRejectForm && (
-              <div className="p-4 rounded-lg bg-[#FDF2F2] border border-[#F2C6C6] space-y-3 animate-in fade-in duration-150">
+              <div className="p-4 rounded-2xl bg-[#FDF2F2] border border-[#F2C6C6] space-y-3 animate-in fade-in duration-150">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold text-[#9E3333] flex items-center gap-1.5">
                     <XCircle className="w-3.5 h-3.5 text-[#B83838]" />
@@ -1459,12 +1477,13 @@ export function ArtworksClient({
                   onChange={(e) => setRejectReason(e.target.value)}
                   placeholder="e.g. Dimensions not adhering to gallery specifications / low resolution imagery..."
                   rows={2}
-                  className="w-full text-xs p-2.5 bg-white border border-[#F2C6C6] rounded-lg focus:outline-none focus:border-[#B83838] focus:ring-1 focus:ring-[#B83838]"
+                  className="w-full text-xs p-2.5 bg-white border border-[#F2C6C6] rounded-xl focus:outline-none focus:border-[#B83838] focus:ring-1 focus:ring-[#B83838]"
                 />
                 <div className="flex justify-end">
                   <Button
                     variant="danger"
                     size="sm"
+                    className="rounded-full"
                     onClick={() => handleUpdateStatus("rejected")}
                     isLoading={isActionLoading}
                   >
@@ -1475,29 +1494,29 @@ export function ArtworksClient({
             )}
 
             {/* Specifications Section */}
-            <div className="space-y-3 text-xs">
-              <h5 className="font-semibold text-[#141413] uppercase tracking-wider text-[11px] text-[#8A8A85]">
+            <div className="p-4 bg-white border border-[#E8E8E3] rounded-2xl shadow-soft-sm space-y-3 text-xs">
+              <h5 className="font-semibold text-[#141413] uppercase tracking-[0.1em] text-[11px] text-[#71716D]">
                 Specifications
               </h5>
 
               <div className="flex items-center justify-between py-2 border-b border-[#F0F0EB]">
-                <span className="text-[#6E6E69]">Artwork ID</span>
-                <span className="font-mono text-[11px] text-[#141413] bg-[#F5F5F0] px-1.5 py-0.5 rounded">
+                <span className="text-[#71716D]">Artwork ID</span>
+                <span className="font-mono text-[11px] text-[#141413] bg-[#FAF5EC] px-2 py-0.5 rounded-full border border-[#E8E8E3]">
                   {selectedArtwork.id}
                 </span>
               </div>
 
               {selectedArtwork.creatorId && (
                 <div className="flex items-center justify-between py-2 border-b border-[#F0F0EB]">
-                  <span className="text-[#6E6E69]">Creator ID</span>
-                  <span className="font-mono text-[11px] text-[#141413] bg-[#F5F5F0] px-1.5 py-0.5 rounded">
+                  <span className="text-[#71716D]">Creator ID</span>
+                  <span className="font-mono text-[11px] text-[#141413] bg-[#FAF5EC] px-2 py-0.5 rounded-full border border-[#E8E8E3]">
                     {selectedArtwork.creatorId}
                   </span>
                 </div>
               )}
 
               <div className="flex items-center justify-between py-2 border-b border-[#F0F0EB]">
-                <span className="text-[#6E6E69]">Medium</span>
+                <span className="text-[#71716D]">Medium</span>
                 <span className="font-medium text-[#141413]">
                   {selectedArtwork.medium}
                 </span>
@@ -1505,7 +1524,7 @@ export function ArtworksClient({
 
               {selectedArtwork.dimensions && (
                 <div className="flex items-center justify-between py-2 border-b border-[#F0F0EB]">
-                  <span className="text-[#6E6E69]">Physical Dimensions</span>
+                  <span className="text-[#71716D]">Physical Dimensions</span>
                   <span className="font-medium text-[#141413]">
                     {selectedArtwork.dimensions}
                   </span>
@@ -1513,14 +1532,14 @@ export function ArtworksClient({
               )}
 
               <div className="flex items-center justify-between py-2 border-b border-[#F0F0EB]">
-                <span className="text-[#6E6E69]">Submitted Date</span>
+                <span className="text-[#71716D]">Submitted Date</span>
                 <span className="font-medium text-[#141413]">
                   {formatDate(selectedArtwork.createdAt)}
                 </span>
               </div>
 
               <div className="flex items-center justify-between py-2 border-b border-[#F0F0EB]">
-                <span className="text-[#6E6E69]">Catalog Availability</span>
+                <span className="text-[#71716D]">Catalog Availability</span>
                 <span className="font-medium text-[#141413]">
                   {selectedArtwork.status === "published" ? "Available for collectors" : "Restricted / Internal"}
                 </span>
@@ -1564,6 +1583,7 @@ export function ArtworksClient({
             <Button
               variant="outline"
               size="sm"
+              className="rounded-full"
               onClick={() => setIsDeleteModalOpen(false)}
               disabled={isDeleting}
             >
@@ -1572,6 +1592,7 @@ export function ArtworksClient({
             <Button
               variant="danger"
               size="sm"
+              className="rounded-full"
               onClick={handleConfirmDelete}
               isLoading={isDeleting}
               leftIcon={<Trash2 className="w-3.5 h-3.5" />}

@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import {
   ArrowUpDown,
   ArrowUp,
@@ -10,12 +10,8 @@ import {
   Sparkles,
   CheckCircle2,
   Ban,
-  Shield,
-  Layers,
-  Calendar,
-  Award,
 } from "lucide-react";
-import { Collector, CollectorStatus } from "@/lib/types";
+import { Collector } from "@/lib/types";
 import {
   Table,
   TableHeader,
@@ -56,6 +52,13 @@ function formatDate(dateStr: string): string {
   }
 }
 
+function getInitials(name: string): string {
+  if (!name) return "P";
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
 export function CollectorsClient({
   initialCollectors,
   preferences,
@@ -65,10 +68,9 @@ export function CollectorsClient({
   const searchParams = useSearchParams();
   const initialStatusParam = searchParams.get("status") || "all";
 
-  const [Collectors, setCollectors] = useState<Collector[]>(initialCollectors);
+  const [collectors, setCollectors] = useState<Collector[]>(initialCollectors);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedpreferences, setSelectedpreferences] = useState("all");
-  const [selectedPlan, setSelectedPlan] = useState("all");
+  const [selectedPreferences, setSelectedPreferences] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState(initialStatusParam);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -93,37 +95,34 @@ export function CollectorsClient({
 
   // Filtering
   const filteredCollectors = useMemo(() => {
-    return Collectors.filter((Collector) => {
+    return collectors.filter((collector) => {
       // Search
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase().trim();
-        const matchesName = Collector.name.toLowerCase().includes(q);
-        const matchespreferences = Collector.preferences?.toLowerCase().includes(q);
-        if (!matchesName && !matchespreferences) return false;
+        const matchesName = collector.name.toLowerCase().includes(q);
+        const matchesPref = (collector.preferences || "").toLowerCase().includes(q);
+        if (!matchesName && !matchesPref) return false;
       }
 
-      // preferences filter
-      if (
-        selectedpreferences !== "all" &&
-        Collector.preferences !== selectedpreferences
-      ) {
+      // Preferences filter
+      if (selectedPreferences !== "all" && collector.preferences !== selectedPreferences) {
         return false;
       }
 
       // Status filter
-      if (selectedStatus !== "all" && Collector.status !== selectedStatus) {
+      if (selectedStatus !== "all" && collector.status !== selectedStatus) {
         return false;
       }
 
       return true;
     });
-  }, [Collectors, searchQuery, selectedpreferences, selectedStatus]);
+  }, [collectors, searchQuery, selectedPreferences, selectedStatus]);
 
   // Sorting
   const sortedCollectors = useMemo(() => {
     return [...filteredCollectors].sort((a, b) => {
-      const aVal = a[sortField] || "";
-      const bVal = b[sortField] || "";
+      let aVal = a[sortField] || "";
+      let bVal = b[sortField] || "";
 
       if (sortField === "createdAt") {
         const timeA = new Date(a.createdAt).getTime();
@@ -142,11 +141,13 @@ export function CollectorsClient({
   }, [filteredCollectors, sortField, sortDirection]);
 
   // Pagination
+  const totalPages = Math.max(1, Math.ceil(sortedCollectors.length / pageSize));
   const paginatedCollectors = useMemo(() => {
     const start = (currentPage - 1) * pageSize;
     return sortedCollectors.slice(start, start + pageSize);
   }, [sortedCollectors, currentPage, pageSize]);
 
+  // Sort handler
   const handleSort = (field: SortField) => {
     if (sortField === field) {
       setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
@@ -159,68 +160,28 @@ export function CollectorsClient({
 
   const renderSortIndicator = (field: SortField) => {
     if (sortField !== field) {
-      return (
-        <ArrowUpDown className="w-3 h-3 text-[#A0A09B] opacity-0 group-hover:opacity-100 transition-opacity" />
-      );
+      return <ArrowUpDown className="w-3 h-3 text-[#A0A09B] opacity-0 group-hover:opacity-100 transition-opacity" />;
     }
     return sortDirection === "asc" ? (
-      <ArrowUp className="w-3 h-3 text-[#B8532F]" />
+      <ArrowUp className="w-3 h-3 text-[#865E16]" />
     ) : (
-      <ArrowDown className="w-3 h-3 text-[#B8532F]" />
+      <ArrowDown className="w-3 h-3 text-[#865E16]" />
     );
   };
 
-  const router = useRouter();
-
+  // Row Click opens Drawer
   const handleRowClick = (collector: Collector) => {
-    router.push(`/admin/collectors/${collector.id}`);
+    setSelectedCollector(collector);
+    setIsDrawerOpen(true);
   };
 
-  // Drawer action: Approve pending Collector (optimistic)
-  const handleApproveCollector = async () => {
-    if (!selectedCollector) return;
-    const CollectorName = selectedCollector.name;
-    const previous = { ...selectedCollector };
-    const updated = { ...selectedCollector, status: "active" as CollectorStatus };
-
-    setSelectedCollector(updated);
-    setCollectors((prev) =>
-      prev.map((c) => (c.id === selectedCollector.id ? updated : c))
-    );
-
-    setIsUpdating(true);
-    try {
-      const res = await updateCollectorAction(selectedCollector.id, {
-        status: "active",
-      });
-      if (!res.success) {
-        setSelectedCollector(previous);
-        setCollectors((prev) =>
-          prev.map((c) => (c.id === selectedCollector.id ? previous : c))
-        );
-        toast.error("Failed to approve Collector", res.error || "Please try again.");
-      } else {
-        toast.success("Collector approved", `${CollectorName} is now an active Collector.`);
-      }
-    } catch {
-      setSelectedCollector(previous);
-      setCollectors((prev) =>
-        prev.map((c) => (c.id === selectedCollector.id ? previous : c))
-      );
-      toast.error("Network error", "Could not complete approval.");
-    } finally {
-      setIsUpdating(false);
-    }
-  };
-
-  // Drawer action: Suspend or Reactivate (optimistic)
+  // Drawer action: Suspend/Revert
   const handleToggleSuspend = async () => {
     if (!selectedCollector) return;
-    const CollectorName = selectedCollector.name;
-    const previous = { ...selectedCollector };
-    const nextStatus: CollectorStatus =
+    const nextStatus =
       selectedCollector.status === "active" ? "suspended" : "active";
-    const updated = { ...selectedCollector, status: nextStatus };
+    const previous = { ...selectedCollector };
+    const updated = { ...selectedCollector, status: nextStatus as any };
 
     setSelectedCollector(updated);
     setCollectors((prev) =>
@@ -242,8 +203,8 @@ export function CollectorsClient({
         toast.success(
           nextStatus === "suspended" ? "Collector suspended" : "Suspension reverted",
           nextStatus === "suspended"
-            ? `${CollectorName} has been suspended.`
-            : `Suspension reverted. ${CollectorName} is active.`
+            ? `${selectedCollector.name} is now suspended.`
+            : `Suspension reverted. ${selectedCollector.name} is active.`
         );
       }
     } catch {
@@ -251,26 +212,24 @@ export function CollectorsClient({
       setCollectors((prev) =>
         prev.map((c) => (c.id === selectedCollector.id ? previous : c))
       );
-      toast.error("Network error", "Could not update Collector status.");
+      toast.error("Network error", "Could not update collector status.");
     } finally {
       setIsUpdating(false);
     }
   };
 
-
-
-  // Filter Bar configuration reusing FilterBar component
+  // Filter Bar configuration
   const filterConfigs: FilterSelectConfig[] = [
     {
       id: "preferences",
-      label: "preferences",
-      value: selectedpreferences,
+      label: "Preferences",
+      value: selectedPreferences,
       onChange: (val) => {
-        setSelectedpreferences(val);
+        setSelectedPreferences(val);
         setCurrentPage(1);
       },
       options: [
-        { label: "All preferences", value: "all" },
+        { label: "All Preferences", value: "all" },
         ...preferences.map((d) => ({ label: d, value: d })),
       ],
     },
@@ -293,12 +252,12 @@ export function CollectorsClient({
 
   const hasActiveFilters =
     Boolean(searchQuery) ||
-    selectedpreferences !== "all" ||
+    selectedPreferences !== "all" ||
     selectedStatus !== "all";
 
   const handleResetFilters = () => {
     setSearchQuery("");
-    setSelectedpreferences("all");
+    setSelectedPreferences("all");
     setSelectedStatus("all");
     setCurrentPage(1);
   };
@@ -306,27 +265,24 @@ export function CollectorsClient({
   return (
     <div className="space-y-6 animate-in fade-in duration-150">
       {/* Title & Stats */}
-      <div className="border-b border-[#E8E8E3] pb-5 flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-3">
+      <div className="border-b border-[#E8E8E3] pb-6 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <div>
-          <h2 className="text-xl md:text-2xl font-medium tracking-tight text-[#141413]">
-            Collectors
-          </h2>
-          <p className="mt-1 text-xs md:text-sm text-[#6E6E69]">
-            Curated studio roster, Collector verification, and spotlight profiles.
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/80 rounded-full text-[11px] font-semibold tracking-[0.2em] text-[#73736C] uppercase border border-[#E8E8E3] mb-3 shadow-2xs font-sans">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#865E16]" />
+            ACQUISITION & PATRON DIRECTORY
+          </div>
+          <h1 className="font-serif text-3xl sm:text-4xl font-semibold tracking-tight text-[#141413]">
+            Art Patrons & <span className="italic font-normal">Collectors.</span>
+          </h1>
+          <p className="mt-1.5 text-xs sm:text-sm text-[#6E6E69] max-w-2xl leading-relaxed">
+            Manage collectors, private acquisition inquiries, and art purchases.
           </p>
         </div>
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 shrink-0">
-          <ExportDropdown exportType="collectors" filters={{ query: searchQuery, status: selectedStatus === "all" ? undefined : selectedStatus}} />
-          <div className="flex items-center gap-3 text-xs text-[#6E6E69]">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 shrink-0 self-start sm:self-auto">
+          <ExportDropdown exportType="collectors" filters={{ query: searchQuery, status: selectedStatus === "all" ? undefined : selectedStatus }} />
+          <div className="flex items-center gap-3 text-xs px-3.5 py-1.5 rounded-full border border-[#E8E8E3] bg-white text-[#6E6E69] font-medium shadow-2xs">
             <span>
-              Total: <strong className="text-[#141413]">{Collectors.length}</strong>
-            </span>
-            <span>•</span>
-            <span>
-              Pending:{" "}
-              <strong className="text-[#B8532F]">
-                {Collectors.filter((c) => c.status === "pending").length}
-              </strong>
+              Total: <strong className="text-[#141413]">{collectors.length} patrons</strong>
             </span>
           </div>
         </div>
@@ -339,13 +295,14 @@ export function CollectorsClient({
           setSearchQuery(q);
           setCurrentPage(1);
         }}
-        searchPlaceholder="Search Collector or preferences..."
+        searchPlaceholder="Search collector or taste preference..."
         filters={filterConfigs}
         hasActiveFilters={hasActiveFilters}
         onResetFilters={handleResetFilters}
+        className="rounded-2xl border border-[#E8E8E3] bg-white shadow-soft-sm p-4"
       >
         <span className="text-xs text-[#71716D]">
-          {sortedCollectors.length} {sortedCollectors.length === 1 ? "Collector" : "Collectors"} found
+          {sortedCollectors.length} {sortedCollectors.length === 1 ? "collector" : "collectors"} found
         </span>
       </FilterBar>
 
@@ -353,15 +310,15 @@ export function CollectorsClient({
       {sortedCollectors.length === 0 ? (
         <EmptyState
           icon={<Sparkles className="w-5 h-5 text-[#8A8A85]" />}
-          title="No Collectors found"
+          title="No collectors found"
           description={
             hasActiveFilters
-              ? "No Collectors match the current filter criteria. Try resetting your search or filters."
-              : "No Collectors registered in the studio roster yet."
+              ? "No collectors match the current filter criteria. Try resetting your search or filters."
+              : "No collectors registered on the platform yet."
           }
           action={
             hasActiveFilters ? (
-              <Button variant="outline" size="sm" onClick={handleResetFilters}>
+              <Button variant="outline" size="sm" className="rounded-full px-5" onClick={handleResetFilters}>
                 Reset Filters
               </Button>
             ) : null
@@ -369,113 +326,116 @@ export function CollectorsClient({
         />
       ) : (
         <div className="space-y-4">
-          <Table>
-            <TableHeader>
-              <tr>
-                <TableHead>
-                  <button
-                    onClick={() => handleSort("name")}
-                    className="group inline-flex items-center gap-1.5 hover:text-[#141413] cursor-pointer"
-                  >
-                    <span>Collector</span>
-                    {renderSortIndicator("name")}
-                  </button>
-                </TableHead>
-                <TableHead>
-                  <span>Preferences</span>
-                </TableHead>
-                <TableHead>
-                  <span>Interests Raised</span>
-                </TableHead>
-                <TableHead>
-                  <button
-                    onClick={() => handleSort("status")}
-                    className="group inline-flex items-center gap-1.5 hover:text-[#141413] cursor-pointer"
-                  >
-                    <span>Status</span>
-                    {renderSortIndicator("status")}
-                  </button>
-                </TableHead>
-                <TableHead>
-                  <button
-                    onClick={() => handleSort("createdAt")}
-                    className="group inline-flex items-center gap-1.5 hover:text-[#141413] cursor-pointer"
-                  >
-                    <span>Joined</span>
-                    {renderSortIndicator("createdAt")}
-                  </button>
-                </TableHead>
-              </tr>
-            </TableHeader>
-            <TableBody>
-              {paginatedCollectors.map((Collector) => (
-                <TableRow
-                  key={Collector.id}
-                  onClick={() => handleRowClick(Collector)}
-                  className="cursor-pointer"
-                >
-                  {/* Collector Name */}
-                  <TableCell>
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-7 h-7 rounded-full bg-[#EAEAE5] border border-[#DCDCD6] flex items-center justify-center text-xs font-semibold text-[#141413] shrink-0">
-                        {Collector.name.charAt(0)}
-                      </div>
-                      <div>
-                        <p className="font-medium text-[#141413]">
-                          {Collector.name}
-                        </p>
-                        <p className="text-[11px] text-[#71716D]">
-                          ID: {Collector.id}
-                        </p>
-                      </div>
-                    </div>
-                  </TableCell>
-
-                  {/* preferences */}
-                  <TableCell className="text-[#52524E]">
-                    {Collector.preferences || "Various"}
-                  </TableCell>
-
-                  {/* Interests Raised */}
-                  <TableCell>
-                    {(() => {
-                      const count = inquiryCounts[Collector.id] || 0;
-                      return count > 0 ? (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
-                          <Sparkles className="w-3 h-3 text-emerald-600" />
-                          {count} {count === 1 ? "Artwork" : "Artworks"}
-                        </span>
-                      ) : (
-                        <span className="text-xs text-[#9E9E98]">—</span>
-                      );
-                    })()}
-                  </TableCell>
-
-                  {/* Status */}
-                  <TableCell>
-                    <Badge
-                      variant={
-                        Collector.status === "active"
-                          ? "success"
-                          : Collector.status === "pending"
-                          ? "warning"
-                          : "danger"
-                      }
-                      size="sm"
-                      dot
+          <div className="bg-white rounded-2xl border border-[#E8E8E3] shadow-soft-sm overflow-hidden">
+            <Table className="border-none">
+              <TableHeader className="bg-[#FAF5EC]/70 border-b border-[#E8E8E3]">
+                <tr>
+                  <TableHead>
+                    <button
+                      onClick={() => handleSort("name")}
+                      className="group inline-flex items-center gap-1.5 hover:text-[#141413] cursor-pointer"
                     >
-                      {Collector.status}
-                    </Badge>
-                  </TableCell>
+                      <span>Collector</span>
+                      {renderSortIndicator("name")}
+                    </button>
+                  </TableHead>
+                  <TableHead>
+                    <span>Preferences</span>
+                  </TableHead>
+                  <TableHead>
+                    <span>Inquiries Raised</span>
+                  </TableHead>
+                  <TableHead>
+                    <button
+                      onClick={() => handleSort("status")}
+                      className="group inline-flex items-center gap-1.5 hover:text-[#141413] cursor-pointer"
+                    >
+                      <span>Status</span>
+                      {renderSortIndicator("status")}
+                    </button>
+                  </TableHead>
+                  <TableHead>
+                    <button
+                      onClick={() => handleSort("createdAt")}
+                      className="group inline-flex items-center gap-1.5 hover:text-[#141413] cursor-pointer"
+                    >
+                      <span>Joined</span>
+                      {renderSortIndicator("createdAt")}
+                    </button>
+                  </TableHead>
+                </tr>
+              </TableHeader>
+              <TableBody>
+                {paginatedCollectors.map((collector) => (
+                  <TableRow
+                    key={collector.id}
+                    onClick={() => handleRowClick(collector)}
+                    className="cursor-pointer hover:bg-[#FAF5EC]/30 transition-colors"
+                  >
+                    {/* Collector Name */}
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-[#FAF5EC] border border-[#ECDDBB] flex items-center justify-center text-xs font-semibold text-[#141413] shrink-0">
+                          {getInitials(collector.name)}
+                        </div>
+                        <div>
+                          <p className="font-medium text-[#141413]">
+                            {collector.name}
+                          </p>
+                          <p className="text-[11px] text-[#71716D]">
+                            ID: {collector.id}
+                          </p>
+                        </div>
+                      </div>
+                    </TableCell>
 
-                  {/* Joined Date */}
-                  <TableCell className="text-xs text-[#6E6E69]">
-                    {formatDate(Collector.createdAt)}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                    {/* preferences */}
+                    <TableCell className="text-[#52524E] font-medium">
+                      {collector.preferences || "Contemporary Art"}
+                    </TableCell>
+
+                    {/* Interests Raised */}
+                    <TableCell>
+                      {(() => {
+                        const count = inquiryCounts[collector.id] || 0;
+                        return count > 0 ? (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#F0F5F1] text-[#28633B] border border-[#CDE3D4]">
+                            <Sparkles className="w-3 h-3 text-[#28633B]" />
+                            {count} {count === 1 ? "Artwork" : "Artworks"}
+                          </span>
+                        ) : (
+                          <span className="text-xs text-[#8A8A85]">None yet</span>
+                        );
+                      })()}
+                    </TableCell>
+
+                    {/* Status */}
+                    <TableCell>
+                      <Badge
+                        variant={
+                          collector.status === "active"
+                            ? "success"
+                            : collector.status === "pending"
+                            ? "warning"
+                            : "danger"
+                        }
+                        size="sm"
+                        dot
+                        className="rounded-full capitalize font-medium"
+                      >
+                        {collector.status}
+                      </Badge>
+                    </TableCell>
+
+                    {/* Joined Date */}
+                    <TableCell className="text-xs text-[#6E6E69]">
+                      {formatDate(collector.createdAt)}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
 
           {/* Reusable Pagination */}
           <Pagination
@@ -487,54 +447,45 @@ export function CollectorsClient({
         </div>
       )}
 
-      {/* Side Drawer: Reusing Drawer component for Collector details & actions */}
+      {/* Side Drawer: Collector details & actions */}
       <Drawer
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
         title={selectedCollector?.name || "Collector Profile"}
-        description="Curatorial review and studio permissions"
+        description="Patron portfolio and acquisition inquiry status"
         footer={
           selectedCollector && (
             <div className="flex items-center justify-between w-full">
-              {selectedCollector.status === "pending" ? (
+              <Button
+                variant={
+                  selectedCollector.status === "active" ? "outline" : "primary"
+                }
+                size="sm"
+                onClick={handleToggleSuspend}
+                isLoading={isUpdating}
+                className="rounded-full px-5"
+                leftIcon={
+                  selectedCollector.status === "active" ? (
+                    <Ban className="w-3.5 h-3.5" />
+                  ) : (
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                  )
+                }
+              >
+                {selectedCollector.status === "active"
+                  ? "Suspend Patron"
+                  : "Revert Suspension"}
+              </Button>
+
+              <Link href={`/admin/collectors/${selectedCollector.id}`}>
                 <Button
                   variant="primary"
                   size="sm"
-                  onClick={handleApproveCollector}
-                  isLoading={isUpdating}
-                  leftIcon={<CheckCircle2 className="w-3.5 h-3.5" />}
+                  className="rounded-full px-5"
                 >
-                  Approve Collector
+                  View Full Dossier
                 </Button>
-              ) : (
-                <Button
-                  variant={
-                    selectedCollector.status === "active" ? "outline" : "primary"
-                  }
-                  size="sm"
-                  onClick={handleToggleSuspend}
-                  isLoading={isUpdating}
-                  leftIcon={
-                    selectedCollector.status === "active" ? (
-                      <Ban className="w-3.5 h-3.5" />
-                    ) : (
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                    )
-                  }
-                >
-                  {selectedCollector.status === "active"
-                    ? "Suspend Collector"
-                    : "Revert Suspension"}
-                </Button>
-              )}
-
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsDrawerOpen(false)}
-              >
-                Done
-              </Button>
+              </Link>
             </div>
           )
         }
@@ -543,21 +494,17 @@ export function CollectorsClient({
           <div className="space-y-6">
             {/* Header in Drawer */}
             <div className="flex items-center gap-3.5 pb-5 border-b border-[#E8E8E3]">
-              {selectedCollector.profilePicUrl ? (
-                <img src={selectedCollector.profilePicUrl} alt={selectedCollector.name} className="w-12 h-12 rounded-full object-cover border border-[#DCDCD6]" />
-              ) : (
-                <div className="w-12 h-12 rounded-full bg-[#EAEAE5] border border-[#DCDCD6] flex items-center justify-center text-base font-semibold text-[#141413]">
-                  {selectedCollector.name.charAt(0)}
-                </div>
-              )}
+              <div className="w-12 h-12 rounded-full bg-[#FAF5EC] border border-[#ECDDBB] flex items-center justify-center text-base font-semibold text-[#141413]">
+                {getInitials(selectedCollector.name)}
+              </div>
               <div className="min-w-0">
-                <h4 className="text-sm font-semibold text-[#141413] truncate">
+                <h4 className="font-serif text-base font-semibold text-[#141413] truncate">
                   {selectedCollector.name}
                 </h4>
                 <p className="text-xs text-[#6E6E69] truncate">
-                  {selectedCollector.preferences}
+                  Patron & Collector
                 </p>
-                <div className="flex items-center gap-1.5 mt-1.5">
+                <div className="flex items-center gap-1.5 mt-2">
                   <Badge
                     variant={
                       selectedCollector.status === "active"
@@ -568,6 +515,7 @@ export function CollectorsClient({
                     }
                     size="sm"
                     dot
+                    className="rounded-full capitalize font-medium"
                   >
                     {selectedCollector.status}
                   </Badge>
@@ -575,96 +523,33 @@ export function CollectorsClient({
               </div>
             </div>
 
-
             {/* Collector Metadata */}
             <div className="space-y-3 text-xs">
-              <h5 className="font-medium text-[#141413] uppercase tracking-wider text-[11px] text-[#8A8A85]">
-                Collector Dossier
+              <h5 className="font-semibold text-[#73736C] uppercase tracking-[0.2em] text-[11px] font-sans">
+                Patron Dossier
               </h5>
 
-              <div className="flex items-center justify-between py-2 border-b border-[#F0F0EB]">
+              <div className="flex items-center justify-between py-2.5 border-b border-[#F0F0EB]">
                 <span className="text-[#6E6E69]">Collector ID</span>
-                <span className="font-mono text-[11px] text-[#141413] bg-[#F5F5F0] px-1.5 py-0.5 rounded">
+                <span className="font-mono text-[11px] text-[#141413] bg-[#FAF5EC] border border-[#ECDDBB] px-2 py-0.5 rounded-full">
                   {selectedCollector.id}
                 </span>
               </div>
 
-              <div className="flex items-center justify-between py-2 border-b border-[#F0F0EB]">
-                <span className="text-[#6E6E69]">Linked User ID</span>
-                <span className="font-mono text-[11px] text-[#141413] bg-[#F5F5F0] px-1.5 py-0.5 rounded">
-                  {selectedCollector.userId}
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between py-2 border-b border-[#F0F0EB]">
-                <span className="text-[#6E6E69]">Preferences</span>
+              <div className="flex items-center justify-between py-2.5 border-b border-[#F0F0EB]">
+                <span className="text-[#6E6E69]">Art Preferences</span>
                 <span className="font-medium text-[#141413]">
-                  {selectedCollector.preferences || "Various"}
+                  {selectedCollector.preferences || "Contemporary Art"}
                 </span>
               </div>
 
-              <div className="flex items-center justify-between py-2 border-b border-[#F0F0EB]">
-                <span className="text-[#6E6E69]">Artworks of Interest</span>
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold text-[#141413]">
-                    {inquiryCounts[selectedCollector.id] || 0}
-                  </span>
-                  <Link
-                    href={`/admin/collectors/${selectedCollector.id}?tab=collection`}
-                    className="text-[11px] font-semibold text-[#B8532F] hover:underline flex items-center gap-0.5"
-                  >
-                    <span>View Artworks</span>
-                    <span>→</span>
-                  </Link>
-                </div>
-              </div>
-
-              {selectedCollector.email && (
-                <div className="flex items-center justify-between py-2 border-b border-[#F0F0EB]">
-                  <span className="text-[#6E6E69]">Email</span>
-                  <span className="font-medium text-[#141413]">
-                    {selectedCollector.email}
-                  </span>
-                </div>
-              )}
-
-              {selectedCollector.phoneNumber && (
-                <div className="flex items-center justify-between py-2 border-b border-[#F0F0EB]">
-                  <span className="text-[#6E6E69]">Phone</span>
-                  <span className="font-medium text-[#141413]">
-                    {selectedCollector.phoneNumber}
-                  </span>
-                </div>
-              )}
-
-              {selectedCollector.location && (
-                <div className="flex items-center justify-between py-2 border-b border-[#F0F0EB]">
-                  <span className="text-[#6E6E69]">Location</span>
-                  <span className="font-medium text-[#141413]">
-                    {selectedCollector.location}
-                  </span>
-                </div>
-              )}
-
-              <div className="flex items-center justify-between py-2 border-b border-[#F0F0EB]">
+              <div className="flex items-center justify-between py-2.5 border-b border-[#F0F0EB]">
                 <span className="text-[#6E6E69]">Registered Date</span>
                 <span className="font-medium text-[#141413]">
                   {formatDate(selectedCollector.createdAt)}
                 </span>
               </div>
             </div>
-
-            {/* Pending Notice if Pending */}
-            {selectedCollector.status === "pending" && (
-              <div className="p-3.5 rounded-lg bg-[#FAF5EC] border border-[#ECDDBB] text-xs text-[#865E16] space-y-1">
-                <p className="font-medium">Curatorial Review Required</p>
-                <p className="text-[11px] leading-relaxed">
-                  This Collector’s portfolio is in the onboarding queue. Approving
-                  them will unlock public showcase permissions and exhibition
-                  eligibility.
-                </p>
-              </div>
-            )}
           </div>
         )}
       </Drawer>

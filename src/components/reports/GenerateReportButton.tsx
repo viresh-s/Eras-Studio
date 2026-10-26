@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { FileText, Loader2, Calendar, Check, AlertCircle, ArrowRight, CheckCircle2 } from "lucide-react";
+import { FileText, Loader2, Check, AlertCircle, ArrowRight, CheckCircle2 } from "lucide-react";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 
@@ -156,9 +156,9 @@ export function GenerateReportButton() {
           setIsSuccess(false);
           setIsOpen(true);
         }}
-        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[#E8E8E3] bg-white text-xs font-medium text-[#141413] hover:bg-[#F5F5F0] hover:border-[#D0D0CA] transition-all duration-150 shadow-xs cursor-pointer select-none active:scale-[0.98]"
+        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#141413] text-white text-xs uppercase tracking-[0.08em] font-medium border border-[#141413] hover:bg-black transition-all duration-200 shadow-xs cursor-pointer select-none active:scale-[0.98]"
       >
-        <FileText className="w-3.5 h-3.5 text-[#B8532F]" />
+        <FileText className="w-3.5 h-3.5 text-[#FAF5EC]" />
         <span>Generate Report</span>
       </button>
 
@@ -170,30 +170,30 @@ export function GenerateReportButton() {
         title="Generate Performance Report"
         description="Choose a reporting period and generate a concise overview of your studio's performance."
         maxWidth="md"
-        footer={null} // We will use a custom footer inside the body to match the exact design requirement
+        footer={null}
       >
         <div className="flex flex-col space-y-6 pt-2">
           {/* Success State Overlay / Replacement */}
           {isSuccess ? (
             <div className="flex flex-col items-center justify-center py-10 text-center animate-in fade-in zoom-in-95 duration-300">
-              <div className="w-12 h-12 rounded-full bg-[#E8F3EB] text-[#28633B] flex items-center justify-center mb-4">
+              <div className="w-12 h-12 rounded-full bg-[#F0F5F1] text-[#28633B] flex items-center justify-center mb-4">
                 <CheckCircle2 className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-medium text-[#141413] mb-1">Report ready</h3>
-              <p className="text-sm text-[#6E6E69]">Your performance report has been generated.</p>
+              <h3 className="text-lg font-serif font-semibold text-[#141413] mb-1">Report ready</h3>
+              <p className="text-sm text-[#6E6E69]">Your performance report has been generated and downloaded.</p>
             </div>
           ) : (
             <>
               {errorMsg && (
-                <div className="p-3 rounded-lg bg-[#FDF3F2] border border-[#F4CDCD] flex items-start gap-2.5 text-xs text-[#B83838]">
-                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                <div className="p-3.5 rounded-xl bg-[#FDF2F2] border border-[#F2C6C6] flex items-start gap-2.5 text-xs text-[#9E3333]">
+                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-[#B83838]" />
                   <span>{errorMsg}</span>
                 </div>
               )}
 
               {/* REPORTING PERIOD */}
               <div className="space-y-3">
-                <h4 className="text-[11px] font-semibold text-[#6E6E69] uppercase tracking-wider">
+                <h4 className="text-[11px] font-semibold text-[#73736C] uppercase tracking-[0.2em] font-sans">
                   Reporting Period
                 </h4>
                 
@@ -209,19 +209,19 @@ export function GenerateReportButton() {
                           setSelectedPeriod(opt.id);
                           setErrorMsg(null);
                         }}
-                        className={`flex flex-col items-start justify-center p-3.5 rounded-xl border transition-all cursor-pointer text-left ${
+                        className={`flex flex-col items-start justify-center p-3.5 rounded-2xl border transition-all cursor-pointer text-left ${
                           isSelected
-                            ? "border-[#B8532F] bg-[#FAF5F2] ring-1 ring-[#B8532F]"
-                            : "border-[#E8E8E3] bg-white hover:bg-[#FAFAF8] hover:border-[#D0D0CA]"
+                            ? "border-[#141413] bg-[#FAF5EC] ring-1 ring-[#141413]"
+                            : "border-[#E8E8E3] bg-white hover:bg-[#FAF5EC]/40 hover:border-[#D0D0CA]"
                         } ${isGenerating ? "opacity-50 cursor-not-allowed" : ""}`}
                       >
                         <div className="flex items-center justify-between w-full">
-                          <span className={`text-sm font-medium ${isSelected ? "text-[#B8532F]" : "text-[#141413]"}`}>
+                          <span className={`text-sm font-medium ${isSelected ? "text-[#141413] font-semibold" : "text-[#141413]"}`}>
                             {opt.label}
                           </span>
-                          {isSelected && <Check className="w-4 h-4 text-[#B8532F]" />}
+                          {isSelected && <Check className="w-4 h-4 text-[#865E16]" />}
                         </div>
-                        <span className="text-xs text-[#71716D] mt-1">{opt.description}</span>
+                        <span className="text-xs text-[#6E6E69] mt-1">{opt.description}</span>
                       </button>
                     );
                   })}
@@ -234,16 +234,16 @@ export function GenerateReportButton() {
                       setSelectedPeriod("custom");
                       setErrorMsg(null);
                     }}
-                    className={`sm:col-span-2 flex items-center justify-between p-3.5 rounded-xl border transition-all cursor-pointer ${
+                    className={`sm:col-span-2 flex items-center justify-between p-3.5 rounded-2xl border transition-all cursor-pointer ${
                       selectedPeriod === "custom"
-                        ? "border-[#B8532F] bg-[#FAF5F2] ring-1 ring-[#B8532F]"
-                        : "border-[#E8E8E3] bg-white hover:bg-[#FAFAF8] hover:border-[#D0D0CA]"
+                        ? "border-[#141413] bg-[#FAF5EC] ring-1 ring-[#141413]"
+                        : "border-[#E8E8E3] bg-white hover:bg-[#FAF5EC]/40 hover:border-[#D0D0CA]"
                     } ${isGenerating ? "opacity-50 cursor-not-allowed" : ""}`}
                   >
-                    <span className={`text-sm font-medium ${selectedPeriod === "custom" ? "text-[#B8532F]" : "text-[#141413]"}`}>
+                    <span className={`text-sm font-medium ${selectedPeriod === "custom" ? "text-[#141413] font-semibold" : "text-[#141413]"}`}>
                       Custom range
                     </span>
-                    {selectedPeriod === "custom" ? <Check className="w-4 h-4 text-[#B8532F]" /> : <ArrowRight className="w-4 h-4 text-[#6E6E69]" />}
+                    {selectedPeriod === "custom" ? <Check className="w-4 h-4 text-[#865E16]" /> : <ArrowRight className="w-4 h-4 text-[#6E6E69]" />}
                   </button>
                 </div>
 
@@ -259,7 +259,7 @@ export function GenerateReportButton() {
                         disabled={isGenerating}
                         value={startDate}
                         onChange={(e) => setStartDate(e.target.value)}
-                        className="w-full text-sm px-3 py-2 rounded-lg border border-[#E8E8E3] bg-white text-[#141413] focus:outline-none focus:border-[#B8532F] focus:ring-1 focus:ring-[#B8532F] shadow-xs"
+                        className="w-full text-sm px-3.5 py-2 rounded-xl border border-[#E8E8E3] bg-white text-[#141413] focus:outline-none focus:border-[#141413] focus:ring-1 focus:ring-[#141413] shadow-xs"
                       />
                     </div>
                     <div>
@@ -271,7 +271,7 @@ export function GenerateReportButton() {
                         disabled={isGenerating}
                         value={endDate}
                         onChange={(e) => setEndDate(e.target.value)}
-                        className="w-full text-sm px-3 py-2 rounded-lg border border-[#E8E8E3] bg-white text-[#141413] focus:outline-none focus:border-[#B8532F] focus:ring-1 focus:ring-[#B8532F] shadow-xs"
+                        className="w-full text-sm px-3.5 py-2 rounded-xl border border-[#E8E8E3] bg-white text-[#141413] focus:outline-none focus:border-[#141413] focus:ring-1 focus:ring-[#141413] shadow-xs"
                       />
                     </div>
                   </div>
@@ -280,18 +280,18 @@ export function GenerateReportButton() {
 
               {/* REPORT PREVIEW */}
               <div className="space-y-3">
-                <h4 className="text-[11px] font-semibold text-[#6E6E69] uppercase tracking-wider">
+                <h4 className="text-[11px] font-semibold text-[#73736C] uppercase tracking-[0.2em] font-sans">
                   Report Preview
                 </h4>
-                <div className="p-4 rounded-xl border border-[#E8E8E3] bg-[#FAFAF8]">
+                <div className="p-5 rounded-2xl border border-[#E8E8E3] bg-[#FAF5EC]/50">
                   <h5 className="text-sm font-medium text-[#141413]">
                     {previewInfo.title}
                   </h5>
-                  <p className="text-xs text-[#71716D] mt-1 mb-4">
+                  <p className="text-xs text-[#6E6E69] mt-1 mb-4">
                     {previewInfo.range}
                   </p>
                   <div className="space-y-2">
-                    <p className="text-xs font-medium text-[#141413] mb-2">Includes:</p>
+                    <p className="text-xs font-semibold text-[#141413] mb-2 uppercase tracking-wider">Includes:</p>
                     <div className="flex items-center gap-2 text-xs text-[#6E6E69]">
                       <Check className="w-3.5 h-3.5 text-[#28633B]" />
                       <span>Platform performance</span>
@@ -302,7 +302,7 @@ export function GenerateReportButton() {
                     </div>
                     <div className="flex items-center gap-2 text-xs text-[#6E6E69]">
                       <Check className="w-3.5 h-3.5 text-[#28633B]" />
-                      <span>Key performance insights</span>
+                      <span>Key curatorial & financial insights</span>
                     </div>
                   </div>
                 </div>
@@ -314,6 +314,7 @@ export function GenerateReportButton() {
                   variant="secondary"
                   onClick={() => setIsOpen(false)}
                   disabled={isGenerating}
+                  className="rounded-full px-5 py-2"
                 >
                   Cancel
                 </Button>
@@ -321,7 +322,7 @@ export function GenerateReportButton() {
                   variant="primary"
                   onClick={handleGenerate}
                   disabled={isGenerating}
-                  className="min-w-[140px]"
+                  className="min-w-[150px] rounded-full px-6 py-2.5"
                 >
                   {isGenerating ? (
                     <span className="flex items-center gap-2">
@@ -331,7 +332,7 @@ export function GenerateReportButton() {
                   ) : errorMsg ? (
                     "Try Again"
                   ) : (
-                    "Generate Report"
+                    "Generate PDF Report"
                   )}
                 </Button>
               </div>

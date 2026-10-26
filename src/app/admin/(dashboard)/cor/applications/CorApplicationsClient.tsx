@@ -172,10 +172,13 @@ export function CorApplicationsClient({
   return (
     <div className="space-y-6">
       {/* Visual Reference Header matching Prototype */}
-      <div className="border-b border-[#E8E8E3] pb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="border-b border-[#E8E8E3] pb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#141413]">
-            Applications
+          <p className="text-[11px] font-medium tracking-[0.2em] uppercase text-[#865E16] mb-1">
+            Institutional Representation
+          </p>
+          <h1 className="text-3xl font-serif font-normal tracking-tight text-[#141413]">
+            Representation Applications.
           </h1>
           <p className="text-xs sm:text-sm text-[#6E6E69] mt-1 max-w-2xl">
             Keep every candidate and opportunity moving together. Update pipeline stages, manage interviews, and track offers.
@@ -184,40 +187,37 @@ export function CorApplicationsClient({
 
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 shrink-0">
           <ExportDropdown exportType="cor-applications" filters={{ query: searchQuery, status: statusFilter === "all" ? undefined : statusFilter, company: companyFilter === "all" ? undefined : companyFilter }} />
-          <Button
-            variant="dark"
+          <button
             onClick={() => setApplyModalOpen(true)}
-            className="shrink-0"
+            className="shrink-0 whitespace-nowrap inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#141413] hover:bg-[#2A2A28] text-white text-xs font-medium tracking-[0.04em] shadow-soft-sm transition-all"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Apply for Creator</span>
-          </Button>
+          </button>
         </div>
       </div>
 
       {/* Navigation Tabs */}
       <CorNavTabs counts={counts} />
 
-
-
       {/* Search and Filters Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="p-2 sm:p-2.5 rounded-2xl border border-[#E8E8E3] bg-white shadow-soft-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         {/* Status Pill Tabs (Reference Prototype Style) */}
-        <div className="flex items-center gap-1 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
           <button
             onClick={() => {
               setStatusFilter("all");
               setCurrentPage(1);
             }}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+            className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
               statusFilter === "all"
-                ? "bg-[#141413] text-white shadow-xs"
-                : "bg-white text-[#6E6E69] border border-[#E8E8E3] hover:text-[#141413] hover:bg-[#F7F7F4]"
+                ? "bg-[#141413] text-white shadow-soft-sm"
+                : "text-[#6E6E69] hover:text-[#141413] hover:bg-[#FAF5EC]"
             }`}
           >
             <span>All</span>
-            <span className={`text-[11px] px-1.5 py-0.2 rounded-full ${
-              statusFilter === "all" ? "bg-white/20 text-white" : "bg-[#F3F3EE] text-[#6E6E69]"
+            <span className={`text-[11px] px-2 py-0.2 rounded-full ${
+              statusFilter === "all" ? "bg-white/20 text-white" : "bg-[#FAF5EC] text-[#865E16]"
             }`}>
               {statusCounts.all}
             </span>
@@ -232,15 +232,15 @@ export function CorApplicationsClient({
                   setStatusFilter(st);
                   setCurrentPage(1);
                 }}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
+                className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap ${
                   active
-                    ? "bg-[#141413] text-white shadow-xs"
-                    : "bg-white text-[#6E6E69] border border-[#E8E8E3] hover:text-[#141413] hover:bg-[#F7F7F4]"
+                    ? "bg-[#141413] text-white shadow-soft-sm"
+                    : "text-[#6E6E69] hover:text-[#141413] hover:bg-[#FAF5EC]"
                 }`}
               >
                 <span>{st}</span>
-                <span className={`text-[11px] px-1.5 py-0.2 rounded-full ${
-                  active ? "bg-white/20 text-white" : "bg-[#F3F3EE] text-[#6E6E69]"
+                <span className={`text-[11px] px-2 py-0.2 rounded-full ${
+                  active ? "bg-white/20 text-white" : "bg-[#FAF5EC] text-[#865E16]"
                 }`}>
                   {statusCounts[st] || 0}
                 </span>
@@ -258,7 +258,7 @@ export function CorApplicationsClient({
                 setCompanyFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="text-xs bg-white border border-[#E8E8E3] rounded-lg px-2.5 py-1.5 text-[#141413] focus:outline-none focus:ring-1 focus:ring-[#B8532F]"
+              className="text-xs bg-[#FAF5EC]/50 border border-[#E8E8E3] rounded-full px-3 py-1.5 text-[#141413] focus:outline-none focus:bg-white focus:border-[#865E16] transition-colors"
             >
               <option value="all">All Companies</option>
               {uniqueCompanies.map((c) => (
@@ -270,7 +270,7 @@ export function CorApplicationsClient({
           )}
 
           <div className="relative w-full sm:w-64">
-            <Search className="w-4 h-4 text-[#8A8A85] absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-3.5 h-3.5 text-[#8A8A85] absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder="Search company or candidate..."
@@ -279,36 +279,36 @@ export function CorApplicationsClient({
                 setSearchQuery(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full text-xs md:text-sm bg-white border border-[#E8E8E3] rounded-lg pl-9 pr-3 py-1.5 text-[#141413] placeholder-[#8A8A85] focus:outline-none focus:ring-1 focus:ring-[#B8532F]"
+              className="w-full text-xs bg-[#FAF5EC]/50 border border-[#E8E8E3] rounded-full pl-9 pr-3.5 py-2 text-[#141413] placeholder-[#8A8A85] focus:outline-none focus:bg-white focus:border-[#865E16] transition-colors"
             />
           </div>
         </div>
       </div>
 
       {/* Applications Data Table */}
-      <div className="bg-white border border-[#E8E8E3] rounded-xl overflow-hidden shadow-xs">
+      <div className="bg-white border border-[#E8E8E3] rounded-2xl overflow-hidden shadow-soft-sm">
         <Table>
           <TableHeader>
-            <TableRow className="bg-[#FAFAF8] border-b border-[#E8E8E3]">
-              <TableHead className="py-3 px-4 text-xs font-semibold text-[#6E6E69] uppercase tracking-wider">
+            <TableRow className="bg-[#FAF5EC]/70 border-b border-[#E8E8E3]">
+              <TableHead className="py-3 px-5 text-[11px] font-medium text-[#8A8A85] uppercase tracking-wider">
                 Opportunity
               </TableHead>
-              <TableHead className="py-3 px-4 text-xs font-semibold text-[#6E6E69] uppercase tracking-wider">
+              <TableHead className="py-3 px-5 text-[11px] font-medium text-[#8A8A85] uppercase tracking-wider">
                 Creator
               </TableHead>
-              <TableHead className="py-3 px-4 text-xs font-semibold text-[#6E6E69] uppercase tracking-wider">
+              <TableHead className="py-3 px-5 text-[11px] font-medium text-[#8A8A85] uppercase tracking-wider">
                 Status
               </TableHead>
-              <TableHead className="py-3 px-4 text-xs font-semibold text-[#6E6E69] uppercase tracking-wider">
+              <TableHead className="py-3 px-5 text-[11px] font-medium text-[#8A8A85] uppercase tracking-wider">
                 Applied On
               </TableHead>
-              <TableHead className="py-3 px-4 text-xs font-semibold text-[#6E6E69] uppercase tracking-wider">
+              <TableHead className="py-3 px-5 text-[11px] font-medium text-[#8A8A85] uppercase tracking-wider">
                 Interview
               </TableHead>
-              <TableHead className="py-3 px-4 text-xs font-semibold text-[#6E6E69] uppercase tracking-wider">
+              <TableHead className="py-3 px-5 text-[11px] font-medium text-[#8A8A85] uppercase tracking-wider">
                 Managed By
               </TableHead>
-              <TableHead className="py-3 px-4 text-xs font-semibold text-[#6E6E69] uppercase tracking-wider text-right">
+              <TableHead className="py-3 px-5 text-[11px] font-medium text-[#8A8A85] uppercase tracking-wider text-right">
                 Action
               </TableHead>
             </TableRow>
@@ -327,15 +327,15 @@ export function CorApplicationsClient({
               paginatedApplications.map((app) => (
                 <TableRow
                   key={app.id}
-                  className="hover:bg-[#FBFBFA] transition-colors border-b border-[#E8E8E3] last:border-none"
+                  className="hover:bg-[#FAF5EC]/40 transition-colors border-b border-[#E8E8E3] last:border-none"
                 >
                   {/* Company & Role */}
-                  <TableCell className="py-3 px-4">
+                  <TableCell className="py-3.5 px-5">
                     <Link
                       href={`/admin/cor/applications/${app.id}`}
                       className="group block"
                     >
-                      <div className="font-bold text-sm text-[#141413] group-hover:text-[#B8532F] transition-colors">
+                      <div className="font-serif text-base text-[#141413] group-hover:text-[#865E16] transition-colors">
                         {app.company}
                       </div>
                       <div className="text-xs text-[#6E6E69]">
@@ -345,7 +345,7 @@ export function CorApplicationsClient({
                   </TableCell>
 
                   {/* Candidate / Creator */}
-                  <TableCell className="py-3 px-4">
+                  <TableCell className="py-3.5 px-5">
                     <div className="flex items-center gap-3">
                       {app.creatorAvatar ? (
                         <img
@@ -354,14 +354,14 @@ export function CorApplicationsClient({
                           className="w-8 h-8 rounded-full object-cover border border-[#E8E8E3]"
                         />
                       ) : (
-                        <div className="w-8 h-8 rounded-full bg-[#EAEAE5] flex items-center justify-center text-xs font-semibold text-[#141413]">
+                        <div className="w-8 h-8 rounded-full bg-[#FAF5EC] border border-[#E8E8E3] flex items-center justify-center text-xs font-serif text-[#141413]">
                           {app.creatorName.slice(0, 2).toUpperCase()}
                         </div>
                       )}
                       <div>
                         <Link
                           href={`/admin/cor/members/${app.corMemberId}`}
-                          className="font-semibold text-xs text-[#141413] hover:text-[#B8532F] transition-colors"
+                          className="font-medium text-xs text-[#141413] hover:text-[#865E16] transition-colors"
                         >
                           {app.creatorName}
                         </Link>
@@ -373,7 +373,7 @@ export function CorApplicationsClient({
                   </TableCell>
 
                   {/* Interactive Status Dropdown (Phase 13) */}
-                  <TableCell className="py-3 px-4">
+                  <TableCell className="py-3.5 px-5">
                     <div className="relative inline-block">
                       <select
                         value={app.status}
@@ -381,15 +381,15 @@ export function CorApplicationsClient({
                         onChange={(e) =>
                           handleStatusChange(app.id, e.target.value as CorApplicationStatus)
                         }
-                        className={`text-xs font-semibold rounded-lg px-2.5 py-1.5 border transition-all cursor-pointer focus:outline-none focus:ring-1 focus:ring-[#B8532F] ${
+                        className={`text-xs font-medium rounded-full px-3 py-1 border transition-all cursor-pointer focus:outline-none focus:border-[#865E16] ${
                           app.status === "Offer"
-                            ? "bg-[#ECFDF5] text-[#047857] border-[#A7F3D0]"
+                            ? "bg-[#FAF5EC] text-[#865E16] border-[#865E16]/40"
                             : app.status === "Interview"
-                            ? "bg-[#FFFBEB] text-[#B45309] border-[#FDE68A]"
+                            ? "bg-[#FAF5EC] text-[#865E16] border-[#865E16]/30"
                             : app.status === "Screening"
-                            ? "bg-[#FEF3C7] text-[#92400E] border-[#FCD34D]"
+                            ? "bg-[#FAF5EC] text-[#141413] border-[#E8E8E3]"
                             : app.status === "Final Round"
-                            ? "bg-[#FDF4FF] text-[#86198F] border-[#F5D0FE]"
+                            ? "bg-[#FAF5EC] text-[#865E16] border-[#865E16]/40"
                             : app.status === "Rejected"
                             ? "bg-[#FEF2F2] text-[#B91C1C] border-[#FECACA]"
                             : "bg-white text-[#141413] border-[#E8E8E3]"
@@ -405,14 +405,14 @@ export function CorApplicationsClient({
                   </TableCell>
 
                   {/* Applied Date */}
-                  <TableCell className="py-3 px-4 text-xs text-[#6E6E69]">
+                  <TableCell className="py-3.5 px-5 text-xs text-[#6E6E69]">
                     {formatDate(app.appliedDate)}
                   </TableCell>
 
                   {/* Interview Date */}
-                  <TableCell className="py-3 px-4 text-xs text-[#141413]">
+                  <TableCell className="py-3.5 px-5 text-xs text-[#141413]">
                     {app.interviewDate ? (
-                      <span className="font-medium text-[#B8532F]">
+                      <span className="font-serif text-sm text-[#865E16]">
                         {formatDate(app.interviewDate)}
                       </span>
                     ) : (
@@ -421,15 +421,15 @@ export function CorApplicationsClient({
                   </TableCell>
 
                   {/* Consultant */}
-                  <TableCell className="py-3 px-4 text-xs text-[#6E6E69]">
+                  <TableCell className="py-3.5 px-5 text-xs text-[#6E6E69]">
                     {app.consultant || "Career Team"}
                   </TableCell>
 
                   {/* Actions View */}
-                  <TableCell className="py-3 px-4 text-right">
+                  <TableCell className="py-3.5 px-5 text-right">
                     <Link
                       href={`/admin/cor/applications/${app.id}`}
-                      className="px-3 py-1.5 rounded-lg text-xs font-medium border border-[#E8E8E3] bg-white text-[#141413] hover:bg-[#F3F3EE] transition-colors whitespace-nowrap inline-flex items-center gap-1 shadow-2xs"
+                      className="px-3.5 py-1.5 rounded-full text-xs font-medium border border-[#E8E8E3] bg-white text-[#141413] hover:bg-[#FAF5EC] transition-all whitespace-nowrap inline-flex items-center gap-1 shadow-soft-sm"
                     >
                       <span>View</span>
                       <span>&rarr;</span>
