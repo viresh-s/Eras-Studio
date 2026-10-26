@@ -128,12 +128,12 @@ export default function NotificationBell() {
 
       channel.subscribe();
 
-      // 2. High-frequency 4s polling fallback (ensures notifications appear even if realtime websocket disconnects)
+      // 2. Fallback polling (ensures notifications appear even if realtime websocket disconnects)
       pollTimer = setInterval(() => {
         if (userIdRef.current && isMounted && typeof document !== 'undefined' && !document.hidden) {
           fetchNotificationsFast(userIdRef.current);
         }
-      }, 4000);
+      }, 30000);
 
       clockTimer = setInterval(() => {
         if (isMounted) setCurrentTime(Date.now());

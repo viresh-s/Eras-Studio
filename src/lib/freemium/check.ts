@@ -8,16 +8,7 @@ export interface FreemiumStatus {
   artworksLimit: number;
 }
 
-export async function checkFreemiumStatus(userId: string): Promise<FreemiumStatus> {
-  const supabase = await createClient();
-
-  // Get profile
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('is_premium, plan, created_at')
-    .eq('id', userId)
-    .maybeSingle();
-
+export function evaluateFreemiumStatus(profile: any, artworksUsed: number): FreemiumStatus {
   if (!profile) {
     return {
       isLocked: true,
@@ -40,13 +31,6 @@ export async function checkFreemiumStatus(userId: string): Promise<FreemiumStatu
     };
   }
 
-  // Count artworks
-  const { count } = await supabase
-    .from('artworks')
-    .select('*', { count: 'exact', head: true })
-    .eq('creator_id', userId);
-
-  const artworksUsed = count || 0;
   const isLite = profile.plan === 'lite' || profile.plan === 'light';
   const limit = isLite ? 50 : 3;
   const isArtworkLocked = artworksUsed >= limit;
@@ -70,6 +54,35 @@ export async function checkFreemiumStatus(userId: string): Promise<FreemiumStatu
     artworksUsed,
     artworksLimit: limit,
   };
+}
+
+export async function checkFreemiumStatus(userId: string): Promise<FreemiumStatus> {
+  const supabase = await createClient();
+
+  // Get profile
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('is_premium, plan, created_at')
+    .eq('id', userId)
+    .maybeSingle();
+
+  if (!profile) {
+    return {
+      isLocked: true,
+      reason: 'Profile not found',
+      daysRemaining: 0,
+      artworksUsed: 0,
+      artworksLimit: 3,
+    };
+  }
+
+  // Count artworks
+  const { count } = await supabase
+    .from('artworks')
+    .select('*', { count: 'exact', head: true })
+    .eq('creator_id', userId);
+
+  return evaluateFreemiumStatus(profile, count || 0);
 }
 
 export async function upgradeToPremium(userId: string): Promise<{ success: boolean; error?: string }> {

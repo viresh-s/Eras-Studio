@@ -10,17 +10,21 @@ export default async function CreatorArtworksPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: artworks } = await supabase
-    .from('artworks')
-    .select('*')
-    .eq('creator_id', user.id)
-    .order('created_at', { ascending: false });
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('full_name')
-    .eq('id', user.id)
-    .single();
+  const [
+    { data: artworks },
+    { data: profile }
+  ] = await Promise.all([
+    supabase
+      .from('artworks')
+      .select('*')
+      .eq('creator_id', user.id)
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('profiles')
+      .select('full_name')
+      .eq('id', user.id)
+      .maybeSingle(),
+  ]);
 
   return (
     <div>

@@ -133,7 +133,7 @@ function SignupFormContent() {
           <div className="text-center mb-1">
             <span
               style={{
-                fontFamily: "'Century Schoolbook', 'Playfair Display', Georgia, serif",
+                fontFamily: "'Century Schoolbook', Century, 'TeX Gyre Schola', Georgia, serif",
                 color: '#123C83',
                 fontWeight: 700,
                 letterSpacing: '0.04em',
@@ -148,7 +148,7 @@ function SignupFormContent() {
           <div className="text-center mb-3">
             <span
               style={{
-                fontFamily: "'Century Schoolbook', 'Playfair Display', Georgia, serif",
+                fontFamily: "'Century Schoolbook', Century, 'TeX Gyre Schola', Georgia, serif",
                 color: '#343434',
                 fontStyle: 'italic',
                 fontWeight: 700,

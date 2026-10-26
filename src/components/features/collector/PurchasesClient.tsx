@@ -58,22 +58,22 @@ export default function PurchasesClient({
   const renderEmptyState = () => (
     <div className="bg-[#F3F4F6] rounded-2xl border border-dashed border-gray-300 p-16 flex flex-col items-center justify-center text-center mt-6">
       <Layers className="w-8 h-8 text-gray-500 mb-4" />
-      <h3 className="text-xl font-bold text-gray-900 mb-2 font-heading" style={{ fontFamily: "'Playfair Display', serif" }}>
+      <h3 className="text-xl font-bold text-gray-900 mb-2 font-serif italic" style={{ fontFamily: "'Century Schoolbook', Century, serif", fontStyle: 'italic' }}>
         No acquisitions in this view.
       </h3>
-      <p className="text-sm text-gray-500">
+      <p className="text-sm text-gray-500 font-sans" style={{ fontFamily: "'Poppins', sans-serif" }}>
         Artwork purchases are always arranged directly with creators.
       </p>
     </div>
   );
 
   return (
-    <div className="max-w-5xl mx-auto pt-4 pb-20">
+    <div className="max-w-5xl mx-auto pt-4 pb-20 font-sans" style={{ fontFamily: "'Poppins', sans-serif" }}>
       {/* Header */}
-      <p className="text-[10px] font-bold tracking-[0.15em] text-gray-500 uppercase mb-3">
+      <p className="text-[10px] font-bold tracking-[0.15em] text-gray-500 uppercase mb-3 font-sans">
         YOUR COLLECTION, IN THE MAKING
       </p>
-      <h1 className="text-5xl text-gray-900 mb-3 tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>
+      <h1 className="text-5xl text-gray-900 mb-3 tracking-tight font-serif italic" style={{ fontFamily: "'Century Schoolbook', Century, serif", fontStyle: 'italic' }}>
         Acquisition journal
       </h1>
       <p className="text-gray-500 text-sm mb-8">
@@ -119,7 +119,7 @@ export default function PurchasesClient({
                   {statuses[acq.id]}
                 </div>
                 
-                <h2 className="text-3xl text-gray-900 mb-2" style={{ fontFamily: "'Playfair Display', serif" }}>
+                <h2 className="text-3xl text-gray-900 mb-2 font-serif italic" style={{ fontFamily: "'Century Schoolbook', Century, serif", fontStyle: 'italic' }}>
                   {acq.title}
                 </h2>
                 
@@ -182,7 +182,7 @@ export default function PurchasesClient({
                   {statuses[acq.id]}
                 </div>
                 
-                <h2 className="text-3xl text-gray-900 mb-2" style={{ fontFamily: "'Playfair Display', serif" }}>
+                <h2 className="text-3xl text-gray-900 mb-2 font-serif italic" style={{ fontFamily: "'Century Schoolbook', Century, serif", fontStyle: 'italic' }}>
                   {acq.title}
                 </h2>
                 

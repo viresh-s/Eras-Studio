@@ -159,7 +159,7 @@ function LoginFormContent() {
           <div className="text-center mb-6">
             <span
               style={{
-                fontFamily: "'Century Schoolbook', 'Playfair Display', Georgia, serif",
+                fontFamily: "'Century Schoolbook', Century, 'TeX Gyre Schola', Georgia, serif",
                 color: '#123C83',
                 fontWeight: 700,
                 letterSpacing: '0.04em',
@@ -184,7 +184,7 @@ function LoginFormContent() {
             </h1>
             <p
               style={{
-                fontFamily: "'Century Schoolbook', 'Playfair Display', Georgia, serif",
+                fontFamily: "'Century Schoolbook', Century, 'TeX Gyre Schola', Georgia, serif",
                 color: 'rgba(79.69, 79.69, 79.69, 0.75)',
                 fontStyle: 'italic',
                 fontWeight: 700,

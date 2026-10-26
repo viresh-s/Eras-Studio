@@ -25,7 +25,12 @@ interface ArtworkData {
   description: string | null;
   external_link: string | null;
   image_url: string;
+  image_url_full?: string | null;
   additional_images: string[];
+  additional_images_full?: string[] | null;
+  image_width?: number | null;
+  image_height?: number | null;
+  aspect_ratio?: number | null;
   price: number | null;
   status: string;
   year: string | null;
@@ -111,7 +116,9 @@ export default function ArtworkDiscoveryDetail({
           <div className="w-full sticky top-24">
             <ArtworkImageGallery
               primaryImage={artwork.image_url}
+              primaryImageFull={artwork.image_url_full}
               additionalImages={artwork.additional_images || []}
+              additionalImagesFull={artwork.additional_images_full || []}
               altText={artwork.title}
             />
           </div>
@@ -145,8 +152,8 @@ export default function ArtworkDiscoveryDetail({
               </div>
 
               <h1
-                className="text-4xl sm:text-5xl lg:text-6xl text-gray-900 mb-5 tracking-tight font-heading leading-tight"
-                style={{ fontFamily: "'Playfair Display', serif" }}
+                className="text-4xl sm:text-5xl lg:text-6xl text-gray-900 mb-5 tracking-tight font-serif italic leading-tight"
+                style={{ fontFamily: "'Century Schoolbook', Century, serif", fontStyle: 'italic' }}
               >
                 {artwork.title}
               </h1>

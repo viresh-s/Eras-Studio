@@ -8,53 +8,51 @@ import ArtworkGridCard from '@/components/features/creator/ArtworkGridCard';
 import ArtworkCardActions from '@/components/features/creator/ArtworkCardActions';
 import RestrictedUploadAction from './components/RestrictedUploadAction';
 
+import { evaluateFreemiumStatus } from '@/lib/freemium/check';
+
 export default async function CreatorDashboard() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single();
+  // Fetch all dashboard data concurrently in parallel
+  const [
+    { data: profile },
+    { count: artworkCount },
+    { count: chatCount },
+    { data: artworks },
+  ] = await Promise.all([
+    supabase.from('profiles').select('*').eq('id', user.id).maybeSingle(),
+    supabase.from('artworks').select('*', { count: 'exact', head: true }).eq('creator_id', user.id),
+    supabase.from('inquiries_chats').select('*', { count: 'exact', head: true }).eq('creator_id', user.id),
+    supabase
+      .from('artworks')
+      .select('*')
+      .eq('creator_id', user.id)
+      .eq('is_published', true)
+      .order('created_at', { ascending: false }),
+  ]);
 
-  // Fetch stats
-  const { count: artworkCount } = await supabase
-    .from('artworks')
-    .select('*', { count: 'exact', head: true })
-    .eq('creator_id', user.id);
+  const freemiumStatus = evaluateFreemiumStatus(profile, artworkCount || 0);
 
-  const { count: chatCount } = await supabase
-    .from('inquiries_chats')
-    .select('*', { count: 'exact', head: true })
-    .eq('creator_id', user.id);
-
-  const { data: artworks } = await supabase
-    .from('artworks')
-    .select('*')
-    .eq('creator_id', user.id)
-    .eq('is_published', true)
-    .order('created_at', { ascending: false });
-
-  // Calculate profile completeness
+  // Calculate profile completeness matching EditProfileForm dossier fields
   const profileFields = [
-    profile?.full_name, profile?.about_me, profile?.location_city,
-    profile?.portfolio_url, profile?.profile_pic_url,
+    Boolean(profile?.full_name),
+    Boolean(profile?.profile_pic_url),
+    Boolean(profile?.location_city || profile?.location_country),
+    Boolean(profile?.primary_medium),
+    Boolean(profile?.about_me || profile?.artist_statement),
+    Boolean(profile?.artist_biography_url),
+    Boolean(profile?.latest_cv_url),
+    Boolean(profile?.artist_statement_doc_url),
+    Boolean(profile?.short_portfolio_url),
+    Boolean(profile?.long_portfolio_url),
+    Boolean(profile?.top_artworks_drive_url),
   ];
   const filledFields = profileFields.filter(Boolean).length;
   const completeness = Math.round((filledFields / profileFields.length) * 100);
 
-  const { checkFreemiumStatus } = await import('@/lib/freemium/check');
-  const freemiumStatus = await checkFreemiumStatus(user.id);
   const isLimited = freemiumStatus.isLocked;
-
-  console.log('[DEBUG Limits]', {
-    isPremium: profile?.is_premium,
-    profileCreatedAt: profile?.created_at,
-    isLimited,
-    reason: freemiumStatus.reason
-  });
 
   return (
     <div>
@@ -65,7 +63,7 @@ export default async function CreatorDashboard() {
         </p>
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div>
-            <h1 className="text-4xl font-serif font-semibold text-[var(--color-cor-ink)] tracking-tight mb-1">My Portfolio</h1>
+            <h1 className="text-4xl font-serif italic font-semibold text-[var(--color-cor-ink)] tracking-tight mb-1" style={{ fontFamily: "'Century Schoolbook', Century, serif", fontStyle: 'italic' }}>My Portfolio</h1>
             <p className="text-[var(--color-cor-ink-light)] text-sm">Make space for the work that matters.</p>
           </div>
           <div className="flex flex-wrap items-center gap-3 mt-4 sm:mt-0">
@@ -84,16 +82,32 @@ export default async function CreatorDashboard() {
         </div>
       </div>
 
-      {/* Profile Completion Bar */}
+      {/* Profile Completion Progress Bar */}
       {completeness < 100 && (
-        <div className="bg-[var(--color-cor-surface)] rounded-3xl border border-[var(--color-cor-border)] p-5 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div>
-            <p className="text-sm font-semibold text-[var(--color-cor-ink)]">Your profile is {completeness}% complete</p>
-            <p className="text-xs text-[var(--color-cor-ink-light)] mt-0.5">A little more about you makes a lasting impression.</p>
+        <div className="bg-[var(--color-cor-surface)] rounded-3xl border border-[var(--color-cor-border)] p-5 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-5 shadow-2xs">
+          <div className="flex-1 max-w-xl">
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-xs font-semibold text-[var(--color-cor-ink)]">
+                Profile Completeness
+              </span>
+              <span className="text-xs font-semibold text-[var(--color-cor-ink)]">
+                {completeness}%
+              </span>
+            </div>
+            {/* Progress Bar */}
+            <div className="w-full bg-[#EFEFEF] rounded-full h-2 overflow-hidden mb-1.5">
+              <div
+                className="bg-[var(--color-cor-ink)] h-2 rounded-full transition-all duration-500"
+                style={{ width: `${completeness}%` }}
+              />
+            </div>
+            <p className="text-xs text-[var(--color-cor-ink-light)]">
+              A little more about you makes a lasting impression.
+            </p>
           </div>
           <Link
             href="/profile"
-            className="px-4 py-2 text-sm font-semibold text-[var(--color-cor-ink)] bg-[var(--color-cor-surface)] border border-[var(--color-cor-border)] rounded-full hover:bg-[#F4F4ED] transition-colors whitespace-nowrap"
+            className="px-5 py-2.5 text-xs font-semibold text-[var(--color-cor-ink)] bg-[var(--color-cor-surface)] border border-[var(--color-cor-border)] rounded-full hover:bg-[#F4F4ED] hover:border-[var(--color-cor-ink)] transition-colors whitespace-nowrap self-start sm:self-center shrink-0"
           >
             Edit Profile →
           </Link>
@@ -128,7 +142,7 @@ export default async function CreatorDashboard() {
       <div className="mb-8">
         <div className="flex items-center justify-between mb-5">
           <div>
-            <h2 className="text-2xl font-serif font-semibold text-[var(--color-cor-ink)]">Your works</h2>
+            <h2 className="text-2xl font-sans font-semibold text-[var(--color-cor-ink)]">Your works</h2>
             <p className="text-xs text-[var(--color-cor-ink-light)] mt-0.5">
               {artworkCount || 0} Artworks in total · Portfolio
             </p>

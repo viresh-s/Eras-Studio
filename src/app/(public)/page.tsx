@@ -3,6 +3,7 @@ import { ArrowRight, Palette, Sparkles, MessageCircle, ShieldCheck, Compass } fr
 import Marquee from 'react-fast-marquee';
 import LandingHeroVisual from '@/components/features/public/LandingHeroVisual';
 import { createClient } from '@/lib/supabase/server';
+import { PROTECTED_CONTAINER_CLASS, PROTECTED_IMAGE_CLASS } from '@/lib/media/assetProtection';
 
 interface ArtworkItem {
   id: string;
@@ -180,11 +181,17 @@ export default async function HomePage() {
                 className="group block cursor-pointer"
               >
                 <div className="flex flex-col h-full">
-                  <div className="aspect-[4/5] bg-[#E8E8E3] overflow-hidden relative rounded-2xl mb-4 border border-[#E8E8E3]">
+                  <div className={`aspect-[4/5] bg-[#E8E8E3] overflow-hidden relative rounded-2xl mb-4 border border-[#E8E8E3] ${PROTECTED_CONTAINER_CLASS}`}>
                     <img
                       src={artwork.image_url}
                       alt={artwork.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                      draggable={false}
+                      className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out select-none pointer-events-none ${PROTECTED_IMAGE_CLASS}`}
+                    />
+                    {/* Transparent overlay shield */}
+                    <div
+                      className="absolute inset-0 z-[2]"
+                      aria-hidden="true"
                     />
                     <div className="absolute top-3.5 right-3.5 z-10">
                       <span className="inline-block px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest rounded-full bg-white/95 backdrop-blur-md text-[#141413] shadow-sm">
@@ -196,10 +203,13 @@ export default async function HomePage() {
                   <div className="flex-1 flex flex-col px-1">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0 flex-1">
-                        <h3 className="font-serif text-[18px] font-bold text-[#141413] truncate leading-tight group-hover:opacity-75 transition-opacity">
+                        <h3
+                          className="font-serif italic text-[18px] font-semibold text-[#141413] truncate leading-tight group-hover:opacity-75 transition-opacity"
+                          style={{ fontFamily: "'Century Schoolbook', Century, serif", fontStyle: 'italic' }}
+                        >
                           {artwork.title}
                         </h3>
-                        <p className="text-[#6E6E69] text-[11px] mt-1.5 uppercase tracking-wider font-semibold">
+                        <p className="font-sans text-[#6E6E69] text-[11px] mt-1.5 uppercase tracking-wider font-semibold" style={{ fontFamily: "'Poppins', sans-serif" }}>
                           {artwork.artist_name || artwork.profiles?.full_name}
                           {artwork.year ? `, ${artwork.year}` : ''}
                         </p>

@@ -15,7 +15,12 @@ const createArtworkSchema = z.object({
   description: z.string().max(5000).nullable().optional(),
   externalLink: z.string().url().max(500).or(z.literal("")).nullable().optional(),
   imageUrl: z.string().url("Invalid image URL"),
+  imageUrlFull: z.string().url("Invalid full image URL").optional(),
   additionalImages: z.array(z.string().url()).optional(),
+  additionalImagesFull: z.array(z.string().url()).optional(),
+  imageWidth: z.number().int().positive().optional(),
+  imageHeight: z.number().int().positive().optional(),
+  aspectRatio: z.number().positive().optional(),
   price: z.number().nonnegative().nullable().optional(),
   year: z.string().max(4).nullable().optional(),
   dimensions: z.string().max(100).nullable().optional(),
@@ -42,7 +47,12 @@ export interface CreateArtworkData {
   description?: string;
   externalLink?: string;
   imageUrl: string;
+  imageUrlFull?: string;
   additionalImages?: string[];
+  additionalImagesFull?: string[];
+  imageWidth?: number;
+  imageHeight?: number;
+  aspectRatio?: number;
   price?: number | null;
   year?: string;
   dimensions?: string;
@@ -96,7 +106,12 @@ export async function createArtwork(data: CreateArtworkData) {
       description: sanitizedDescription,
       external_link: data.externalLink || null,
       image_url: data.imageUrl,
+      image_url_full: data.imageUrlFull || null,
       additional_images: data.additionalImages || [],
+      additional_images_full: data.additionalImagesFull || [],
+      image_width: data.imageWidth || null,
+      image_height: data.imageHeight || null,
+      aspect_ratio: data.aspectRatio || null,
       price: data.price || null,
       status: data.status || 'Available',
       year: data.year || null,
@@ -168,7 +183,12 @@ export async function updateArtwork(artworkId: string, data: Partial<CreateArtwo
   if (data.description !== undefined) updateData.description = data.description ? sanitizeText(data.description, 5000) : null;
   if (data.externalLink !== undefined) updateData.external_link = data.externalLink || null;
   if (data.imageUrl !== undefined) updateData.image_url = data.imageUrl;
+  if (data.imageUrlFull !== undefined) updateData.image_url_full = data.imageUrlFull || null;
   if (data.additionalImages !== undefined) updateData.additional_images = data.additionalImages;
+  if (data.additionalImagesFull !== undefined) updateData.additional_images_full = data.additionalImagesFull;
+  if (data.imageWidth !== undefined) updateData.image_width = data.imageWidth || null;
+  if (data.imageHeight !== undefined) updateData.image_height = data.imageHeight || null;
+  if (data.aspectRatio !== undefined) updateData.aspect_ratio = data.aspectRatio || null;
   if (data.price !== undefined) updateData.price = data.price || null;
   if (data.status !== undefined) updateData.status = data.status;
   if (data.year !== undefined) updateData.year = data.year || null;

@@ -1,14 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
-import { Search, SlidersHorizontal, ChevronDown, X, Check, ArrowRight } from 'lucide-react';
+import { Search, SlidersHorizontal, X, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createChatSession } from '@/actions/chatActions';
 import TopCreatorsRow from '@/components/features/discovery/TopCreatorsRow';
 import { getTopCreators, RankedCreator } from '@/lib/services/rankingService';
+import { PROTECTED_CONTAINER_CLASS, PROTECTED_IMAGE_CLASS } from '@/lib/media/assetProtection';
 
 const categoryPills = [
   { value: '', label: 'All works' },
@@ -38,8 +39,15 @@ interface ArtworkItem {
   price_visibility?: string | null;
   status: string;
   year?: string | null;
-  profiles: { full_name: string } | null;
+  profiles: { full_name: string; profile_pic_url?: string | null } | null;
 }
+
+const getInitials = (name: string) => {
+  if (!name) return 'A';
+  const parts = name.trim().split(' ');
+  if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+  return name.substring(0, 2).toUpperCase();
+};
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -54,21 +62,25 @@ const itemVariants = {
   show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" as const } }
 };
 
+// Module-level cache for default view (eliminates blank skeleton flash on navigation)
+let cachedDefaultArtworks: ArtworkItem[] | null = null;
+let cachedHasMore: boolean = true;
+
 export default function BrowsePage() {
   const router = useRouter();
-  const [artworks, setArtworks] = useState<ArtworkItem[]>([]);
+  const [artworks, setArtworks] = useState<ArtworkItem[]>(() => cachedDefaultArtworks || []);
   const [searchQuery, setSearchQuery] = useState('');
   const [artTypeFilter, setArtTypeFilter] = useState('');
   const [sortBy, setSortBy] = useState('recommended');
   const [priceFilter, setPriceFilter] = useState<'all' | 'under10k' | '10k-50k' | '50kPlus' | 'on_request'>('all');
   const [showFilters, setShowFilters] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(() => !cachedDefaultArtworks || cachedDefaultArtworks.length === 0);
   const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
+  const [hasMore, setHasMore] = useState(() => cachedHasMore);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [requestedArtworkIds, setRequestedArtworkIds] = useState<Set<string>>(new Set());
   const [topCreators, setTopCreators] = useState<RankedCreator[]>([]);
-  const [isLoadingCreators, setIsLoadingCreators] = useState(true);
+  const [isLoadingCreators, setIsLoadingCreators] = useState(false);
 
   // Modal State for "Price on request"
   const [selectedArtworkForPrice, setSelectedArtworkForPrice] = useState<ArtworkItem | null>(null);
@@ -77,6 +89,7 @@ export default function BrowsePage() {
   const [requestSuccessMessage, setRequestSuccessMessage] = useState<string | null>(null);
 
   const ITEMS_PER_PAGE = 16;
+  const isInitialMount = useRef(true);
 
   // Load user, previous requests, and dynamic top creators on mount
   useEffect(() => {
@@ -94,33 +107,34 @@ export default function BrowsePage() {
       }
     });
 
-    // Real-time Top Creators Ranking calculation
-    setIsLoadingCreators(true);
+    // Real-time Top Creators Ranking (cached after first fetch)
     getTopCreators(10)
       .then((data) => setTopCreators(data))
-      .catch((err) => console.error('Failed to load top creators:', err))
-      .finally(() => setIsLoadingCreators(false));
+      .catch((err) => console.error('Failed to load top creators:', err));
   }, []);
 
-  // Reset page when filters change
+  // Fetch when page changes or filters change (without duplicate mount triggers)
   useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      fetchArtworks(1, true);
+      return;
+    }
+
     setPage(1);
-    setArtworks([]);
-    setHasMore(true);
+    fetchArtworks(1, true);
   }, [searchQuery, artTypeFilter, sortBy, priceFilter]);
 
-  // Fetch when page changes or filters change
-  useEffect(() => {
-    fetchArtworks(page === 1);
-  }, [page, searchQuery, artTypeFilter, sortBy, priceFilter]);
-
-  const fetchArtworks = async (isReset = false) => {
-    setIsLoading(true);
+  const fetchArtworks = async (targetPage = 1, isReset = false) => {
+    // Only show skeleton spinner if we don't have items to display
+    if (isReset && (!cachedDefaultArtworks || cachedDefaultArtworks.length === 0)) {
+      setIsLoading(true);
+    }
     const supabase = createClient();
 
     let query = supabase
       .from('artworks')
-      .select('id, creator_id, title, art_type, artist_name, image_url, price, price_visibility, status, year, created_at, profiles(full_name)', { count: 'exact' })
+      .select('id, creator_id, title, art_type, artist_name, image_url, price, price_visibility, status, year, created_at, profiles(full_name, profile_pic_url)', { count: 'exact' })
       .eq('status', 'Available');
 
     // Sorting
@@ -155,7 +169,7 @@ export default function BrowsePage() {
     }
 
     // Apply pagination range
-    const from = (page - 1) * ITEMS_PER_PAGE;
+    const from = (targetPage - 1) * ITEMS_PER_PAGE;
     const to = from + ITEMS_PER_PAGE - 1;
     query = query.range(from, to);
 
@@ -204,8 +218,15 @@ export default function BrowsePage() {
         }
       }
 
+      const isDefaultView = !searchQuery && !artTypeFilter && sortBy === 'recommended' && priceFilter === 'all';
+      const calculatedHasMore = count !== null ? from + data.length < count : data.length === ITEMS_PER_PAGE;
+
       if (isReset) {
         setArtworks(finalArtworks as unknown as ArtworkItem[]);
+        if (isDefaultView) {
+          cachedDefaultArtworks = finalArtworks as unknown as ArtworkItem[];
+          cachedHasMore = calculatedHasMore;
+        }
       } else {
         setArtworks(prev => {
           const newArtworks = finalArtworks as unknown as ArtworkItem[];
@@ -215,13 +236,15 @@ export default function BrowsePage() {
         });
       }
 
-      if (count !== null) {
-        setHasMore(from + data.length < count);
-      } else {
-        setHasMore(data.length === ITEMS_PER_PAGE);
-      }
+      setHasMore(calculatedHasMore);
     }
     setIsLoading(false);
+  };
+
+  const handleLoadMore = () => {
+    const nextPage = page + 1;
+    setPage(nextPage);
+    fetchArtworks(nextPage, false);
   };
 
   const handleOpenPriceRequest = (artwork: ArtworkItem) => {
@@ -274,146 +297,8 @@ export default function BrowsePage() {
 
   return (
     <div className="min-h-screen bg-[var(--color-cor-bg,#FAFAF8)] font-sans">
-      {/* Hero Section */}
-      <div className="max-w-[1400px] mx-auto px-6 py-16 lg:py-24">
-        <div className="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-24">
-          {/* Left: Text Content */}
-          <div className="lg:w-1/2 flex flex-col items-start text-left z-10">
-            <p className="text-xs font-semibold tracking-[0.2em] text-gray-500 uppercase mb-6 flex items-center gap-3">
-              <span className="w-1.5 h-1.5 rounded-full bg-gray-400 block"></span>
-              A SPACE FOR THE CREATIVE SPIRIT
-            </p>
-            <h1 className="text-5xl md:text-7xl font-bold text-gray-900 tracking-tight leading-[1.05] mb-6 font-serif">
-              Find a work.<br />
-              Feel a <span className="italic font-normal">connection.</span>
-            </h1>
-            <div className="space-y-1 mb-8">
-              <p className="text-gray-600 text-base md:text-lg">
-                Discover original perspectives from independent artists.
-              </p>
-              <p className="text-gray-600 text-base md:text-lg">
-                A new favourite is waiting to be found.
-              </p>
-            </div>
-
-            <button
-              onClick={() => {
-                document.getElementById('gallery')?.scrollIntoView({ behavior: 'smooth' });
-              }}
-              className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#141413] text-[#FAF5EC] border border-[#141413] rounded-full text-xs uppercase tracking-[0.08em] font-medium hover:bg-black transition-all duration-200 group cursor-pointer"
-            >
-              <span>Explore the gallery</span>
-              <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform duration-200" />
-            </button>
-          </div>
-
-          {/* Right: Artwork Cards Collage */}
-          <div className="lg:w-1/2 relative h-[450px] lg:h-[500px] w-full flex items-center justify-center pointer-events-none mt-8 lg:mt-0">
-            {/* Card 1 (Left) */}
-            <motion.div
-              initial={{ opacity: 0, rotate: -25, x: -100, y: 50 }}
-              animate={{ opacity: 1, rotate: -15, x: -80, y: 20 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="absolute z-10 w-64 bg-white rounded-xl shadow-2xl p-3 transform-origin-bottom"
-            >
-              <div className="aspect-[3/4] bg-[#5B798A] overflow-hidden rounded-lg mb-3">
-                <div className="w-full h-full relative">
-                  <div className="absolute top-0 right-0 w-full h-1/2 bg-[#1B3644] rotate-[30deg] scale-150 transform origin-top-right"></div>
-                  <div className="absolute bottom-0 right-0 w-2/3 h-1/2 bg-[#C4775A] skew-y-12 translate-y-10"></div>
-                  <div className="absolute top-1/4 right-1/4 w-12 h-12 bg-[#F2F0E6] rounded-full"></div>
-                </div>
-              </div>
-              <div>
-                <p className="text-[10px] text-gray-500 mb-0.5 uppercase tracking-wide">Blue Horizon</p>
-                <p className="text-[8px] text-gray-400">Painting / 2023</p>
-              </div>
-            </motion.div>
-
-            {/* Card 2 (Center - top) */}
-            <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: -20 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-              className="absolute z-30 w-72 bg-white rounded-xl shadow-2xl p-3"
-            >
-              <div className="aspect-[3/4] bg-[#D7AC9C] overflow-hidden rounded-lg mb-3">
-                <div className="w-full h-full relative">
-                  <div className="absolute top-0 right-0 w-full h-2/3 bg-[#5D3035] -rotate-[20deg] scale-150 transform origin-top-right"></div>
-                  <div className="absolute bottom-0 left-1/4 w-1/3 h-3/4 bg-[#1F3740] skew-y-[-10deg] translate-y-10"></div>
-                  <div className="absolute top-1/4 right-1/4 w-16 h-16 bg-[#F2F0E6] rounded-full"></div>
-                </div>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-gray-900 mb-0.5">Monsoon No. 4</p>
-                <p className="text-[9px] text-gray-500 uppercase tracking-wide">Painting / 2023</p>
-              </div>
-            </motion.div>
-
-            {/* Card 3 (Right) */}
-            <motion.div
-              initial={{ opacity: 0, rotate: 25, x: 100, y: 50 }}
-              animate={{ opacity: 1, rotate: 15, x: 80, y: 20 }}
-              transition={{ duration: 0.8, delay: 0.6 }}
-              className="absolute z-20 w-64 bg-white rounded-xl shadow-2xl p-3 transform-origin-bottom"
-            >
-              <div className="aspect-[3/4] bg-[#F2B75A] overflow-hidden rounded-lg mb-3">
-                <div className="w-full h-full relative p-4">
-                  <div className="w-full h-full border-[20px] border-[#AC452D] rounded-t-full bg-[#E5D7A9] relative overflow-hidden">
-                    <div className="w-full h-20 bg-[#C4775A] absolute bottom-0 opacity-50"></div>
-                    <div className="w-16 h-16 rounded-full bg-[#F2F0E6] absolute top-10 left-1/2 -translate-x-1/2"></div>
-                  </div>
-                </div>
-              </div>
-              <div>
-                <p className="text-[10px] text-gray-500 mb-0.5 uppercase tracking-wide">Fragments of Memory</p>
-                <p className="text-[8px] text-gray-400">Mixed Media / 2024</p>
-              </div>
-            </motion.div>
-
-            {/* Circular text badge */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: 1 }}
-              className="absolute z-40 -bottom-8 left-[45%] lg:left-1/3 w-28 h-28 bg-[#F0EBE6] rounded-full flex items-center justify-center shadow-lg border border-white"
-            >
-              <div className="text-center">
-                <p className="text-gray-800 text-sm font-serif italic leading-tight">Art is a</p>
-                <p className="text-gray-800 text-sm font-serif italic leading-tight">way of</p>
-                <p className="text-gray-800 text-sm font-serif italic leading-tight">seeing.</p>
-                <p className="text-[6px] tracking-widest text-gray-500 mt-2 uppercase">Eras Studio</p>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </div>
-
       {/* Main Content (Gallery & Discovery Bar) */}
-      <div id="gallery" className="max-w-[1400px] mx-auto px-4 sm:px-6 pb-32">
-        {/* ========================================================================= */}
-        {/* 1. DISCOVERY HEADER (Matching user specification)                         */}
-        {/* ========================================================================= */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-          <h2 className="font-serif text-3xl sm:text-4xl text-[#141413] tracking-tight">
-            A world of original work
-          </h2>
-
-          {/* Sort Dropdown */}
-          <div className="relative self-start sm:self-auto">
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="appearance-none bg-white/80 backdrop-blur-xs pl-4 pr-9 py-2 border border-[#E8E8E3] rounded-full text-xs font-medium text-[#141413] hover:border-[#141413] transition-colors cursor-pointer outline-none shadow-xs"
-            >
-              {sortOptions.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-            <ChevronDown size={14} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
-          </div>
-        </div>
+      <div id="gallery" className="max-w-[1400px] mx-auto pb-32">
 
         {/* ========================================================================= */}
         {/* 2. SEARCH BAR & FILTERS BUTTON                                            */}
@@ -591,149 +476,144 @@ export default function BrowsePage() {
         </AnimatePresence>
 
         {/* ========================================================================= */}
-        {/* 5. ARTWORK GALLERY GRID                                                   */}
+        {/* 5. ARTWORK GALLERY GRID (Pinterest Masonry Layout matching reference spec) */}
         {/* ========================================================================= */}
         {isLoading && artworks.length === 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {[...Array(8)].map((_, i) => (
-              <div key={i} className="bg-white rounded-2xl border border-[#E8E8E3] animate-pulse overflow-hidden p-3">
-                <div className="aspect-[4/5] bg-gray-100 rounded-xl mb-3" />
-                <div className="space-y-2 px-1">
-                  <div className="h-4 bg-gray-100 rounded-full w-3/4" />
-                  <div className="h-3 bg-gray-100 rounded-full w-1/2" />
+          <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 sm:gap-5 [column-fill:_balance]">
+            {[320, 240, 420, 280, 360, 260, 380, 300].map((height, i) => (
+              <div key={i} className="break-inside-avoid mb-4 sm:mb-5">
+                <div className="bg-white rounded-[22px] border border-[#E8E8E3] animate-pulse p-2 shadow-xs">
+                  <div
+                    style={{ height: `${height}px` }}
+                    className="w-full bg-gray-100 rounded-[18px] mb-2.5"
+                  />
+                  <div className="space-y-2 px-1 pb-1">
+                    <div className="h-4 bg-gray-100 rounded-full w-3/4" />
+                    <div className="h-3 bg-gray-100 rounded-full w-1/2" />
+                  </div>
                 </div>
               </div>
             ))}
           </div>
         ) : artworks.length > 0 ? (
           <>
-            <motion.div
-              variants={containerVariants}
-              initial="hidden"
-              animate="show"
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-            >
-              {(() => {
-                const renderArtworkCard = (artwork: ArtworkItem) => {
-                  const isPriceOnRequest =
-                    artwork.price_visibility === 'Price on Request' ||
-                    (!artwork.price &&
-                      artwork.price_visibility !== 'Hide Price' &&
-                      artwork.price_visibility !== 'Hidden');
+            {(() => {
+              const renderArtworkCard = (artwork: ArtworkItem) => {
+                const creatorName = artwork.artist_name || artwork.profiles?.full_name || 'Independent Artist';
 
-                  const isRequested = requestedArtworkIds.has(artwork.id);
+                return (
+                  <div key={artwork.id} className="break-inside-avoid mb-4 sm:mb-5 group">
+                    <div className="relative bg-white rounded-[22px] p-2 border border-[#EBEBE6] shadow-[0_2px_10px_rgba(20,20,19,0.03)] hover:shadow-[0_10px_28px_rgba(20,20,19,0.08)] transition-all duration-300">
+                      <Link href={`/artwork/${artwork.id}`} className="block cursor-pointer">
+                        {/* Artwork Image Container - Unconstrained natural height with Anti-Download Shield */}
+                        <div className={`relative overflow-hidden rounded-[18px] bg-[#F5F5F0] ${PROTECTED_CONTAINER_CLASS}`}>
+                          <img
+                            src={artwork.image_url}
+                            alt={artwork.title}
+                            draggable={false}
+                            onContextMenu={(e) => e.preventDefault()}
+                            onDragStart={(e) => e.preventDefault()}
+                            className={`w-full h-auto object-cover block group-hover:scale-[1.018] transition-transform duration-500 ease-out select-none pointer-events-none ${PROTECTED_IMAGE_CLASS}`}
+                            loading="lazy"
+                          />
 
-                  return (
-                    <motion.div key={artwork.id} variants={itemVariants} className="h-full">
-                      <Link href={`/artwork/${artwork.id}`} className="group block h-full cursor-pointer">
-                        <div className="flex flex-col h-full bg-white rounded-2xl border border-[#E8E8E3] p-3 shadow-soft hover:shadow-soft-md transition-all duration-300">
-                          {/* Artwork Image Container */}
-                          <div className="aspect-[4/5] bg-[#E8E8E3] overflow-hidden relative rounded-xl mb-3.5">
-                            <img
-                              src={artwork.image_url}
-                              alt={artwork.title}
-                              className="w-full h-full object-cover group-hover:scale-104 transition-transform duration-500 ease-out"
-                            />
-                            {/* Medium Badge */}
-                            <div className="absolute top-3 right-3 z-10">
-                              <span className="inline-block px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest rounded-full bg-white/90 backdrop-blur-md text-[#141413] shadow-xs">
+                          {/* Transparent overlay shield */}
+                          <div
+                            className="absolute inset-0 z-[2]"
+                            onContextMenu={(e) => e.preventDefault()}
+                            onDragStart={(e) => e.preventDefault()}
+                            aria-hidden="true"
+                          />
+
+                          {/* Medium Badge (subtle overlay on top-right on hover) */}
+                          {artwork.art_type && (
+                            <div className="absolute top-2.5 right-2.5 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                              <span className="inline-block px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider rounded-full bg-white/95 backdrop-blur-md text-[#141413] shadow-xs">
                                 {artwork.art_type}
                               </span>
                             </div>
+                          )}
+                        </div>
+
+                        {/* Minimalist Single Row: Title (Century in italic style) on left, [Avatar] Creator (Poppins) next, Availability (Poppins) on right */}
+                        <div className="pt-2.5 pb-1 px-1 flex items-center justify-between gap-2">
+                          <div className="min-w-0 flex items-center gap-2 truncate">
+                            <h3
+                              className="font-serif italic text-[14px] sm:text-[15px] font-semibold text-[#141413] leading-snug truncate group-hover:text-[#B8532F] transition-colors tracking-tight"
+                              style={{ fontFamily: "'Century Schoolbook', Century, serif", fontStyle: 'italic' }}
+                            >
+                              {artwork.title}
+                            </h3>
+                            <div className="flex items-center gap-1.5 shrink-0 max-w-[130px] sm:max-w-[160px]">
+                              <div className="w-4 h-4 rounded-full bg-gray-200 border border-gray-300/60 overflow-hidden flex items-center justify-center text-[8px] font-bold text-gray-700 shrink-0 font-sans" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                                {artwork.profiles?.profile_pic_url ? (
+                                  <img
+                                    src={artwork.profiles.profile_pic_url}
+                                    alt=""
+                                    className="w-full h-full object-cover"
+                                  />
+                                ) : (
+                                  getInitials(creatorName)
+                                )}
+                              </div>
+                              <span className="font-sans text-[11px] sm:text-[12px] font-medium text-gray-600 truncate" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                                {creatorName}
+                              </span>
+                            </div>
                           </div>
 
-                          {/* Artwork Metadata & Price Bar */}
-                          <div className="flex-1 flex flex-col justify-between px-1">
-                            <div className="mb-3">
-                              <h3 className="font-serif text-[18px] font-semibold text-[#141413] truncate leading-tight group-hover:text-[#B8532F] transition-colors">
-                                {artwork.title}
-                              </h3>
-                              <p className="text-gray-500 text-[11px] mt-1 uppercase tracking-wider font-medium truncate">
-                                {artwork.artist_name || artwork.profiles?.full_name}
-                                {artwork.year ? `, ${artwork.year}` : ''}
-                              </p>
-                            </div>
-
-                            {/* Price & Action Footer */}
-                            <div className="flex items-center justify-between border-t border-gray-100 pt-2.5">
-                              <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-400">
-                                {isPriceOnRequest ? 'Direct Inquiry' : 'Available'}
-                              </span>
-
-                              {artwork.price_visibility === 'Hide Price' || artwork.price_visibility === 'Hidden' ? (
-                                <span className="text-xs font-medium text-gray-400">
-                                  Disclosed on inquiry
-                                </span>
-                              ) : isPriceOnRequest ? (
-                                /* Interactive "Price on request" Button */
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    handleOpenPriceRequest(artwork);
-                                  }}
-                                  className={`px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all shadow-xs cursor-pointer ${
-                                    isRequested
-                                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100'
-                                      : 'bg-[#141413] text-[#FAF5EC] hover:bg-black active:scale-95'
-                                  }`}
-                                >
-                                  {isRequested ? 'Price Requested ✓' : 'Price on request'}
-                                </button>
-                              ) : artwork.price ? (
-                                <span className="font-bold text-[#141413] text-sm">
-                                  ₹{artwork.price.toLocaleString('en-IN')}
-                                </span>
-                              ) : (
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    handleOpenPriceRequest(artwork);
-                                  }}
-                                  className={`px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all shadow-xs cursor-pointer ${
-                                    isRequested
-                                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                      : 'bg-[#141413] text-[#FAF5EC] hover:bg-black'
-                                  }`}
-                                >
-                                  {isRequested ? 'Price Requested ✓' : 'Price on request'}
-                                </button>
-                              )}
-                            </div>
+                          <div className="flex items-center gap-1.5 shrink-0 pl-1">
+                            <span
+                              className={`w-1.5 h-1.5 rounded-full ${
+                                artwork.status === 'Available'
+                                  ? 'bg-emerald-500'
+                                  : artwork.status === 'Sold'
+                                  ? 'bg-red-400'
+                                  : 'bg-amber-400'
+                              }`}
+                            />
+                            <span className="font-sans text-[11px] font-medium text-gray-600 capitalize tracking-tight" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                              {artwork.status || 'Available'}
+                            </span>
                           </div>
                         </div>
                       </Link>
-                    </motion.div>
-                  );
-                };
+                    </div>
+                  </div>
+                );
+              };
 
-                const firstBatch = artworks.slice(0, 4);
-                const remainingBatch = artworks.slice(4);
+              const firstBatch = topCreators.length > 0 ? artworks.slice(0, 8) : artworks;
+              const remainingBatch = topCreators.length > 0 ? artworks.slice(8) : [];
 
-                return (
-                  <>
-                    {/* First 4 Artwork Cards */}
+              return (
+                <>
+                  {/* First Batch Masonry Columns */}
+                  <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 sm:gap-5 [column-fill:_balance]">
                     {firstBatch.map(renderArtworkCard)}
+                  </div>
 
-                    {/* Spotlight: Top 10 Creators Row (Inserted after 4th artwork card, spanning full grid width) */}
-                    <div className="col-span-1 sm:col-span-2 lg:col-span-3 xl:col-span-4 w-full">
+                  {/* Spotlight: Top 10 Creators Row (Between Batches, 100% full width) */}
+                  {topCreators && topCreators.length > 0 && (
+                    <div className="my-8 w-full">
                       <TopCreatorsRow creators={topCreators} isLoading={isLoadingCreators} />
                     </div>
+                  )}
 
-                    {/* Remaining Artwork Cards */}
-                    {remainingBatch.map(renderArtworkCard)}
-                  </>
-                );
-              })()}
-            </motion.div>
+                  {/* Remaining Batch Masonry Columns */}
+                  {remainingBatch.length > 0 && (
+                    <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 sm:gap-5 [column-fill:_balance]">
+                      {remainingBatch.map(renderArtworkCard)}
+                    </div>
+                  )}
+                </>
+              );
+            })()}
 
             {hasMore && (
               <div className="mt-12 flex justify-center">
                 <button
-                  onClick={() => setPage(p => p + 1)}
+                  onClick={handleLoadMore}
                   disabled={isLoading}
                   className="px-7 py-3 bg-white border border-[#E8E8E3] text-[#141413] rounded-full text-xs uppercase tracking-[0.08em] font-semibold hover:border-[#141413] hover:bg-[#141413] hover:text-white transition-all duration-200 shadow-xs cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                 >

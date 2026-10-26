@@ -106,6 +106,7 @@ export default function Navbar({ profile }: NavbarProps) {
                 <Link
                   key={link.href}
                   href={link.href}
+                  prefetch={false}
                   className={`relative px-4 py-5 text-sm font-medium transition-colors ${
                     isActive
                       ? 'text-[var(--color-cor-ink)]'
@@ -214,6 +215,7 @@ export default function Navbar({ profile }: NavbarProps) {
               <Link
                 key={link.href}
                 href={link.href}
+                prefetch={false}
                 className={`relative px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors ${
                   isActive
                     ? 'text-[var(--color-cor-ink)]'

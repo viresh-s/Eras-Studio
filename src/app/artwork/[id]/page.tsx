@@ -10,58 +10,56 @@ export default async function ArtworkPage({ params }: ArtworkPageProps) {
   const { id } = await params;
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // 1. Concurrently fetch auth user and artwork data
+  const [
+    { data: { user } },
+    { data: artwork }
+  ] = await Promise.all([
+    supabase.auth.getUser(),
+    supabase
+      .from('artworks')
+      .select(`*, profiles(full_name, profile_pic_url, about_me, portfolio_url)`)
+      .eq('id', id)
+      .maybeSingle(),
+  ]);
 
   if (!user) {
     redirect('/login');
   }
 
-  const { data: artwork } = await supabase
-    .from('artworks')
-    .select(`*, profiles(full_name, profile_pic_url, about_me, portfolio_url)`)
-    .eq('id', id)
-    .single();
-
   if (!artwork) notFound();
 
-  let userRole: string | null = null;
+  const isOwner = user.id === artwork.creator_id;
+  const canExpress = !isOwner;
 
-  if (user) {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single();
-    userRole = profile?.role || null;
-  }
+  // 2. Concurrently fetch user profile, existing chat, and save status in parallel
+  const [
+    { data: profile },
+    chatResult,
+    savedResult
+  ] = await Promise.all([
+    supabase.from('profiles').select('role').eq('id', user.id).maybeSingle(),
+    canExpress
+      ? supabase
+          .from('inquiries_chats')
+          .select('id, status, created_at')
+          .eq('artwork_id', id)
+          .eq('guest_id', user.id)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
+    canExpress
+      ? supabase
+          .from('saved_artworks')
+          .select('id')
+          .eq('artwork_id', id)
+          .eq('user_id', user.id)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
+  ]);
 
-  const isOwner = user?.id === artwork.creator_id;
-  const canExpress = Boolean(user && !isOwner);
-
-  let existingChat = null;
-  let isSaved = false;
-
-  if (canExpress && user) {
-    const { data: chatData } = await supabase
-      .from('inquiries_chats')
-      .select('id, status, created_at')
-      .eq('artwork_id', id)
-      .eq('guest_id', user.id)
-      .maybeSingle();
-
-    existingChat = chatData;
-
-    // Check if artwork is saved (ignore errors if table missing)
-    const { data: savedData } = await supabase
-      .from('saved_artworks')
-      .select('id')
-      .eq('artwork_id', id)
-      .eq('user_id', user.id)
-      .maybeSingle();
-    isSaved = !!savedData;
-  }
+  const userRole = profile?.role || null;
+  const existingChat = chatResult?.data || null;
+  const isSaved = Boolean(savedResult?.data);
 
   return (
     <ArtworkDiscoveryDetail

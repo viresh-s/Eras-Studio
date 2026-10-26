@@ -79,12 +79,24 @@ export function calculateCreatorScore(factors: CreatorScoringFactors): number {
   return Math.min(Math.round(total), 100);
 }
 
+let cachedTopCreators: { data: RankedCreator[]; timestamp: number; limit: number } | null = null;
+const TOP_CREATORS_CACHE_TTL = 3 * 60 * 1000; // 3 minutes cache
+
+export function invalidateTopCreatorsCache() {
+  cachedTopCreators = null;
+}
+
 /**
  * Fetches and ranks creators dynamically in real-time.
  * Every time any creator gains an inquiry, save, artwork, or profile edit,
  * their score recalculates instantly on the next load.
  */
 export async function getTopCreators(limit: number = 10): Promise<RankedCreator[]> {
+  const now = Date.now();
+  if (cachedTopCreators && now - cachedTopCreators.timestamp < TOP_CREATORS_CACHE_TTL && cachedTopCreators.limit >= limit) {
+    return cachedTopCreators.data.slice(0, limit);
+  }
+
   try {
     const supabase = createClient();
 
@@ -94,7 +106,7 @@ export async function getTopCreators(limit: number = 10): Promise<RankedCreator[
     });
 
     if (!rpcError && rpcData && Array.isArray(rpcData) && rpcData.length > 0) {
-      return (rpcData as any[]).map((row: any, idx: number) => ({
+      const results = (rpcData as any[]).map((row: any, idx: number) => ({
         id: row.creator_id,
         name: row.full_name || 'Anonymous Creator',
         profilePicUrl: row.profile_pic_url || null,
@@ -109,6 +121,8 @@ export async function getTopCreators(limit: number = 10): Promise<RankedCreator[
         inquiryCount: Number(row.inquiry_count) || 0,
         saveCount: Number(row.save_count) || 0,
       }));
+      cachedTopCreators = { data: results, timestamp: Date.now(), limit };
+      return results;
     }
 
     // 2. Direct table fallback calculation
@@ -235,15 +249,19 @@ export async function getTopCreators(limit: number = 10): Promise<RankedCreator[
       rank: i + 1,
     }));
 
+    let finalResults: RankedCreator[];
     if (ranked.length < limit) {
       const fallback = getFallbackSeedCreators(limit - ranked.length);
       const existingIds = new Set(ranked.map((r) => r.id));
       const filteredFallback = fallback.filter((f) => !existingIds.has(f.id));
       const combined = [...ranked, ...filteredFallback].slice(0, limit);
-      return combined.map((c, i) => ({ ...c, rank: i + 1 }));
+      finalResults = combined.map((c, i) => ({ ...c, rank: i + 1 }));
+    } else {
+      finalResults = ranked.slice(0, limit);
     }
 
-    return ranked.slice(0, limit);
+    cachedTopCreators = { data: finalResults, timestamp: Date.now(), limit };
+    return finalResults;
   } catch (err) {
     console.error('Error computing top creators:', err);
     return getFallbackSeedCreators(limit);

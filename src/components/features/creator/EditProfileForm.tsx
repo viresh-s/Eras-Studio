@@ -186,12 +186,22 @@ function DocumentUploader({
         </div>
 
         <div className="min-w-0 flex-1">
-          <h4 className="text-xs sm:text-[13px] font-semibold text-[#181A1F] leading-tight flex items-center">
+          <label
+            style={{
+              fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
+              color: '#181A1F',
+              fontWeight: 500,
+            }}
+            className="text-xs font-medium text-[#181A1F] leading-tight flex items-center mb-1 select-none"
+          >
             <span>{label}</span>
-            {required && <span className="text-red-500 ml-1 font-bold text-xs">*</span>}
-          </h4>
+            {required && <span className="text-red-500 ml-1 text-xs font-normal">*</span>}
+          </label>
           {description && (
-            <p className="text-[11px] text-[#71716D] mt-1 leading-snug line-clamp-1">
+            <p
+              style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+              className="text-[11px] text-[#71716D] leading-snug line-clamp-1"
+            >
               {description}
             </p>
           )}
@@ -200,13 +210,19 @@ function DocumentUploader({
 
       {/* Bottom Section: File Info & Actions */}
       <div className="mt-3 pt-2.5 border-t border-[#F0F0EB] flex items-center justify-between gap-2 flex-wrap">
-        <span className="text-[10.5px] text-[#929292]">
+        <span
+          style={{ fontFamily: "'Poppins', sans-serif" }}
+          className="text-[10.5px] text-[#929292]"
+        >
           {fileUrl ? 'PDF attached · Max 10 MB' : 'PDF · Max 10 MB'}
         </span>
 
         <div>
           {isUploading ? (
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] bg-[#F3F3F3] text-[#71716D] text-[11px] font-medium">
+            <div
+              style={{ fontFamily: "'Poppins', sans-serif" }}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] bg-[#F3F3F3] text-[#71716D] text-[11px] font-medium"
+            >
               <Loader2 size={11} className="animate-spin text-[#181A1F]" />
               <span>Uploading...</span>
             </div>
@@ -216,6 +232,7 @@ function DocumentUploader({
                 href={fileUrl}
                 target="_blank"
                 rel="noopener noreferrer"
+                style={{ fontFamily: "'Poppins', sans-serif" }}
                 className="px-2 py-1 rounded-[6px] text-[11px] font-medium text-[#181A1F] bg-[#F3F3F3] hover:bg-[#E8E8E8] transition-colors inline-flex items-center gap-1"
                 title="View document"
               >
@@ -225,6 +242,7 @@ function DocumentUploader({
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
+                style={{ fontFamily: "'Poppins', sans-serif" }}
                 className="px-2 py-1 rounded-[6px] text-[11px] font-medium text-[#181A1F] bg-[#F3F3F3] hover:bg-[#E8E8E8] transition-colors inline-flex items-center gap-1 cursor-pointer"
                 title="Replace document"
               >
@@ -234,6 +252,7 @@ function DocumentUploader({
               <button
                 type="button"
                 onClick={onRemoved}
+                style={{ fontFamily: "'Poppins', sans-serif" }}
                 className="p-1 rounded-[6px] text-[#8E8E88] hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
                 title="Remove document"
               >
@@ -255,7 +274,10 @@ function DocumentUploader({
       </div>
 
       {uploadError && (
-        <div className="mt-2 pt-1.5 border-t border-red-100 text-xs text-red-600 flex items-center gap-1.5">
+        <div
+          style={{ fontFamily: "'Poppins', sans-serif" }}
+          className="mt-2 pt-1.5 border-t border-red-100 text-xs text-red-600 flex items-center gap-1.5"
+        >
           <AlertCircle size={12} className="shrink-0" />
           <span>{uploadError}</span>
         </div>
@@ -933,19 +955,19 @@ export default function EditProfileForm({ userProfile }: { userProfile: Profile 
                     </div>
 
                     {/* Section B: Top 25 Artworks Archive */}
-                    <div className="pt-6 border-t border-[#E8E8E3] space-y-3">
+                    <div className="pt-6 border-t border-[#E8E8E3] space-y-2">
                       <div>
-                        <h3
-                          style={{ fontFamily: "'Poppins', sans-serif" }}
-                          className="text-sm font-semibold text-[#181A1F] flex items-center gap-2"
+                        <label
+                          style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif", fontWeight: 500 }}
+                          className="block text-xs font-medium text-[#181A1F] flex items-center gap-1.5 mb-1 select-none"
                         >
-                          <FolderArchive size={16} className="text-[#181A1F]" />
+                          <FolderArchive size={14} className="text-[#71716D]" />
                           <span>Top 25 Artworks Archive Link</span>
-                          <span className="text-red-500 text-xs">*</span>
-                        </h3>
+                          <span className="text-red-500 ml-1 text-xs font-normal">*</span>
+                        </label>
                         <p
-                          style={{ fontFamily: "'Poppins', sans-serif" }}
-                          className="text-xs text-[#71716D] mt-1"
+                          style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+                          className="text-[11px] text-[#71716D] leading-snug"
                         >
                           Share a Google Drive folder link containing your 25 best artworks, ranked 1 to 25. Please make sure folder access is set to &ldquo;Anyone with the link can view&rdquo;.
                         </p>
@@ -1046,10 +1068,13 @@ export default function EditProfileForm({ userProfile }: { userProfile: Profile 
 
                     {/* Proposal Guidelines & Review Criteria Card to fill space purposefully */}
                     <div className="bg-white rounded-[16px] border border-[#E8E8E3] p-5 shadow-2xs space-y-3">
-                      <h3 className="text-xs font-semibold text-[#181A1F] flex items-center gap-2">
-                        <Sparkles size={14} className="text-[#181A1F]" />
+                      <div
+                        style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif", fontWeight: 500 }}
+                        className="text-xs font-medium text-[#181A1F] flex items-center gap-1.5"
+                      >
+                        <Sparkles size={14} className="text-[#71716D]" />
                         <span>Curatorial Proposal Guidelines</span>
-                      </h3>
+                      </div>
                       <p className="text-[11px] text-[#555555] leading-relaxed">
                         Curators, galleries, and residency boards frequently search for actionable artist proposals. When preparing your proposal document, we recommend including:
                       </p>
@@ -1098,7 +1123,7 @@ export default function EditProfileForm({ userProfile }: { userProfile: Profile 
                     ) : (
                       <>
                         <Save size={15} />
-                        <span>Save Profile & Documents</span>
+                        <span>Save Profile</span>
                       </>
                     )}
                   </button>

@@ -5,7 +5,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRouter } from 'next/navigation';
-import { Save, Link as LinkIcon, ArrowLeft, Upload, Trash2 } from 'lucide-react';
+import { Save, Link as LinkIcon, ArrowLeft, Upload, Trash2, Loader2 } from 'lucide-react';
 import { updateArtwork } from '@/actions/artworkActions';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
@@ -14,6 +14,14 @@ import MultiSelect from '@/components/ui/MultiSelect';
 import TextArea from '@/components/ui/TextArea';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
+import {
+  compressImages,
+  uploadCompressedPair,
+  validateImageFile,
+  MAX_INPUT_SIZE_MB,
+  type PipelineProgress,
+  type CompressionResult,
+} from '@/lib/media/imagePipeline';
 
 const mediumOptions = [
   { value: 'Painting', label: 'Painting' },
@@ -106,12 +114,21 @@ export default function ArtworkEditForm({ userId, artwork }: ArtworkEditFormProp
 
   // Initial images from the database
   const initialImages = [artwork.image_url, ...(artwork.additional_images || [])].filter(Boolean);
+  const initialFullImages = [
+    artwork.image_url_full || artwork.image_url,
+    ...(artwork.additional_images_full || artwork.additional_images || []),
+  ].filter(Boolean);
 
   const [existingUrls, setExistingUrls] = useState<string[]>(initialImages);
+  const [existingFullUrls, setExistingFullUrls] = useState<string[]>(initialFullImages);
   const [newFiles, setNewFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [customStyle, setCustomStyle] = useState('');
   const [customCollection, setCustomCollection] = useState('');
+
+  // Compression pipeline state
+  const [compressionProgress, setCompressionProgress] = useState<PipelineProgress | null>(null);
+  const [uploadStage, setUploadStage] = useState<string | null>(null);
 
   const totalImages = existingUrls.length + newFiles.length;
 
@@ -148,10 +165,22 @@ export default function ArtworkEditForm({ userId, artwork }: ArtworkEditFormProp
   const selectedPriceVisibility = watch('priceVisibility');
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    if (files.length > 0) {
+    const rawFiles = Array.from(e.target.files || []);
+    setError(null);
+
+    const validFiles: File[] = [];
+    for (const file of rawFiles) {
+      try {
+        validateImageFile(file);
+        validFiles.push(file);
+      } catch (valErr) {
+        setError(valErr instanceof Error ? valErr.message : 'Invalid image file');
+      }
+    }
+
+    if (validFiles.length > 0) {
       const availableSlots = 5 - totalImages;
-      const filesToAdd = files.slice(0, availableSlots);
+      const filesToAdd = validFiles.slice(0, availableSlots);
 
       const updatedFiles = [...newFiles, ...filesToAdd];
       setNewFiles(updatedFiles);
@@ -167,6 +196,10 @@ export default function ArtworkEditForm({ userId, artwork }: ArtworkEditFormProp
     const updated = [...existingUrls];
     updated.splice(index, 1);
     setExistingUrls(updated);
+
+    const updatedFull = [...existingFullUrls];
+    updatedFull.splice(index, 1);
+    setExistingFullUrls(updatedFull);
   };
 
   const removeNewFile = (index: number) => {
@@ -187,41 +220,48 @@ export default function ArtworkEditForm({ userId, artwork }: ArtworkEditFormProp
 
     setIsLoading(true);
     setError(null);
+    setCompressionProgress(null);
+    setUploadStage(null);
 
     try {
       const supabase = createClient();
-      const uploadedUrls: string[] = [];
+      const uploadedPairs: { cardUrl: string; fullUrl: string }[] = [];
+      let newCompressionResults: CompressionResult[] = [];
 
-      // Upload any newly added images
+      // Compress and upload any newly added images
       if (newFiles.length > 0) {
-        await Promise.all(
-          newFiles.map(async (file, index) => {
-            const fileExt = file.name.split('.').pop();
-            const fileName = `${userId}/${Date.now()}_${index}.${fileExt}`;
+        setUploadStage('Compressing new images...');
+        try {
+          newCompressionResults = await compressImages(newFiles, (progress) => {
+            setCompressionProgress(progress);
+          });
+        } catch (compErr) {
+          throw new Error(
+            `Image compression failed: ${compErr instanceof Error ? compErr.message : 'Unknown error'}`
+          );
+        }
 
-            const { error: uploadError } = await supabase.storage
-              .from('artworks')
-              .upload(fileName, file);
-
-            if (uploadError) throw uploadError;
-
-            const { data: urlData } = supabase.storage
-              .from('artworks')
-              .getPublicUrl(fileName);
-
-            uploadedUrls.push(urlData.publicUrl);
-          })
-        );
+        setUploadStage('Uploading optimized images...');
+        for (let i = 0; i < newCompressionResults.length; i++) {
+          setUploadStage(`Uploading image ${i + 1} of ${newCompressionResults.length}...`);
+          const urls = await uploadCompressedPair(supabase, userId, newCompressionResults[i], i);
+          uploadedPairs.push(urls);
+        }
       }
 
-      const finalUrls = [...existingUrls, ...uploadedUrls];
-      const coverImage = finalUrls[0];
-      const additionalImages = finalUrls.slice(1);
+      const finalCardUrls = [...existingUrls, ...uploadedPairs.map((p) => p.cardUrl)];
+      const finalFullUrls = [...existingFullUrls, ...uploadedPairs.map((p) => p.fullUrl)];
+
+      const coverImage = finalCardUrls[0];
+      const coverImageFull = finalFullUrls[0];
+      const additionalImages = finalCardUrls.slice(1);
+      const additionalImagesFull = finalFullUrls.slice(1);
 
       const finalStyle = data.style === 'Other' ? customStyle : data.style;
       const finalCollection = data.collection === 'Other' ? customCollection : data.collection;
       const tagsArray = data.tags || [];
 
+      setUploadStage('Saving artwork details...');
       await updateArtwork(artwork.id, {
         userId,
         title: data.title,
@@ -242,7 +282,15 @@ export default function ArtworkEditForm({ userId, artwork }: ArtworkEditFormProp
         status: data.status,
         isPublished: submitAction === 'publish',
         imageUrl: coverImage,
+        imageUrlFull: coverImageFull,
         additionalImages: additionalImages,
+        additionalImagesFull: additionalImagesFull,
+        // If a new cover image was uploaded, save its dimensions
+        ...(existingUrls.length === 0 && newCompressionResults.length > 0 ? {
+          imageWidth: newCompressionResults[0].originalWidth,
+          imageHeight: newCompressionResults[0].originalHeight,
+          aspectRatio: newCompressionResults[0].aspectRatio,
+        } : {}),
       });
 
       router.push('/portfolio/artworks');
@@ -251,6 +299,8 @@ export default function ArtworkEditForm({ userId, artwork }: ArtworkEditFormProp
       setError(err instanceof Error ? err.message : 'Something went wrong');
     } finally {
       setIsLoading(false);
+      setCompressionProgress(null);
+      setUploadStage(null);
     }
   };
 
@@ -266,6 +316,36 @@ export default function ArtworkEditForm({ userId, artwork }: ArtworkEditFormProp
       {error && (
         <div className="mb-4 bg-red-50 border border-red-200 rounded-xl p-3 text-red-600 text-sm">
           {error}
+        </div>
+      )}
+
+      {/* Compression & Upload Progress Bar */}
+      {isLoading && uploadStage && (
+        <div className="mb-6 bg-gray-50 rounded-xl border border-gray-200 p-4">
+          <div className="flex items-center gap-3 mb-2">
+            <Loader2 size={16} className="animate-spin text-gray-600" />
+            <span className="text-sm font-medium text-gray-700">{uploadStage}</span>
+          </div>
+          {compressionProgress && (
+            <div className="space-y-1">
+              <div className="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
+                <div
+                  className="h-full bg-gray-900 rounded-full transition-all duration-300 ease-out"
+                  style={{
+                    width: `${Math.round(
+                      ((compressionProgress.fileIndex * 100 + compressionProgress.percent) /
+                        (compressionProgress.totalFiles * 100)) *
+                        100
+                    )}%`,
+                  }}
+                />
+              </div>
+              <p className="text-[10px] text-gray-500">
+                File {compressionProgress.fileIndex + 1} of {compressionProgress.totalFiles}
+                {compressionProgress.stage !== 'complete' && ` — ${compressionProgress.stage.replace(/-/g, ' ')}`}
+              </p>
+            </div>
+          )}
         </div>
       )}
 
@@ -332,7 +412,7 @@ export default function ArtworkEditForm({ userId, artwork }: ArtworkEditFormProp
                   <Upload size={18} className="text-gray-400" />
                 </div>
                 <p className="font-semibold text-gray-900 text-xs">Add Image</p>
-                <p className="text-[10px] text-gray-400 mt-1">{5 - totalImages} slots left</p>
+                <p className="text-[10px] text-gray-400 mt-1">{5 - totalImages} slots left (max {MAX_INPUT_SIZE_MB} MB each)</p>
               </div>
             )}
           </div>

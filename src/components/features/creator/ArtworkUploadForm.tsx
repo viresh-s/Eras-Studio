@@ -5,7 +5,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRouter } from 'next/navigation';
-import { Upload, Image, Link as LinkIcon, Trash2, Save } from 'lucide-react';
+import { Upload, Image, Link as LinkIcon, Trash2, Save, Loader2 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { createArtwork } from '@/actions/artworkActions';
 import Button from '@/components/ui/Button';
@@ -14,6 +14,15 @@ import Select from '@/components/ui/Select';
 import MultiSelect from '@/components/ui/MultiSelect';
 import TextArea from '@/components/ui/TextArea';
 import type { FreemiumStatus } from '@/lib/freemium/check';
+import {
+  compressImages,
+  uploadCompressedPair,
+  formatFileSize,
+  validateImageFile,
+  MAX_INPUT_SIZE_MB,
+  type PipelineProgress,
+  type CompressionResult,
+} from '@/lib/media/imagePipeline';
 
 const mediumOptions = [
   { value: 'Painting', label: 'Painting' },
@@ -108,6 +117,10 @@ export default function ArtworkUploadForm({ userId, freemiumStatus }: UploadForm
   const [customStyle, setCustomStyle] = useState('');
   const [customCollection, setCustomCollection] = useState('');
 
+  // Compression pipeline state
+  const [compressionProgress, setCompressionProgress] = useState<PipelineProgress | null>(null);
+  const [uploadStage, setUploadStage] = useState<string | null>(null);
+
   useEffect(() => {
     if (freemiumStatus.isLocked) {
       router.replace('/subscription');
@@ -133,14 +146,27 @@ export default function ArtworkUploadForm({ userId, freemiumStatus }: UploadForm
   const selectedPriceVisibility = watch('priceVisibility');
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    if (files.length > 0) {
-      const newFiles = [...selectedFiles, ...files].slice(0, 5);
+    const rawFiles = Array.from(e.target.files || []);
+    setError(null);
+
+    const validFiles: File[] = [];
+    for (const file of rawFiles) {
+      try {
+        validateImageFile(file);
+        validFiles.push(file);
+      } catch (valErr) {
+        setError(valErr instanceof Error ? valErr.message : 'Invalid image file');
+      }
+    }
+
+    if (validFiles.length > 0) {
+      const newFiles = [...selectedFiles, ...validFiles].slice(0, 5);
       setSelectedFiles(newFiles);
 
       const newUrls = newFiles.map(file => URL.createObjectURL(file));
       setPreviewUrls(newUrls);
     }
+    e.target.value = '';
   };
 
   const removeFile = (index: number) => {
@@ -161,38 +187,53 @@ export default function ArtworkUploadForm({ userId, freemiumStatus }: UploadForm
 
     setIsLoading(true);
     setError(null);
+    setCompressionProgress(null);
+    setUploadStage(null);
 
     try {
       const supabase = createClient();
-      const uploadedUrls: string[] = [];
 
-      // Upload all images
-      await Promise.all(
-        selectedFiles.map(async (file, index) => {
-          const fileExt = file.name.split('.').pop();
-          const fileName = `${userId}/${Date.now()}_${index}.${fileExt}`;
+      // ── Stage 1: Client-Side WebP Compression ──
+      setUploadStage('Compressing images...');
+      let compressionResults: CompressionResult[];
+      try {
+        compressionResults = await compressImages(selectedFiles, (progress) => {
+          setCompressionProgress(progress);
+        });
+      } catch (compErr) {
+        throw new Error(
+          `Image compression failed: ${compErr instanceof Error ? compErr.message : 'Unknown error'}`
+        );
+      }
 
-          const { error: uploadError } = await supabase.storage
-            .from('artworks')
-            .upload(fileName, file);
+      // ── Stage 2: Upload Compressed WebP Pairs to Supabase ──
+      setUploadStage('Uploading optimized images...');
+      const uploadedPairs: { cardUrl: string; fullUrl: string }[] = [];
 
-          if (uploadError) throw uploadError;
+      for (let i = 0; i < compressionResults.length; i++) {
+        setUploadStage(`Uploading image ${i + 1} of ${compressionResults.length}...`);
+        const urls = await uploadCompressedPair(supabase, userId, compressionResults[i], i);
+        uploadedPairs.push(urls);
+      }
 
-          const { data: urlData } = supabase.storage
-            .from('artworks')
-            .getPublicUrl(fileName);
+      // Cover image = first image's card URL (for feeds/grids)
+      const coverImage = uploadedPairs[0].cardUrl;
+      // Full-res cover for detail views
+      const coverImageFull = uploadedPairs[0].fullUrl;
+      // Additional images = remaining card URLs
+      const additionalImages = uploadedPairs.slice(1).map((p) => p.cardUrl);
+      // Additional full-res URLs
+      const additionalImagesFull = uploadedPairs.slice(1).map((p) => p.fullUrl);
 
-          uploadedUrls.push(urlData.publicUrl);
-        })
-      );
-
-      const coverImage = uploadedUrls[0];
-      const additionalImages = uploadedUrls.slice(1);
+      // Image metadata from the cover (first) image
+      const coverMeta = compressionResults[0];
 
       const finalStyle = data.style === 'Other' ? customStyle : data.style;
       const finalCollection = data.collection === 'Other' ? customCollection : data.collection;
       const tagsArray = data.tags || [];
 
+      // ── Stage 3: Save to Database ──
+      setUploadStage('Saving artwork details...');
       await createArtwork({
         userId,
         title: data.title,
@@ -209,7 +250,12 @@ export default function ArtworkUploadForm({ userId, freemiumStatus }: UploadForm
         description: data.description,
         externalLink: data.externalLink,
         imageUrl: coverImage,
+        imageUrlFull: coverImageFull,
         additionalImages: additionalImages,
+        additionalImagesFull: additionalImagesFull,
+        imageWidth: coverMeta.originalWidth,
+        imageHeight: coverMeta.originalHeight,
+        aspectRatio: coverMeta.aspectRatio,
         price: data.price ? parseFloat(data.price) : null,
         priceVisibility: data.priceVisibility,
         status: data.status,
@@ -222,6 +268,8 @@ export default function ArtworkUploadForm({ userId, freemiumStatus }: UploadForm
       setError(err instanceof Error ? err.message : 'Something went wrong');
     } finally {
       setIsLoading(false);
+      setCompressionProgress(null);
+      setUploadStage(null);
     }
   };
 
@@ -242,6 +290,36 @@ export default function ArtworkUploadForm({ userId, freemiumStatus }: UploadForm
       {error && (
         <div className="mb-4 bg-red-50 border border-red-200 rounded-xl p-3 text-red-600 text-sm">
           {error}
+        </div>
+      )}
+
+      {/* Compression & Upload Progress Bar */}
+      {isLoading && uploadStage && (
+        <div className="mb-6 bg-gray-50 rounded-xl border border-gray-200 p-4">
+          <div className="flex items-center gap-3 mb-2">
+            <Loader2 size={16} className="animate-spin text-gray-600" />
+            <span className="text-sm font-medium text-gray-700">{uploadStage}</span>
+          </div>
+          {compressionProgress && (
+            <div className="space-y-1">
+              <div className="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
+                <div
+                  className="h-full bg-gray-900 rounded-full transition-all duration-300 ease-out"
+                  style={{
+                    width: `${Math.round(
+                      ((compressionProgress.fileIndex * 100 + compressionProgress.percent) /
+                        (compressionProgress.totalFiles * 100)) *
+                        100
+                    )}%`,
+                  }}
+                />
+              </div>
+              <p className="text-[10px] text-gray-500">
+                File {compressionProgress.fileIndex + 1} of {compressionProgress.totalFiles}
+                {compressionProgress.stage !== 'complete' && ` — ${compressionProgress.stage.replace(/-/g, ' ')}`}
+              </p>
+            </div>
+          )}
         </div>
       )}
 
@@ -281,7 +359,7 @@ export default function ArtworkUploadForm({ userId, freemiumStatus }: UploadForm
                   <Upload size={18} className="text-gray-400" />
                 </div>
                 <p className="font-semibold text-gray-900 text-xs">Add Image</p>
-                <p className="text-[10px] text-gray-400 mt-1">Up to 5 images</p>
+                <p className="text-[10px] text-gray-400 mt-1">Up to 5 images (max {MAX_INPUT_SIZE_MB} MB each)</p>
               </div>
             )}
           </div>

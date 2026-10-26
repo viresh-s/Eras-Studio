@@ -50,7 +50,12 @@ export interface Artwork {
   description: string | null;
   external_link: string | null;
   image_url: string;
+  image_url_full: string | null;
   additional_images: string[];
+  additional_images_full: string[] | null;
+  image_width: number | null;
+  image_height: number | null;
+  aspect_ratio: number | null;
   price: number | null;
   status: ArtworkStatus;
   year: string | null;

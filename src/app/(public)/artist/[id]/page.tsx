@@ -12,24 +12,29 @@ export default async function ArtistProfilePage({ params }: ArtistProfilePagePro
   const { id } = await params;
   const supabase = await createClient();
 
-  // Fetch the artist profile
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', id)
-    .single();
+  // Concurrently fetch profile, published artworks, and auth user
+  const [
+    { data: profile },
+    { data: artworks },
+    { data: { user } }
+  ] = await Promise.all([
+    supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', id)
+      .maybeSingle(),
+    supabase
+      .from('artworks')
+      .select('*')
+      .eq('creator_id', id)
+      .eq('is_published', true)
+      .order('created_at', { ascending: false }),
+    supabase.auth.getUser(),
+  ]);
 
   if (!profile || profile.role !== 'Creator') {
     notFound();
   }
-
-  // Fetch their published artworks
-  const { data: artworks } = await supabase
-    .from('artworks')
-    .select('*')
-    .eq('creator_id', id)
-    .eq('is_published', true)
-    .order('created_at', { ascending: false });
 
   const getInitials = (name: string) => {
     if (!name) return '?';
@@ -38,7 +43,6 @@ export default async function ArtistProfilePage({ params }: ArtistProfilePagePro
     return name.substring(0, 2).toUpperCase();
   };
 
-  const { data: { user } } = await supabase.auth.getUser();
   const isOwner = user?.id === profile.id;
 
   return (
@@ -63,7 +67,7 @@ export default async function ArtistProfilePage({ params }: ArtistProfilePagePro
 
         {/* Centered Avatar */}
         <div className="relative -mt-10 flex justify-center z-10">
-          <div className="w-20 h-20 rounded-full bg-[#E5E5E5] flex items-center justify-center text-xl font-bold text-gray-700 overflow-hidden shadow-[0_4px_10px_rgba(0,0,0,0.1)] border-2 border-white" style={{ fontFamily: "'Playfair Display', serif" }}>
+          <div className="w-20 h-20 rounded-full bg-[#E5E5E5] flex items-center justify-center text-xl font-bold text-gray-700 overflow-hidden shadow-[0_4px_10px_rgba(0,0,0,0.1)] border-2 border-white font-sans" style={{ fontFamily: "'Poppins', sans-serif" }}>
             {profile.profile_pic_url ? (
               <img src={profile.profile_pic_url} alt="Profile" className="w-full h-full object-cover" />
             ) : (
@@ -74,12 +78,15 @@ export default async function ArtistProfilePage({ params }: ArtistProfilePagePro
 
         {/* Centered Info */}
         <div className="text-center mt-6 mb-12 max-w-3xl mx-auto">
-          <p className="text-[11px] text-gray-500 font-medium mb-3">
+          <p className="text-[11px] text-gray-500 font-medium mb-3 font-sans" style={{ fontFamily: "'Poppins', sans-serif" }}>
             {profile.primary_medium || 'Artist'} 
             {profile.location_city && ` · ${profile.location_city}`}
           </p>
           
-          <h1 className="text-5xl sm:text-6xl text-gray-900 mb-5 tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>
+          <h1
+            className="text-5xl sm:text-6xl text-gray-900 mb-5 tracking-tight font-serif italic"
+            style={{ fontFamily: "'Century Schoolbook', Century, serif", fontStyle: 'italic' }}
+          >
             {profile.full_name}
           </h1>
           
