@@ -95,9 +95,9 @@ export default async function CreatorDashboard() {
               </span>
             </div>
             {/* Progress Bar */}
-            <div className="w-full bg-[#EFEFEF] rounded-full h-2 overflow-hidden mb-1.5">
+            <div className="w-full bg-blue-100/70 rounded-full h-2 overflow-hidden mb-1.5">
               <div
-                className="bg-[var(--color-cor-ink)] h-2 rounded-full transition-all duration-500"
+                className="bg-blue-600 h-2 rounded-full transition-all duration-500"
                 style={{ width: `${completeness}%` }}
               />
             </div>

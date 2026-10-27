@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client';
 import { updateProfile, updateProfileAvatar } from '@/actions/profileActions';
 import { Cloud, Loader2, CheckCircle2, AlertCircle, MessageCircle, ShoppingBag, Compass, User } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import type { Profile } from '@/types/database';
 
 interface CollectorProfileFormProps {
@@ -28,6 +29,54 @@ export default function CollectorProfileForm({ profile, email }: CollectorProfil
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const optimizeAvatarFile = async (file: File): Promise<Blob> => {
+    return new Promise((resolve) => {
+      const htmlImg = document.createElement('img');
+      const objectUrl = URL.createObjectURL(file);
+      htmlImg.onload = () => {
+        URL.revokeObjectURL(objectUrl);
+        const maxDim = 1200;
+        let width = htmlImg.naturalWidth || htmlImg.width;
+        let height = htmlImg.naturalHeight || htmlImg.height;
+
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d', { alpha: false });
+        if (!ctx) {
+          resolve(file);
+          return;
+        }
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(htmlImg, 0, 0, width, height);
+
+        canvas.toBlob(
+          (blob) => {
+            resolve(blob || file);
+          },
+          'image/webp',
+          0.92
+        );
+      };
+      htmlImg.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        resolve(file);
+      };
+      htmlImg.src = objectUrl;
+    });
+  };
+
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -41,13 +90,15 @@ export default function CollectorProfileForm({ profile, email }: CollectorProfil
     setError(null);
 
     try {
+      setAvatarPreview(URL.createObjectURL(file));
       const supabase = createClient();
-      const fileExt = file.name.split('.').pop() || 'png';
-      const fileName = `${profile.id}/${Date.now()}.${fileExt}`;
+      const optimizedBlob = await optimizeAvatarFile(file);
+      const uploadFile = new File([optimizedBlob], 'avatar.webp', { type: 'image/webp' });
+      const fileName = `${profile.id}/avatar.webp`;
 
       const { error: uploadError } = await supabase.storage
         .from('avatars')
-        .upload(fileName, file, { upsert: true, cacheControl: '3600' });
+        .upload(fileName, uploadFile, { upsert: true, cacheControl: '3600' });
 
       if (uploadError) throw new Error(uploadError.message);
 
@@ -60,6 +111,7 @@ export default function CollectorProfileForm({ profile, email }: CollectorProfil
       router.refresh();
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to upload profile picture.');
+      setAvatarPreview(profile.profile_pic_url || null);
     } finally {
       setIsUploadingAvatar(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -142,10 +194,16 @@ export default function CollectorProfileForm({ profile, email }: CollectorProfil
             <div>
               {/* 1. Collector Mini Identity Banner */}
               <div className="p-5 border-b border-[#E8E8E3] flex items-center gap-3 bg-white">
-                <div className="w-11 h-11 rounded-full overflow-hidden bg-[#F3F3F3] border border-[#E2E2DC] shrink-0 flex items-center justify-center">
+                <div className="relative w-11 h-11 rounded-full overflow-hidden bg-[#F3F3F3] border border-[#E2E2DC] shrink-0 flex items-center justify-center">
                   {avatarPreview ? (
-                    /* eslint-disable-next-line @next/next/no-img-element */
-                    <img src={avatarPreview} alt={fullName} className="w-full h-full object-cover" />
+                    <Image
+                      src={avatarPreview}
+                      alt={fullName || 'Collector'}
+                      fill
+                      sizes="44px"
+                      className="object-cover"
+                      unoptimized={avatarPreview.startsWith('blob:') || avatarPreview.startsWith('data:')}
+                    />
                   ) : (
                     <span className="text-xs font-semibold text-[#6E6E69]">{getInitials()}</span>
                   )}
@@ -265,23 +323,26 @@ export default function CollectorProfileForm({ profile, email }: CollectorProfil
 
                     <div className="flex flex-col sm:flex-row gap-8 items-start mb-6">
                       {/* Left Sub-column: Avatar Circle & Replace */}
-                      <div className="flex flex-col items-center shrink-0 w-full sm:w-36 pt-1">
-                        <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden bg-[#F3F3F3] border border-[#E2E2DC] shadow-xs relative flex items-center justify-center">
+                      <div className="flex flex-col items-center shrink-0 w-full sm:w-44 pt-1">
+                        <div className="w-32 h-32 sm:w-36 sm:h-36 rounded-full overflow-hidden bg-[#F3F3F3] border border-[#E2E2DC] shadow-xs relative flex items-center justify-center">
                           {avatarPreview ? (
-                            /* eslint-disable-next-line @next/next/no-img-element */
-                            <img
+                            <Image
                               src={avatarPreview}
                               alt="Collector Avatar"
-                              className="w-full h-full object-cover"
+                              fill
+                              sizes="(max-width: 640px) 128px, 144px"
+                              className="object-cover"
+                              unoptimized={avatarPreview.startsWith('blob:') || avatarPreview.startsWith('data:')}
+                              priority
                             />
                           ) : (
-                            <span className="text-xl sm:text-2xl font-serif font-bold text-[#8E8E88]">
+                            <span className="text-2xl sm:text-3xl font-serif font-bold text-[#8E8E88]">
                               {getInitials()}
                             </span>
                           )}
 
                           {isUploadingAvatar && (
-                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-20">
                               <Loader2 size={24} className="text-white animate-spin" />
                             </div>
                           )}
@@ -490,22 +551,45 @@ export default function CollectorProfileForm({ profile, email }: CollectorProfil
                     type="submit"
                     disabled={isLoading}
                     style={{
-                      background: '#181A1F',
-                      borderRadius: 16.22,
-                      fontFamily: "'Poppins', sans-serif",
-                      color: 'white',
-                      fontWeight: 600,
+                      position: 'relative',
+                      background: 'linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%)',
+                      boxShadow: '0px 7px 22px rgba(35, 77, 255, 0.13), 0px 3px 3px rgba(255, 255, 255, 0.65) inset, 0px -3px 6px rgba(6, 42, 137, 0.33) inset',
+                      overflow: 'hidden',
+                      borderRadius: 40,
+                      outline: '2px #2356FF solid',
+                      outlineOffset: '-2px',
                     }}
-                    className="px-7 py-3 hover:bg-black active:scale-[0.99] text-sm transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="px-8 py-3.5 sm:px-10 sm:py-4 inline-flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 hover:brightness-110 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed group select-none"
                   >
-                    {isLoading ? (
-                      <>
-                        <Loader2 size={14} className="animate-spin" />
-                        <span>Saving...</span>
-                      </>
-                    ) : (
-                      <span>Save Changes</span>
-                    )}
+                    <div
+                      style={{
+                        position: 'absolute',
+                        inset: 3,
+                        borderRadius: 37,
+                        border: '1px rgba(255, 255, 255, 0.15) solid',
+                        pointerEvents: 'none',
+                      }}
+                    />
+                    <div
+                      style={{
+                        color: 'white',
+                        fontSize: 18,
+                        fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
+                        fontWeight: '600',
+                        lineHeight: '24px',
+                        wordWrap: 'break-word',
+                      }}
+                      className="flex items-center gap-2 relative z-10"
+                    >
+                      {isLoading ? (
+                        <>
+                          <Loader2 size={18} className="animate-spin text-white" />
+                          <span>Saving Profile...</span>
+                        </>
+                      ) : (
+                        <span>Save Profile</span>
+                      )}
+                    </div>
                   </button>
                 </div>
               </div>

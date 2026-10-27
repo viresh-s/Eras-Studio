@@ -49,19 +49,6 @@ const getInitials = (name: string) => {
   return name.substring(0, 2).toUpperCase();
 };
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: { staggerChildren: 0.08 }
-  }
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 15 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" as const } }
-};
-
 // Module-level cache for default view (eliminates blank skeleton flash on navigation)
 let cachedDefaultArtworks: ArtworkItem[] | null = null;
 let cachedHasMore: boolean = true;
@@ -108,22 +95,12 @@ export default function BrowsePage() {
     });
 
     // Real-time Top Creators Ranking (cached after first fetch)
+    setIsLoadingCreators(true);
     getTopCreators(10)
       .then((data) => setTopCreators(data))
-      .catch((err) => console.error('Failed to load top creators:', err));
+      .catch((err) => console.error('Failed to load top creators:', err))
+      .finally(() => setIsLoadingCreators(false));
   }, []);
-
-  // Fetch when page changes or filters change (without duplicate mount triggers)
-  useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-      fetchArtworks(1, true);
-      return;
-    }
-
-    setPage(1);
-    fetchArtworks(1, true);
-  }, [searchQuery, artTypeFilter, sortBy, priceFilter]);
 
   const fetchArtworks = async (targetPage = 1, isReset = false) => {
     // Only show skeleton spinner if we don't have items to display
@@ -240,6 +217,18 @@ export default function BrowsePage() {
     }
     setIsLoading(false);
   };
+
+  // Fetch when page changes or filters change (without duplicate mount triggers)
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      fetchArtworks(1, true);
+      return;
+    }
+
+    setPage(1);
+    fetchArtworks(1, true);
+  }, [searchQuery, artTypeFilter, sortBy, priceFilter]);
 
   const handleLoadMore = () => {
     const nextPage = page + 1;
@@ -535,31 +524,29 @@ export default function BrowsePage() {
                           )}
                         </div>
 
-                        {/* Minimalist Single Row: Title (Century in italic style) on left, [Avatar] Creator (Poppins) next, Availability (Poppins) on right */}
+                        {/* Single Row: [Avatar] Creator Name (Poppins) on left, Availability (Poppins) on right */}
                         <div className="pt-2.5 pb-1 px-1 flex items-center justify-between gap-2">
                           <div className="min-w-0 flex items-center gap-2 truncate">
-                            <h3
-                              className="font-serif italic text-[14px] sm:text-[15px] font-semibold text-[#141413] leading-snug truncate group-hover:text-[#B8532F] transition-colors tracking-tight"
-                              style={{ fontFamily: "'Century Schoolbook', Century, serif", fontStyle: 'italic' }}
+                            <div
+                              className="w-5 h-5 rounded-full bg-gray-200 border border-gray-300/60 overflow-hidden flex items-center justify-center text-[9px] font-bold text-gray-700 shrink-0 font-sans"
+                              style={{ fontFamily: "'Poppins', sans-serif" }}
                             >
-                              {artwork.title}
-                            </h3>
-                            <div className="flex items-center gap-1.5 shrink-0 max-w-[130px] sm:max-w-[160px]">
-                              <div className="w-4 h-4 rounded-full bg-gray-200 border border-gray-300/60 overflow-hidden flex items-center justify-center text-[8px] font-bold text-gray-700 shrink-0 font-sans" style={{ fontFamily: "'Poppins', sans-serif" }}>
-                                {artwork.profiles?.profile_pic_url ? (
-                                  <img
-                                    src={artwork.profiles.profile_pic_url}
-                                    alt=""
-                                    className="w-full h-full object-cover"
-                                  />
-                                ) : (
-                                  getInitials(creatorName)
-                                )}
-                              </div>
-                              <span className="font-sans text-[11px] sm:text-[12px] font-medium text-gray-600 truncate" style={{ fontFamily: "'Poppins', sans-serif" }}>
-                                {creatorName}
-                              </span>
+                              {artwork.profiles?.profile_pic_url ? (
+                                <img
+                                  src={artwork.profiles.profile_pic_url}
+                                  alt=""
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                getInitials(creatorName)
+                              )}
                             </div>
+                            <span
+                              className="font-sans text-[12px] sm:text-[13px] font-medium text-[#141413] group-hover:text-[#B8532F] transition-colors truncate"
+                              style={{ fontFamily: "'Poppins', sans-serif" }}
+                            >
+                              {creatorName}
+                            </span>
                           </div>
 
                           <div className="flex items-center gap-1.5 shrink-0 pl-1">
@@ -572,7 +559,10 @@ export default function BrowsePage() {
                                   : 'bg-amber-400'
                               }`}
                             />
-                            <span className="font-sans text-[11px] font-medium text-gray-600 capitalize tracking-tight" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                            <span
+                              className="font-sans text-[11px] sm:text-[12px] font-medium text-gray-600 capitalize tracking-tight"
+                              style={{ fontFamily: "'Poppins', sans-serif" }}
+                            >
                               {artwork.status || 'Available'}
                             </span>
                           </div>

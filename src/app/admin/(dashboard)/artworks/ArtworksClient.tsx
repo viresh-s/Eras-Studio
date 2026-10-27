@@ -644,7 +644,7 @@ export function ArtworksClient({
                 userId={viewingArtwork.creatorId}
                 name={viewingArtwork.creatorName}
                 role="Creator"
-                avatar={null as any}
+                avatar={viewingArtwork.creatorAvatar}
                 className="text-sm font-medium"
               />
             </div>

@@ -2,7 +2,8 @@ import { createClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
 import ProfileTabs from '@/components/features/creator/ProfileTabs';
 import ReportUserButton from '@/components/features/user/ReportUserButton';
-import { Mail, MapPin } from 'lucide-react';
+import ArtistProfileAvatar from '@/components/features/creator/ArtistProfileAvatar';
+import { Sparkles } from 'lucide-react';
 
 interface ArtistProfilePageProps {
   params: Promise<{ id: string }>;
@@ -45,6 +46,29 @@ export default async function ArtistProfilePage({ params }: ArtistProfilePagePro
 
   const isOwner = user?.id === profile.id;
 
+  // Determine subscription tier ('pro' | 'lite' | 'free')
+  const rawPlan = (profile.plan || '').toLowerCase().trim();
+  const isPro = Boolean(profile.is_premium || rawPlan === 'pro' || rawPlan === 'elite');
+  const isLite = !isPro && (rawPlan === 'lite' || rawPlan === 'light');
+
+  const tierConfig = isPro
+    ? {
+        label: 'Pro Creator',
+        badgeClass: 'bg-blue-50 border-blue-200 text-blue-700',
+        dotClass: 'bg-blue-600',
+      }
+    : isLite
+    ? {
+        label: 'Lite Creator',
+        badgeClass: 'bg-sky-50 border-sky-200 text-sky-700',
+        dotClass: 'bg-sky-500',
+      }
+    : {
+        label: 'Free Creator',
+        badgeClass: 'bg-blue-50/70 border-blue-200/80 text-blue-600',
+        dotClass: 'bg-blue-400',
+      };
+
   return (
     <div className="min-h-screen bg-white pb-20">
       <div className="max-w-[1400px] mx-auto px-6 pt-10">
@@ -65,15 +89,13 @@ export default async function ArtistProfilePage({ params }: ArtistProfilePagePro
           )}
         </div>
 
-        {/* Centered Avatar */}
-        <div className="relative -mt-10 flex justify-center z-10">
-          <div className="w-20 h-20 rounded-full bg-[#E5E5E5] flex items-center justify-center text-xl font-bold text-gray-700 overflow-hidden shadow-[0_4px_10px_rgba(0,0,0,0.1)] border-2 border-white font-sans" style={{ fontFamily: "'Poppins', sans-serif" }}>
-            {profile.profile_pic_url ? (
-              <img src={profile.profile_pic_url} alt="Profile" className="w-full h-full object-cover" />
-            ) : (
-              getInitials(profile.full_name)
-            )}
-          </div>
+        {/* Centered Avatar (Enlarged with Click-to-View Pop-up Window) */}
+        <div className="relative -mt-16 sm:-mt-18 md:-mt-20 flex justify-center z-10">
+          <ArtistProfileAvatar
+            profilePicUrl={profile.profile_pic_url}
+            fullName={profile.full_name}
+            initials={getInitials(profile.full_name)}
+          />
         </div>
 
         {/* Centered Info */}
@@ -97,8 +119,16 @@ export default async function ArtistProfilePage({ params }: ArtistProfilePagePro
           )}
 
           <div className="flex justify-center items-center gap-3">
-             <span className="px-4 py-1.5 text-[11px] font-semibold rounded-full bg-white border border-gray-200 text-gray-700 shadow-sm">
-               Pro Creator
+             <span
+               className={`inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold rounded-full border shadow-2xs ${tierConfig.badgeClass}`}
+               style={{ fontFamily: "'Poppins', sans-serif" }}
+             >
+               {isPro ? (
+                 <Sparkles size={13} className="text-blue-600 shrink-0" />
+               ) : (
+                 <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${tierConfig.dotClass}`} />
+               )}
+               <span>{tierConfig.label}</span>
              </span>
              {user && !isOwner && (
                 <ReportUserButton

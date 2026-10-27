@@ -22,9 +22,14 @@ export default async function EditProfilePage() {
     redirect('/user/profile');
   }
 
+  const userProfile = {
+    ...profile,
+    email: profile.email || user.email || '',
+  };
+
   return (
     <div className="py-2">
-      <EditProfileForm userProfile={profile} />
+      <EditProfileForm userProfile={userProfile} />
     </div>
   );
 }

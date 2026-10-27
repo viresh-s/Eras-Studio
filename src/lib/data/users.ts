@@ -13,6 +13,7 @@ function mapUserFromSupabase(row: any): User {
     isCorMember: Boolean(row.is_premium),
     status: (row.status?.toLowerCase() as any) || "active",
     createdAt: row.created_at || new Date().toISOString(),
+    profilePicUrl: row.profile_pic_url || undefined,
   };
 }
 

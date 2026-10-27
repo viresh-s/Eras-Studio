@@ -326,8 +326,16 @@ export function SubscriptionsClient({ initialSubscribers, stats }: Subscriptions
                     <TableRow key={sub.id} className="hover:bg-[#FAF5EC]/40 transition-colors border-b border-[#F0F0EB] last:border-0">
                       <TableCell className="pl-6 py-3.5">
                         <div className="flex items-center gap-3">
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold shrink-0 ${avatarColor}`}>
-                            {initials}
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold shrink-0 overflow-hidden ${sub.profilePicUrl ? 'border border-[#ECDDBB]' : avatarColor}`}>
+                            {sub.profilePicUrl ? (
+                              <img
+                                src={sub.profilePicUrl}
+                                alt={sub.name}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              initials
+                            )}
                           </div>
                           <div className="min-w-0">
                             <p className="text-sm font-medium text-[#141413] truncate">{sub.name}</p>

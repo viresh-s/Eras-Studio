@@ -33,6 +33,7 @@ function mapFromSupabase(row: any): Artwork {
     title: row.title || "Untitled",
     creatorId: row.creator_id || "",
     creatorName: row.artist_name || (row.profiles?.full_name ?? "Unknown Artist"),
+    creatorAvatar: row.profiles?.profile_pic_url || undefined,
     medium: row.art_type || row.style || "Mixed Media",
     dimensions: row.dimensions || "Dimensions unavailable",
     price: Number(row.price) || 0,

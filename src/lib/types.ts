@@ -20,6 +20,7 @@ export interface User {
   isCorMember: boolean;
   status: UserStatus;
   createdAt: string;
+  profilePicUrl?: string;
 }
 
 export type CreatorStatus = "active" | "pending" | "suspended";
@@ -120,6 +121,7 @@ export interface Artwork {
   title: string;
   creatorId: string;
   creatorName: string;
+  creatorAvatar?: string;
   medium: string;
   dimensions: string;
   price: number;

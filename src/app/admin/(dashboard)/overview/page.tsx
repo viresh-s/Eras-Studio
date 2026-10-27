@@ -192,8 +192,16 @@ export default async function OverviewPage() {
                     className="grid grid-cols-12 items-center px-5 py-3.5 text-xs md:text-sm hover:bg-[#FAF5EC]/40 transition-colors"
                   >
                     <div className="col-span-5 min-w-0 pr-2 flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-[#FAF5EC] border border-[#ECDDBB] flex items-center justify-center text-xs font-semibold text-[#141413] shrink-0">
-                        {getInitials(user.name)}
+                      <div className="w-8 h-8 rounded-full bg-[#FAF5EC] border border-[#ECDDBB] flex items-center justify-center text-xs font-semibold text-[#141413] shrink-0 overflow-hidden">
+                        {user.profilePicUrl ? (
+                          <img
+                            src={user.profilePicUrl}
+                            alt={user.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          getInitials(user.name)
+                        )}
                       </div>
                       <div className="truncate min-w-0">
                         <p className="font-medium text-[#141413] truncate">

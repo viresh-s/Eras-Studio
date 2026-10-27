@@ -428,8 +428,16 @@ export function UsersClient({ initialUsers }: UsersClientProps) {
                     {/* Name */}
                     <TableCell>
                       <div className="flex items-center gap-2.5">
-                        <div className="w-7 h-7 rounded-full bg-[#FAF5EC] border border-[#ECDDBB] flex items-center justify-center text-xs font-semibold text-[#141413] shrink-0">
-                          {getInitials(user.name)}
+                        <div className="w-7 h-7 rounded-full bg-[#FAF5EC] border border-[#ECDDBB] flex items-center justify-center text-xs font-semibold text-[#141413] shrink-0 overflow-hidden">
+                          {user.profilePicUrl ? (
+                            <img
+                              src={user.profilePicUrl}
+                              alt={user.name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            getInitials(user.name)
+                          )}
                         </div>
                         <span className="font-medium text-[#141413]">
                           {user.name}
@@ -560,8 +568,16 @@ export function UsersClient({ initialUsers }: UsersClientProps) {
           <div className="space-y-6">
             {/* User Hero Header in Drawer */}
             <div className="flex items-center gap-3.5 pb-5 border-b border-[#E8E8E3]">
-              <div className="w-12 h-12 rounded-full bg-[#FAF5EC] border border-[#ECDDBB] flex items-center justify-center text-base font-semibold text-[#141413]">
-                {getInitials(selectedUser.name)}
+              <div className="w-12 h-12 rounded-full bg-[#FAF5EC] border border-[#ECDDBB] flex items-center justify-center text-base font-semibold text-[#141413] shrink-0 overflow-hidden">
+                {selectedUser.profilePicUrl ? (
+                  <img
+                    src={selectedUser.profilePicUrl}
+                    alt={selectedUser.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  getInitials(selectedUser.name)
+                )}
               </div>
               <div className="min-w-0">
                 <h4 className="font-serif text-base font-semibold text-[#141413] truncate">

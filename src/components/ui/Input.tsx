@@ -44,7 +44,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               error ? 'border-red-400 focus:border-red-500 focus:ring-1 focus:ring-red-500' : 'border-[#E2E2DC] focus:border-[#181A1F] focus:ring-1 focus:ring-[#181A1F]'
             } rounded-[12px] py-2.5 ${leftIcon ? 'pl-10' : 'pl-3.5'} ${
               rightIcon ? 'pr-10' : 'pr-3.5'
-            } transition-colors duration-150 outline-none disabled:bg-[#FAF9F6] disabled:border-[#E8E8E3] disabled:cursor-not-allowed ${className}`}
+            } transition-colors duration-150 outline-none disabled:bg-[#F8F8F8] disabled:hover:bg-[#F8F8F8] disabled:border-[#E8E8E3] disabled:cursor-not-allowed ${className}`}
             {...props}
           />
           {rightIcon && (

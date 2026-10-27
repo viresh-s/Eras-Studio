@@ -491,8 +491,16 @@ export function CreatorsClient({
                     {/* Creator Name */}
                     <TableCell>
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-[#FAF5EC] border border-[#ECDDBB] flex items-center justify-center text-xs font-semibold text-[#141413] shrink-0">
-                          {getInitials(creator.name)}
+                        <div className="w-8 h-8 rounded-full bg-[#FAF5EC] border border-[#ECDDBB] flex items-center justify-center text-xs font-semibold text-[#141413] shrink-0 overflow-hidden">
+                          {creator.profilePicUrl ? (
+                            <img
+                              src={creator.profilePicUrl}
+                              alt={creator.name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            getInitials(creator.name)
+                          )}
                         </div>
                         <div>
                           <p className="font-medium text-[#141413]">
@@ -628,8 +636,16 @@ export function CreatorsClient({
           <div className="space-y-6">
             {/* Header in Drawer */}
             <div className="flex items-center gap-3.5 pb-5 border-b border-[#E8E8E3]">
-              <div className="w-12 h-12 rounded-full bg-[#FAF5EC] border border-[#ECDDBB] flex items-center justify-center text-base font-semibold text-[#141413]">
-                {getInitials(selectedCreator.name)}
+              <div className="w-12 h-12 rounded-full bg-[#FAF5EC] border border-[#ECDDBB] flex items-center justify-center text-base font-semibold text-[#141413] shrink-0 overflow-hidden">
+                {selectedCreator.profilePicUrl ? (
+                  <img
+                    src={selectedCreator.profilePicUrl}
+                    alt={selectedCreator.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  getInitials(selectedCreator.name)
+                )}
               </div>
               <div className="min-w-0">
                 <h4 className="font-serif text-base font-semibold text-[#141413] truncate">
