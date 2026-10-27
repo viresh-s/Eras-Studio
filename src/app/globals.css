@@ -1,6 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap');
 @import "tailwindcss";
 
+@font-face {
+  font-family: 'Century';
+  src: local('Century'), url('/fonts/CENTURY.TTF') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme inline {
   /* --- Clean White Minimalist Colors (matching login & signup) --- */
   --color-cor-bg: #FFFFFF;
@@ -137,4 +145,110 @@ input:-webkit-autofill:active {
   box-shadow: 0 0 0 1000px #FFFFFF inset !important;
   -webkit-text-fill-color: #181A1F !important;
   transition: background-color 5000s ease-in-out 0s;
+}
+
+/* --- Admin Panel Poppins Typography System & Design Tokens --- */
+.admin-scope {
+  --admin-accent: #1345EE;
+  --admin-accent-hover: #0E35B8;
+  --admin-accent-light: #000000;
+  font-family: var(--font-sans);
+}
+
+.admin-scope :where(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--font-sans);
+  letter-spacing: -0.01em;
+}
+
+.admin-scope :where(p, span, a, label, li, td, th, div, strong, b, em, i) {
+  font-family: var(--font-sans);
+}
+
+.admin-scope button,
+.admin-scope input,
+.admin-scope select,
+.admin-scope textarea,
+.admin-scope optgroup,
+.admin-scope option,
+.admin-scope table,
+.admin-scope th,
+.admin-scope td,
+.admin-scope .font-mono,
+.admin-scope [data-numeric] {
+  font-family: var(--font-sans);
+}
+
+/* Fallback protection: ensure non-title font-serif elements inside admin render with Poppins */
+.admin-scope .font-serif:not(.admin-century-title) {
+  font-family: var(--font-sans);
+}
+
+/* Dedicated Century-Style Title Exception: strictly Century, italic, and medium-bold (500) */
+.admin-scope .admin-century-title,
+.admin-century-title {
+  font-family: "Century" !important;
+  font-style: italic !important;
+  font-weight: 500 !important;
+  font-synthesis: style weight !important;
+  font-synthesis-style: auto !important;
+}
+
+.admin-scope .admin-century-title *,
+.admin-century-title * {
+  font-family: inherit !important;
+  font-style: inherit !important;
+  font-weight: inherit !important;
+}
+
+/* Typography Refinement: Reduce ordinary semi-bold (weight 600) UI text to medium (weight 500) */
+.admin-scope .font-semibold:not(.admin-century-title) {
+  font-weight: 500;
+}
+
+/* --- Premium Blue Gradient Main Buttons --- */
+.admin-btn-premium-gradient {
+  border-radius: 12px !important;
+  border: 2px solid #2356FF !important;
+  background: linear-gradient(
+    90deg,
+    #082779 0%,
+    #1345EE 62%,
+    #458CFF 100%
+  ) !important;
+  box-shadow:
+    0 -3px 6px 0 rgba(6, 42, 137, 0.33) inset,
+    0 3px 3px 0 rgba(255, 255, 255, 0.65) inset,
+    0 7px 22px 0 rgba(35, 77, 255, 0.13) !important;
+  color: #FFFFFF !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.admin-btn-premium-gradient:hover:not(:disabled) {
+  opacity: 0.96;
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+  box-shadow:
+    0 -3px 6px 0 rgba(6, 42, 137, 0.33) inset,
+    0 3px 3px 0 rgba(255, 255, 255, 0.75) inset,
+    0 10px 24px 0 rgba(35, 77, 255, 0.22) !important;
+}
+
+.admin-btn-premium-gradient:active:not(:disabled) {
+  transform: translateY(0);
+  filter: brightness(0.98);
+}
+
+.admin-btn-premium-gradient:focus-visible {
+  outline: 2px solid #458CFF !important;
+  outline-offset: 3px !important;
+}
+
+.admin-btn-premium-gradient:disabled,
+.admin-btn-premium-gradient[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
 }

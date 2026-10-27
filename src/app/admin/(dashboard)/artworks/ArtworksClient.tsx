@@ -267,28 +267,28 @@ export function ArtworksClient({
     switch (status) {
       case "published":
         return (
-          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-[#EAF2EC] text-[#28633B] border border-[#D4E6D8]">
+          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-medium bg-[#EAF2EC] text-[#28633B] border border-[#D4E6D8]">
             <span className="w-1.5 h-1.5 rounded-full bg-[#28633B]" />
             Published
           </span>
         );
       case "pending":
         return (
-          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-[#FAF5EC] text-[#865E16] border border-[#ECDDBB]">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#865E16]" />
+          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-medium bg-[#000000] text-white border border-black">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#1345EE]" />
             Pending
           </span>
         );
       case "draft":
         return (
-          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-[#F3F3EF] text-[#71716D] border border-[#E5E5DF]">
+          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-medium bg-[#F3F3EF] text-[#71716D] border border-[#E5E5DF]">
             <span className="w-1.5 h-1.5 rounded-full bg-[#71716D]" />
             Draft
           </span>
         );
       case "rejected":
         return (
-          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-[#FDF3F2] text-[#B83838] border border-[#F4CDCD]">
+          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-medium bg-[#FDF3F2] text-[#B83838] border border-[#F4CDCD]">
             <span className="w-1.5 h-1.5 rounded-full bg-[#B83838]" />
             Rejected
           </span>
@@ -602,7 +602,7 @@ export function ArtworksClient({
           <button
             type="button"
             onClick={() => setViewingArtwork(null)}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#E8E8E3] bg-white text-xs uppercase tracking-[0.08em] font-medium text-[#141413] hover:bg-[#FAF5EC] hover:border-[#141413] transition-colors shadow-soft-sm cursor-pointer select-none"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-[#E8E8E3] bg-white text-xs uppercase tracking-[0.08em] font-medium text-[#141413] hover:bg-[#F2F0ED] hover:border-[#1345EE] transition-colors shadow-soft-sm cursor-pointer select-none"
           >
             <span>←</span>
             <span>Back to gallery</span>
@@ -612,7 +612,7 @@ export function ArtworksClient({
         {/* 2-Column Discovery Detail Layout matching Eras Studio aesthetic */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-start max-w-6xl mx-auto pt-2">
           {/* Left Column: Artwork Image framed in soft canvas container */}
-          <div className="lg:col-span-6 bg-[#FAF5EC] p-6 sm:p-10 md:p-12 rounded-2xl border border-[#E8E8E3] shadow-soft-sm flex items-center justify-center">
+          <div className="lg:col-span-6 bg-[#F2F0ED] p-6 sm:p-10 md:p-12 rounded-2xl border border-[#E8E8E3] shadow-soft-sm flex items-center justify-center">
             <div className="relative w-full aspect-4/5 max-w-md rounded-2xl overflow-hidden shadow-soft-md bg-white border border-[#E8E8E3]">
               <Image
                 src={viewingArtwork.imageUrl}
@@ -628,13 +628,13 @@ export function ArtworksClient({
           {/* Right Column: Metadata, Specifications & Actions */}
           <div className="lg:col-span-6 space-y-5 pt-1 bg-white p-6 sm:p-8 rounded-2xl border border-[#E8E8E3] shadow-soft-sm">
             {/* Category / Year */}
-            <p className="text-xs uppercase tracking-[0.1em] text-[#865E16] font-medium flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#865E16]" />
+            <p className="text-xs uppercase tracking-[0.1em] text-[#1345EE] font-medium flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#1345EE]" />
               {viewingArtwork.medium} / {viewingArtwork.year || "2026"}
             </p>
 
             {/* Title */}
-            <h1 className="text-3xl sm:text-4xl font-serif text-[#141413] tracking-tight leading-tight">
+            <h1 className="text-3xl sm:text-4xl font-medium text-[#141413] tracking-tight leading-tight">
               {viewingArtwork.title}
             </h1>
 
@@ -690,7 +690,7 @@ export function ArtworksClient({
 
             {/* Price */}
             <div className="pt-1">
-              <p className="text-xl font-serif font-bold text-[#141413]">
+              <p className="text-xl font-bold text-[#141413]">
                 {viewingArtwork.price > 0
                   ? formatCurrency(viewingArtwork.price)
                   : "Price on request"}
@@ -702,7 +702,7 @@ export function ArtworksClient({
               <Button
                 variant="danger"
                 size="sm"
-                className="rounded-full inline-flex items-center justify-center gap-2"
+                className="rounded-xl inline-flex items-center justify-center gap-2"
                 onClick={() => {
                   setSelectedArtwork(viewingArtwork);
                   setIsDeleteModalOpen(true);
@@ -715,7 +715,7 @@ export function ArtworksClient({
               <Button
                 variant={viewingArtwork.isFeatured ? "primary" : "outline"}
                 size="sm"
-                className="rounded-full inline-flex items-center justify-center gap-2"
+                className="rounded-xl inline-flex items-center justify-center gap-2"
                 onClick={() => handleToggleFeature(viewingArtwork)}
               >
                 <Star className={`w-3.5 h-3.5 ${viewingArtwork.isFeatured ? "fill-current" : ""}`} />
@@ -725,7 +725,7 @@ export function ArtworksClient({
               <Button
                 variant={viewingArtwork.status === "draft" || viewingArtwork.status === "rejected" ? "outline" : "outline"}
                 size="sm"
-                className={`rounded-full inline-flex items-center justify-center gap-2 ${
+                className={`rounded-xl inline-flex items-center justify-center gap-2 ${
                   viewingArtwork.status === "draft" || viewingArtwork.status === "rejected"
                     ? "text-emerald-700 border-emerald-300 hover:bg-emerald-50"
                     : ""
@@ -826,14 +826,8 @@ export function ArtworksClient({
       <div className="border-b border-[#E8E8E3] pb-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#865E16]" />
-              <span className="text-[11px] uppercase tracking-[0.14em] font-medium text-[#71716D]">
-                Curatorial Catalog & Moderation
-              </span>
-            </div>
-            <h1 className="text-3xl sm:text-4xl font-serif text-[#141413] tracking-tight">
-              Curatorial Gallery<span className="italic font-normal">.</span>
+            <h1 className="admin-century-title text-3xl sm:text-4xl text-[#141413] tracking-tight">
+              Curatorial Gallery.
             </h1>
             <p className="mt-1 text-xs md:text-sm text-[#71716D] font-light">
               Catalog of creator submissions, editorial features, medium specifications, and publication review.
@@ -842,14 +836,14 @@ export function ArtworksClient({
 
           <div className="flex items-center gap-2.5 self-start sm:self-auto">
             {/* View Mode Switcher */}
-            <div className="inline-flex items-center p-1 rounded-full border border-[#E8E8E3] bg-white shadow-soft-sm">
+            <div className="inline-flex items-center p-1 rounded-xl border border-[#E8E8E3] bg-white shadow-soft-sm">
               <button
                 type="button"
                 onClick={() => setViewMode("grid")}
                 aria-label="Grid view"
-                className={`p-1.5 px-3 rounded-full text-xs font-medium transition-colors cursor-pointer flex items-center gap-1.5 ${
+                className={`p-1.5 px-3 rounded-lg text-xs font-medium transition-colors cursor-pointer flex items-center gap-1.5 ${
                   viewMode === "grid"
-                    ? "bg-[#141413] text-white shadow-soft-sm"
+                    ? "bg-[#000000] text-white font-medium border border-black shadow-soft-sm"
                     : "text-[#71716D] hover:text-[#141413]"
                 }`}
               >
@@ -860,9 +854,9 @@ export function ArtworksClient({
                 type="button"
                 onClick={() => setViewMode("table")}
                 aria-label="Table view"
-                className={`p-1.5 px-3 rounded-full text-xs font-medium transition-colors cursor-pointer flex items-center gap-1.5 ${
+                className={`p-1.5 px-3 rounded-lg text-xs font-medium transition-colors cursor-pointer flex items-center gap-1.5 ${
                   viewMode === "table"
-                    ? "bg-[#141413] text-white shadow-soft-sm"
+                    ? "bg-[#000000] text-white font-medium border border-black shadow-soft-sm"
                     : "text-[#71716D] hover:text-[#141413]"
                 }`}
               >
@@ -877,7 +871,7 @@ export function ArtworksClient({
             <button
               type="button"
               onClick={() => setIsAddModalOpen(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#141413] text-white text-xs uppercase tracking-[0.08em] font-medium hover:bg-[#2A2A28] active:bg-[#000000] transition-colors shadow-soft-sm cursor-pointer select-none"
+              className="admin-btn-premium-gradient inline-flex items-center gap-2 px-5 py-2.5 text-white text-xs uppercase tracking-[0.08em] font-medium cursor-pointer select-none active:scale-[0.98]"
             >
               <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
               <span>Add Artwork</span>
@@ -898,7 +892,7 @@ export function ArtworksClient({
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Search artworks by title, creator, or medium..."
-            className="w-full text-xs md:text-sm pl-10 pr-9 py-2.5 rounded-full border border-[#E8E8E3] bg-[#FAF5EC]/40 focus:bg-white text-[#141413] placeholder:text-[#8A8A85] focus:outline-none focus:border-[#865E16] focus:ring-1 focus:ring-[#865E16] transition-all shadow-2xs"
+            className="w-full text-xs md:text-sm pl-10 pr-9 py-2.5 rounded-xl border border-[#E8E8E3] bg-[#F2F0ED]/50 focus:bg-white text-[#141413] placeholder:text-[#8A8A85] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all shadow-2xs"
           />
           {searchInput && (
             <button
@@ -928,9 +922,9 @@ export function ArtworksClient({
                     setStatusFilter(pill.value);
                     setCurrentPage(1);
                   }}
-                  className={`px-3.5 py-1 rounded-full text-xs font-medium transition-all cursor-pointer select-none ${
+                  className={`px-3.5 py-1 rounded-xl text-xs font-medium transition-all cursor-pointer select-none ${
                     isActive
-                      ? "bg-[#141413] text-white shadow-soft-sm"
+                      ? "bg-[#000000] text-white font-medium border border-black shadow-soft-sm"
                       : "bg-white text-[#71716D] border border-[#E8E8E3] hover:text-[#141413] hover:border-[#141413]"
                   }`}
                 >
@@ -950,7 +944,7 @@ export function ArtworksClient({
                 setCurrentPage(1);
               }}
               aria-label="Filter by medium"
-              className="text-xs px-3 py-1.5 rounded-full border border-[#E8E8E3] bg-white text-[#141413] focus:outline-none focus:border-[#865E16] cursor-pointer"
+              className="text-xs px-3 py-1.5 rounded-xl border border-[#E8E8E3] bg-white text-[#141413] focus:outline-none focus:border-[#1345EE] cursor-pointer"
             >
               <option value="all">All Media</option>
               {distinctMedia.map((medium) => (
@@ -964,7 +958,7 @@ export function ArtworksClient({
               <button
                 type="button"
                 onClick={handleResetFilters}
-                className="text-xs text-[#865E16] hover:text-[#141413] font-medium px-2 py-1 cursor-pointer"
+                className="text-xs text-[#1345EE] hover:text-[#0E35B8] font-medium px-2 py-1 cursor-pointer"
               >
                 Reset
               </button>
@@ -981,9 +975,9 @@ export function ArtworksClient({
       {/* 3. BULK ACTION BAR (Table mode) */}
       {/* ========================================================================= */}
       {viewMode === "table" && selectedIds.size > 0 && (
-        <div className="flex items-center justify-between p-3 px-4 bg-[#FAF5EC] border border-[#ECDDBB] rounded-2xl shadow-soft-sm animate-in fade-in duration-150">
+        <div className="flex items-center justify-between p-3 px-4 bg-[#F2F0ED] border border-[#1345EE]/30 rounded-3xl shadow-soft-sm animate-in fade-in duration-150">
           <div className="flex items-center gap-2 text-xs font-medium text-[#141413]">
-            <CheckSquare className="w-4 h-4 text-[#865E16]" />
+            <CheckSquare className="w-4 h-4 text-[#1345EE]" />
             <span>
               {selectedIds.size} {selectedIds.size === 1 ? "artwork" : "artworks"} selected
             </span>
@@ -993,7 +987,7 @@ export function ArtworksClient({
             <Button
               variant="outline"
               size="sm"
-              className="rounded-full"
+              className="rounded-xl"
               onClick={() => setSelectedIds(new Set())}
             >
               Deselect All
@@ -1001,7 +995,7 @@ export function ArtworksClient({
             <Button
               variant="primary"
               size="sm"
-              className="rounded-full"
+              className="rounded-xl"
               onClick={() => handleBulkUpdateStatus("published")}
               leftIcon={<Check className="w-3.5 h-3.5" />}
             >
@@ -1010,7 +1004,7 @@ export function ArtworksClient({
             <Button
               variant="danger"
               size="sm"
-              className="rounded-full"
+              className="rounded-xl"
               onClick={() => handleBulkUpdateStatus("rejected")}
               leftIcon={<X className="w-3.5 h-3.5" />}
             >
@@ -1062,7 +1056,7 @@ export function ArtworksClient({
                 className="group bg-white border border-[#E8E8E3] hover:border-[#141413] rounded-2xl overflow-hidden flex flex-col cursor-pointer transition-all duration-200 shadow-soft-sm hover:shadow-soft-md"
               >
                 {/* Fixed Dimension Image Container with Next.js Optimization */}
-                <div className="relative aspect-4/3 w-full bg-[#FAF5EC] overflow-hidden">
+                <div className="relative aspect-4/3 w-full bg-[#F2F0ED] overflow-hidden">
                   <Image
                     src={art.imageUrl}
                     alt={art.title}
@@ -1078,8 +1072,8 @@ export function ArtworksClient({
 
                   {/* Subtle Hover Action Pill */}
                   <div className="absolute inset-0 bg-[#141413]/15 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/95 text-[#141413] text-[11px] uppercase tracking-[0.06em] font-medium shadow-soft-sm backdrop-blur-xs">
-                      <Eye className="w-3 h-3 text-[#865E16]" />
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/95 text-[#141413] text-[11px] uppercase tracking-[0.06em] font-medium shadow-soft-sm backdrop-blur-xs">
+                      <Eye className="w-3 h-3 text-[#1345EE]" />
                       <span>View Specs</span>
                     </span>
                   </div>
@@ -1088,7 +1082,7 @@ export function ArtworksClient({
                 {/* Card Text Content */}
                 <div className="p-4 flex-1 flex flex-col justify-between space-y-2.5">
                   <div>
-                    <h4 className="text-sm font-serif font-semibold text-[#141413] group-hover:text-[#865E16] transition-colors truncate">
+                    <h4 className="text-sm font-medium text-[#141413] group-hover:text-[#1345EE] transition-colors truncate">
                       {art.title}
                     </h4>
                     <p className="text-xs text-[#71716D] truncate mt-0.5">
@@ -1100,7 +1094,7 @@ export function ArtworksClient({
                     <span className="text-[11px] text-[#71716D] truncate max-w-[120px]">
                       {art.medium}
                     </span>
-                    <span className="font-serif font-semibold text-[#141413]">
+                    <span className="font-medium text-[#141413]">
                       {art.price ? formatCurrency(art.price) : "—"}
                     </span>
                   </div>
@@ -1131,7 +1125,7 @@ export function ArtworksClient({
           <div className="rounded-2xl border border-[#E8E8E3] bg-white overflow-hidden shadow-soft-sm">
             <Table>
               <TableHeader>
-                <tr className="bg-[#FAF5EC]/60 border-b border-[#E8E8E3]">
+                <tr className="bg-[#F2F0ED]/70 border-b border-[#E8E8E3]">
                   <TableHead className="w-10">
                     <button
                       type="button"
@@ -1140,9 +1134,9 @@ export function ArtworksClient({
                       aria-label="Select all on this page"
                     >
                       {selectedIds.size === paginatedArtworks.length && paginatedArtworks.length > 0 ? (
-                        <CheckSquare className="w-4 h-4 text-[#865E16]" />
+                        <CheckSquare className="w-4 h-4 text-[#1345EE]" />
                       ) : selectedIds.size > 0 ? (
-                        <MinusSquare className="w-4 h-4 text-[#865E16]" />
+                        <MinusSquare className="w-4 h-4 text-[#1345EE]" />
                       ) : (
                         <Square className="w-4 h-4" />
                       )}
@@ -1164,7 +1158,7 @@ export function ArtworksClient({
                     <TableRow
                       key={art.id}
                       onClick={() => setViewingArtwork(art)}
-                      className="cursor-pointer hover:bg-[#FAF5EC]/40 transition-colors border-b border-[#F0F0EB] last:border-0"
+                      className="cursor-pointer hover:bg-[#F2F0ED]/40 transition-colors border-b border-[#F0F0EB] last:border-0"
                     >
                       <TableCell onClick={(e) => handleToggleSelectRow(art.id, e)}>
                         <button
@@ -1173,7 +1167,7 @@ export function ArtworksClient({
                           aria-label={`Select ${art.title}`}
                         >
                           {isSelected ? (
-                            <CheckSquare className="w-4 h-4 text-[#865E16]" />
+                            <CheckSquare className="w-4 h-4 text-[#1345EE]" />
                           ) : (
                             <Square className="w-4 h-4" />
                           )}
@@ -1182,7 +1176,7 @@ export function ArtworksClient({
 
                       <TableCell>
                         <div className="flex items-center gap-3.5">
-                          <div className="relative w-12 h-12 rounded-xl bg-[#FAF5EC] overflow-hidden shrink-0 border border-[#E8E8E3]">
+                          <div className="relative w-12 h-12 rounded-xl bg-[#F2F0ED] overflow-hidden shrink-0 border border-[#E8E8E3]">
                             <Image
                               src={art.imageUrl}
                               alt={art.title}
@@ -1193,10 +1187,10 @@ export function ArtworksClient({
                             />
                           </div>
                           <div>
-                            <span className="font-serif font-semibold text-sm text-[#141413] whitespace-nowrap block">
+                            <span className="font-semibold text-sm text-[#141413] whitespace-nowrap block">
                               {art.title}
                             </span>
-                            <span className="text-xs text-[#71716D] font-serif">
+                            <span className="text-xs text-[#71716D]">
                               {art.price ? formatCurrency(art.price) : "—"}
                             </span>
                           </div>
@@ -1228,23 +1222,23 @@ export function ArtworksClient({
                           <button
                             type="button"
                             onClick={() => setViewingArtwork(art)}
-                            className="px-3 py-1 rounded-full border border-[#E8E8E3] text-xs font-medium text-[#141413] bg-white hover:bg-[#FAF5EC] transition-colors cursor-pointer select-none"
+                            className="px-3 py-1 rounded-lg border border-[#E8E8E3] text-xs font-medium text-[#141413] bg-white hover:bg-[#F2F0ED] transition-colors cursor-pointer select-none"
                           >
                             View
                           </button>
                           <button
                             type="button"
                             onClick={() => handleToggleFeature(art)}
-                            className="px-3 py-1 rounded-full border border-[#E8E8E3] text-xs font-medium text-[#141413] bg-white hover:bg-[#FAF5EC] transition-colors cursor-pointer select-none"
+                            className="px-3 py-1 rounded-lg border border-[#E8E8E3] text-xs font-medium text-[#141413] bg-white hover:bg-[#F2F0ED] transition-colors cursor-pointer select-none"
                           >
                             {art.isFeatured ? "Unfeature" : "Feature"}
                           </button>
                           <button
                             type="button"
                             onClick={() => handleToggleHide(art)}
-                            className={`px-3 py-1 rounded-full border text-xs font-medium transition-colors cursor-pointer select-none ${
+                            className={`px-3 py-1 rounded-lg border text-xs font-medium transition-colors cursor-pointer select-none ${
                               art.status === "published"
-                                ? "border-[#E8E8E3] text-[#141413] bg-white hover:bg-[#FAF5EC]"
+                                ? "border-[#E8E8E3] text-[#141413] bg-white hover:bg-[#F2F0ED]"
                                 : "border-emerald-300 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 font-medium"
                             }`}
                           >
@@ -1256,14 +1250,14 @@ export function ArtworksClient({
                               setSelectedArtwork(art);
                               setIsDeleteModalOpen(true);
                             }}
-                            className="px-3 py-1 rounded-full border border-[#E8E8E3] text-xs font-medium text-[#9E3333] bg-white hover:bg-red-50 hover:border-red-200 transition-colors cursor-pointer select-none"
+                            className="px-3 py-1 rounded-lg border border-[#E8E8E3] text-xs font-medium text-[#9E3333] bg-white hover:bg-red-50 hover:border-red-200 transition-colors cursor-pointer select-none"
                           >
                             Remove
                           </button>
                           <button
                             type="button"
                             onClick={() => handleToggleFlag(art)}
-                            className={`px-3 py-1 rounded-full border text-xs font-medium transition-colors cursor-pointer select-none ${
+                            className={`px-3 py-1 rounded-lg border text-xs font-medium transition-colors cursor-pointer select-none ${
                               art.isFlagged
                                 ? "bg-amber-50 text-amber-700 border-amber-300"
                                 : "border-[#E8E8E3] text-[#71716D] bg-white hover:bg-amber-50 hover:text-amber-700 hover:border-amber-200"
@@ -1361,7 +1355,7 @@ export function ArtworksClient({
         {selectedArtwork && (
           <div className="space-y-6">
             {/* Artwork Image Container */}
-            <div className="relative aspect-16/10 w-full rounded-2xl bg-[#FAF5EC] overflow-hidden border border-[#E8E8E3]">
+            <div className="relative aspect-16/10 w-full rounded-2xl bg-[#F2F0ED] overflow-hidden border border-[#E8E8E3]">
               <Image
                 src={selectedArtwork.imageUrl}
                 alt={selectedArtwork.title}
@@ -1379,7 +1373,7 @@ export function ArtworksClient({
             <div className="p-4 bg-white border border-[#E8E8E3] rounded-2xl shadow-soft-sm space-y-3">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <h4 className="text-base font-serif font-semibold text-[#141413]">
+                  <h4 className="text-base font-semibold text-[#141413]">
                     {selectedArtwork.title}
                   </h4>
                   <p className="text-xs text-[#71716D] mt-0.5">
@@ -1388,14 +1382,14 @@ export function ArtworksClient({
                 </div>
 
                 <div className="text-right shrink-0">
-                  <span className="text-base font-serif font-semibold text-[#141413]">
+                  <span className="text-base font-medium text-[#141413]">
                     {selectedArtwork.price ? formatCurrency(selectedArtwork.price) : "Price on request"}
                   </span>
                   <div className="mt-1">
                     <button
                       type="button"
                       onClick={() => setIsEditing((prev) => !prev)}
-                      className="inline-flex items-center gap-1 text-[11px] text-[#865E16] hover:text-[#141413] font-medium cursor-pointer"
+                      className="inline-flex items-center gap-1 text-[11px] text-[#1345EE] hover:text-[#0E35B8] font-medium cursor-pointer"
                     >
                       <Edit3 className="w-3 h-3" />
                       <span>{isEditing ? "Close Edit" : "Edit Details"}</span>
@@ -1501,7 +1495,7 @@ export function ArtworksClient({
 
               <div className="flex items-center justify-between py-2 border-b border-[#F0F0EB]">
                 <span className="text-[#71716D]">Artwork ID</span>
-                <span className="font-mono text-[11px] text-[#141413] bg-[#FAF5EC] px-2 py-0.5 rounded-full border border-[#E8E8E3]">
+                <span className="text-[11px] font-medium text-[#141413] bg-[#F2F0ED] px-2 py-0.5 rounded-full border border-[#E8E8E3]">
                   {selectedArtwork.id}
                 </span>
               </div>
@@ -1509,7 +1503,7 @@ export function ArtworksClient({
               {selectedArtwork.creatorId && (
                 <div className="flex items-center justify-between py-2 border-b border-[#F0F0EB]">
                   <span className="text-[#71716D]">Creator ID</span>
-                  <span className="font-mono text-[11px] text-[#141413] bg-[#FAF5EC] px-2 py-0.5 rounded-full border border-[#E8E8E3]">
+                  <span className="text-[11px] font-medium text-[#141413] bg-[#F2F0ED] px-2 py-0.5 rounded-full border border-[#E8E8E3]">
                     {selectedArtwork.creatorId}
                   </span>
                 </div>

@@ -5,7 +5,24 @@ import { getSupabaseAdmin } from "../supabase/server";
 let creatorsStore: Creator[] = [...seedCreators];
 
 function mapCreatorFromSupabase(row: any): Creator {
-  const loc = [row.location_city, row.location_country].filter(Boolean).join(", ");
+  const loc = [row.location_city, row.location_country]
+    .map((s: any) => (typeof s === "string" ? s.trim() : ""))
+    .filter(Boolean)
+    .join(", ");
+
+  let parsedSocial: Record<string, string> | undefined = undefined;
+  if (row.social_links) {
+    if (typeof row.social_links === "object") {
+      parsedSocial = row.social_links;
+    } else if (typeof row.social_links === "string") {
+      try {
+        parsedSocial = JSON.parse(row.social_links);
+      } catch {
+        parsedSocial = { website: row.social_links };
+      }
+    }
+  }
+
   return {
     id: row.id,
     userId: row.id,
@@ -13,14 +30,19 @@ function mapCreatorFromSupabase(row: any): Creator {
     email: row.email,
     phoneNumber: row.phone_number,
     location: loc || undefined,
-    aboutMe: row.about_me,
+    aboutMe: row.about_me || row.artist_statement || undefined,
     profilePicUrl: row.profile_pic_url,
     portfolioUrl: row.portfolio_url,
-    socialLinks: row.social_links || undefined,
+    socialLinks: parsedSocial,
     discipline: row.primary_medium || row.art_forms || "Visual Arts",
     plan: row.plan ? (row.plan.toLowerCase() as any) : (row.is_premium ? "elite" : "pro"),
     status: (row.status?.toLowerCase() as any) || "active",
     createdAt: row.created_at || new Date().toISOString(),
+    coverImageUrl: row.cover_image_url || undefined,
+    artistStatement: row.artist_statement || undefined,
+    artForms: row.art_forms || undefined,
+    awards: row.awards || undefined,
+    cvUrl: row.cv_file_url || undefined,
   };
 }
 
@@ -108,7 +130,6 @@ export const creatorsRepo = {
           .from("profiles")
           .select("*")
           .eq("id", id)
-          .eq("role", "Creator")
           .maybeSingle();
 
         if (!error && data) {
@@ -119,7 +140,7 @@ export const creatorsRepo = {
       }
     }
 
-    const creator = creatorsStore.find((c) => c.id === id);
+    const creator = creatorsStore.find((c) => c.id === id || c.userId === id);
     return creator ? { ...creator } : null;
   },
 

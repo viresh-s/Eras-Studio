@@ -29,7 +29,7 @@ export default async function SubscriptionsPage() {
             ))}
           </div>
           <div className="flex items-center justify-between gap-4">
-            <Skeleton className="h-9 w-72 rounded-full" />
+            <Skeleton className="h-9 w-72 rounded-xl" />
           </div>
           <Skeleton className="h-96 w-full rounded-2xl" />
         </div>

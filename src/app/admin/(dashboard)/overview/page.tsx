@@ -108,12 +108,8 @@ export default async function OverviewPage() {
       {/* Page Header */}
       <div className="border-b border-[#E8E8E3] pb-6 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/80 rounded-full text-[11px] font-semibold tracking-[0.2em] text-[#73736C] uppercase border border-[#E8E8E3] mb-3 shadow-2xs font-sans">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#865E16]" />
-            CURATORIAL & PLATFORM PULSE
-          </div>
-          <h1 className="font-serif text-3xl sm:text-4xl font-semibold tracking-tight text-[#141413] leading-tight">
-            Studio <span className="italic font-normal">Pulse.</span>
+          <h1 className="admin-century-title text-3xl sm:text-4xl tracking-tight text-[#141413] leading-tight">
+            Studio Pulse.
           </h1>
           <p className="mt-1.5 text-xs sm:text-sm text-[#6E6E69] max-w-2xl leading-relaxed">
             Live marketplace activity, member registrations, and curatorial queues.
@@ -129,20 +125,20 @@ export default async function OverviewPage() {
 
       {/* Top Row: 8 Stat Cards */}
       <div className="space-y-3">
-        <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-[#73736C] font-sans flex items-center gap-2">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#865E16]" />
+        <h2 className="text-xs font-medium uppercase tracking-[0.2em] text-[#1345EE] font-sans flex items-center gap-2">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#1345EE]" />
           Key Metrics
         </h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
           {statCards.map((stat) => (
             <div
               key={stat.label}
-              className="bg-white border border-[#E8E8E3] rounded-2xl p-4 flex flex-col justify-between transition-all hover:border-[#D5D3CE] shadow-soft-sm hover:shadow-soft-md group"
+              className="bg-white border border-[#E8E8E3] rounded-2xl p-4 flex flex-col justify-between transition-all hover:border-[#1345EE]/40 shadow-soft-sm hover:shadow-soft-md group"
             >
               <span className="text-[11px] font-medium text-[#73736C] leading-snug">
                 {stat.label}
               </span>
-              <span className="font-serif text-2xl sm:text-3xl font-semibold tracking-tight text-[#141413] mt-2 group-hover:text-[#865E16] transition-colors">
+              <span className="text-2xl sm:text-3xl font-semibold tracking-tight text-[#141413] mt-2 group-hover:text-[#1345EE] transition-colors">
                 {stat.value}
               </span>
             </div>
@@ -155,12 +151,12 @@ export default async function OverviewPage() {
         {/* Section 1: Recent Signups */}
         <div className="lg:col-span-2 space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="font-serif text-xl font-semibold text-[#141413] tracking-tight">
+            <h3 className="text-xl font-medium text-[#141413] tracking-tight">
               Recent Signups
             </h3>
             <Link
               href="/admin/users"
-              className="text-xs text-[#141413] hover:text-[#865E16] font-medium inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-[#E8E8E3] bg-white hover:bg-[#FAF5EC] transition-all shadow-2xs"
+              className="text-xs text-[#141413] hover:text-[#1345EE] font-medium inline-flex items-center gap-1.5 px-3 py-1 rounded-xl border border-[#E8E8E3] bg-white hover:bg-[#F2F0ED] transition-all shadow-2xs"
             >
               <span>View all patrons</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -178,7 +174,7 @@ export default async function OverviewPage() {
             ) : (
               <div className="divide-y divide-[#E8E8E3]">
                 {/* Table Header */}
-                <div className="grid grid-cols-12 px-5 py-3.5 text-xs font-semibold text-[#73736C] bg-[#FAF5EC]/70 uppercase tracking-wider font-sans">
+                <div className="grid grid-cols-12 px-5 py-3.5 text-xs font-medium text-[#73736C] bg-[#F2F0ED]/70 uppercase tracking-wider font-sans">
                   <div className="col-span-5">Member</div>
                   <div className="col-span-2 text-center">Role</div>
                   <div className="col-span-2 text-center">Plan</div>
@@ -189,10 +185,10 @@ export default async function OverviewPage() {
                 {recentSignups.map((user) => (
                   <div
                     key={user.id}
-                    className="grid grid-cols-12 items-center px-5 py-3.5 text-xs md:text-sm hover:bg-[#FAF5EC]/40 transition-colors"
+                    className="grid grid-cols-12 items-center px-5 py-3.5 text-xs md:text-sm hover:bg-[#F2F0ED]/40 transition-colors"
                   >
                     <div className="col-span-5 min-w-0 pr-2 flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-[#FAF5EC] border border-[#ECDDBB] flex items-center justify-center text-xs font-semibold text-[#141413] shrink-0 overflow-hidden">
+                      <div className="w-8 h-8 rounded-full bg-[#000000] border border-black flex items-center justify-center text-xs font-medium text-white shrink-0 overflow-hidden">
                         {user.profilePicUrl ? (
                           <img
                             src={user.profilePicUrl}
@@ -217,7 +213,7 @@ export default async function OverviewPage() {
                       <Badge
                         variant={user.role === "creator" ? "accent" : "default"}
                         size="sm"
-                        className="capitalize rounded-full font-medium"
+                        className="capitalize rounded-md font-medium"
                       >
                         {user.role}
                       </Badge>
@@ -234,7 +230,7 @@ export default async function OverviewPage() {
                               : "default"
                           }
                           size="sm"
-                          className="capitalize rounded-full font-medium"
+                          className="capitalize rounded-md font-medium"
                         >
                           {user.plan}
                         </Badge>
@@ -256,16 +252,16 @@ export default async function OverviewPage() {
         {/* Section 2: Needs Attention */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="font-serif text-xl font-semibold text-[#141413] tracking-tight">
+            <h3 className="text-xl font-medium text-[#141413] tracking-tight">
               Needs Attention
             </h3>
             {totalNeedsAttention > 0 ? (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#FAF5EC] text-[#865E16] border border-[#ECDDBB]">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#865E16]" />
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-medium bg-[#000000] text-white border border-black">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#1345EE]" />
                 {totalNeedsAttention} pending
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#F0F5F1] text-[#28633B] border border-[#CDE3D4]">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-medium bg-[#F0F5F1] text-[#28633B] border border-[#CDE3D4]">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#28633B]" />
                 All clear
               </span>
@@ -281,15 +277,15 @@ export default async function OverviewPage() {
                 <Link
                   key={item.title}
                   href={item.href}
-                  className="group block bg-white border border-[#E8E8E3] hover:border-[#D5D3CE] rounded-2xl p-4 transition-all duration-150 shadow-soft-sm hover:shadow-soft-md"
+                  className="group block bg-white border border-[#E8E8E3] hover:border-[#1345EE]/40 rounded-3xl p-4 transition-all duration-150 shadow-soft-sm hover:shadow-soft-md"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-start gap-3.5 min-w-0">
-                      <div className="w-9 h-9 rounded-xl bg-[#FAF5EC] border border-[#ECDDBB] flex items-center justify-center shrink-0 text-[#865E16] group-hover:bg-[#141413] group-hover:text-white transition-colors">
+                      <div className="w-9 h-9 rounded-xl bg-[#000000] border border-black flex items-center justify-center shrink-0 text-white group-hover:bg-[#1345EE] group-hover:text-white transition-colors">
                         <Icon className="w-4 h-4 stroke-[1.75]" />
                       </div>
                       <div className="min-w-0">
-                        <h4 className="text-xs font-medium text-[#141413] group-hover:text-[#865E16] transition-colors">
+                        <h4 className="text-xs font-medium text-[#141413] group-hover:text-[#1345EE] transition-colors">
                           {item.title}
                         </h4>
                         <p className="text-[11px] text-[#6E6E69] mt-0.5 leading-snug">
@@ -300,15 +296,15 @@ export default async function OverviewPage() {
 
                     <div className="flex items-center gap-2 shrink-0">
                       <span
-                        className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${
+                        className={`text-xs font-medium px-2.5 py-0.5 rounded-md ${
                           hasPending
-                            ? "bg-[#FAF5EC] text-[#865E16] border border-[#ECDDBB]"
+                            ? "bg-[#000000] text-white border border-black"
                             : "bg-[#F3F3EF] text-[#71716D] border border-[#E5E5DF]"
                         }`}
                       >
                         {item.count}
                       </span>
-                      <ArrowRight className="w-3.5 h-3.5 text-[#8A8A85] group-hover:text-[#141413] group-hover:translate-x-0.5 transition-all" />
+                      <ArrowRight className="w-3.5 h-3.5 text-[#8A8A85] group-hover:text-[#1345EE] group-hover:translate-x-0.5 transition-all" />
                     </div>
                   </div>
                 </Link>
@@ -316,9 +312,9 @@ export default async function OverviewPage() {
             })}
 
             {totalNeedsAttention === 0 && (
-              <div className="p-6 rounded-2xl border border-dashed border-[#DCDCD5] bg-white/60 text-center">
+              <div className="p-6 rounded-3xl border border-dashed border-[#DCDCD5] bg-white/60 text-center">
                 <CheckCircle2 className="w-5 h-5 text-[#28633B] mx-auto mb-1.5" />
-                <p className="font-serif text-sm font-semibold text-[#141413]">
+                <p className="text-sm font-medium text-[#141413]">
                   All queues cleared
                 </p>
                 <p className="text-xs text-[#6E6E69] mt-0.5">

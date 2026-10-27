@@ -128,14 +128,8 @@ export function CorMembersClient({
       {/* Header */}
       <div className="border-b border-[#E8E8E3] pb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#865E16]" />
-            <span className="text-[11px] uppercase tracking-[0.14em] font-medium text-[#71716D]">
-              Represented Creator Roster
-            </span>
-          </div>
-          <h1 className="text-3xl sm:text-4xl font-serif text-[#141413] tracking-tight">
-            COR Members<span className="italic font-normal">.</span>
+          <h1 className="admin-century-title text-3xl sm:text-4xl text-[#141413] tracking-tight">
+            COR Members.
           </h1>
           <p className="text-xs md:text-sm text-[#71716D] font-light mt-1 max-w-2xl">
             Active roster of creators with COR representation. Review career profiles, track applications, and match opportunities.
@@ -145,12 +139,13 @@ export function CorMembersClient({
         <div className="flex items-center gap-3 shrink-0">
           <ExportDropdown exportType="cor-members" filters={{ query: searchQuery, status: statusFilter === "all" ? undefined : statusFilter }} />
           <Button
-            variant="dark"
+            variant="premium-gradient"
             onClick={() => {
               setSelectedMemberForApply(members[0] || null);
               setApplyModalOpen(true);
             }}
-            className="rounded-full bg-[#141413] text-white px-4 py-2 text-xs uppercase tracking-[0.08em] font-medium shadow-soft-sm hover:bg-[#2A2A28]"
+            aria-label="Apply for Creators"
+            className="admin-btn-premium-gradient text-white px-5 py-2.5 text-xs uppercase tracking-[0.08em] font-medium"
           >
             <Send className="w-3.5 h-3.5" />
             <span>Apply for Creator</span>
@@ -183,14 +178,14 @@ export function CorMembersClient({
                 }}
                 className={`inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-medium transition-all cursor-pointer ${
                   active
-                    ? "bg-[#141413] text-white shadow-soft-sm"
+                    ? "bg-[#000000] text-white font-medium border border-black shadow-soft-sm"
                     : "bg-white text-[#71716D] border border-[#E8E8E3] hover:text-[#141413] hover:border-[#141413]"
                 }`}
               >
                 <span>{tab.label}</span>
                 <span
                   className={`text-[10px] px-1.5 py-0.2 rounded-full ${
-                    active ? "bg-white/20 text-white" : "bg-[#FAF5EC] text-[#71716D] border border-[#E8E8E3]"
+                    active ? "bg-white text-[#1345EE]" : "bg-[#F2F0ED] text-[#71716D] border border-[#E8E8E3]"
                   }`}
                 >
                   {tab.count}
@@ -211,7 +206,7 @@ export function CorMembersClient({
               setSearchQuery(e.target.value);
               setCurrentPage(1);
             }}
-            className="w-full text-xs pl-9 pr-3 py-2 bg-[#FAF5EC]/40 focus:bg-white border border-[#E8E8E3] rounded-full text-[#141413] placeholder-[#8A8A85] focus:outline-none focus:border-[#865E16] focus:ring-1 focus:ring-[#865E16] transition-all"
+            className="w-full text-xs pl-9 pr-3 py-2 bg-[#F2F0ED]/50 focus:bg-white border border-[#E8E8E3] rounded-full text-[#141413] placeholder-[#8A8A85] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all"
           />
         </div>
       </div>
@@ -220,7 +215,7 @@ export function CorMembersClient({
       <div className="bg-white border border-[#E8E8E3] rounded-2xl overflow-hidden shadow-soft-sm">
         <Table>
           <TableHeader>
-            <TableRow className="bg-[#FAF5EC]/60 border-b border-[#E8E8E3]">
+            <TableRow className="bg-[#F2F0ED]/70 border-b border-[#E8E8E3]">
               <TableHead className="py-3.5 px-4 text-xs font-medium text-[#71716D] uppercase tracking-[0.08em]">
                 Creator
               </TableHead>
@@ -255,7 +250,7 @@ export function CorMembersClient({
               paginatedMembers.map((member) => (
                 <TableRow
                   key={member.id}
-                  className="hover:bg-[#FAF5EC]/40 transition-colors border-b border-[#F0F0EB] last:border-none"
+                  className="hover:bg-[#F2F0ED]/40 transition-colors border-b border-[#F0F0EB] last:border-none"
                 >
                   <TableCell className="py-3.5 px-4">
                     <Link
@@ -269,12 +264,12 @@ export function CorMembersClient({
                           className="w-9 h-9 rounded-full object-cover border border-[#E8E8E3]"
                         />
                       ) : (
-                        <div className="w-9 h-9 rounded-full bg-[#FAF5EC] border border-[#ECDDBB] flex items-center justify-center text-xs font-semibold text-[#141413]">
+                        <div className="w-9 h-9 rounded-full bg-[#000000] border border-black flex items-center justify-center text-xs font-medium text-white">
                           {member.name.slice(0, 2).toUpperCase()}
                         </div>
                       )}
                       <div>
-                        <div className="font-serif font-semibold text-sm text-[#141413] group-hover:text-[#865E16] transition-colors">
+                        <div className="font-medium text-sm text-[#141413] group-hover:text-[#1345EE] transition-colors">
                           {member.name}
                         </div>
                         <div className="text-xs text-[#71716D]">
@@ -292,7 +287,7 @@ export function CorMembersClient({
                       {(member.skills || []).slice(0, 3).map((s) => (
                         <span
                           key={s}
-                          className="px-2 py-0.5 rounded-full bg-[#FAF5EC] text-[10px] font-medium text-[#71716D] border border-[#E8E8E3]"
+                          className="px-2 py-0.5 rounded-full bg-[#F2F0ED] text-[10px] font-medium text-[#71716D] border border-[#E8E8E3]"
                         >
                           {s}
                         </span>
@@ -320,7 +315,7 @@ export function CorMembersClient({
 
                   <TableCell className="py-3.5 px-4">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-semibold text-[#141413]">
+                      <span className="text-xs font-medium text-[#141413]">
                         {member.activeApplicationsCount ?? 1} active
                       </span>
                       {member.latestApplicationStatus && (
@@ -335,7 +330,7 @@ export function CorMembersClient({
                         type="button"
                         onClick={() => handleOpenApplyModal(member)}
                         title="Apply for Opportunity"
-                        className="px-3 py-1 rounded-full text-xs font-medium border border-[#ECDDBB] bg-[#FAF5EC] text-[#865E16] hover:bg-[#F3E7D3] transition-colors whitespace-nowrap inline-flex items-center gap-1 shadow-soft-sm cursor-pointer"
+                        className="px-3 py-1 rounded-full text-xs font-medium border border-black bg-[#000000] text-white hover:bg-neutral-800 transition-colors whitespace-nowrap inline-flex items-center gap-1 shadow-soft-sm cursor-pointer"
                       >
                         <span>Apply</span>
                         <span aria-hidden="true">→</span>
@@ -346,7 +341,7 @@ export function CorMembersClient({
                         onClick={() => handleToggleStatus(member)}
                         disabled={statusTogglingId === member.id}
                         title={member.status === "active" ? "Pause representation" : "Reactivate"}
-                        className="p-1.5 rounded-full border border-[#E8E8E3] text-[#71716D] hover:text-[#141413] hover:bg-[#FAF5EC] transition-colors shrink-0 inline-flex items-center justify-center disabled:opacity-50 cursor-pointer"
+                        className="p-1.5 rounded-full border border-[#E8E8E3] text-[#71716D] hover:text-[#141413] hover:bg-[#F2F0ED] transition-colors shrink-0 inline-flex items-center justify-center disabled:opacity-50 cursor-pointer"
                       >
                         {member.status === "active" ? (
                           <PauseCircle className="w-3.5 h-3.5" />
@@ -357,7 +352,7 @@ export function CorMembersClient({
 
                       <Link
                         href={`/admin/cor/members/${member.id}`}
-                        className="p-1.5 rounded-full border border-[#E8E8E3] text-[#71716D] hover:text-[#141413] hover:bg-[#FAF5EC] transition-colors shrink-0 inline-flex items-center justify-center"
+                        className="p-1.5 rounded-full border border-[#E8E8E3] text-[#71716D] hover:text-[#141413] hover:bg-[#F2F0ED] transition-colors shrink-0 inline-flex items-center justify-center"
                         title="View Career Profile"
                       >
                         <ArrowRight className="w-3.5 h-3.5" />

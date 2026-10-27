@@ -177,9 +177,9 @@ export function UsersClient({ initialUsers }: UsersClientProps) {
       return <ArrowUpDown className="w-3 h-3 text-[#A0A09B] opacity-0 group-hover:opacity-100 transition-opacity" />;
     }
     return sortDirection === "asc" ? (
-      <ArrowUp className="w-3 h-3 text-[#865E16]" />
+      <ArrowUp className="w-3 h-3 text-[#1345EE]" />
     ) : (
-      <ArrowDown className="w-3 h-3 text-[#865E16]" />
+      <ArrowDown className="w-3 h-3 text-[#1345EE]" />
     );
   };
 
@@ -264,12 +264,8 @@ export function UsersClient({ initialUsers }: UsersClientProps) {
       {/* Page Title & Stats Badge */}
       <div className="border-b border-[#E8E8E3] pb-6 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/80 rounded-full text-[11px] font-semibold tracking-[0.2em] text-[#73736C] uppercase border border-[#E8E8E3] mb-3 shadow-2xs font-sans">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#865E16]" />
-            COMMUNITY & ACCESS ROSTER
-          </div>
-          <h1 className="font-serif text-3xl sm:text-4xl font-semibold tracking-tight text-[#141413]">
-            Users & <span className="italic font-normal">Patrons.</span>
+          <h1 className="admin-century-title text-3xl sm:text-4xl tracking-tight text-[#141413]">
+            Users & Patrons.
           </h1>
           <p className="mt-1.5 text-xs sm:text-sm text-[#6E6E69] max-w-2xl leading-relaxed">
             Manage creator profiles, collectors, plan tiers, and platform permissions.
@@ -277,8 +273,8 @@ export function UsersClient({ initialUsers }: UsersClientProps) {
         </div>
         <div className="flex items-center gap-3 shrink-0 self-start sm:self-auto">
           <ExportDropdown exportType="users" filters={{ query: searchQuery, role: activeTab === "all" ? undefined : activeTab }} />
-          <div className="text-xs px-3.5 py-1.5 rounded-full border border-[#E8E8E3] bg-white text-[#6E6E69] font-medium shadow-2xs">
-            Total: <span className="text-[#141413] font-semibold">{users.length} members</span>
+          <div className="text-xs px-3.5 py-1.5 rounded-xl border border-[#E8E8E3] bg-white text-[#6E6E69] font-medium shadow-2xs">
+            Total: <span className="text-[#141413] font-medium">{users.length} members</span>
           </div>
         </div>
       </div>
@@ -294,18 +290,18 @@ export function UsersClient({ initialUsers }: UsersClientProps) {
                 setActiveTab(tab.id);
                 setCurrentPage(1);
               }}
-              className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium transition-all duration-200 cursor-pointer select-none whitespace-nowrap shadow-2xs ${
+              className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-all duration-200 cursor-pointer select-none whitespace-nowrap shadow-2xs ${
                 isActive
-                  ? "bg-[#141413] text-white shadow-xs"
-                  : "bg-white text-[#6E6E69] border border-[#E8E8E3] hover:text-[#141413] hover:bg-[#FAF5EC]"
+                  ? "bg-[#000000] text-white font-medium border border-black shadow-xs"
+                  : "bg-white text-[#6E6E69] border border-[#E8E8E3] hover:text-[#141413] hover:bg-[#F2F0ED]"
               }`}
             >
               <span>{tab.label}</span>
               <span
-                className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
                   isActive
-                    ? "bg-white text-[#141413]"
-                    : "bg-[#FAF5EC] text-[#865E16] border border-[#ECDDBB]"
+                    ? "bg-white text-[#1345EE]"
+                    : "bg-[#F2F0ED] text-[#1345EE] border border-[#1345EE]/25"
                 }`}
               >
                 {tab.count}
@@ -347,7 +343,7 @@ export function UsersClient({ initialUsers }: UsersClientProps) {
               <Button
                 variant="outline"
                 size="sm"
-                className="rounded-full px-5"
+                className="rounded-xl px-5"
                 onClick={() => setSearchQuery("")}
               >
                 Clear Search
@@ -359,7 +355,7 @@ export function UsersClient({ initialUsers }: UsersClientProps) {
         <div className="space-y-4">
           <div className="bg-white rounded-2xl border border-[#E8E8E3] shadow-soft-sm overflow-hidden">
             <Table className="border-none">
-              <TableHeader className="bg-[#FAF5EC]/70 border-b border-[#E8E8E3]">
+              <TableHeader className="bg-[#F2F0ED]/70 border-b border-[#E8E8E3]">
                 <tr>
                   <TableHead>
                     <button
@@ -423,12 +419,12 @@ export function UsersClient({ initialUsers }: UsersClientProps) {
                   <TableRow
                     key={user.id}
                     onClick={() => handleRowClick(user)}
-                    className="cursor-pointer hover:bg-[#FAF5EC]/30 transition-colors"
+                    className="cursor-pointer hover:bg-[#F2F0ED]/40 transition-colors"
                   >
                     {/* Name */}
                     <TableCell>
                       <div className="flex items-center gap-2.5">
-                        <div className="w-7 h-7 rounded-full bg-[#FAF5EC] border border-[#ECDDBB] flex items-center justify-center text-xs font-semibold text-[#141413] shrink-0 overflow-hidden">
+                        <div className="w-7 h-7 rounded-full bg-[#000000] border border-black flex items-center justify-center text-xs font-medium text-white shrink-0 overflow-hidden">
                           {user.profilePicUrl ? (
                             <img
                               src={user.profilePicUrl}
@@ -453,7 +449,7 @@ export function UsersClient({ initialUsers }: UsersClientProps) {
                       <Badge
                         variant={user.role === "creator" ? "accent" : "default"}
                         size="sm"
-                        className="rounded-full capitalize font-medium"
+                        className="rounded-md capitalize font-medium"
                       >
                         {user.role}
                       </Badge>
@@ -471,7 +467,7 @@ export function UsersClient({ initialUsers }: UsersClientProps) {
                               : "default"
                           }
                           size="sm"
-                          className="rounded-full capitalize font-medium"
+                          className="rounded-md capitalize font-medium"
                         >
                           {user.plan}
                         </Badge>
@@ -483,7 +479,7 @@ export function UsersClient({ initialUsers }: UsersClientProps) {
                     {/* COR Badge */}
                     <TableCell>
                       {user.isCorMember ? (
-                        <Badge variant="accent" size="sm" dot className="rounded-full font-medium">
+                        <Badge variant="accent" size="sm" dot className="rounded-md font-medium">
                           Yes
                         </Badge>
                       ) : (
@@ -497,7 +493,7 @@ export function UsersClient({ initialUsers }: UsersClientProps) {
                         variant={user.status === "active" ? "success" : "danger"}
                         size="sm"
                         dot
-                        className="rounded-full capitalize font-medium"
+                        className="rounded-md capitalize font-medium"
                       >
                         {user.status}
                       </Badge>
@@ -537,7 +533,7 @@ export function UsersClient({ initialUsers }: UsersClientProps) {
                 size="sm"
                 onClick={() => setIsDeleteModalOpen(true)}
                 leftIcon={<Trash2 className="w-3.5 h-3.5" />}
-                className="rounded-full px-4"
+                className="rounded-xl px-4"
               >
                 Delete User
               </Button>
@@ -547,7 +543,7 @@ export function UsersClient({ initialUsers }: UsersClientProps) {
                 size="sm"
                 onClick={handleToggleStatus}
                 isLoading={isUpdatingStatus}
-                className="rounded-full px-5"
+                className="rounded-xl px-5"
                 leftIcon={
                   selectedUser.status === "active" ? (
                     <Ban className="w-3.5 h-3.5" />
@@ -568,7 +564,7 @@ export function UsersClient({ initialUsers }: UsersClientProps) {
           <div className="space-y-6">
             {/* User Hero Header in Drawer */}
             <div className="flex items-center gap-3.5 pb-5 border-b border-[#E8E8E3]">
-              <div className="w-12 h-12 rounded-full bg-[#FAF5EC] border border-[#ECDDBB] flex items-center justify-center text-base font-semibold text-[#141413] shrink-0 overflow-hidden">
+              <div className="w-12 h-12 rounded-full bg-[#000000] border border-black flex items-center justify-center text-base font-medium text-white shrink-0 overflow-hidden">
                 {selectedUser.profilePicUrl ? (
                   <img
                     src={selectedUser.profilePicUrl}
@@ -580,7 +576,7 @@ export function UsersClient({ initialUsers }: UsersClientProps) {
                 )}
               </div>
               <div className="min-w-0">
-                <h4 className="font-serif text-base font-semibold text-[#141413] truncate">
+                <h4 className="text-base font-medium text-[#141413] truncate">
                   {selectedUser.name}
                 </h4>
                 <p className="text-xs text-[#6E6E69] truncate">
@@ -591,12 +587,12 @@ export function UsersClient({ initialUsers }: UsersClientProps) {
                     variant={selectedUser.status === "active" ? "success" : "danger"}
                     size="sm"
                     dot
-                    className="rounded-full capitalize"
+                    className="rounded-md capitalize font-medium"
                   >
                     {selectedUser.status}
                   </Badge>
                   {selectedUser.isCorMember && (
-                    <Badge variant="warning" size="sm" dot className="rounded-full">
+                    <Badge variant="warning" size="sm" dot className="rounded-md font-medium">
                       COR Fellow
                     </Badge>
                   )}
@@ -606,13 +602,13 @@ export function UsersClient({ initialUsers }: UsersClientProps) {
 
             {/* Profile Attributes List */}
             <div className="space-y-3.5 text-xs">
-              <h5 className="font-semibold text-[#73736C] uppercase tracking-[0.2em] text-[11px] font-sans">
+              <h5 className="font-medium text-[#1345EE] uppercase tracking-[0.2em] text-[11px] font-sans">
                 Account Metadata
               </h5>
 
               <div className="flex items-center justify-between py-2.5 border-b border-[#F0F0EB]">
                 <span className="text-[#6E6E69]">User ID</span>
-                <span className="font-mono text-[11px] text-[#141413] bg-[#FAF5EC] border border-[#ECDDBB] px-2 py-0.5 rounded-full">
+                <span className="font-mono text-[11px] text-[#141413] bg-[#F2F0ED] border border-[#E8E8E3] px-2 py-0.5 rounded-md">
                   {selectedUser.id}
                 </span>
               </div>
@@ -647,12 +643,12 @@ export function UsersClient({ initialUsers }: UsersClientProps) {
             </div>
 
             {/* Security / Notice */}
-            <div className="p-4 rounded-2xl bg-[#FAF5EC] border border-[#ECDDBB] text-xs text-[#865E16] space-y-1.5">
-              <div className="flex items-center gap-1.5 font-semibold">
+            <div className="p-4 rounded-3xl bg-[#F2F0ED] border border-[#1345EE]/30 text-xs text-[#141413] space-y-1.5">
+              <div className="flex items-center gap-1.5 font-medium text-[#1345EE]">
                 <AlertTriangle className="w-3.5 h-3.5" />
                 <span>Account Controls Notice</span>
               </div>
-              <p className="text-[11px] text-[#865E16]/90 leading-relaxed">
+              <p className="text-[11px] text-[#141413]/80 leading-relaxed">
                 Suspending this user will immediately revoke their ability to publish
                 artworks, apply for studio residencies, and interact with the collective.
               </p>
@@ -674,7 +670,7 @@ export function UsersClient({ initialUsers }: UsersClientProps) {
               size="sm"
               onClick={() => setIsDeleteModalOpen(false)}
               disabled={isDeleting}
-              className="rounded-full px-5"
+              className="rounded-xl px-5"
             >
               Cancel
             </Button>
@@ -684,7 +680,7 @@ export function UsersClient({ initialUsers }: UsersClientProps) {
               onClick={handleConfirmDelete}
               isLoading={isDeleting}
               leftIcon={<Trash2 className="w-3.5 h-3.5" />}
-              className="rounded-full px-5"
+              className="rounded-xl px-5"
             >
               Delete Permanently
             </Button>

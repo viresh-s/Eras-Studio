@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   ArrowUpDown,
   ArrowUp,
@@ -167,16 +168,17 @@ export function CreatorsClient({
       return <ArrowUpDown className="w-3 h-3 text-[#A0A09B] opacity-0 group-hover:opacity-100 transition-opacity" />;
     }
     return sortDirection === "asc" ? (
-      <ArrowUp className="w-3 h-3 text-[#865E16]" />
+      <ArrowUp className="w-3 h-3 text-[#1345EE]" />
     ) : (
-      <ArrowDown className="w-3 h-3 text-[#865E16]" />
+      <ArrowDown className="w-3 h-3 text-[#1345EE]" />
     );
   };
 
-  // Row Click opens Drawer
+  const router = useRouter();
+
+  // Row Click navigates to Creator detail view
   const handleRowClick = (creator: Creator) => {
-    setSelectedCreator(creator);
-    setIsDrawerOpen(true);
+    router.push(`/admin/creators/${creator.id}`);
   };
 
   // Drawer action: Approve creator (pending -> active)
@@ -364,12 +366,8 @@ export function CreatorsClient({
       {/* Title & Stats */}
       <div className="border-b border-[#E8E8E3] pb-6 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/80 rounded-full text-[11px] font-semibold tracking-[0.2em] text-[#73736C] uppercase border border-[#E8E8E3] mb-3 shadow-2xs font-sans">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#865E16]" />
-            ARTIST DIRECTORY & VERIFICATION
-          </div>
-          <h1 className="font-serif text-3xl sm:text-4xl font-semibold tracking-tight text-[#141413]">
-            Creator <span className="italic font-normal">Roster.</span>
+          <h1 className="admin-century-title text-3xl sm:text-4xl tracking-tight text-[#141413]">
+            Creator Roster.
           </h1>
           <p className="mt-1.5 text-xs sm:text-sm text-[#6E6E69] max-w-2xl leading-relaxed">
             Curated studio artists, verification review, and exhibition tiers.
@@ -377,14 +375,14 @@ export function CreatorsClient({
         </div>
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 shrink-0 self-start sm:self-auto">
           <ExportDropdown exportType="creators" filters={{ query: searchQuery, status: selectedStatus === "all" ? undefined : selectedStatus, plan: selectedPlan === "all" ? undefined : selectedPlan }} />
-          <div className="flex items-center gap-3 text-xs px-3.5 py-1.5 rounded-full border border-[#E8E8E3] bg-white text-[#6E6E69] font-medium shadow-2xs">
+          <div className="flex items-center gap-3 text-xs px-3.5 py-1.5 rounded-xl border border-[#E8E8E3] bg-white text-[#6E6E69] font-medium shadow-2xs">
             <span>
               Total: <strong className="text-[#141413]">{creators.length}</strong>
             </span>
             <span>•</span>
             <span>
               Pending:{" "}
-              <strong className="text-[#865E16]">
+              <strong className="text-[#1345EE]">
                 {creators.filter((c) => c.status === "pending").length}
               </strong>
             </span>
@@ -422,7 +420,7 @@ export function CreatorsClient({
           }
           action={
             hasActiveFilters ? (
-              <Button variant="outline" size="sm" className="rounded-full px-5" onClick={handleResetFilters}>
+              <Button variant="outline" size="sm" className="rounded-xl px-5" onClick={handleResetFilters}>
                 Reset Filters
               </Button>
             ) : null
@@ -432,7 +430,7 @@ export function CreatorsClient({
         <div className="space-y-4">
           <div className="bg-white rounded-2xl border border-[#E8E8E3] shadow-soft-sm overflow-hidden">
             <Table className="border-none">
-              <TableHeader className="bg-[#FAF5EC]/70 border-b border-[#E8E8E3]">
+              <TableHeader className="bg-[#F2F0ED]/70 border-b border-[#E8E8E3]">
                 <tr>
                   <TableHead>
                     <button
@@ -486,12 +484,12 @@ export function CreatorsClient({
                   <TableRow
                     key={creator.id}
                     onClick={() => handleRowClick(creator)}
-                    className="cursor-pointer hover:bg-[#FAF5EC]/30 transition-colors"
+                    className="cursor-pointer hover:bg-[#F2F0ED]/40 transition-colors"
                   >
                     {/* Creator Name */}
                     <TableCell>
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-[#FAF5EC] border border-[#ECDDBB] flex items-center justify-center text-xs font-semibold text-[#141413] shrink-0 overflow-hidden">
+                        <div className="w-8 h-8 rounded-full bg-[#000000] border border-black flex items-center justify-center text-xs font-medium text-white shrink-0 overflow-hidden">
                           {creator.profilePicUrl ? (
                             <img
                               src={creator.profilePicUrl}
@@ -530,7 +528,7 @@ export function CreatorsClient({
                               : "default"
                           }
                           size="sm"
-                          className="rounded-full capitalize font-medium"
+                          className="rounded-md capitalize font-medium"
                         >
                           {creator.plan}
                         </Badge>
@@ -551,7 +549,7 @@ export function CreatorsClient({
                         }
                         size="sm"
                         dot
-                        className="rounded-full capitalize font-medium"
+                        className="rounded-md capitalize font-medium"
                       >
                         {creator.status}
                       </Badge>
@@ -593,7 +591,7 @@ export function CreatorsClient({
                   onClick={handleApproveCreator}
                   isLoading={isUpdating}
                   leftIcon={<CheckCircle2 className="w-3.5 h-3.5" />}
-                  className="rounded-full px-5"
+                  className="rounded-xl px-5"
                 >
                   Approve Creator
                 </Button>
@@ -605,7 +603,7 @@ export function CreatorsClient({
                   size="sm"
                   onClick={handleToggleSuspend}
                   isLoading={isUpdating}
-                  className="rounded-full px-5"
+                  className="rounded-xl px-5"
                   leftIcon={
                     selectedCreator.status === "active" ? (
                       <Ban className="w-3.5 h-3.5" />
@@ -620,14 +618,25 @@ export function CreatorsClient({
                 </Button>
               )}
 
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsDrawerOpen(false)}
-                className="rounded-full px-4"
-              >
-                Done
-              </Button>
+              <div className="flex items-center gap-2">
+                <Link href={`/admin/creators/${selectedCreator.id}`}>
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    className="rounded-xl px-5"
+                  >
+                    View Full Profile
+                  </Button>
+                </Link>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsDrawerOpen(false)}
+                  className="rounded-xl px-4"
+                >
+                  Done
+                </Button>
+              </div>
             </div>
           )
         }
@@ -636,7 +645,7 @@ export function CreatorsClient({
           <div className="space-y-6">
             {/* Header in Drawer */}
             <div className="flex items-center gap-3.5 pb-5 border-b border-[#E8E8E3]">
-              <div className="w-12 h-12 rounded-full bg-[#FAF5EC] border border-[#ECDDBB] flex items-center justify-center text-base font-semibold text-[#141413] shrink-0 overflow-hidden">
+              <div className="w-12 h-12 rounded-full bg-[#000000] border border-black flex items-center justify-center text-base font-medium text-white shrink-0 overflow-hidden">
                 {selectedCreator.profilePicUrl ? (
                   <img
                     src={selectedCreator.profilePicUrl}
@@ -648,7 +657,7 @@ export function CreatorsClient({
                 )}
               </div>
               <div className="min-w-0">
-                <h4 className="font-serif text-base font-semibold text-[#141413] truncate">
+                <h4 className="text-base font-medium text-[#141413] truncate">
                   {selectedCreator.name}
                 </h4>
                 <p className="text-xs text-[#6E6E69] truncate">
@@ -665,12 +674,12 @@ export function CreatorsClient({
                     }
                     size="sm"
                     dot
-                    className="rounded-full capitalize font-medium"
+                    className="rounded-md capitalize font-medium"
                   >
                     {selectedCreator.status}
                   </Badge>
                   {selectedCreator.plan && (
-                    <Badge variant="accent" size="sm" className="rounded-full uppercase">
+                    <Badge variant="accent" size="sm" className="rounded-md uppercase font-medium">
                       {selectedCreator.plan} Plan
                     </Badge>
                   )}
@@ -679,10 +688,10 @@ export function CreatorsClient({
             </div>
 
             {/* Action: Change Plan (Free / Elite / Pro) */}
-            <div className="space-y-3 p-4 rounded-2xl bg-[#FAF5EC]/50 border border-[#ECDDBB]">
+            <div className="space-y-3 p-4 rounded-2xl bg-[#F2F0ED]/70 border border-[#E8E8E3]">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-semibold text-[#141413] flex items-center gap-1.5 font-sans">
-                  <Award className="w-3.5 h-3.5 text-[#865E16]" />
+                <label className="text-xs font-medium text-[#141413] flex items-center gap-1.5 font-sans">
+                  <Award className="w-3.5 h-3.5 text-[#1345EE]" />
                   <span>Subscription Plan</span>
                 </label>
                 <span className="text-[11px] text-[#71716D]">
@@ -705,10 +714,10 @@ export function CreatorsClient({
                       type="button"
                       disabled={isUpdating}
                       onClick={() => handleChangePlan(plan)}
-                      className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-all cursor-pointer ${
+                      className={`px-3 py-1.5 text-xs font-medium rounded-xl border transition-all cursor-pointer ${
                         isSelected
-                          ? "bg-[#141413] text-white border-[#141413] shadow-xs"
-                          : "bg-white text-[#52524E] border-[#E8E8E3] hover:bg-[#FAF5EC]"
+                          ? "bg-[#000000] text-white border-black font-medium shadow-xs"
+                          : "bg-white text-[#52524E] border-[#E8E8E3] hover:bg-[#F2F0ED]"
                       }`}
                     >
                       {plan ? plan.charAt(0).toUpperCase() + plan.slice(1) : ""}
@@ -720,20 +729,20 @@ export function CreatorsClient({
 
             {/* Creator Metadata */}
             <div className="space-y-3 text-xs">
-              <h5 className="font-semibold text-[#73736C] uppercase tracking-[0.2em] text-[11px] font-sans">
+              <h5 className="font-medium text-[#1345EE] uppercase tracking-[0.2em] text-[11px] font-sans">
                 Creator Dossier
               </h5>
 
               <div className="flex items-center justify-between py-2.5 border-b border-[#F0F0EB]">
                 <span className="text-[#6E6E69]">Creator ID</span>
-                <span className="font-mono text-[11px] text-[#141413] bg-[#FAF5EC] border border-[#ECDDBB] px-2 py-0.5 rounded-full">
+                <span className="font-mono text-[11px] text-[#141413] bg-[#F2F0ED] border border-[#E8E8E3] px-2 py-0.5 rounded-md">
                   {selectedCreator.id}
                 </span>
               </div>
 
               <div className="flex items-center justify-between py-2.5 border-b border-[#F0F0EB]">
                 <span className="text-[#6E6E69]">Linked User ID</span>
-                <span className="font-mono text-[11px] text-[#141413] bg-[#FAF5EC] border border-[#ECDDBB] px-2 py-0.5 rounded-full">
+                <span className="font-mono text-[11px] text-[#141413] bg-[#F2F0ED] border border-[#E8E8E3] px-2 py-0.5 rounded-md">
                   {selectedCreator.userId}
                 </span>
               </div>
@@ -755,9 +764,9 @@ export function CreatorsClient({
 
             {/* Pending Notice if Pending */}
             {selectedCreator.status === "pending" && (
-              <div className="p-4 rounded-2xl bg-[#FAF5EC] border border-[#ECDDBB] text-xs text-[#865E16] space-y-1.5">
-                <p className="font-semibold">Curatorial Review Required</p>
-                <p className="text-[11px] text-[#865E16]/90 leading-relaxed">
+              <div className="p-4 rounded-3xl bg-[#F2F0ED] border border-[#1345EE]/30 text-xs text-[#141413] space-y-1.5">
+                <p className="font-medium text-[#1345EE]">Curatorial Review Required</p>
+                <p className="text-[11px] text-[#6E6E69] leading-relaxed">
                   This creator’s portfolio is in the onboarding queue. Approving
                   them will unlock public showcase permissions and exhibition
                   eligibility.

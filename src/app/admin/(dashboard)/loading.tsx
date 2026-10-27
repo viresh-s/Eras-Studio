@@ -39,7 +39,7 @@ export default function DashboardLoading() {
         {Array.from({ length: 6 }).map((_, i) => (
           <div
             key={i}
-            className="flex items-center justify-between py-3.5 border-b border-[#FAF5EC] last:border-none"
+            className="flex items-center justify-between py-3.5 border-b border-[#F2F0ED] last:border-none"
           >
             <div className="flex items-center gap-3.5">
               <Skeleton className="w-9 h-9 rounded-full" />

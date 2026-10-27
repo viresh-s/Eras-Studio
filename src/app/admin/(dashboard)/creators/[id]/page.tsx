@@ -31,15 +31,26 @@ export default async function CreatorDetailPage({ params }: CreatorDetailPagePro
   }
 
   // Fetch related data
-  const [artworks, corMember] = await Promise.all([
+  let [artworks, corMember] = await Promise.all([
     safeAsync(artworksRepo.list({ creatorId: creator.id }), []),
     safeAsync(corMembersRepo.getByCreatorId(creator.id), null),
   ]);
 
+  if ((!artworks || artworks.length === 0) && creator.userId && creator.userId !== creator.id) {
+    const userArtworks = await safeAsync(artworksRepo.list({ creatorId: creator.userId }), []);
+    if (userArtworks && userArtworks.length > 0) {
+      artworks = userArtworks;
+    }
+  }
+
+  if (!corMember && creator.userId && creator.userId !== creator.id) {
+    corMember = await safeAsync(corMembersRepo.getByCreatorId(creator.userId), null);
+  }
+
   return (
     <CreatorDetailClient
       creator={creator}
-      artworks={artworks}
+      artworks={artworks || []}
       corMember={corMember}
     />
   );

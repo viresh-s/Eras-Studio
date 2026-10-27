@@ -19,11 +19,11 @@ export default function DashboardError({
   return (
     <div className="min-h-[50vh] flex flex-col items-center justify-center text-center px-4 py-12 animate-in fade-in duration-200">
       <div className="p-8 sm:p-10 rounded-2xl border border-[#E8E8E3] bg-white shadow-soft-sm max-w-lg w-full flex flex-col items-center">
-        <div className="w-12 h-12 rounded-full bg-[#FAF5EC] border border-[#865E16]/30 flex items-center justify-center text-[#865E16] mb-4 shadow-soft-sm">
+        <div className="w-12 h-12 rounded-full bg-[#000000] border border-black flex items-center justify-center text-white mb-4 shadow-soft-sm">
           <AlertTriangle className="w-6 h-6 stroke-[1.75]" />
         </div>
 
-        <h2 className="text-2xl font-serif font-normal tracking-tight text-[#141413]">
+        <h2 className="text-2xl font-medium tracking-tight text-[#141413]">
           Something went wrong
         </h2>
 
@@ -47,7 +47,7 @@ export default function DashboardError({
 
           <Link
             href="/admin/overview"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-[#E8E8E3] bg-white text-xs font-medium text-[#6E6E69] hover:text-[#141413] hover:bg-[#FAF5EC] transition-all shadow-soft-sm"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-[#E8E8E3] bg-white text-xs font-medium text-[#6E6E69] hover:text-[#141413] hover:bg-[#F2F0ED] transition-all shadow-soft-sm"
           >
             <LayoutDashboard className="w-3.5 h-3.5" />
             <span>Back to Overview</span>

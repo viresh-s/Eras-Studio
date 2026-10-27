@@ -68,28 +68,28 @@ export function CorNavTabs({ counts }: CorNavTabsProps) {
           <Link
             key={tab.href}
             href={tab.href}
-            className={`group inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium transition-all whitespace-nowrap cursor-pointer ${
+            className={`group inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-all whitespace-nowrap cursor-pointer ${
               isActive
-                ? "bg-[#141413] text-white shadow-soft-sm"
-                : "bg-white text-[#71716D] border border-[#E8E8E3] hover:text-[#141413] hover:border-[#141413] hover:bg-[#FAF5EC]"
+                ? "bg-[#000000] text-white font-medium border border-black shadow-soft-sm"
+                : "bg-white text-[#71716D] border border-[#E8E8E3] hover:text-[#141413] hover:border-[#141413] hover:bg-[#F2F0ED]"
             }`}
           >
             <Icon
               className={`w-3.5 h-3.5 stroke-[1.75] transition-colors ${
-                isActive ? "text-[#ECDDBB]" : "text-[#8A8A85] group-hover:text-[#141413]"
+                isActive ? "text-white" : "text-[#8A8A85] group-hover:text-[#141413]"
               }`}
             />
             <span>{tab.name}</span>
             {typeof tab.count === "number" && (
               <span
-                className={`ml-0.5 px-2 py-0.5 rounded-full text-[10px] font-semibold transition-colors ${
+                className={`ml-0.5 px-2 py-0.5 rounded-md text-[10px] font-medium transition-colors ${
                   tab.highlightCount
                     ? isActive
-                      ? "bg-[#ECDDBB] text-[#141413]"
-                      : "bg-[#865E16] text-white"
+                      ? "bg-white text-[#1345EE]"
+                      : "bg-[#1345EE] text-white"
                     : isActive
-                    ? "bg-white/20 text-white"
-                    : "bg-[#FAF5EC] text-[#71716D] border border-[#E8E8E3]"
+                    ? "bg-white text-[#1345EE]"
+                    : "bg-[#F2F0ED] text-[#1345EE] border border-[#1345EE]/25"
                 }`}
               >
                 {tab.count}

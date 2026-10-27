@@ -245,9 +245,9 @@ export function CollectorDetailClient({
       <div>
         <Link
           href="/admin/collectors"
-          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-[#E8E8E3] bg-white text-xs font-medium text-[#141413] hover:bg-[#FAF5EC] transition-colors shadow-2xs"
+          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-[#E8E8E3] bg-white text-xs font-medium text-[#141413] hover:bg-[#F2F0ED] transition-colors shadow-2xs"
         >
-          <ArrowLeft className="w-3.5 h-3.5 text-[#865E16]" />
+          <ArrowLeft className="w-3.5 h-3.5 text-[#1345EE]" />
           <span>Back to Patron Directory</span>
         </Link>
       </div>
@@ -261,16 +261,16 @@ export function CollectorDetailClient({
               <img
                 src={collectorState.profilePicUrl}
                 alt={collectorState.name}
-                className="w-16 h-16 rounded-full object-cover border-2 border-[#ECDDBB]"
+                className="w-16 h-16 rounded-full object-cover border-2 border-[#1345EE]/30"
               />
             ) : (
-              <div className="w-16 h-16 rounded-full bg-[#FAF5EC] border border-[#ECDDBB] flex items-center justify-center text-xl font-serif font-bold text-[#141413]">
+              <div className="w-16 h-16 rounded-full bg-[#000000] border border-black flex items-center justify-center text-xl font-bold text-white">
                 {collectorState.name.slice(0, 2).toUpperCase()}
               </div>
             )}
             <div>
               <div className="flex items-center gap-3">
-                <h1 className="font-serif text-2xl sm:text-3xl font-semibold tracking-tight text-[#141413]">
+                <h1 className="text-2xl sm:text-3xl font-medium tracking-tight text-[#141413]">
                   {collectorState.name}
                 </h1>
                 <Badge
@@ -283,7 +283,7 @@ export function CollectorDetailClient({
                   }
                   size="sm"
                   dot
-                  className="rounded-full capitalize font-medium"
+                  className="rounded-md capitalize font-medium"
                 >
                   {collectorState.status}
                 </Badge>
@@ -292,11 +292,11 @@ export function CollectorDetailClient({
                 {collectorState.email || "No email"} · {collectorState.location || "Remote"} · Joined {formatDate(collectorState.createdAt)}
               </p>
               <div className="flex items-center gap-2.5 mt-2">
-                <span className="text-xs font-semibold text-[#865E16] uppercase tracking-wider font-sans">
+                <span className="text-xs font-medium text-[#1345EE] uppercase tracking-wider font-sans">
                   {collectorState.preferences || "Contemporary Art"}
                 </span>
                 <span className="text-[#C4C4BD]">·</span>
-                <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#28633B] bg-[#F0F5F1] px-2.5 py-0.5 rounded-full border border-[#CDE3D4]">
+                <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#28633B] bg-[#F0F5F1] px-2.5 py-0.5 rounded-md border border-[#CDE3D4]">
                   <Sparkles className="w-3 h-3 text-[#28633B]" />
                   {interestsState.length} {interestsState.length === 1 ? "Artwork Interest" : "Artworks of Interest"}
                 </span>
@@ -309,7 +309,7 @@ export function CollectorDetailClient({
               variant="outline"
               size="sm"
               onClick={() => setIsSuspendModalOpen(true)}
-              className="rounded-full px-4 text-xs uppercase tracking-[0.08em]"
+              className="rounded-xl px-4 text-xs uppercase tracking-[0.08em]"
             >
               {isSuspended ? "Revert Suspension" : "Suspend"}
             </Button>
@@ -317,7 +317,7 @@ export function CollectorDetailClient({
               variant="outline"
               size="sm"
               onClick={() => setIsArchiveModalOpen(true)}
-              className="rounded-full px-4 text-xs uppercase tracking-[0.08em]"
+              className="rounded-xl px-4 text-xs uppercase tracking-[0.08em]"
             >
               {isArchived ? "Revert Archive" : "Archive"}
             </Button>
@@ -325,10 +325,42 @@ export function CollectorDetailClient({
               variant="danger"
               size="sm"
               onClick={() => setIsDeleteModalOpen(true)}
-              className="rounded-full px-4 text-xs uppercase tracking-[0.08em]"
+              className="rounded-xl px-4 text-xs uppercase tracking-[0.08em]"
             >
               Delete Account
             </Button>
+          </div>
+        </div>
+
+        {/* Quick summary stats */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-5 border-t border-[#E8E8E3] text-xs">
+          <div className="bg-[#F2F0ED]/70 p-3.5 rounded-xl border border-[#E8E8E3]">
+            <span className="text-[#73736C] font-sans font-semibold uppercase tracking-wider text-[11px]">Expressed Interests</span>
+            <div className="text-2xl font-semibold text-[#141413] mt-1">
+              {interestsState.length}
+            </div>
+          </div>
+          <div className="bg-[#F2F0ED]/70 p-3.5 rounded-xl border border-[#E8E8E3]">
+            <span className="text-[#73736C] font-sans font-semibold uppercase tracking-wider text-[11px]">Subscription Plan</span>
+            <div className="text-2xl font-semibold capitalize text-[#141413] mt-1">
+              {collectorState.plan || "Free"}
+            </div>
+          </div>
+          <div className="bg-[#F2F0ED]/70 p-3.5 rounded-xl border border-[#E8E8E3]">
+            <span className="text-[#73736C] font-sans font-semibold uppercase tracking-wider text-[11px]">Account Status</span>
+            <div className="text-2xl font-semibold capitalize text-[#141413] mt-1">
+              {collectorState.status === "active" ? (
+                <span className="text-[#28633B]">Active</span>
+              ) : (
+                <span className="text-[#9E3333]">{collectorState.status}</span>
+              )}
+            </div>
+          </div>
+          <div className="bg-[#F2F0ED]/70 p-3.5 rounded-xl border border-[#E8E8E3]">
+            <span className="text-[#73736C] font-sans font-semibold uppercase tracking-wider text-[11px]">Collector ID</span>
+            <div className="font-mono text-xs font-medium text-[#141413] mt-2 truncate" title={collectorState.id}>
+              {collectorState.id}
+            </div>
           </div>
         </div>
 
@@ -349,7 +381,7 @@ export function CollectorDetailClient({
                 size="sm"
                 onClick={() => setIsSuspendModalOpen(false)}
                 disabled={isActionLoading}
-                className="rounded-full px-5"
+                className="rounded-xl px-5"
               >
                 Cancel
               </Button>
@@ -358,15 +390,15 @@ export function CollectorDetailClient({
                 size="sm"
                 onClick={handleConfirmSuspendToggle}
                 isLoading={isActionLoading}
-                className="rounded-full px-5"
+                className="rounded-xl px-5"
               >
                 {isSuspended ? "Revert Suspension" : "Suspend Account"}
               </Button>
             </>
           }
         >
-          <div className="p-4 bg-[#FAF5EC] border border-[#ECDDBB] rounded-2xl text-xs text-[#865E16] space-y-1">
-            <p className="font-semibold text-[#141413]">Account Impact:</p>
+          <div className="p-4 bg-[#F2F0ED] border border-[#1345EE]/30 rounded-3xl text-xs text-[#1345EE] space-y-1">
+            <p className="font-medium text-[#141413]">Account Impact:</p>
             <p>• Profile: {collectorState.name} ({collectorState.email || "No email"})</p>
             <p>• Target status: {isSuspended ? "active (reverted)" : "suspended"}</p>
           </div>
@@ -385,7 +417,7 @@ export function CollectorDetailClient({
                 size="sm"
                 onClick={() => setIsDeleteModalOpen(false)}
                 disabled={isActionLoading}
-                className="rounded-full px-5"
+                className="rounded-xl px-5"
               >
                 Cancel
               </Button>
@@ -394,17 +426,17 @@ export function CollectorDetailClient({
                 size="sm"
                 onClick={handleConfirmDelete}
                 isLoading={isActionLoading}
-                className="rounded-full px-5"
+                className="rounded-xl px-5"
               >
                 Delete Account Permanently
               </Button>
             </>
           }
         >
-          <div className="p-4 bg-[#FDF2F2] border border-[#F2C6C6] rounded-2xl text-xs text-[#9E3333] flex items-start gap-2.5">
+          <div className="p-4 bg-[#FDF2F2] border border-[#F2C6C6] rounded-3xl text-xs text-[#9E3333] flex items-start gap-2.5">
             <AlertTriangle className="w-4 h-4 shrink-0 text-[#B83838] mt-0.5" />
             <div>
-              <p className="font-semibold text-[#9E3333]">Critical Warning</p>
+              <p className="font-medium text-[#9E3333]">Critical Warning</p>
               <p>Removing this profile will delete collector credentials and associated profile metadata.</p>
             </div>
           </div>
@@ -427,7 +459,7 @@ export function CollectorDetailClient({
                 size="sm"
                 onClick={() => setIsArchiveModalOpen(false)}
                 disabled={isActionLoading}
-                className="rounded-full px-5"
+                className="rounded-xl px-5"
               >
                 Cancel
               </Button>
@@ -436,14 +468,14 @@ export function CollectorDetailClient({
                 size="sm"
                 onClick={handleConfirmArchive}
                 isLoading={isActionLoading}
-                className="rounded-full px-5"
+                className="rounded-xl px-5"
               >
                 {isArchived ? "Revert Archive" : "Archive Collector"}
               </Button>
             </>
           }
         >
-          <div className="p-4 bg-[#FAF5EC] border border-[#ECDDBB] rounded-2xl text-xs text-[#6E6E69]">
+          <div className="p-4 bg-[#F2F0ED] border border-[#1345EE]/30 rounded-3xl text-xs text-[#6E6E69]">
             <p>Archiving preserves existing inquiries, messages, and transactional records.</p>
           </div>
         </Modal>
@@ -468,20 +500,20 @@ export function CollectorDetailClient({
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium transition-all cursor-pointer whitespace-nowrap shadow-2xs ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer whitespace-nowrap shadow-2xs ${
                 active
-                  ? "bg-[#141413] text-white shadow-xs"
-                  : "bg-white text-[#6E6E69] border border-[#E8E8E3] hover:text-[#141413] hover:bg-[#FAF5EC]"
+                  ? "bg-[#000000] text-white font-medium border border-black shadow-xs"
+                  : "bg-white text-[#6E6E69] border border-[#E8E8E3] hover:text-[#141413] hover:bg-[#F2F0ED]"
               }`}
             >
               <Icon className="w-3.5 h-3.5" />
               <span>{tab.label}</span>
               {"count" in tab && typeof tab.count === "number" && tab.count > 0 && (
                 <span
-                  className={`ml-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                  className={`ml-1 text-[10px] font-bold px-2 py-0.5 rounded-md ${
                     active
-                      ? "bg-white text-[#141413]"
-                      : "bg-[#FAF5EC] text-[#865E16] border border-[#ECDDBB]"
+                      ? "bg-white text-[#1345EE]"
+                      : "bg-[#F2F0ED] text-[#1345EE] border border-[#1345EE]/30"
                   }`}
                 >
                   {tab.count}
@@ -498,44 +530,62 @@ export function CollectorDetailClient({
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Personal Information */}
-              <div className="p-5 rounded-xl border border-[#E8E8E3] bg-white">
-                <h3 className="text-sm font-semibold text-[#141413] mb-4 pb-3 border-b border-[#F0F0EB]">
+              <div className="p-6 rounded-2xl border border-[#E8E8E3] bg-white shadow-soft-sm">
+                <h3 className="text-base font-semibold text-[#141413] mb-4 pb-3 border-b border-[#F0F0EB]">
                   Personal Information
                 </h3>
-                <div className="space-y-4 text-sm">
+                <div className="space-y-4 text-xs md:text-sm">
                   <div className="grid grid-cols-3 gap-2">
                     <div className="text-[#6E6E69]">Full Name</div>
-                    <div className="col-span-2 font-medium text-[#141413]">{collector.name}</div>
+                    <div className="col-span-2 font-medium text-[#141413]">{collectorState.name}</div>
                   </div>
                   <div className="grid grid-cols-3 gap-2">
+                    <div className="text-[#6E6E69]">Collector ID</div>
+                    <div className="col-span-2 font-mono text-xs font-medium text-[#141413] bg-[#F2F0ED] px-2 py-0.5 rounded-md border border-[#E8E8E3] inline-block w-fit">
+                      {collectorState.id}
+                    </div>
+                  </div>
+                  {collectorState.userId && collectorState.userId !== collectorState.id && (
+                    <div className="grid grid-cols-3 gap-2">
+                      <div className="text-[#6E6E69]">User ID</div>
+                      <div className="col-span-2 font-mono text-xs font-medium text-[#141413] bg-[#F2F0ED] px-2 py-0.5 rounded-md border border-[#E8E8E3] inline-block w-fit">
+                        {collectorState.userId}
+                      </div>
+                    </div>
+                  )}
+                  <div className="grid grid-cols-3 gap-2">
                     <div className="text-[#6E6E69]">Email</div>
-                    <div className="col-span-2 font-medium text-[#141413]">{collector.email || "Not provided"}</div>
+                    <div className="col-span-2 font-medium text-[#141413]">{collectorState.email || "Not provided"}</div>
                   </div>
                   <div className="grid grid-cols-3 gap-2">
                     <div className="text-[#6E6E69]">Phone</div>
-                    <div className="col-span-2 font-medium text-[#141413]">{collector.phoneNumber || "Not provided"}</div>
+                    <div className="col-span-2 font-medium text-[#141413]">{collectorState.phoneNumber || "Not provided"}</div>
                   </div>
                   <div className="grid grid-cols-3 gap-2">
                     <div className="text-[#6E6E69]">Location</div>
-                    <div className="col-span-2 font-medium text-[#141413]">{collector.location || "Not provided"}</div>
+                    <div className="col-span-2 font-medium text-[#141413]">{collectorState.location || "Not provided"}</div>
                   </div>
                   <div className="grid grid-cols-3 gap-2">
-                    <div className="text-[#6E6E69]">Preferences</div>
-                    <div className="col-span-2 font-medium text-[#141413]">{collector.preferences || "Various Art Forms"}</div>
+                    <div className="text-[#6E6E69]">Art Preferences</div>
+                    <div className="col-span-2 font-medium text-[#141413]">{collectorState.preferences || "Various Art Forms"}</div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="text-[#6E6E69]">Joined Platform</div>
+                    <div className="col-span-2 font-medium text-[#141413]">{formatDate(collectorState.createdAt)}</div>
                   </div>
                 </div>
               </div>
 
               {/* Additional Information */}
-              <div className="p-5 rounded-xl border border-[#E8E8E3] bg-white">
-                <h3 className="text-sm font-semibold text-[#141413] mb-4 pb-3 border-b border-[#F0F0EB]">
+              <div className="p-6 rounded-2xl border border-[#E8E8E3] bg-white shadow-soft-sm">
+                <h3 className="text-base font-semibold text-[#141413] mb-4 pb-3 border-b border-[#F0F0EB]">
                   About Collector
                 </h3>
-                <div className="space-y-4 text-sm">
+                <div className="space-y-4 text-xs md:text-sm">
                   <div className="space-y-1.5 mt-2">
-                    <div className="text-[#6E6E69]">Bio</div>
-                    <div className="font-medium text-[#141413] whitespace-pre-wrap leading-relaxed text-sm">
-                      {collector.aboutMe || "No bio provided."}
+                    <div className="text-[#6E6E69]">Bio & Patron Profile</div>
+                    <div className="font-medium text-[#141413] whitespace-pre-wrap leading-relaxed">
+                      {collectorState.aboutMe || "No biography provided."}
                     </div>
                   </div>
                 </div>
@@ -543,7 +593,7 @@ export function CollectorDetailClient({
             </div>
 
             {/* Overview Widget: Expressed Interests Summary */}
-            <div className="p-5 rounded-xl border border-[#E8E8E3] bg-white space-y-4">
+            <div className="p-6 rounded-2xl border border-[#E8E8E3] bg-white shadow-soft-sm space-y-4">
               <div className="flex items-center justify-between pb-3 border-b border-[#F0F0EB]">
                 <div className="flex items-center gap-2">
                   <h3 className="text-sm font-semibold text-[#141413]">
@@ -555,7 +605,7 @@ export function CollectorDetailClient({
                 </div>
                 <button
                   onClick={() => setActiveTab("collection")}
-                  className="text-xs font-semibold text-[#B8532F] hover:text-[#9A4222] transition-colors inline-flex items-center gap-1"
+                  className="text-xs font-semibold text-[#1345EE] hover:text-[#0E35B8] transition-colors inline-flex items-center gap-1"
                 >
                   <span>View All in Collection & Activity</span>
                   <span>→</span>
@@ -768,7 +818,7 @@ export function CollectorDetailClient({
                             <span>No Image</span>
                           </div>
                         )}
-                        <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-black/60 text-white backdrop-blur-xs">
+                        <span className="absolute top-2 left-2 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-black/60 text-white backdrop-blur-xs">
                           {interest.artType || "Artwork"}
                         </span>
                       </div>
@@ -782,7 +832,7 @@ export function CollectorDetailClient({
                                 {interest.artworkTitle}
                               </h3>
                               {/* Artwork Availability Badge */}
-                              <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
+                              <span className="text-[11px] font-medium px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200">
                                 {interest.artworkStatus || "Available"}
                               </span>
                             </div>
@@ -799,7 +849,7 @@ export function CollectorDetailClient({
                           {/* Inquiry Status Badge & Status Selector */}
                           <div className="flex items-center gap-2">
                             <span
-                              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${
+                              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold ${
                                 interest.status.toLowerCase() === "active"
                                   ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
                                   : interest.status.toLowerCase() === "pending"
@@ -883,7 +933,7 @@ export function CollectorDetailClient({
                               <MessageSquare className="w-3.5 h-3.5 text-[#B8532F]" />
                               <span>Collector&apos;s Initial Expression of Interest:</span>
                             </div>
-                            <p className="text-[#141413] italic font-serif text-sm">
+                            <p className="text-[#141413] italic text-sm">
                               &ldquo;{interest.initialMessage}&rdquo;
                             </p>
                           </div>

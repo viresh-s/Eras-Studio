@@ -156,9 +156,9 @@ export function GenerateReportButton() {
           setIsSuccess(false);
           setIsOpen(true);
         }}
-        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#141413] text-white text-xs uppercase tracking-[0.08em] font-medium border border-[#141413] hover:bg-black transition-all duration-200 shadow-xs cursor-pointer select-none active:scale-[0.98]"
+        className="admin-btn-premium-gradient inline-flex items-center gap-2 px-5 py-2.5 text-white text-xs uppercase tracking-[0.08em] font-medium cursor-pointer select-none active:scale-[0.98]"
       >
-        <FileText className="w-3.5 h-3.5 text-[#FAF5EC]" />
+        <FileText className="w-3.5 h-3.5 text-white" />
         <span>Generate Report</span>
       </button>
 
@@ -193,7 +193,7 @@ export function GenerateReportButton() {
 
               {/* REPORTING PERIOD */}
               <div className="space-y-3">
-                <h4 className="text-[11px] font-semibold text-[#73736C] uppercase tracking-[0.2em] font-sans">
+                <h4 className="text-[11px] font-medium text-[#73736C] uppercase tracking-[0.2em] font-sans">
                   Reporting Period
                 </h4>
                 
@@ -211,17 +211,17 @@ export function GenerateReportButton() {
                         }}
                         className={`flex flex-col items-start justify-center p-3.5 rounded-2xl border transition-all cursor-pointer text-left ${
                           isSelected
-                            ? "border-[#141413] bg-[#FAF5EC] ring-1 ring-[#141413]"
-                            : "border-[#E8E8E3] bg-white hover:bg-[#FAF5EC]/40 hover:border-[#D0D0CA]"
+                            ? "border-black bg-[#000000] ring-1 ring-black"
+                            : "border-[#E8E8E3] bg-white hover:bg-[#F2F0ED] hover:border-[#D0D0CA]"
                         } ${isGenerating ? "opacity-50 cursor-not-allowed" : ""}`}
                       >
                         <div className="flex items-center justify-between w-full">
-                          <span className={`text-sm font-medium ${isSelected ? "text-[#141413] font-semibold" : "text-[#141413]"}`}>
+                          <span className={`text-sm font-medium ${isSelected ? "text-white" : "text-[#141413]"}`}>
                             {opt.label}
                           </span>
-                          {isSelected && <Check className="w-4 h-4 text-[#865E16]" />}
+                          {isSelected && <Check className="w-4 h-4 text-white" />}
                         </div>
-                        <span className="text-xs text-[#6E6E69] mt-1">{opt.description}</span>
+                        <span className={`text-xs mt-1 ${isSelected ? "text-[#E8E8E3]" : "text-[#6E6E69]"}`}>{opt.description}</span>
                       </button>
                     );
                   })}
@@ -236,14 +236,14 @@ export function GenerateReportButton() {
                     }}
                     className={`sm:col-span-2 flex items-center justify-between p-3.5 rounded-2xl border transition-all cursor-pointer ${
                       selectedPeriod === "custom"
-                        ? "border-[#141413] bg-[#FAF5EC] ring-1 ring-[#141413]"
-                        : "border-[#E8E8E3] bg-white hover:bg-[#FAF5EC]/40 hover:border-[#D0D0CA]"
+                        ? "border-black bg-[#000000] ring-1 ring-black"
+                        : "border-[#E8E8E3] bg-white hover:bg-[#F2F0ED] hover:border-[#D0D0CA]"
                     } ${isGenerating ? "opacity-50 cursor-not-allowed" : ""}`}
                   >
-                    <span className={`text-sm font-medium ${selectedPeriod === "custom" ? "text-[#141413] font-semibold" : "text-[#141413]"}`}>
+                    <span className={`text-sm font-medium ${selectedPeriod === "custom" ? "text-white" : "text-[#141413]"}`}>
                       Custom range
                     </span>
-                    {selectedPeriod === "custom" ? <Check className="w-4 h-4 text-[#865E16]" /> : <ArrowRight className="w-4 h-4 text-[#6E6E69]" />}
+                    {selectedPeriod === "custom" ? <Check className="w-4 h-4 text-white" /> : <ArrowRight className="w-4 h-4 text-[#6E6E69]" />}
                   </button>
                 </div>
 
@@ -280,10 +280,10 @@ export function GenerateReportButton() {
 
               {/* REPORT PREVIEW */}
               <div className="space-y-3">
-                <h4 className="text-[11px] font-semibold text-[#73736C] uppercase tracking-[0.2em] font-sans">
+                <h4 className="text-[11px] font-medium text-[#73736C] uppercase tracking-[0.2em] font-sans">
                   Report Preview
                 </h4>
-                <div className="p-5 rounded-2xl border border-[#E8E8E3] bg-[#FAF5EC]/50">
+                <div className="p-5 rounded-2xl border border-[#E8E8E3] bg-[#F2F0ED]/70">
                   <h5 className="text-sm font-medium text-[#141413]">
                     {previewInfo.title}
                   </h5>
@@ -291,7 +291,7 @@ export function GenerateReportButton() {
                     {previewInfo.range}
                   </p>
                   <div className="space-y-2">
-                    <p className="text-xs font-semibold text-[#141413] mb-2 uppercase tracking-wider">Includes:</p>
+                    <p className="text-xs font-medium text-[#141413] mb-2 uppercase tracking-wider">Includes:</p>
                     <div className="flex items-center gap-2 text-xs text-[#6E6E69]">
                       <Check className="w-3.5 h-3.5 text-[#28633B]" />
                       <span>Platform performance</span>
@@ -314,7 +314,7 @@ export function GenerateReportButton() {
                   variant="secondary"
                   onClick={() => setIsOpen(false)}
                   disabled={isGenerating}
-                  className="rounded-full px-5 py-2"
+                  className="rounded-xl px-5 py-2"
                 >
                   Cancel
                 </Button>
@@ -322,7 +322,7 @@ export function GenerateReportButton() {
                   variant="primary"
                   onClick={handleGenerate}
                   disabled={isGenerating}
-                  className="min-w-[150px] rounded-full px-6 py-2.5"
+                  className="min-w-[150px] rounded-xl px-6 py-2.5 !bg-[#1345EE] hover:!bg-[#0E35B8] !border-[#1345EE] text-white"
                 >
                   {isGenerating ? (
                     <span className="flex items-center gap-2">

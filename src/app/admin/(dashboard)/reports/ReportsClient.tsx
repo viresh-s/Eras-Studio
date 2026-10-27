@@ -470,14 +470,8 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
       <div className="border-b border-[#E8E8E3] pb-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#865E16]" />
-              <span className="text-[11px] uppercase tracking-[0.14em] font-medium text-[#71716D]">
-                Curatorial Integrity & Safety
-              </span>
-            </div>
-            <h1 className="text-3xl sm:text-4xl font-serif text-[#141413] tracking-tight">
-              Reports & Moderation<span className="italic font-normal">.</span>
+            <h1 className="admin-century-title text-3xl sm:text-4xl text-[#141413] tracking-tight">
+              Reports & Moderation.
             </h1>
             <p className="mt-1 text-xs md:text-sm text-[#71716D] font-light">
               Community moderation, content disputes, copyright protection, and member conduct reviews.
@@ -508,7 +502,7 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
                 }}
                 className={`px-3.5 py-1 rounded-full text-xs font-medium transition-all cursor-pointer select-none whitespace-nowrap ${
                   isActive
-                    ? "bg-[#141413] text-white shadow-soft-sm"
+                    ? "bg-[#000000] text-white font-medium border border-black shadow-soft-sm"
                     : "bg-white text-[#71716D] border border-[#E8E8E3] hover:text-[#141413] hover:border-[#141413]"
                 }`}
               >
@@ -526,7 +520,7 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Search reports..."
-            className="w-full text-xs pl-9 pr-8 py-2 rounded-full border border-[#E8E8E3] bg-[#FAF5EC]/40 focus:bg-white text-[#141413] placeholder:text-[#8A8A85] focus:outline-none focus:border-[#865E16] focus:ring-1 focus:ring-[#865E16] transition-all shadow-2xs"
+            className="w-full text-xs pl-9 pr-8 py-2 rounded-full border border-[#E8E8E3] bg-[#F2F0ED]/50 focus:bg-white text-[#141413] placeholder:text-[#8A8A85] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all shadow-2xs"
           />
           {searchInput && (
             <button
@@ -586,7 +580,7 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
           <div className="bg-white rounded-2xl border border-[#E8E8E3] overflow-visible shadow-soft-sm min-h-[360px]">
             <Table containerClassName="overflow-visible min-h-[360px] border-none bg-transparent">
               <TableHeader>
-                <tr className="bg-[#FAF5EC]/60 border-b border-[#E8E8E3]">
+                <tr className="bg-[#F2F0ED]/70 border-b border-[#E8E8E3]">
                   <TableHead className="py-3.5 pl-6 font-medium text-xs uppercase tracking-[0.08em] text-[#71716D]">
                     Reported content
                   </TableHead>
@@ -605,7 +599,7 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
                   <TableRow
                     key={rep.id}
                     onClick={() => handleOpenDetail(rep)}
-                    className="cursor-pointer hover:bg-[#FAF5EC]/40 transition-colors border-b border-[#F0F0EB] last:border-0"
+                    className="cursor-pointer hover:bg-[#F2F0ED]/40 transition-colors border-b border-[#F0F0EB] last:border-0"
                   >
                     {/* 1. Reported Content */}
                     <TableCell className="pl-6 py-4 font-normal text-sm text-[#141413]">
@@ -615,7 +609,7 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
                           e.stopPropagation();
                           handleOpenDetail(rep);
                         }}
-                        className="hover:underline text-left cursor-pointer font-serif font-semibold text-[#141413] block"
+                        className="hover:underline text-left cursor-pointer font-semibold text-[#141413] block"
                       >
                         {rep.artworkTitle || "Untitled Artwork"}
                       </button>
@@ -668,7 +662,7 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
                         <button
                           type="button"
                           onClick={() => setActiveDropdownId(activeDropdownId === rep.id ? null : rep.id)}
-                          className="px-3.5 py-1.5 rounded-full border border-[#E8E8E3] text-xs font-medium text-[#141413] bg-white hover:bg-[#FAF5EC] hover:border-[#141413] transition-colors cursor-pointer inline-flex items-center gap-1.5 select-none shadow-soft-sm"
+                          className="px-3.5 py-1.5 rounded-full border border-[#E8E8E3] text-xs font-medium text-[#141413] bg-white hover:bg-[#F2F0ED] hover:border-[#141413] transition-colors cursor-pointer inline-flex items-center gap-1.5 select-none shadow-soft-sm"
                           aria-expanded={activeDropdownId === rep.id}
                         >
                           <span>Actions</span>
@@ -683,7 +677,7 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
                                 setActiveDropdownId(null);
                                 handleOpenDetail(rep);
                               }}
-                              className="w-full px-3.5 py-2 text-xs text-[#141413] hover:bg-[#FAF5EC] flex items-center gap-2 cursor-pointer transition-colors"
+                              className="w-full px-3.5 py-2 text-xs text-[#141413] hover:bg-[#F2F0ED] flex items-center gap-2 cursor-pointer transition-colors"
                             >
                               <Eye className="w-3.5 h-3.5 text-[#71716D]" />
                               <span>View Details</span>
@@ -960,7 +954,7 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
           <div className="space-y-6">
             {/* Artwork Preview Card */}
             <div className="rounded-2xl border border-[#E8E8E3] overflow-hidden bg-white shadow-soft-sm">
-              <div className="relative aspect-16/9 w-full bg-[#FAF5EC]">
+              <div className="relative aspect-16/9 w-full bg-[#F2F0ED]">
                 <Image
                   src={selectedReport.artworkImageUrl || "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=800"}
                   alt={selectedReport.artworkTitle || "Artwork"}
@@ -970,10 +964,10 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
               </div>
               <div className="p-4 space-y-1">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-serif font-semibold text-[#141413] text-base">
+                  <h3 className="font-medium text-[#141413] text-base">
                     {selectedReport.artworkTitle}
                   </h3>
-                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#FAF5EC] text-[#865E16] border border-[#ECDDBB] capitalize font-medium">
+                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#F2F0ED] text-[#1345EE] border border-[#1345EE]/30 capitalize font-medium">
                     {selectedReport.artworkStatus || "published"}
                   </span>
                 </div>
@@ -1043,20 +1037,20 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
 
             {/* Reason & Additional Details */}
             <div className="space-y-2">
-              <span className="text-xs font-semibold text-[#141413] uppercase tracking-wider">
+              <span className="text-xs font-medium text-[#141413] uppercase tracking-wider">
                 Reason for report
               </span>
-              <div className="p-3.5 rounded-2xl border border-[#ECDDBB] bg-[#FAF5EC] text-xs font-medium text-[#865E16] shadow-soft-sm">
+              <div className="p-3.5 rounded-2xl border border-[#1345EE]/30 bg-[#F2F0ED] text-xs font-medium text-[#1345EE] shadow-soft-sm">
                 {selectedReport.reason}
               </div>
             </div>
 
             {selectedReport.details && (
               <div className="space-y-2">
-                <span className="text-xs font-semibold text-[#141413] uppercase tracking-wider">
+                <span className="text-xs font-medium text-[#141413] uppercase tracking-wider">
                   Reporter Message / Details
                 </span>
-                <div className="p-4 rounded-2xl border border-[#E8E8E3] bg-[#FAF5EC]/40 text-xs text-[#52524E] leading-relaxed shadow-soft-sm">
+                <div className="p-4 rounded-2xl border border-[#E8E8E3] bg-[#F2F0ED]/50 text-xs text-[#52524E] leading-relaxed shadow-soft-sm">
                   {selectedReport.details}
                 </div>
               </div>
@@ -1154,7 +1148,7 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
       >
         {suspendTarget && (
           <div className="space-y-3 text-xs text-[#71716D]">
-            <div className="p-3.5 rounded-2xl border border-[#E8E8E3] bg-[#FAF5EC]/40 space-y-1.5">
+            <div className="p-3.5 rounded-2xl border border-[#E8E8E3] bg-[#F2F0ED]/50 space-y-1.5">
               <p>
                 <span className="font-semibold text-[#141413]">User:</span> {suspendTarget.ownerName}
               </p>

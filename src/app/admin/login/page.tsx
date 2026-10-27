@@ -1,6 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AlertCircle, Eye, EyeOff } from "lucide-react";
 
@@ -13,18 +15,42 @@ export default function AdminLoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Load remembered admin username/email
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("eras_remembered_admin");
+      if (saved) {
+        setUsername(saved);
+        setRememberMe(true);
+      }
+    } catch {
+      // Ignore localStorage access errors
+    }
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
     if (!username.trim() || !password.trim()) {
-      setError("Please enter both username and password.");
+      setError("Please enter both email/username and password.");
       return;
     }
 
     setIsLoading(true);
 
     try {
+      // Save or clear remembered admin username/email
+      try {
+        if (rememberMe) {
+          localStorage.setItem("eras_remembered_admin", username.trim());
+        } else {
+          localStorage.removeItem("eras_remembered_admin");
+        }
+      } catch {
+        // Ignore localStorage access errors
+      }
+
       const response = await fetch("/api/admin/login", {
         method: "POST",
         headers: {
@@ -44,7 +70,7 @@ export default function AdminLoginPage() {
         return;
       }
 
-      // Success: redirect to dashboard
+      // Success: redirect to admin dashboard
       router.push("/admin/overview");
       router.refresh();
     } catch (err) {
@@ -55,156 +81,230 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-white text-[#141413] flex flex-col lg:flex-row antialiased selection:bg-[#FAF5EC] selection:text-[#865E16]">
-      {/* Left Column: Portrait Artwork Display */}
-      <div className="hidden lg:flex lg:w-1/2 min-h-screen items-center justify-center p-8 lg:p-12 xl:p-16 bg-white select-none">
-        <div className="relative w-full max-w-[460px] xl:max-w-[500px] h-[580px] xl:h-[700px] rounded-[32px] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.12)] border border-[#ECECE8] bg-[#FAF8F5]">
-          <img
-            src="/images/admin-login-artwork.jpg"
-            alt="Botanical Floral Art"
-            className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
+    <div className="admin-scope min-h-screen bg-white flex items-center justify-center p-4 sm:p-6 md:p-10 lg:p-12 selection:bg-[#000000] selection:text-white">
+      <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16 items-center">
+        
+        {/* Left Column: Artwork Card */}
+        <div className="relative w-full aspect-[4/5] max-h-[580px] md:max-h-[640px] rounded-[24px] sm:rounded-[28px] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.08)] bg-neutral-900 select-none">
+          <Image
+            src="/images/blue-lily-artwork.jpg"
+            alt="Blue Lily Botanical Art"
+            fill
+            priority
+            sizes="(max-width: 768px) 100vw, 50vw"
+            className="object-cover object-center"
           />
-          <div className="absolute bottom-6 left-6 px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-xs text-[10px] font-semibold tracking-wider uppercase text-[#141413] shadow-md border border-black/5">
-            BOTANICAL FLORAL ART
+
+          {/* Floating Pill Badge: matching reference screenshot */}
+          <div className="absolute bottom-6 left-6 z-10 bg-white border border-[#C7C7C7] px-4 py-1.5 sm:px-5 sm:py-2 rounded-full shadow-[0_4px_16px_rgba(0,0,0,0.08)] flex items-center">
+            <span
+              style={{
+                fontFamily: "'Poppins', sans-serif",
+                color: "#323232",
+                fontWeight: 500,
+              }}
+              className="text-[10px] sm:text-[11px] uppercase tracking-wider"
+            >
+              BLUE LILY BOTANICAL ART
+            </span>
           </div>
         </div>
-      </div>
 
-      {/* Right Column: Centered Admin Login Form */}
-      <div className="w-full lg:w-1/2 min-h-screen flex flex-col justify-center items-center px-6 sm:px-12 lg:px-16 py-12 bg-white">
-        <div className="w-full max-w-sm sm:max-w-md mx-auto space-y-8">
-          {/* Brand & Heading matching reference */}
-          <div className="text-center space-y-1.5">
-            <div className="font-serif font-bold text-lg sm:text-xl tracking-[0.25em] text-[#1B365D] uppercase">
-              ERAS
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-normal text-[#141413] tracking-tight pt-2">
+        {/* Right Column: Sign In Form & Brand */}
+        <div className="w-full max-w-[390px] mx-auto flex flex-col justify-center">
+          
+          {/* Brand Header: ERAS */}
+          <div className="text-center mb-6 flex justify-center">
+            <Image
+              src="/images/eras-logo.png"
+              alt="ERAS"
+              width={140}
+              height={35}
+              className="h-7 w-auto object-contain select-none"
+              priority
+            />
+          </div>
+
+          {/* Main Titles: Welcome Back & Admin Console */}
+          <div className="text-center mb-8">
+            <h1
+              style={{
+                fontFamily: "'Poppins', sans-serif",
+                color: "#000000",
+                fontWeight: 500,
+              }}
+              className="text-3xl sm:text-[34px] tracking-tight leading-tight"
+            >
               Welcome Back
             </h1>
-            <p className="font-serif italic text-xl sm:text-2xl text-[#6E6E69]">
+            <p
+              style={{
+                fontFamily: "'Century Schoolbook', 'Playfair Display', Georgia, serif",
+                color: "rgba(79.69, 79.69, 79.69, 0.75)",
+                fontStyle: "italic",
+                fontWeight: 700,
+              }}
+              className="text-2xl sm:text-[28px] mt-0.5"
+            >
               Admin Console
-            </p>
-            <p className="text-xs text-[#7A7A75] leading-relaxed max-w-xs mx-auto pt-1">
-              Enter administrative credentials to manage gallery roster, community operations, and curatorial workflows.
             </p>
           </div>
 
-          {/* Error Alert */}
+          {/* Error Message */}
           {error && (
             <div
               role="alert"
-              className="flex items-start gap-2.5 p-3.5 rounded-xl bg-[#FEF2F2] border border-[#FECACA] text-[#B91C1C] text-xs leading-relaxed animate-in fade-in"
+              className="mb-5 bg-red-50 border border-red-200 rounded-xl p-3 text-red-600 text-xs flex items-start gap-2 animate-in fade-in"
             >
-              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-[#B91C1C]" />
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-600" />
               <div className="flex-1">{error}</div>
             </div>
           )}
 
-          {/* Minimal Underline Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-5">
-              {/* Username / Email Field */}
-              <div className="space-y-1">
-                <label
-                  htmlFor="username"
-                  className="text-xs font-normal text-[#8A8A85] block select-none"
-                >
-                  Email or Username
-                </label>
-                <div className="border-b border-[#D8D8D3] focus-within:border-[#141413] transition-colors py-1">
-                  <input
-                    id="username"
-                    type="text"
-                    name="username"
-                    autoComplete="username"
-                    placeholder="admin@erasstudio.com or username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    disabled={isLoading}
-                    className="w-full bg-transparent py-1 text-sm text-[#141413] placeholder-[#BCBCB6] focus:outline-none"
-                    required
-                  />
-                </div>
-              </div>
+          {/* Credentials Form */}
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Email / Username Field */}
+            <div>
+              <label
+                htmlFor="username"
+                style={{
+                  fontFamily: "'Poppins', sans-serif",
+                  color: "#929292",
+                  fontWeight: 500,
+                }}
+                className="block text-xs mb-1 select-none"
+              >
+                Email
+              </label>
+              <input
+                id="username"
+                type="text"
+                name="username"
+                autoComplete="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                disabled={isLoading}
+                style={{
+                  fontFamily: "'Poppins', sans-serif",
+                  color: "#343434",
+                }}
+                className="w-full bg-transparent border-0 border-b border-[#A1A1A1] focus:border-black focus:ring-0 text-sm py-2 outline-none transition-colors"
+                required
+              />
+            </div>
 
-              {/* Password Field with Eye Toggle */}
-              <div className="space-y-1">
-                <label
-                  htmlFor="password"
-                  className="text-xs font-normal text-[#8A8A85] block select-none"
+            {/* Password Field */}
+            <div>
+              <label
+                htmlFor="password"
+                style={{
+                  fontFamily: "'Poppins', sans-serif",
+                  color: "#929292",
+                  fontWeight: 500,
+                }}
+                className="block text-xs mb-1 select-none"
+              >
+                Password
+              </label>
+              <div className="relative">
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={isLoading}
+                  style={{
+                    fontFamily: "'Poppins', sans-serif",
+                    color: "#343434",
+                  }}
+                  className="w-full bg-transparent border-0 border-b border-[#A1A1A1] focus:border-black focus:ring-0 text-sm py-2 pr-8 outline-none transition-colors"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-0 bottom-2 text-[#343434] hover:text-black transition-colors cursor-pointer p-0.5"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  tabIndex={-1}
                 >
-                  Password
-                </label>
-                <div className="relative border-b border-[#D8D8D3] focus-within:border-[#141413] transition-colors py-1 flex items-center">
-                  <input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    name="password"
-                    autoComplete="current-password"
-                    placeholder="••••••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    disabled={isLoading}
-                    className="w-full bg-transparent py-1 pr-8 text-sm text-[#141413] placeholder-[#BCBCB6] focus:outline-none"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-0 text-[#8A8A85] hover:text-[#141413] transition-colors focus:outline-none p-1 cursor-pointer"
-                    tabIndex={-1}
-                    aria-label={showPassword ? "Hide password" : "Show password"}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="w-4 h-4" />
-                    ) : (
-                      <Eye className="w-4 h-4" />
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              {/* Remember Me */}
-              <div className="flex items-center text-xs pt-1">
-                <label className="flex items-center gap-2 cursor-pointer select-none text-[#5A5A55] hover:text-[#141413] transition-colors">
-                  <input
-                    type="checkbox"
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                    className="w-3.5 h-3.5 rounded border-[#C8C8C3] text-[#141413] focus:ring-0 focus:ring-offset-0 cursor-pointer accent-[#141413]"
-                  />
-                  <span>Remember me</span>
-                </label>
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
               </div>
             </div>
 
-            {/* Action Buttons */}
+            {/* Remember Me & Forgot Password */}
+            <div className="flex items-center justify-between pt-1">
+              <label className="inline-flex items-center gap-2 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="w-4 h-4 rounded border border-[#CBCBCB] text-[#181A1F] focus:ring-0 focus:ring-offset-0 cursor-pointer accent-[#181A1F]"
+                />
+                <span
+                  style={{
+                    fontFamily: "'Poppins', sans-serif",
+                    color: "#929292",
+                    fontWeight: 500,
+                  }}
+                  className="text-xs"
+                >
+                  Remember me
+                </span>
+              </label>
+              <a
+                href="#forgot"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setError("Admin password reset is managed by system administrators. Please contact your lead curator.");
+                }}
+                style={{
+                  fontFamily: "'Poppins', sans-serif",
+                  color: "#BDBDBD",
+                  fontWeight: 500,
+                }}
+                className="text-xs hover:text-[#343434] transition-colors cursor-pointer"
+              >
+                Forgot password?
+              </a>
+            </div>
+
+            {/* Primary Log In Button */}
             <div className="pt-2">
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full py-3.5 rounded-full bg-[#141413] hover:bg-[#2A2A28] active:scale-[0.99] text-white text-sm font-medium tracking-[0.02em] shadow-sm transition-all duration-200 disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
+                style={{
+                  background: "#181A1F",
+                  borderRadius: 9999,
+                  fontFamily: "'Poppins', sans-serif",
+                  color: "white",
+                  fontWeight: 500,
+                }}
+                className="w-full h-11 sm:h-12 hover:bg-black active:scale-[0.99] text-sm transition-all duration-200 shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
-                  <>
-                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     <span>Signing in...</span>
-                  </>
+                  </div>
                 ) : (
-                  "Log in"
+                  <span>Log in</span>
                 )}
               </button>
             </div>
           </form>
 
-          {/* Understated Links and Labels */}
-          <div className="text-center pt-2 text-xs text-[#8A8A85] space-y-1">
-            <p>
-              Protected curatorial platform •{" "}
-              <a href="/" className="text-[#141413] hover:underline font-medium">
-                Return to Gallery
-              </a>
-            </p>
+          {/* Understated Return Link */}
+          <div className="text-center pt-6 text-xs text-[#8A8A85]">
+            <Link
+              href="/"
+              className="text-[#8A8A85] hover:text-[#141413] transition-colors inline-flex items-center gap-1 font-medium"
+            >
+              <span>← Return to Gallery</span>
+            </Link>
           </div>
         </div>
       </div>

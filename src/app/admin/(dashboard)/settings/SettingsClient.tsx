@@ -140,10 +140,7 @@ export function SettingsClient({ initialSettings }: SettingsClientProps) {
       {/* ========================================================================= */}
       <div className="border-b border-[#E8E8E3] pb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <p className="text-[11px] font-medium tracking-[0.2em] uppercase text-[#865E16] mb-1">
-            Configuration & Rules
-          </p>
-          <h1 className="text-3xl sm:text-4xl font-serif font-normal text-[#141413] tracking-tight">
+          <h1 className="admin-century-title text-3xl sm:text-4xl text-[#141413] tracking-tight">
             Studio Settings.
           </h1>
           <p className="mt-1 text-xs sm:text-sm text-[#6E6E69]">
@@ -154,13 +151,13 @@ export function SettingsClient({ initialSettings }: SettingsClientProps) {
         {/* Live sync & status tag */}
         <div className="flex items-center gap-2 self-start sm:self-auto">
           {isDirty ? (
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-medium bg-[#FAF5EC] text-[#865E16] border border-[#865E16]/30 shadow-soft-sm">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#865E16] animate-pulse" />
+            <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-medium bg-[#000000] text-white border border-black shadow-soft-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#1345EE] animate-pulse" />
               Unsaved changes
             </span>
           ) : (
             <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-medium bg-white text-[#6E6E69] border border-[#E8E8E3] shadow-soft-sm">
-              <Check className="w-3 h-3 text-[#865E16]" />
+              <Check className="w-3 h-3 text-[#1345EE]" />
               Platform synchronized
             </span>
           )}
@@ -175,7 +172,7 @@ export function SettingsClient({ initialSettings }: SettingsClientProps) {
           {/* SECTION A: ARTWORK ALLOWANCES */}
           <div className="space-y-4">
             <div>
-              <h2 className="text-lg font-serif font-medium text-[#141413]">
+              <h2 className="text-lg font-medium text-[#141413]">
                 Artwork allowances
               </h2>
               <p className="text-xs text-[#8A8A85] mt-0.5">
@@ -264,7 +261,7 @@ export function SettingsClient({ initialSettings }: SettingsClientProps) {
           {/* SECTION B: PLATFORM CONTROLS */}
           <div className="space-y-4">
             <div>
-              <h2 className="text-lg font-serif font-medium text-[#141413]">
+              <h2 className="text-lg font-medium text-[#141413]">
                 Platform controls
               </h2>
               <p className="text-xs text-[#8A8A85] mt-0.5">
@@ -363,7 +360,7 @@ export function SettingsClient({ initialSettings }: SettingsClientProps) {
             <div className="flex items-center justify-between">
               <label
                 htmlFor="platform-announcement"
-                className="text-sm font-serif font-medium text-[#141413]"
+                className="text-sm font-medium text-[#141413]"
               >
                 Platform announcement
               </label>
@@ -384,9 +381,9 @@ export function SettingsClient({ initialSettings }: SettingsClientProps) {
               }
               maxLength={1000}
               placeholder="Enter studio-wide announcement shown to members..."
-              className={`w-full bg-[#FAF5EC]/30 text-[#141413] text-xs md:text-sm placeholder:text-[#9A9A94] border ${
+              className={`w-full bg-[#F2F0ED]/40 text-[#141413] text-xs md:text-sm placeholder:text-[#9A9A94] border ${
                 fieldErrors.platformAnnouncement ? "border-[#D94E4E]" : "border-[#E8E8E3]"
-              } rounded-xl p-3.5 transition-colors focus:outline-none focus:bg-white focus:border-[#865E16] leading-relaxed`}
+              } rounded-xl p-3.5 transition-colors focus:outline-none focus:bg-white focus:border-[#1345EE] leading-relaxed`}
             />
             {fieldErrors.platformAnnouncement && (
               <p className="text-xs text-[#D94E4E]">{fieldErrors.platformAnnouncement}</p>
@@ -435,7 +432,7 @@ export function SettingsClient({ initialSettings }: SettingsClientProps) {
                   type="button"
                   onClick={handleReset}
                   disabled={isSaving}
-                  className="px-5 py-2.5 rounded-full border border-[#E8E8E3] bg-white text-xs font-medium text-[#6E6E69] hover:text-[#141413] hover:bg-[#FAF5EC] transition-all shadow-soft-sm"
+                  className="px-5 py-2.5 rounded-full border border-[#E8E8E3] bg-white text-xs font-medium text-[#6E6E69] hover:text-[#141413] hover:bg-[#F2F0ED] transition-all shadow-soft-sm"
                 >
                   Reset
                 </button>

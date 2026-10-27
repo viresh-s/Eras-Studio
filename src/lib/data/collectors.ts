@@ -1,10 +1,29 @@
-import { Collector, CollectorFilters } from "../types";
+import { Collector, CollectorFilters, CollectorStatus } from "../types";
 import { getSupabaseAdmin } from "../supabase/server";
+import { seedUsers } from "./seed";
 
-let collectorsStore: Collector[] = []; // In a real app, you'd populate this with seed data
+const seedCollectors: Collector[] = seedUsers
+  .filter((u) => u.role === "collector")
+  .map((u) => ({
+    id: u.id,
+    userId: u.id,
+    name: u.name,
+    email: u.email,
+    location: "Global",
+    aboutMe: "Contemporary art patron, private collector, and institutional supporter.",
+    preferences: "Contemporary Art",
+    plan: u.plan,
+    status: u.status as CollectorStatus,
+    createdAt: u.createdAt,
+  }));
+
+let collectorsStore: Collector[] = [...seedCollectors];
 
 function mapCollectorFromSupabase(row: any): Collector {
-  const loc = [row.location_city, row.location_country].filter(Boolean).join(", ");
+  const loc = [row.location_city, row.location_country]
+    .map((s: any) => (typeof s === "string" ? s.trim() : ""))
+    .filter(Boolean)
+    .join(", ");
   return {
     id: row.id,
     userId: row.id,
@@ -12,9 +31,9 @@ function mapCollectorFromSupabase(row: any): Collector {
     email: row.email,
     phoneNumber: row.phone_number,
     location: loc || undefined,
-    aboutMe: row.about_me,
+    aboutMe: row.about_me || undefined,
     profilePicUrl: row.profile_pic_url,
-    preferences: row.art_forms || "Various",
+    preferences: row.art_forms || "Contemporary Art",
     plan: row.plan ? (row.plan.toLowerCase() as any) : (row.is_premium ? "elite" : "free"),
     status: (row.status?.toLowerCase() as any) || "active",
     createdAt: row.created_at || new Date().toISOString(),
@@ -105,7 +124,6 @@ export const collectorsRepo = {
           .from("profiles")
           .select("*")
           .eq("id", id)
-          .eq("role", "User")
           .maybeSingle();
 
         if (!error && data) {
@@ -116,7 +134,7 @@ export const collectorsRepo = {
       }
     }
 
-    const collector = collectorsStore.find((c) => c.id === id);
+    const collector = collectorsStore.find((c) => c.id === id || c.userId === id);
     return collector ? { ...collector } : null;
   },
 

@@ -100,7 +100,7 @@ export function CorOpportunityDetailClient({
       <div>
         <Link
           href="/admin/cor/opportunities"
-          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#E8E8E3] bg-white text-xs font-medium text-[#6E6E69] hover:text-[#141413] hover:bg-[#FAF5EC] transition-all shadow-soft-sm"
+          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#E8E8E3] bg-white text-xs font-medium text-[#6E6E69] hover:text-[#141413] hover:bg-[#F2F0ED] transition-all shadow-soft-sm"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>Back to Opportunities</span>
@@ -112,13 +112,13 @@ export function CorOpportunityDetailClient({
         <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
           <div>
             <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="text-2xl md:text-3xl font-serif font-normal tracking-tight text-[#141413]">
+              <h1 className="text-2xl md:text-3xl font-medium tracking-tight text-[#141413]">
                 {opportunity.title}
               </h1>
               <CorOpportunityBadge status={opportunity.status} />
             </div>
             <div className="flex items-center gap-2 text-xs md:text-sm text-[#6E6E69] mt-1.5 font-medium">
-              <Building className="w-4 h-4 text-[#865E16]" />
+              <Building className="w-4 h-4 text-[#1345EE]" />
               <span className="text-[#141413]">{opportunity.company}</span>
               <span>·</span>
               <MapPin className="w-4 h-4 text-[#8A8A85]" />
@@ -129,7 +129,7 @@ export function CorOpportunityDetailClient({
           <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 shrink-0">
             <button
               onClick={handleToggleOpportunityStatus}
-              className="px-4 py-2 rounded-full border border-[#E8E8E3] bg-white text-xs font-medium text-[#6E6E69] hover:text-[#141413] hover:bg-[#FAF5EC] transition-all shadow-soft-sm"
+              className="px-4 py-2 rounded-full border border-[#E8E8E3] bg-white text-xs font-medium text-[#6E6E69] hover:text-[#141413] hover:bg-[#F2F0ED] transition-all shadow-soft-sm"
             >
               <span>{opportunity.status === "open" ? "Close Opportunity" : "Reopen Opportunity"}</span>
             </button>
@@ -138,7 +138,7 @@ export function CorOpportunityDetailClient({
                 setSelectedMemberId(undefined);
                 setApplyModalOpen(true);
               }}
-              className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#141413] text-white text-xs font-medium hover:bg-[#2A2A28] transition-all shadow-soft-sm tracking-[0.04em]"
+              className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#1345EE] text-white text-xs font-medium hover:bg-[#0E35B8] transition-all shadow-soft-sm tracking-[0.04em]"
             >
               <Send className="w-3.5 h-3.5 shrink-0" />
               <span>Apply for Candidate</span>
@@ -148,27 +148,27 @@ export function CorOpportunityDetailClient({
 
         {/* Quick summary grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-5 border-t border-[#E8E8E3] text-xs">
-          <div className="p-3.5 rounded-xl bg-[#FAF5EC]/70 border border-[#E8E8E3]/60">
+          <div className="p-3.5 rounded-xl bg-[#F2F0ED]/70 border border-[#E8E8E3]/60">
             <span className="text-[#8A8A85] text-[11px] uppercase tracking-wider block">Salary / Budget</span>
-            <div className="font-serif text-lg text-[#141413] mt-0.5">
+            <div className="text-lg font-medium text-[#141413] mt-0.5">
               {opportunity.salary || "Competitive"}
             </div>
           </div>
-          <div className="p-3.5 rounded-xl bg-[#FAF5EC]/70 border border-[#E8E8E3]/60">
+          <div className="p-3.5 rounded-xl bg-[#F2F0ED]/70 border border-[#E8E8E3]/60">
             <span className="text-[#8A8A85] text-[11px] uppercase tracking-wider block">Active Applications</span>
-            <div className="font-serif text-xl text-[#141413] mt-0.5">
+            <div className="text-xl font-medium text-[#141413] mt-0.5">
               {applications.length}
             </div>
           </div>
-          <div className="p-3.5 rounded-xl bg-[#FAF5EC]/70 border border-[#E8E8E3]/60">
+          <div className="p-3.5 rounded-xl bg-[#F2F0ED]/70 border border-[#E8E8E3]/60">
             <span className="text-[#8A8A85] text-[11px] uppercase tracking-wider block">Deadline</span>
-            <div className="font-serif text-base text-[#141413] mt-0.5">
+            <div className="text-base font-medium text-[#141413] mt-0.5">
               {opportunity.applicationDeadline ? formatDate(opportunity.applicationDeadline) : "Open"}
             </div>
           </div>
-          <div className="p-3.5 rounded-xl bg-[#FAF5EC]/70 border border-[#E8E8E3]/60">
+          <div className="p-3.5 rounded-xl bg-[#F2F0ED]/70 border border-[#E8E8E3]/60">
             <span className="text-[#8A8A85] text-[11px] uppercase tracking-wider block">Recruiter / Contact</span>
-            <div className="font-serif text-base text-[#865E16] mt-0.5 truncate">
+            <div className="text-base font-medium text-[#1345EE] mt-0.5 truncate">
               {opportunity.recruiterContact || opportunity.recruiterEmail || "Direct Portal"}
             </div>
           </div>
@@ -195,7 +195,7 @@ export function CorOpportunityDetailClient({
               {opportunity.requiredSkills.map((s) => (
                 <span
                   key={s}
-                  className="px-3.5 py-1 rounded-full bg-[#FAF5EC] border border-[#E8E8E3] text-xs font-medium text-[#141413]"
+                  className="px-3.5 py-1 rounded-full bg-[#F2F0ED] border border-[#E8E8E3] text-xs font-medium text-[#141413]"
                 >
                   {s}
                 </span>
@@ -209,7 +209,7 @@ export function CorOpportunityDetailClient({
                 href={opportunity.jobUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs font-medium text-[#865E16] hover:underline"
+                className="inline-flex items-center gap-1.5 text-xs font-medium text-[#1345EE] hover:underline"
               >
                 <span>External Listing URL</span>
                 <ExternalLink className="w-3.5 h-3.5" />
@@ -223,7 +223,7 @@ export function CorOpportunityDetailClient({
       <div className="bg-white border border-[#E8E8E3] rounded-2xl overflow-hidden shadow-soft-sm">
         <div className="p-5 border-b border-[#E8E8E3] flex items-center justify-between">
           <div>
-            <h2 className="font-serif text-lg text-[#141413]">
+            <h2 className="text-lg font-medium text-[#141413]">
               Applied COR Candidates ({applications.length})
             </h2>
             <p className="text-xs text-[#6E6E69] mt-0.5">
@@ -241,7 +241,7 @@ export function CorOpportunityDetailClient({
             applications.map((app) => (
               <div
                 key={app.id}
-                className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-[#FAF5EC]/40 transition-colors"
+                className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-[#F2F0ED]/40 transition-colors"
               >
                 <div className="flex items-center gap-3.5">
                   {app.creatorAvatar ? (
@@ -251,12 +251,12 @@ export function CorOpportunityDetailClient({
                       className="w-10 h-10 rounded-full object-cover border border-[#E8E8E3]"
                     />
                   ) : (
-                    <div className="w-10 h-10 rounded-full bg-[#FAF5EC] border border-[#E8E8E3] flex items-center justify-center text-xs font-serif text-[#141413]">
+                    <div className="w-10 h-10 rounded-full bg-[#000000] border border-black flex items-center justify-center text-xs font-medium text-white">
                       {app.creatorName.slice(0, 2).toUpperCase()}
                     </div>
                   )}
                   <div>
-                    <div className="font-serif text-base text-[#141413]">
+                    <div className="text-base font-medium text-[#141413]">
                       {app.creatorName}
                     </div>
                     <div className="text-xs text-[#6E6E69]">
@@ -270,7 +270,7 @@ export function CorOpportunityDetailClient({
                   <select
                     value={app.status}
                     onChange={(e) => handleStatusChange(app.id, e.target.value as CorApplicationStatus)}
-                    className="text-xs font-medium border border-[#E8E8E3] rounded-full px-3 py-1.5 bg-[#FAF5EC]/50 text-[#141413] focus:outline-none focus:border-[#865E16]"
+                    className="text-xs font-medium border border-[#E8E8E3] rounded-full px-3 py-1.5 bg-[#F2F0ED]/50 text-[#141413] focus:outline-none focus:border-[#1345EE]"
                   >
                     {[
                       "Recommended",
@@ -290,7 +290,7 @@ export function CorOpportunityDetailClient({
 
                   <Link
                     href={`/admin/cor/applications/${app.id}`}
-                    className="px-3.5 py-1.5 rounded-full text-xs font-medium border border-[#E8E8E3] bg-white text-[#141413] hover:bg-[#FAF5EC] whitespace-nowrap inline-flex items-center gap-1 shadow-soft-sm transition-all"
+                    className="px-3.5 py-1.5 rounded-full text-xs font-medium border border-[#E8E8E3] bg-white text-[#141413] hover:bg-[#F2F0ED] whitespace-nowrap inline-flex items-center gap-1 shadow-soft-sm transition-all"
                   >
                     <span>Timeline</span>
                     <span aria-hidden="true">→</span>
@@ -306,15 +306,15 @@ export function CorOpportunityDetailClient({
       <div className="space-y-4">
         <div className="p-5 rounded-2xl border border-[#E8E8E3] bg-white shadow-soft-sm flex items-center justify-between">
           <div>
-            <h2 className="font-serif text-lg text-[#141413] flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-[#865E16]" />
+            <h2 className="text-lg font-medium text-[#141413] flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-[#1345EE]" />
               <span>Available COR Member Matches</span>
             </h2>
             <p className="text-xs text-[#6E6E69] mt-0.5">
               Rule-based compatibility scores based on candidate skills, desired role, and preferences.
             </p>
           </div>
-          <span className="text-xs font-medium text-[#865E16] bg-[#FAF5EC] px-3 py-1 rounded-full border border-[#E8E8E3]">
+          <span className="text-xs font-medium text-white bg-[#000000] px-3 py-1 rounded-full border border-black">
             {rankedMembers.length} Members Evaluated
           </span>
         </div>
@@ -335,12 +335,12 @@ export function CorOpportunityDetailClient({
                         className="w-10 h-10 rounded-full object-cover border border-[#E8E8E3]"
                       />
                     ) : (
-                      <div className="w-10 h-10 rounded-full bg-[#FAF5EC] border border-[#E8E8E3] flex items-center justify-center text-xs font-serif text-[#141413]">
+                      <div className="w-10 h-10 rounded-full bg-[#000000] border border-black flex items-center justify-center text-xs font-medium text-white">
                         {match.member.name.slice(0, 2).toUpperCase()}
                       </div>
                     )}
                     <div>
-                      <div className="font-serif text-base text-[#141413]">
+                      <div className="text-base font-medium text-[#141413]">
                         {match.member.name}
                       </div>
                       <div className="text-xs text-[#6E6E69]">
@@ -352,9 +352,9 @@ export function CorOpportunityDetailClient({
                   <span
                     className={`text-xs font-medium px-2.5 py-1 rounded-full border shrink-0 ${
                       match.scorePercentage >= 75
-                        ? "bg-[#FAF5EC] text-[#865E16] border-[#865E16]/30"
+                        ? "bg-[#000000] text-white border-black"
                         : match.scorePercentage >= 50
-                        ? "bg-[#FAF5EC] text-[#141413] border-[#E8E8E3]"
+                        ? "bg-[#F2F0ED] text-[#141413] border-[#E8E8E3]"
                         : "bg-white text-[#6E6E69] border-[#E8E8E3]"
                     }`}
                   >
@@ -366,7 +366,7 @@ export function CorOpportunityDetailClient({
                   {match.reasons.map((r, i) => (
                     <div key={i} className="flex items-center gap-2">
                       {r.matched ? (
-                        <CheckCircle2 className="w-3.5 h-3.5 text-[#865E16] shrink-0" />
+                        <CheckCircle2 className="w-3.5 h-3.5 text-[#1345EE] shrink-0" />
                       ) : (
                         <span className="w-1.5 h-1.5 rounded-full bg-[#8A8A85] shrink-0 ml-1 mr-1" />
                       )}
@@ -382,7 +382,7 @@ export function CorOpportunityDetailClient({
                     setSelectedMemberId(match.member.id);
                     setApplyModalOpen(true);
                   }}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#141413] text-white text-xs font-medium hover:bg-[#2A2A28] transition-all shadow-soft-sm"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#1345EE] text-white text-xs font-medium hover:bg-[#0E35B8] transition-all shadow-soft-sm"
                 >
                   <Send className="w-3 h-3 shrink-0" />
                   <span>Apply for {match.member.name}</span>

@@ -134,7 +134,7 @@ export function ApplyForMemberModal({
             <select
               value={selectedMemberId}
               onChange={(e) => setSelectedMemberId(e.target.value)}
-              className="w-full text-xs md:text-sm bg-[#FAF5EC]/40 border border-[#E8E8E3] rounded-xl px-3.5 py-2.5 text-[#141413] focus:outline-none focus:bg-white focus:border-[#865E16] transition-colors"
+              className="w-full text-xs md:text-sm bg-[#F2F0ED]/50 border border-[#E8E8E3] rounded-xl px-3.5 py-2.5 text-[#141413] focus:outline-none focus:bg-white focus:border-[#1345EE] transition-colors"
             >
               {availableMembers.map((m) => (
                 <option key={m.id} value={m.id}>
@@ -153,7 +153,7 @@ export function ApplyForMemberModal({
           <select
             value={selectedOpportunityId}
             onChange={(e) => setSelectedOpportunityId(e.target.value)}
-            className="w-full text-xs md:text-sm bg-[#FAF5EC]/40 border border-[#E8E8E3] rounded-xl px-3.5 py-2.5 text-[#141413] focus:outline-none focus:bg-white focus:border-[#865E16] transition-colors"
+            className="w-full text-xs md:text-sm bg-[#F2F0ED]/50 border border-[#E8E8E3] rounded-xl px-3.5 py-2.5 text-[#141413] focus:outline-none focus:bg-white focus:border-[#1345EE] transition-colors"
           >
             {availableOpportunities.map((o) => (
               <option key={o.id} value={o.id}>
@@ -165,10 +165,10 @@ export function ApplyForMemberModal({
 
         {/* Transparent Rule-Based Match Breakdown Box */}
         {matchResult && selectedMember && selectedOpportunity && (
-          <div className="p-5 rounded-2xl border border-[#E8E8E3] bg-[#FAF5EC]/60 space-y-3">
+          <div className="p-5 rounded-2xl border border-[#E8E8E3] bg-[#F2F0ED]/70 space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-[#865E16]" />
+                <Sparkles className="w-4 h-4 text-[#1345EE]" />
                 <span className="text-xs font-medium uppercase tracking-[0.1em] text-[#141413]">
                   Rule-based Match Profile
                 </span>
@@ -176,9 +176,9 @@ export function ApplyForMemberModal({
               <span
                 className={`text-xs font-medium px-2.5 py-0.5 rounded-full border ${
                   matchResult.scorePercentage >= 75
-                    ? "bg-[#FAF5EC] text-[#865E16] border-[#865E16]/30"
+                    ? "bg-[#000000] text-white border-black"
                     : matchResult.scorePercentage >= 50
-                    ? "bg-[#FAF5EC] text-[#141413] border-[#E8E8E3]"
+                    ? "bg-[#F2F0ED] text-[#141413] border-[#E8E8E3]"
                     : "bg-white text-[#6E6E69] border-[#E8E8E3]"
                 }`}
               >
@@ -193,7 +193,7 @@ export function ApplyForMemberModal({
                   className="flex items-start gap-2 p-2.5 rounded-xl bg-white border border-[#E8E8E3]"
                 >
                   {r.matched ? (
-                    <CheckCircle2 className="w-4 h-4 text-[#865E16] shrink-0 mt-0.5" />
+                    <CheckCircle2 className="w-4 h-4 text-[#1345EE] shrink-0 mt-0.5" />
                   ) : (
                     <AlertCircle className="w-4 h-4 text-[#8A8A85] shrink-0 mt-0.5" />
                   )}
@@ -218,7 +218,7 @@ export function ApplyForMemberModal({
             <select
               value={status}
               onChange={(e) => setStatus(e.target.value as CorApplicationStatus)}
-              className="w-full text-xs md:text-sm bg-[#FAF5EC]/40 border border-[#E8E8E3] rounded-xl px-3.5 py-2.5 text-[#141413] focus:outline-none focus:bg-white focus:border-[#865E16] transition-colors"
+              className="w-full text-xs md:text-sm bg-[#F2F0ED]/50 border border-[#E8E8E3] rounded-xl px-3.5 py-2.5 text-[#141413] focus:outline-none focus:bg-white focus:border-[#1345EE] transition-colors"
             >
               {STATUS_OPTIONS.map((opt) => (
                 <option key={opt} value={opt}>
@@ -236,7 +236,7 @@ export function ApplyForMemberModal({
               type="date"
               value={appliedDate}
               onChange={(e) => setAppliedDate(e.target.value)}
-              className="w-full text-xs md:text-sm bg-[#FAF5EC]/40 border border-[#E8E8E3] rounded-xl px-3.5 py-2.5 text-[#141413] focus:outline-none focus:bg-white focus:border-[#865E16] transition-colors"
+              className="w-full text-xs md:text-sm bg-[#F2F0ED]/50 border border-[#E8E8E3] rounded-xl px-3.5 py-2.5 text-[#141413] focus:outline-none focus:bg-white focus:border-[#1345EE] transition-colors"
             />
           </div>
 
@@ -248,7 +248,7 @@ export function ApplyForMemberModal({
               type="date"
               value={interviewDate}
               onChange={(e) => setInterviewDate(e.target.value)}
-              className="w-full text-xs md:text-sm bg-[#FAF5EC]/40 border border-[#E8E8E3] rounded-xl px-3.5 py-2.5 text-[#141413] focus:outline-none focus:bg-white focus:border-[#865E16] transition-colors"
+              className="w-full text-xs md:text-sm bg-[#F2F0ED]/50 border border-[#E8E8E3] rounded-xl px-3.5 py-2.5 text-[#141413] focus:outline-none focus:bg-white focus:border-[#1345EE] transition-colors"
             />
           </div>
         </div>
@@ -263,7 +263,7 @@ export function ApplyForMemberModal({
             value={consultant}
             onChange={(e) => setConsultant(e.target.value)}
             placeholder="e.g. Elena Rostova"
-            className="w-full text-xs md:text-sm bg-[#FAF5EC]/40 border border-[#E8E8E3] rounded-xl px-3.5 py-2.5 text-[#141413] focus:outline-none focus:bg-white focus:border-[#865E16] transition-colors"
+            className="w-full text-xs md:text-sm bg-[#F2F0ED]/50 border border-[#E8E8E3] rounded-xl px-3.5 py-2.5 text-[#141413] focus:outline-none focus:bg-white focus:border-[#1345EE] transition-colors"
           />
         </div>
 
@@ -276,7 +276,7 @@ export function ApplyForMemberModal({
             value={adminNote}
             onChange={(e) => setAdminNote(e.target.value)}
             placeholder="e.g. Portfolio tailored for Kyoto pavilion. Direct submission via lead recruiter."
-            className="w-full text-xs md:text-sm bg-[#FAF5EC]/40 border border-[#E8E8E3] rounded-xl p-3 text-[#141413] focus:outline-none focus:bg-white focus:border-[#865E16] transition-colors"
+            className="w-full text-xs md:text-sm bg-[#F2F0ED]/50 border border-[#E8E8E3] rounded-xl p-3 text-[#141413] focus:outline-none focus:bg-white focus:border-[#1345EE] transition-colors"
           />
         </div>
 
@@ -286,14 +286,14 @@ export function ApplyForMemberModal({
             type="button"
             onClick={onClose}
             disabled={isSubmitting}
-            className="px-4 py-2 rounded-full border border-[#E8E8E3] bg-white text-xs font-medium text-[#6E6E69] hover:text-[#141413] hover:bg-[#FAF5EC] transition-all"
+            className="px-4 py-2 rounded-xl border border-[#E8E8E3] bg-white text-xs font-medium text-[#6E6E69] hover:text-[#141413] hover:bg-[#F2F0ED] transition-all"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={isSubmitting}
-            className="px-5 py-2 rounded-full bg-[#141413] text-white text-xs font-medium hover:bg-[#2A2A28] transition-all shadow-soft-sm tracking-[0.04em] inline-flex items-center justify-center"
+            className="px-5 py-2 rounded-xl bg-[#1345EE] text-white text-xs font-medium hover:bg-[#0E35B8] transition-all shadow-soft-sm tracking-[0.04em] inline-flex items-center justify-center cursor-pointer"
           >
             <span>{isSubmitting ? "Submitting..." : "Submit Application on Behalf"}</span>
             <ArrowRight className="w-3.5 h-3.5 ml-1.5 shrink-0" />

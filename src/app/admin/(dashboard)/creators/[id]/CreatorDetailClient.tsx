@@ -138,9 +138,9 @@ export function CreatorDetailClient({
       <div>
         <Link
           href="/admin/creators"
-          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-[#E8E8E3] bg-white text-xs font-medium text-[#141413] hover:bg-[#FAF5EC] transition-colors shadow-2xs"
+          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-[#E8E8E3] bg-white text-xs font-medium text-[#141413] hover:bg-[#F2F0ED] transition-colors shadow-2xs"
         >
-          <ArrowLeft className="w-3.5 h-3.5 text-[#865E16]" />
+          <ArrowLeft className="w-3.5 h-3.5 text-[#1345EE]" />
           <span>Back to Creator Roster</span>
         </Link>
       </div>
@@ -154,16 +154,16 @@ export function CreatorDetailClient({
               <img
                 src={creatorState.profilePicUrl}
                 alt={creatorState.name}
-                className="w-16 h-16 rounded-full object-cover border-2 border-[#ECDDBB]"
+                className="w-16 h-16 rounded-full object-cover border-2 border-[#1345EE]/30"
               />
             ) : (
-              <div className="w-16 h-16 rounded-full bg-[#FAF5EC] border border-[#ECDDBB] flex items-center justify-center text-xl font-serif font-bold text-[#141413]">
+              <div className="w-16 h-16 rounded-full bg-[#000000] border border-black flex items-center justify-center text-xl font-bold text-white">
                 {creatorState.name.slice(0, 2).toUpperCase()}
               </div>
             )}
             <div>
               <div className="flex items-center gap-3">
-                <h1 className="font-serif text-2xl sm:text-3xl font-semibold tracking-tight text-[#141413]">
+                <h1 className="text-2xl sm:text-3xl font-medium tracking-tight text-[#141413]">
                   {creatorState.name}
                 </h1>
                 <Badge
@@ -176,7 +176,7 @@ export function CreatorDetailClient({
                   }
                   size="sm"
                   dot
-                  className="rounded-full capitalize"
+                  className="rounded-md capitalize font-medium"
                 >
                   {isArchived ? "archived" : creatorState.status}
                 </Badge>
@@ -184,7 +184,7 @@ export function CreatorDetailClient({
               <p className="text-xs md:text-sm text-[#6E6E69] mt-1">
                 {creatorState.email || "No email"} · {creatorState.location || "Remote"} · Joined {formatDate(creatorState.createdAt)}
               </p>
-              <div className="text-xs font-semibold text-[#865E16] mt-1 uppercase tracking-wider font-sans">
+              <div className="text-xs font-medium text-[#1345EE] mt-1 uppercase tracking-wider font-sans">
                 {creatorState.discipline}
               </div>
             </div>
@@ -195,7 +195,7 @@ export function CreatorDetailClient({
               variant="outline"
               size="sm"
               onClick={() => setIsSuspendModalOpen(true)}
-              className="rounded-full px-4 text-xs uppercase tracking-[0.08em]"
+              className="rounded-xl px-4 text-xs uppercase tracking-[0.08em]"
             >
               {isSuspended ? "Revert Suspension" : "Suspend"}
             </Button>
@@ -203,7 +203,7 @@ export function CreatorDetailClient({
               variant="outline"
               size="sm"
               onClick={() => setIsArchiveModalOpen(true)}
-              className="rounded-full px-4 text-xs uppercase tracking-[0.08em]"
+              className="rounded-xl px-4 text-xs uppercase tracking-[0.08em]"
             >
               {isArchived ? "Revert Archive" : "Archive"}
             </Button>
@@ -211,7 +211,7 @@ export function CreatorDetailClient({
               variant="danger"
               size="sm"
               onClick={() => setIsDeleteModalOpen(true)}
-              className="rounded-full px-4 text-xs uppercase tracking-[0.08em]"
+              className="rounded-xl px-4 text-xs uppercase tracking-[0.08em]"
             >
               Delete Account
             </Button>
@@ -220,21 +220,21 @@ export function CreatorDetailClient({
 
         {/* Quick summary stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-5 border-t border-[#E8E8E3] text-xs">
-          <div className="bg-[#FAF5EC]/40 p-3.5 rounded-xl border border-[#E8E8E3]">
+          <div className="bg-[#F2F0ED]/70 p-3.5 rounded-xl border border-[#E8E8E3]">
             <span className="text-[#73736C] font-sans font-semibold uppercase tracking-wider text-[11px]">Total Artworks</span>
-            <div className="font-serif text-2xl font-semibold text-[#141413] mt-1">
+            <div className="text-2xl font-semibold text-[#141413] mt-1">
               {artworks.length}
             </div>
           </div>
-          <div className="bg-[#FAF5EC]/40 p-3.5 rounded-xl border border-[#E8E8E3]">
+          <div className="bg-[#F2F0ED]/70 p-3.5 rounded-xl border border-[#E8E8E3]">
             <span className="text-[#73736C] font-sans font-semibold uppercase tracking-wider text-[11px]">Subscription Plan</span>
-            <div className="font-serif text-2xl font-semibold capitalize text-[#141413] mt-1">
-              {creator.plan || "Free"}
+            <div className="text-2xl font-semibold capitalize text-[#141413] mt-1">
+              {creatorState.plan || "Free"}
             </div>
           </div>
-          <div className="bg-[#FAF5EC]/40 p-3.5 rounded-xl border border-[#E8E8E3]">
+          <div className="bg-[#F2F0ED]/70 p-3.5 rounded-xl border border-[#E8E8E3]">
             <span className="text-[#73736C] font-sans font-semibold uppercase tracking-wider text-[11px]">COR Representation</span>
-            <div className="font-serif text-2xl font-semibold text-[#141413] mt-1">
+            <div className="text-2xl font-semibold text-[#141413] mt-1">
               {corMember ? (
                 <span className="text-[#28633B]">
                   Active Fellow
@@ -242,6 +242,12 @@ export function CreatorDetailClient({
               ) : (
                 <span className="text-[#6E6E69]">Not Enrolled</span>
               )}
+            </div>
+          </div>
+          <div className="bg-[#F2F0ED]/70 p-3.5 rounded-xl border border-[#E8E8E3]">
+            <span className="text-[#73736C] font-sans font-semibold uppercase tracking-wider text-[11px]">Creator ID</span>
+            <div className="font-mono text-xs font-medium text-[#141413] mt-2 truncate" title={creatorState.id}>
+              {creatorState.id}
             </div>
           </div>
         </div>
@@ -262,10 +268,10 @@ export function CreatorDetailClient({
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium transition-all cursor-pointer whitespace-nowrap shadow-2xs ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer whitespace-nowrap shadow-2xs ${
                 active
-                  ? "bg-[#141413] text-white shadow-xs"
-                  : "bg-white text-[#6E6E69] border border-[#E8E8E3] hover:text-[#141413] hover:bg-[#FAF5EC]"
+                  ? "bg-[#000000] text-white font-medium border border-black shadow-xs"
+                  : "bg-white text-[#6E6E69] border border-[#E8E8E3] hover:text-[#141413] hover:bg-[#F2F0ED]"
               }`}
             >
               <Icon className="w-3.5 h-3.5" />
@@ -281,44 +287,68 @@ export function CreatorDetailClient({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Personal Information */}
             <div className="p-6 rounded-2xl border border-[#E8E8E3] bg-white shadow-soft-sm">
-              <h3 className="font-serif text-lg font-semibold text-[#141413] mb-4 pb-3 border-b border-[#F0F0EB]">
+              <h3 className="text-lg font-medium text-[#141413] mb-4 pb-3 border-b border-[#F0F0EB]">
                 Personal Information
               </h3>
               <div className="space-y-4 text-xs md:text-sm">
                 <div className="grid grid-cols-3 gap-2">
                   <div className="text-[#6E6E69]">Full Name</div>
-                  <div className="col-span-2 font-medium text-[#141413]">{creator.name}</div>
+                  <div className="col-span-2 font-medium text-[#141413]">{creatorState.name}</div>
                 </div>
                 <div className="grid grid-cols-3 gap-2">
+                  <div className="text-[#6E6E69]">Creator ID</div>
+                  <div className="col-span-2 font-mono text-xs font-medium text-[#141413] bg-[#F2F0ED] px-2 py-0.5 rounded-md border border-[#E8E8E3] inline-block w-fit">
+                    {creatorState.id}
+                  </div>
+                </div>
+                {creatorState.userId && creatorState.userId !== creatorState.id && (
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="text-[#6E6E69]">User ID</div>
+                    <div className="col-span-2 font-mono text-xs font-medium text-[#141413] bg-[#F2F0ED] px-2 py-0.5 rounded-md border border-[#E8E8E3] inline-block w-fit">
+                      {creatorState.userId}
+                    </div>
+                  </div>
+                )}
+                <div className="grid grid-cols-3 gap-2">
                   <div className="text-[#6E6E69]">Email</div>
-                  <div className="col-span-2 font-medium text-[#141413]">{creator.email || "Not provided"}</div>
+                  <div className="col-span-2 font-medium text-[#141413]">{creatorState.email || "Not provided"}</div>
                 </div>
                 <div className="grid grid-cols-3 gap-2">
                   <div className="text-[#6E6E69]">Phone</div>
-                  <div className="col-span-2 font-medium text-[#141413]">{creator.phoneNumber || "Not provided"}</div>
+                  <div className="col-span-2 font-medium text-[#141413]">{creatorState.phoneNumber || "Not provided"}</div>
                 </div>
                 <div className="grid grid-cols-3 gap-2">
                   <div className="text-[#6E6E69]">Location</div>
-                  <div className="col-span-2 font-medium text-[#141413]">{creator.location || "Not provided"}</div>
+                  <div className="col-span-2 font-medium text-[#141413]">{creatorState.location || "Not provided"}</div>
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="text-[#6E6E69]">Joined Platform</div>
+                  <div className="col-span-2 font-medium text-[#141413]">{formatDate(creatorState.createdAt)}</div>
                 </div>
               </div>
             </div>
 
             {/* Professional Profile */}
             <div className="p-6 rounded-2xl border border-[#E8E8E3] bg-white shadow-soft-sm">
-              <h3 className="font-serif text-lg font-semibold text-[#141413] mb-4 pb-3 border-b border-[#F0F0EB]">
+              <h3 className="text-lg font-medium text-[#141413] mb-4 pb-3 border-b border-[#F0F0EB]">
                 Professional Profile
               </h3>
               <div className="space-y-4 text-xs md:text-sm">
                 <div className="grid grid-cols-3 gap-2">
                   <div className="text-[#6E6E69]">Specialisation</div>
-                  <div className="col-span-2 font-medium text-[#141413]">{creator.discipline}</div>
+                  <div className="col-span-2 font-medium text-[#141413]">{creatorState.discipline}</div>
                 </div>
+                {creatorState.artForms && creatorState.artForms !== creatorState.discipline && (
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="text-[#6E6E69]">Art Forms</div>
+                    <div className="col-span-2 font-medium text-[#141413]">{creatorState.artForms}</div>
+                  </div>
+                )}
                 <div className="grid grid-cols-3 gap-2">
                   <div className="text-[#6E6E69]">Portfolio URL</div>
                   <div className="col-span-2 font-medium text-[#141413]">
-                    {creator.portfolioUrl ? (
-                      <a href={creator.portfolioUrl} target="_blank" rel="noreferrer" className="text-[#865E16] hover:underline inline-flex items-center gap-1">
+                    {creatorState.portfolioUrl ? (
+                      <a href={creatorState.portfolioUrl.startsWith("http") ? creatorState.portfolioUrl : `https://${creatorState.portfolioUrl}`} target="_blank" rel="noreferrer" className="text-[#1345EE] hover:underline inline-flex items-center gap-1">
                         View Portfolio <LinkIcon className="w-3 h-3" />
                       </a>
                     ) : (
@@ -326,10 +356,56 @@ export function CreatorDetailClient({
                     )}
                   </div>
                 </div>
+                {creatorState.cvUrl && (
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="text-[#6E6E69]">Curriculum Vitae</div>
+                    <div className="col-span-2 font-medium text-[#141413]">
+                      <a href={creatorState.cvUrl} target="_blank" rel="noreferrer" className="text-[#1345EE] hover:underline inline-flex items-center gap-1">
+                        View CV Document <LinkIcon className="w-3 h-3" />
+                      </a>
+                    </div>
+                  </div>
+                )}
+                {creatorState.awards && (
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="text-[#6E6E69]">Honors & Awards</div>
+                    <div className="col-span-2 font-medium text-[#141413]">{creatorState.awards}</div>
+                  </div>
+                )}
+                {creatorState.socialLinks && Object.entries(creatorState.socialLinks).some(([_, val]) => Boolean(val)) && (
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="text-[#6E6E69]">Social Links</div>
+                    <div className="col-span-2 flex flex-wrap gap-2">
+                      {Object.entries(creatorState.socialLinks)
+                        .filter(([_, val]) => Boolean(val))
+                        .map(([platform, handle]) => {
+                          const url = handle.startsWith("http")
+                            ? handle
+                            : platform === "instagram"
+                            ? `https://instagram.com/${handle.replace(/^@/, "")}`
+                            : platform === "twitter"
+                            ? `https://twitter.com/${handle.replace(/^@/, "")}`
+                            : `https://${handle}`;
+                          return (
+                            <a
+                              key={platform}
+                              href={url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#F2F0ED] hover:bg-[#E8E8E3] text-[#1345EE] text-xs font-medium transition-colors border border-[#E8E8E3]"
+                            >
+                              <LinkIcon className="w-3 h-3" />
+                              <span className="capitalize">{platform}: {handle}</span>
+                            </a>
+                          );
+                        })}
+                    </div>
+                  </div>
+                )}
                 <div className="space-y-1.5 mt-2 pt-2 border-t border-[#F0F0EB]">
-                  <div className="text-[#6E6E69]">Biography</div>
+                  <div className="text-[#6E6E69]">Biography & Statement</div>
                   <div className="font-medium text-[#141413] whitespace-pre-wrap leading-relaxed">
-                    {creator.aboutMe || "No bio provided."}
+                    {creatorState.aboutMe || creatorState.artistStatement || "No bio or statement provided."}
                   </div>
                 </div>
               </div>
@@ -342,7 +418,7 @@ export function CreatorDetailClient({
             {artworks.length === 0 ? (
               <div className="p-12 text-center bg-white rounded-2xl border border-[#E8E8E3]">
                 <ImageIcon className="w-8 h-8 text-[#8A8A85] mx-auto mb-2" />
-                <h4 className="font-serif text-base font-semibold text-[#141413]">No artworks uploaded</h4>
+                <h4 className="text-base font-medium text-[#141413]">No artworks uploaded</h4>
                 <p className="text-xs text-[#6E6E69] mt-1">This creator hasn&apos;t published any artwork yet.</p>
               </div>
             ) : (
@@ -357,15 +433,15 @@ export function CreatorDetailClient({
                         <div className="w-full h-full flex items-center justify-center text-xs text-[#8A8A85]">No image</div>
                       )}
                       <div className="absolute top-2.5 right-2.5">
-                        <Badge variant={art.status === "published" ? "success" : art.status === "pending" ? "warning" : "default"} size="sm" className="rounded-full capitalize">
+                        <Badge variant={art.status === "published" ? "success" : art.status === "pending" ? "warning" : "default"} size="sm" className="rounded-md capitalize font-medium">
                           {art.status}
                         </Badge>
                       </div>
                     </div>
                     <div className="p-4">
-                      <h4 className="font-serif text-sm font-semibold text-[#141413] truncate">{art.title}</h4>
+                      <h4 className="text-sm font-medium text-[#141413] truncate">{art.title}</h4>
                       <p className="text-xs text-[#6E6E69] mt-0.5">{art.medium} · {art.year || "2024"}</p>
-                      <div className="mt-2 text-xs font-semibold text-[#141413]">
+                      <div className="mt-2 text-xs font-medium text-[#141413]">
                         {art.price ? `$${art.price.toLocaleString()}` : "Price upon request"}
                       </div>
                     </div>
@@ -378,20 +454,20 @@ export function CreatorDetailClient({
 
         {activeTab === "cor" && (
           <div className="p-6 rounded-2xl border border-[#E8E8E3] bg-white shadow-soft-sm max-w-2xl">
-            <h3 className="font-serif text-lg font-semibold text-[#141413] mb-4 pb-3 border-b border-[#F0F0EB]">
+            <h3 className="text-lg font-medium text-[#141413] mb-4 pb-3 border-b border-[#F0F0EB]">
               COR Representation Status
             </h3>
             {corMember ? (
               <div className="space-y-4 text-xs sm:text-sm">
                 <div className="flex items-center justify-between py-2 border-b border-[#F0F0EB]">
                   <span className="text-[#6E6E69]">Member Status</span>
-                  <Badge variant="success" size="sm" dot className="rounded-full capitalize">
+                  <Badge variant="success" size="sm" dot className="rounded-md capitalize font-medium">
                     {corMember.status}
                   </Badge>
                 </div>
                 <div className="flex items-center justify-between py-2 border-b border-[#F0F0EB]">
                   <span className="text-[#6E6E69]">Desired Role</span>
-                  <span className="font-semibold text-[#865E16]">{corMember.desiredRole || "Curated Artist"}</span>
+                  <span className="font-medium text-[#1345EE]">{corMember.desiredRole || "Curated Artist"}</span>
                 </div>
                 <div className="flex items-center justify-between py-2 border-b border-[#F0F0EB]">
                   <span className="text-[#6E6E69]">Preferred Work Type</span>
@@ -424,7 +500,7 @@ export function CreatorDetailClient({
               size="sm"
               onClick={() => setIsSuspendModalOpen(false)}
               disabled={isActionLoading}
-              className="rounded-full px-5"
+              className="rounded-xl px-5"
             >
               Cancel
             </Button>
@@ -433,15 +509,15 @@ export function CreatorDetailClient({
               size="sm"
               onClick={handleConfirmSuspendToggle}
               isLoading={isActionLoading}
-              className="rounded-full px-5"
+              className="rounded-xl px-5"
             >
               {isSuspended ? "Revert Suspension" : "Suspend Account"}
             </Button>
           </>
         }
       >
-        <div className="p-4 bg-[#FAF5EC] border border-[#ECDDBB] rounded-2xl text-xs text-[#865E16] space-y-1">
-          <p className="font-semibold text-[#141413]">Account Impact:</p>
+        <div className="p-4 bg-[#F2F0ED] border border-[#1345EE]/30 rounded-3xl text-xs text-[#1345EE] space-y-1">
+          <p className="font-medium text-[#141413]">Account Impact:</p>
           <p>• Profile: {creatorState.name} ({creatorState.email || "No email"})</p>
           <p>• Target status: {isSuspended ? "active (reverted)" : "suspended"}</p>
         </div>
@@ -460,7 +536,7 @@ export function CreatorDetailClient({
               size="sm"
               onClick={() => setIsDeleteModalOpen(false)}
               disabled={isActionLoading}
-              className="rounded-full px-5"
+              className="rounded-xl px-5"
             >
               Cancel
             </Button>
@@ -469,14 +545,14 @@ export function CreatorDetailClient({
               size="sm"
               onClick={handleConfirmDelete}
               isLoading={isActionLoading}
-              className="rounded-full px-5"
+              className="rounded-xl px-5"
             >
               Delete Account Permanently
             </Button>
           </>
         }
       >
-        <div className="p-4 bg-[#FDF2F2] border border-[#F2C6C6] rounded-2xl text-xs text-[#9E3333] flex items-start gap-2.5">
+        <div className="p-4 bg-[#FDF2F2] border border-[#F2C6C6] rounded-3xl text-xs text-[#9E3333] flex items-start gap-2.5">
           <AlertTriangle className="w-4 h-4 shrink-0 text-[#B83838] mt-0.5" />
           <div>
             <p className="font-semibold text-[#9E3333]">Critical Warning</p>
@@ -502,7 +578,7 @@ export function CreatorDetailClient({
               size="sm"
               onClick={() => setIsArchiveModalOpen(false)}
               disabled={isActionLoading}
-              className="rounded-full px-5"
+              className="rounded-xl px-5"
             >
               Cancel
             </Button>
@@ -511,14 +587,14 @@ export function CreatorDetailClient({
               size="sm"
               onClick={handleConfirmArchive}
               isLoading={isActionLoading}
-              className="rounded-full px-5"
+              className="rounded-xl px-5"
             >
               {isArchived ? "Revert Archive" : "Archive Creator"}
             </Button>
           </>
         }
       >
-        <div className="p-4 bg-[#FAF5EC] border border-[#ECDDBB] rounded-2xl text-xs text-[#6E6E69]">
+        <div className="p-4 bg-[#F2F0ED] border border-[#1345EE]/30 rounded-3xl text-xs text-[#6E6E69]">
           <p>
             {isArchived
               ? "Restoring from archive makes the creator visible in main directory searches again."

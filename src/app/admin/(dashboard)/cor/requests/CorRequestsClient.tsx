@@ -167,14 +167,8 @@ export function CorRequestsClient({
       {/* Top Header */}
       <div className="border-b border-[#E8E8E3] pb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#865E16]" />
-            <span className="text-[11px] uppercase tracking-[0.14em] font-medium text-[#71716D]">
-              Intake Pipeline & Evaluation
-            </span>
-          </div>
-          <h1 className="text-3xl sm:text-4xl font-serif text-[#141413] tracking-tight">
-            Creator Requests<span className="italic font-normal">.</span>
+          <h1 className="admin-century-title text-3xl sm:text-4xl text-[#141413] tracking-tight">
+            Creator Requests.
           </h1>
           <p className="text-xs md:text-sm text-[#71716D] font-light mt-1 max-w-2xl">
             Review creators seeking curatorial representation, career advising, and institutional opportunity matching.
@@ -184,8 +178,8 @@ export function CorRequestsClient({
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
           <ExportDropdown exportType="cor-requests" filters={{ query: searchQuery, status: statusFilter === "all" ? undefined : statusFilter }} />
           {pendingCount > 0 && (
-            <div className="shrink-0 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#ECDDBB] bg-[#FAF5EC] text-[#865E16] text-xs font-semibold whitespace-nowrap shadow-soft-sm">
-              <span className="w-2 h-2 rounded-full bg-[#865E16] animate-pulse" />
+            <div className="shrink-0 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-black bg-[#000000] text-white text-xs font-medium whitespace-nowrap shadow-soft-sm">
+              <span className="w-2 h-2 rounded-full bg-[#1345EE] animate-pulse" />
               <span>{pendingCount} Pending Review</span>
             </div>
           )}
@@ -217,14 +211,14 @@ export function CorRequestsClient({
                 }}
                 className={`inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-medium transition-all cursor-pointer ${
                   active
-                    ? "bg-[#141413] text-white shadow-soft-sm"
+                    ? "bg-[#000000] text-white font-medium border border-black shadow-soft-sm"
                     : "bg-white text-[#71716D] border border-[#E8E8E3] hover:text-[#141413] hover:border-[#141413]"
                 }`}
               >
                 <span>{tab.label}</span>
                 <span
                   className={`text-[10px] px-1.5 py-0.2 rounded-full ${
-                    active ? "bg-white/20 text-white" : "bg-[#FAF5EC] text-[#71716D] border border-[#E8E8E3]"
+                    active ? "bg-white text-[#1345EE]" : "bg-[#F2F0ED] text-[#71716D] border border-[#E8E8E3]"
                   }`}
                 >
                   {tab.count}
@@ -245,7 +239,7 @@ export function CorRequestsClient({
               setSearchQuery(e.target.value);
               setCurrentPage(1);
             }}
-            className="w-full text-xs pl-9 pr-3 py-2 bg-[#FAF5EC]/40 focus:bg-white border border-[#E8E8E3] rounded-full text-[#141413] placeholder-[#8A8A85] focus:outline-none focus:border-[#865E16] focus:ring-1 focus:ring-[#865E16] transition-all"
+            className="w-full text-xs pl-9 pr-3 py-2 bg-[#F2F0ED]/50 focus:bg-white border border-[#E8E8E3] rounded-full text-[#141413] placeholder-[#8A8A85] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all"
           />
         </div>
       </div>
@@ -254,7 +248,7 @@ export function CorRequestsClient({
       <div className="bg-white border border-[#E8E8E3] rounded-2xl overflow-hidden shadow-soft-sm">
         <Table>
           <TableHeader>
-            <TableRow className="bg-[#FAF5EC]/60 border-b border-[#E8E8E3]">
+            <TableRow className="bg-[#F2F0ED]/70 border-b border-[#E8E8E3]">
               <TableHead className="py-3.5 px-4 text-xs font-medium text-[#71716D] uppercase tracking-[0.08em]">
                 Creator
               </TableHead>
@@ -304,12 +298,12 @@ export function CorRequestsClient({
                           className="w-9 h-9 rounded-full object-cover border border-[#E8E8E3]"
                         />
                       ) : (
-                        <div className="w-9 h-9 rounded-full bg-[#EAEAE5] flex items-center justify-center text-xs font-semibold text-[#141413]">
+                        <div className="w-9 h-9 rounded-full bg-[#EAEAE5] flex items-center justify-center text-xs font-medium text-[#141413]">
                           {req.creatorName.slice(0, 2).toUpperCase()}
                         </div>
                       )}
                       <div>
-                        <div className="font-semibold text-sm text-[#141413]">
+                        <div className="font-medium text-sm text-[#141413]">
                           {req.creatorName}
                         </div>
                         <div className="text-xs text-[#6E6E69]">
@@ -350,7 +344,7 @@ export function CorRequestsClient({
                         e.stopPropagation();
                         openReviewDrawer(req);
                       }}
-                      className="px-3.5 py-1 rounded-full text-xs font-medium border border-[#E8E8E3] bg-white text-[#141413] hover:bg-[#FAF5EC] hover:border-[#141413] transition-colors whitespace-nowrap inline-flex items-center gap-1 shadow-soft-sm cursor-pointer"
+                      className="px-3.5 py-1 rounded-full text-xs font-medium border border-[#E8E8E3] bg-white text-[#141413] hover:bg-[#F2F0ED] hover:border-[#141413] transition-colors whitespace-nowrap inline-flex items-center gap-1 shadow-soft-sm cursor-pointer"
                     >
                       <span>Review</span>
                       <span>&rarr;</span>
@@ -392,18 +386,18 @@ export function CorRequestsClient({
                     className="w-12 h-12 rounded-full object-cover border border-[#E8E8E3]"
                   />
                 ) : (
-                  <div className="w-12 h-12 rounded-full bg-[#FAF5EC] border border-[#ECDDBB] flex items-center justify-center text-sm font-semibold text-[#141413]">
+                  <div className="w-12 h-12 rounded-full bg-[#000000] border border-black flex items-center justify-center text-sm font-medium text-white">
                     {selectedRequest.creatorName.slice(0, 2).toUpperCase()}
                   </div>
                 )}
                 <div>
-                  <div className="text-base font-serif font-semibold text-[#141413]">
+                  <div className="text-base font-medium text-[#141413]">
                     {selectedRequest.creatorName}
                   </div>
                   <div className="text-xs text-[#71716D]">
                     {selectedRequest.creatorEmail} · {selectedRequest.location || "Remote"}
                   </div>
-                  <div className="text-xs font-medium text-[#865E16] mt-0.5">
+                  <div className="text-xs font-medium text-[#1345EE] mt-0.5">
                     Target Role: {selectedRequest.desiredRole}
                   </div>
                 </div>
@@ -415,9 +409,9 @@ export function CorRequestsClient({
 
             {/* Decision Action Banner if Pending */}
             {selectedRequest.status === "pending" && (
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-2xl border border-[#ECDDBB] bg-[#FAF5EC] gap-3 shadow-soft-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-2xl border border-[#1345EE]/30 bg-[#F2F0ED] gap-3 shadow-soft-sm">
                 <div className="text-sm text-[#141413] font-medium leading-relaxed">
-                  <strong className="font-serif">COR Membership Decision</strong><br/>
+                  <strong>COR Membership Decision</strong><br/>
                   Would you like to accept this creator into COR?
                 </div>
                 <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
@@ -450,7 +444,7 @@ export function CorRequestsClient({
 
             {selectedRequest.status === "declined" && (
               <div className="p-3.5 rounded-xl border border-[#FECACA] bg-[#FEF2F2] text-xs text-[#B91C1C] space-y-1">
-                <div className="font-semibold">✕ Request Declined</div>
+                <div className="font-medium">✕ Request Declined</div>
                 {selectedRequest.declineReason && (
                   <div>Reason: {selectedRequest.declineReason}</div>
                 )}
@@ -564,7 +558,7 @@ export function CorRequestsClient({
                 <span>4. Education & Background</span>
               </div>
               <div className="bg-white p-3.5 rounded-xl border border-[#E8E8E3] text-xs space-y-2">
-                <div className="font-semibold text-[#141413]">
+                <div className="font-medium text-[#141413]">
                   {selectedRequest.education?.degree || "Formal / Studio Training"}
                 </div>
                 <div className="text-[#6E6E69]">
@@ -576,7 +570,7 @@ export function CorRequestsClient({
                     <span className="text-[#8A8A85] font-medium block">Key Experience Records:</span>
                     {selectedRequest.workHistory.map((wh, idx) => (
                       <div key={idx} className="p-2 rounded-lg bg-[#FAFAF8] border border-[#E8E8E3]">
-                        <div className="font-semibold text-[#141413]">
+                        <div className="font-medium text-[#141413]">
                           {wh.role} — {wh.company}
                         </div>
                         <div className="text-[11px] text-[#8A8A85]">{wh.dates}</div>
@@ -660,25 +654,25 @@ export function CorRequestsClient({
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <span className="text-[#8A8A85]">Expected Salary / Rate:</span>
-                    <p className="font-semibold text-[#141413] mt-0.5">
+                    <p className="font-medium text-[#141413] mt-0.5">
                       {selectedRequest.careerGoals?.expectedSalary || "Negotiable"}
                     </p>
                   </div>
                   <div>
                     <span className="text-[#8A8A85]">Preferred Work Type:</span>
-                    <p className="font-semibold text-[#141413] mt-0.5">
+                    <p className="font-medium text-[#141413] mt-0.5">
                       {selectedRequest.careerGoals?.preferredWorkType || "Hybrid"}
                     </p>
                   </div>
                   <div>
                     <span className="text-[#8A8A85]">Opportunity Type:</span>
-                    <p className="font-semibold text-[#141413] mt-0.5">
+                    <p className="font-medium text-[#141413] mt-0.5">
                       {selectedRequest.careerGoals?.opportunityType || "Full-time / Residency"}
                     </p>
                   </div>
                   <div>
                     <span className="text-[#8A8A85]">Target Desired Role:</span>
-                    <p className="font-semibold text-[#B8532F] mt-0.5">
+                    <p className="font-medium text-[#B8532F] mt-0.5">
                       {selectedRequest.desiredRole}
                     </p>
                   </div>
@@ -711,7 +705,7 @@ export function CorRequestsClient({
           </p>
 
           <div className="p-3 rounded-lg bg-[#ECFDF5] border border-[#A7F3D0] text-xs text-[#047857] space-y-1">
-            <div className="font-semibold">Workflow Actions Triggered:</div>
+            <div className="font-medium">Workflow Actions Triggered:</div>
             <ul className="list-disc list-inside space-y-0.5 text-[11px]">
               <li>COR Request status changed to <strong>Approved</strong>.</li>
               <li>New COR Member profile created and linked to this creator.</li>
@@ -748,7 +742,7 @@ export function CorRequestsClient({
       >
         <div className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#6E6E69] mb-1.5">
+            <label className="block text-xs font-medium uppercase tracking-wider text-[#6E6E69] mb-1.5">
               Reason for Declining
             </label>
             <select
@@ -773,7 +767,7 @@ export function CorRequestsClient({
           </div>
 
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#6E6E69] mb-1.5">
+            <label className="block text-xs font-medium uppercase tracking-wider text-[#6E6E69] mb-1.5">
               Internal Admin Note (Admin Only)
             </label>
             <textarea

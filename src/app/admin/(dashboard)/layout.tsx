@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
@@ -53,14 +54,15 @@ function getPageTitle(pathname: string): string {
   if (pathname.includes("/admin/users")) return "Users";
   if (pathname.includes("/admin/subscriptions")) return "Subscriptions";
   if (pathname.includes("/admin/creators")) return "Creators";
+  if (pathname.includes("/admin/collectors")) return "Overview";
   if (pathname.includes("/admin/artworks")) return "Artworks";
-  if (pathname.includes("/admin/reports")) return "Reports & moderation";
-  if (pathname.includes("/admin/cor/requests")) return "COR Requests";
+  if (pathname.includes("/admin/reports")) return "Reports & Moderation";
+  if (pathname.includes("/admin/cor/requests")) return "Creator Requests";
   if (pathname.includes("/admin/cor/members")) return "COR Members";
-  if (pathname.includes("/admin/cor/applications")) return "COR Applications";
-  if (pathname.includes("/admin/cor/opportunities")) return "COR Opportunities";
-  if (pathname.includes("/admin/cor")) return "Career Operations & Representation (COR)";
-  if (pathname.includes("/admin/settings")) return "Studio settings";
+  if (pathname.includes("/admin/cor/applications")) return "Representation Applications";
+  if (pathname.includes("/admin/cor/opportunities")) return "Institutional Opportunities";
+  if (pathname.includes("/admin/cor")) return "COR";
+  if (pathname.includes("/admin/settings")) return "Studio Settings";
   return "Overview";
 }
 
@@ -184,39 +186,44 @@ export default function DashboardLayout({
 
   return (
     <ToastProvider>
-      <div className="min-h-screen bg-[#FAF5EC] text-[#141413] flex flex-col lg:flex-row font-sans selection:bg-[#141413] selection:text-white">
+      <div className="admin-scope min-h-screen bg-[#F2F0ED] text-[#141413] flex flex-col lg:flex-row font-sans selection:bg-[#000000] selection:text-white">
         {/* Mobile Top Navigation Header */}
         <header className="lg:hidden sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-[#E8E8E3] px-5 py-3.5 flex items-center justify-between">
           <Link
             href="/admin/overview"
             onClick={closeMobileDrawer}
-            className="flex items-center gap-1 select-none"
+            className="flex items-center gap-1.5 select-none"
           >
-            <span className="font-serif italic font-semibold text-2xl tracking-tight text-[#141413]">
-              Eras
-            </span>
-            <span className="font-serif font-medium text-xl tracking-tight text-[#141413]">
+            <Image
+              src="/images/eras-logo.png"
+              alt="ERAS"
+              width={80}
+              height={20}
+              className="h-5 w-auto object-contain"
+              priority
+            />
+            <span className="font-medium text-xl tracking-tight text-[#141413]">
               Studio
             </span>
-            <span className="w-1.5 h-1.5 rounded-full bg-[#865E16] mb-1 ml-0.5 inline-block" />
-            <span className="text-[10px] uppercase tracking-[0.15em] font-semibold text-[#865E16] px-2 py-0.5 rounded-full border border-[#ECDDBB] bg-[#FAF5EC] ml-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#1345EE] mb-1 ml-0.5 inline-block" />
+            <span className="text-[10px] uppercase tracking-[0.15em] font-medium text-white px-2 py-0.5 rounded-lg border border-black bg-[#000000] ml-1.5">
               Admin
             </span>
           </Link>
 
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-[#E8E8E3] bg-[#FAF5EC]">
-              <div className="w-5 h-5 rounded-full bg-white border border-[#E8E8E3] flex items-center justify-center text-[10px] font-semibold text-[#141413]">
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-[#1345EE]/30 bg-white">
+              <div className="w-5 h-5 rounded-full bg-[#000000] border border-black flex items-center justify-center text-[10px] font-medium text-white">
                 A
               </div>
-              <span className="text-xs font-medium text-[#141413]">Admin</span>
+              <span className="text-xs font-medium text-[#1345EE]">Admin</span>
             </div>
 
             <button
               type="button"
               onClick={toggleMobileDrawer}
               aria-label={mobileDrawerOpen ? "Close menu" : "Open menu"}
-              className="p-2 rounded-full border border-[#E8E8E3] bg-white text-[#141413] hover:bg-[#FAF5EC] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#141413]"
+              className="p-2 rounded-lg border border-[#E8E8E3] bg-white text-[#141413] hover:bg-[#F2F0ED] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#141413]"
             >
               {mobileDrawerOpen ? (
                 <X className="w-4 h-4 stroke-[2]" />
@@ -250,43 +257,61 @@ export default function DashboardLayout({
                       <Link
                         href={item.href}
                         onClick={closeMobileDrawer}
-                        className={`flex items-center justify-between px-4 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${
+                        className={`flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
                           isActive || (isCor && isCorActive)
-                            ? "bg-[#141413] text-white shadow-xs"
-                            : "text-[#6E6E69] hover:text-[#141413] hover:bg-[#FAF5EC]"
+                            ? "bg-[#000000] text-white font-medium border border-black shadow-xs"
+                            : "text-[#6E6E69] hover:text-[#141413] hover:bg-[#F2F0ED]"
                         }`}
                       >
                         <div className="flex items-center gap-3">
                           <Icon
                             className={`w-4 h-4 stroke-[1.75] ${
-                              isActive || (isCor && isCorActive) ? "text-[#FAF5EC]" : "text-[#8A8A85]"
+                              isActive || (isCor && isCorActive) ? "text-white" : "text-[#8A8A85]"
                             }`}
                           />
                           <span>{item.name}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           {item.name === "Creators" && displayCounts.creators > 0 && (
-                            <span className="text-[10px] font-bold bg-[#FAF5EC] text-[#865E16] px-2 py-0.5 rounded-full border border-[#ECDDBB]">
+                            <span
+                              className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
+                                isActive || (isCor && isCorActive)
+                                  ? "bg-white text-[#1345EE]"
+                                  : "bg-[#F2F0ED] text-[#1345EE] border border-[#1345EE]/25"
+                              }`}
+                            >
                               {displayCounts.creators}
                             </span>
                           )}
                           {item.name === "Artworks" && displayCounts.artworks > 0 && (
-                            <span className="text-[10px] font-bold bg-[#FAF5EC] text-[#865E16] px-2 py-0.5 rounded-full border border-[#ECDDBB]">
+                            <span
+                              className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
+                                isActive || (isCor && isCorActive)
+                                  ? "bg-white text-[#1345EE]"
+                                  : "bg-[#F2F0ED] text-[#1345EE] border border-[#1345EE]/25"
+                              }`}
+                            >
                               {displayCounts.artworks}
                             </span>
                           )}
                           {item.name === "Reports" && displayCounts.reports > 0 && (
-                            <span className="text-[10px] font-bold bg-[#FAF5EC] text-[#865E16] px-2 py-0.5 rounded-full border border-[#ECDDBB]">
+                            <span
+                              className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
+                                isActive || (isCor && isCorActive)
+                                  ? "bg-white text-[#1345EE]"
+                                  : "bg-[#F2F0ED] text-[#1345EE] border border-[#1345EE]/25"
+                              }`}
+                            >
                               {displayCounts.reports}
                             </span>
                           )}
                           {item.name === "COR" && displayTotalCor > 0 && !isCorActive && (
-                            <span className="text-[10px] font-bold bg-[#FAF5EC] text-[#865E16] px-2 py-0.5 rounded-full border border-[#ECDDBB]">
+                            <span className="text-[10px] font-bold bg-[#F2F0ED] text-[#1345EE] px-2 py-0.5 rounded-md border border-[#1345EE]/25">
                               {displayTotalCor}
                             </span>
                           )}
                           {(isActive || (isCor && isCorActive)) && (
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#865E16]" />
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#1345EE]" />
                           )}
                         </div>
                       </Link>
@@ -301,20 +326,20 @@ export default function DashboardLayout({
                                 key={sub.href}
                                 href={sub.href}
                                 onClick={closeMobileDrawer}
-                                className={`flex items-center justify-between px-3.5 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                                className={`flex items-center justify-between px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                                   isSubActive
-                                    ? "bg-[#FAF5EC] text-[#865E16] font-semibold border border-[#ECDDBB]"
-                                    : "text-[#6E6E69] hover:text-[#141413] hover:bg-[#FAF5EC]/50"
+                                    ? "bg-[#000000] text-white font-medium border border-black"
+                                    : "text-[#6E6E69] hover:text-[#141413] hover:bg-[#F2F0ED]/50"
                                 }`}
                               >
                                 <span>{sub.name}</span>
                                 {sub.name === "Requests" && displayCounts.corRequests > 0 && (
-                                  <span className="text-[9px] font-bold bg-white border border-[#ECDDBB] text-[#865E16] px-1.5 py-0.5 rounded-full">
+                                  <span className="text-[9px] font-bold bg-white border border-[#1345EE]/30 text-[#1345EE] px-1.5 py-0.5 rounded-md">
                                     {displayCounts.corRequests}
                                   </span>
                                 )}
                                 {sub.name === "Applications" && displayCounts.corApplications > 0 && (
-                                  <span className="text-[9px] font-bold bg-white border border-[#ECDDBB] text-[#865E16] px-1.5 py-0.5 rounded-full">
+                                  <span className="text-[9px] font-bold bg-white border border-[#1345EE]/30 text-[#1345EE] px-1.5 py-0.5 rounded-md">
                                     {displayCounts.corApplications}
                                   </span>
                                 )}
@@ -330,7 +355,7 @@ export default function DashboardLayout({
 
               <div className="pt-4 border-t border-[#E8E8E3] flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-full bg-[#FAF5EC] border border-[#ECDDBB] flex items-center justify-center text-xs font-semibold text-[#141413]">
+                  <div className="w-8 h-8 rounded-full bg-[#000000] border border-black flex items-center justify-center text-xs font-medium text-white">
                     A
                   </div>
                   <div className="text-left">
@@ -345,7 +370,7 @@ export default function DashboardLayout({
                     handleLogout();
                   }}
                   disabled={isLoggingOut}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-[#E8E8E3] bg-white text-xs uppercase tracking-[0.08em] font-medium text-[#6E6E69] hover:text-[#B83838] hover:border-[#F2C6C6] hover:bg-[#FDF2F2] transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-[#E8E8E3] bg-white text-xs uppercase tracking-[0.08em] font-medium text-[#6E6E69] hover:text-[#B83838] hover:border-[#F2C6C6] hover:bg-[#FDF2F2] transition-colors cursor-pointer"
                 >
                   {isLoggingOut ? (
                     <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -363,24 +388,29 @@ export default function DashboardLayout({
         <aside className="hidden lg:flex flex-col w-64 shrink-0 border-r border-[#E8E8E3] bg-white min-h-screen sticky top-0 h-screen select-none shadow-soft-sm">
           {/* Top Brand Header */}
           <div className="p-6 border-b border-[#E8E8E3] flex items-center justify-between">
-            <Link href="/admin/overview" className="flex items-center gap-1 group">
-              <span className="font-serif italic font-semibold text-2xl tracking-tight text-[#141413] group-hover:opacity-85 transition-opacity">
-                Eras
-              </span>
-              <span className="font-serif font-medium text-xl tracking-tight text-[#141413]">
+            <Link href="/admin/overview" className="flex items-center gap-1.5 group">
+              <Image
+                src="/images/eras-logo.png"
+                alt="ERAS"
+                width={80}
+                height={20}
+                className="h-5 w-auto object-contain group-hover:opacity-85 transition-opacity"
+                priority
+              />
+              <span className="font-medium text-xl tracking-tight text-[#141413]">
                 Studio
               </span>
-              <span className="w-1.5 h-1.5 rounded-full bg-[#865E16] mb-1 ml-0.5 inline-block" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#1345EE] mb-1 ml-0.5 inline-block" />
             </Link>
-            <span className="text-[10px] font-semibold tracking-[0.15em] uppercase text-[#865E16] px-2.5 py-0.5 rounded-full border border-[#ECDDBB] bg-[#FAF5EC]">
+            <span className="text-[10px] font-medium tracking-[0.15em] uppercase text-white px-2.5 py-0.5 rounded-lg border border-black bg-[#000000]">
               Admin
             </span>
           </div>
 
           {/* Navigation Links */}
           <div className="flex-1 px-4 py-6 overflow-y-auto">
-            <div className="mb-3 px-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#73736C] font-sans flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#865E16]" />
+            <div className="mb-3 px-3 text-[11px] font-medium uppercase tracking-[0.2em] text-[#1345EE] font-sans flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#1345EE]" />
               Platform
             </div>
             <nav className="space-y-1">
@@ -396,17 +426,17 @@ export default function DashboardLayout({
                   <div key={item.href} className="space-y-1">
                     <Link
                       href={item.href}
-                      className={`group flex items-center justify-between px-3.5 py-2.5 rounded-full text-xs md:text-sm font-medium transition-all duration-200 ${
+                      className={`group flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs md:text-sm font-medium transition-all duration-200 ${
                         isActive || (isCor && isCorActive)
-                          ? "bg-[#141413] text-white shadow-xs"
-                          : "text-[#6E6E69] hover:text-[#141413] hover:bg-[#FAF5EC]"
+                          ? "bg-[#000000] text-white font-medium border border-black shadow-xs"
+                          : "text-[#6E6E69] hover:text-[#141413] hover:bg-[#F2F0ED]"
                       }`}
                     >
                       <div className="flex items-center gap-3">
                         <Icon
                           className={`w-4 h-4 stroke-[1.75] transition-colors ${
                             isActive || (isCor && isCorActive)
-                              ? "text-[#FAF5EC]"
+                              ? "text-white"
                               : "text-[#8A8A85] group-hover:text-[#141413]"
                           }`}
                         />
@@ -415,10 +445,10 @@ export default function DashboardLayout({
                       <div className="flex items-center gap-2">
                         {item.name === "Creators" && displayCounts.creators > 0 && (
                           <span
-                            className={`text-[10px] font-bold px-2 py-0.5 rounded-full min-w-[20px] text-center ${
+                            className={`text-[10px] font-bold px-2 py-0.5 rounded-md min-w-[20px] text-center ${
                               isActive || (isCor && isCorActive)
-                                ? "bg-white text-[#141413]"
-                                : "bg-[#FAF5EC] text-[#865E16] border border-[#ECDDBB]"
+                                ? "bg-white text-[#1345EE]"
+                                : "bg-[#F2F0ED] text-[#1345EE] border border-[#1345EE]/25"
                             }`}
                           >
                             {displayCounts.creators}
@@ -426,10 +456,10 @@ export default function DashboardLayout({
                         )}
                         {item.name === "Artworks" && displayCounts.artworks > 0 && (
                           <span
-                            className={`text-[10px] font-bold px-2 py-0.5 rounded-full min-w-[20px] text-center ${
+                            className={`text-[10px] font-bold px-2 py-0.5 rounded-md min-w-[20px] text-center ${
                               isActive || (isCor && isCorActive)
-                                ? "bg-white text-[#141413]"
-                                : "bg-[#FAF5EC] text-[#865E16] border border-[#ECDDBB]"
+                                ? "bg-white text-[#1345EE]"
+                                : "bg-[#F2F0ED] text-[#1345EE] border border-[#1345EE]/25"
                             }`}
                           >
                             {displayCounts.artworks}
@@ -437,22 +467,22 @@ export default function DashboardLayout({
                         )}
                         {item.name === "Reports" && displayCounts.reports > 0 && (
                           <span
-                            className={`text-[10px] font-bold px-2 py-0.5 rounded-full min-w-[20px] text-center ${
+                            className={`text-[10px] font-bold px-2 py-0.5 rounded-md min-w-[20px] text-center ${
                               isActive || (isCor && isCorActive)
-                                ? "bg-white text-[#141413]"
-                                : "bg-[#FAF5EC] text-[#865E16] border border-[#ECDDBB]"
+                                ? "bg-white text-[#1345EE]"
+                                : "bg-[#F2F0ED] text-[#1345EE] border border-[#1345EE]/25"
                             }`}
                           >
                             {displayCounts.reports}
                           </span>
                         )}
                         {item.name === "COR" && displayTotalCor > 0 && !isCorActive && (
-                          <span className="text-[10px] font-bold bg-[#FAF5EC] text-[#865E16] border border-[#ECDDBB] px-2 py-0.5 rounded-full min-w-[20px] text-center">
+                          <span className="text-[10px] font-bold bg-[#F2F0ED] text-[#1345EE] border border-[#1345EE]/25 px-2 py-0.5 rounded-md min-w-[20px] text-center">
                             {displayTotalCor}
                           </span>
                         )}
                         {(isActive || (isCor && isCorActive)) && (
-                          <span className="w-1.5 h-1.5 rounded-full bg-[#865E16]" />
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#1345EE]" />
                         )}
                       </div>
                     </Link>
@@ -467,20 +497,20 @@ export default function DashboardLayout({
                             <Link
                               key={sub.href}
                               href={sub.href}
-                              className={`flex items-center justify-between px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                              className={`flex items-center justify-between px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                                 isSubActive
-                                  ? "bg-[#FAF5EC] text-[#865E16] font-semibold border border-[#ECDDBB]"
-                                  : "text-[#6E6E69] hover:text-[#141413] hover:bg-[#FAF5EC]/60"
+                                  ? "bg-[#000000] text-white font-medium border border-black"
+                                  : "text-[#6E6E69] hover:text-[#141413] hover:bg-[#F2F0ED]/60"
                               }`}
                             >
                               <span>{sub.name}</span>
                               {sub.name === "Requests" && displayCounts.corRequests > 0 && (
-                                <span className="text-[9px] font-bold bg-white border border-[#ECDDBB] text-[#865E16] px-1.5 py-0.5 rounded-full">
+                                <span className="text-[9px] font-bold bg-white border border-[#1345EE]/30 text-[#1345EE] px-1.5 py-0.5 rounded-md">
                                   {displayCounts.corRequests}
                                 </span>
                               )}
                               {sub.name === "Applications" && displayCounts.corApplications > 0 && (
-                                <span className="text-[9px] font-bold bg-white border border-[#ECDDBB] text-[#865E16] px-1.5 py-0.5 rounded-full">
+                                <span className="text-[9px] font-bold bg-white border border-[#1345EE]/30 text-[#1345EE] px-1.5 py-0.5 rounded-md">
                                   {displayCounts.corApplications}
                                 </span>
                               )}
@@ -494,21 +524,21 @@ export default function DashboardLayout({
               })}
             </nav>
 
-            <div className="mt-8 mb-3 px-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#73736C] font-sans flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#865E16]" />
+            <div className="mt-8 mb-3 px-3 text-[11px] font-medium uppercase tracking-[0.2em] text-[#1345EE] font-sans flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#1345EE]" />
               Directory
             </div>
             <div className="space-y-1 text-xs">
               <Link
                 href="/discovery"
-                className="flex items-center justify-between px-3.5 py-2 rounded-full text-[#6E6E69] hover:text-[#141413] hover:bg-[#FAF5EC] transition-colors"
+                className="flex items-center justify-between px-3.5 py-2 rounded-lg text-[#6E6E69] hover:text-[#141413] hover:bg-[#F2F0ED] transition-colors"
               >
                 <span>Browse Gallery</span>
                 <ArrowUpRight className="w-3.5 h-3.5 text-[#8A8A85]" />
               </Link>
               <Link
                 href="/about"
-                className="flex items-center justify-between px-3.5 py-2 rounded-full text-[#6E6E69] hover:text-[#141413] hover:bg-[#FAF5EC] transition-colors"
+                className="flex items-center justify-between px-3.5 py-2 rounded-lg text-[#6E6E69] hover:text-[#141413] hover:bg-[#F2F0ED] transition-colors"
               >
                 <span>About Eras</span>
                 <ArrowUpRight className="w-3.5 h-3.5 text-[#8A8A85]" />
@@ -518,9 +548,9 @@ export default function DashboardLayout({
 
           {/* Sidebar Footer with Session & Logout */}
           <div className="p-4 border-t border-[#E8E8E3] bg-white">
-            <div className="flex items-center justify-between p-2 rounded-2xl border border-transparent hover:border-[#E8E8E3] hover:bg-[#FAF5EC]/40 transition-all">
+            <div className="flex items-center justify-between p-2 rounded-xl border border-transparent hover:border-[#E8E8E3] hover:bg-[#F2F0ED]/40 transition-all">
               <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-8 h-8 rounded-full bg-[#FAF5EC] border border-[#ECDDBB] flex items-center justify-center text-xs font-semibold text-[#141413] shrink-0">
+                <div className="w-8 h-8 rounded-full bg-[#000000] border border-black flex items-center justify-center text-xs font-medium text-white shrink-0">
                   A
                 </div>
                 <div className="truncate text-left">
@@ -538,7 +568,7 @@ export default function DashboardLayout({
                 disabled={isLoggingOut}
                 aria-label="Log out"
                 title="Log out"
-                className="p-2 rounded-full text-[#8A8A85] hover:text-[#B83838] hover:bg-[#FDF2F2] transition-colors ml-1 cursor-pointer disabled:opacity-50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#141413]"
+                className="p-2 rounded-lg text-[#8A8A85] hover:text-[#B83838] hover:bg-[#FDF2F2] transition-colors ml-1 cursor-pointer disabled:opacity-50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#141413]"
               >
                 {isLoggingOut ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -551,12 +581,12 @@ export default function DashboardLayout({
         </aside>
 
         {/* Main Content Area with Dynamic Top Bar */}
-        <main className="flex-1 flex flex-col min-w-0 bg-[#FAF5EC]">
+        <main className="flex-1 flex flex-col min-w-0 bg-[#F2F0ED]">
           {/* Desktop Top Bar */}
           <header className="hidden lg:flex items-center justify-between h-16 px-8 border-b border-[#E8E8E3] bg-white/85 backdrop-blur-md sticky top-0 z-20">
             {/* Active Page Title */}
             <div>
-              <h1 className="font-serif text-xl sm:text-2xl font-semibold tracking-tight text-[#141413]">
+              <h1 className="admin-century-title text-xl sm:text-2xl tracking-tight text-[#141413]">
                 {currentPageTitle}
               </h1>
             </div>
@@ -565,19 +595,19 @@ export default function DashboardLayout({
             <div className="flex items-center gap-3">
               {/* Supabase Status Pill */}
               <div
-                className="hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#E8E8E3] bg-white text-xs text-[#6E6E69] shadow-2xs"
+                className="hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-xl border border-[#E8E8E3] bg-white text-xs text-[#6E6E69] shadow-2xs"
                 title={
                   isBrowserSupabaseConfigured
                     ? "Connected to live Supabase database"
                     : "Using local in-memory dataset."
                 }
               >
-                <DbIcon className="w-3.5 h-3.5 text-[#865E16]" />
+                <DbIcon className="w-3.5 h-3.5 text-[#1345EE]" />
                 <span
                   className={`w-1.5 h-1.5 rounded-full ${
                     isBrowserSupabaseConfigured
                       ? "bg-[#28633B] animate-pulse"
-                      : "bg-[#865E16]"
+                      : "bg-[#1345EE]"
                   }`}
                 />
                 <span className="font-medium text-[#141413]">
@@ -586,11 +616,11 @@ export default function DashboardLayout({
               </div>
 
               {/* Admin Avatar Pill */}
-              <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#E8E8E3] bg-white text-xs text-[#141413] shadow-2xs">
-                <div className="w-5 h-5 rounded-full bg-[#FAF5EC] border border-[#ECDDBB] flex items-center justify-center text-[10px] font-semibold text-[#141413]">
+              <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl border border-[#1345EE]/30 bg-white text-xs text-[#141413] shadow-2xs">
+                <div className="w-5 h-5 rounded-full bg-[#000000] border border-black flex items-center justify-center text-[10px] font-medium text-white">
                   A
                 </div>
-                <span className="font-medium">Admin</span>
+                <span className="font-medium text-[#1345EE]">Admin</span>
                 <span className="w-1.5 h-1.5 rounded-full bg-[#28633B] ml-0.5" title="Online" />
               </div>
 
@@ -600,7 +630,7 @@ export default function DashboardLayout({
                 onClick={handleLogout}
                 disabled={isLoggingOut}
                 aria-label="Log out"
-                className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full border border-[#E8E8E3] bg-white text-xs uppercase tracking-[0.08em] font-medium text-[#141413] hover:text-[#B83838] hover:border-[#F2C6C6] hover:bg-[#FDF2F2] transition-colors cursor-pointer disabled:opacity-50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#141413] shadow-2xs"
+                className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-xl border border-[#E8E8E3] bg-white text-xs uppercase tracking-[0.08em] font-medium text-[#141413] hover:text-[#B83838] hover:border-[#F2C6C6] hover:bg-[#FDF2F2] transition-colors cursor-pointer disabled:opacity-50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#141413] shadow-2xs"
               >
                 {isLoggingOut ? (
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />

@@ -17,7 +17,8 @@ export type ButtonVariant =
   | 'ghost'
   | 'coral'
   | 'danger'
-  | 'dark';
+  | 'dark'
+  | 'premium-gradient';
 
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
@@ -39,6 +40,7 @@ const variantClasses: Record<ButtonVariant, string> = {
   coral: 'bg-[#C84B31] text-white hover:bg-[#B33F27] border border-[#C84B31]',
   danger: 'bg-[#FDF3F2] text-[#B83838] border border-[#F4CDCD] hover:bg-[#FBE8E7]',
   dark: 'bg-[#141413] text-white hover:bg-[#2A2A28] border border-[#141413]',
+  'premium-gradient': 'admin-btn-premium-gradient text-white !border-[#2356FF]',
 };
 
 const sizeClasses: Record<ButtonSize, string> = {

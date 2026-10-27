@@ -40,6 +40,11 @@ export interface Creator {
   plan: UserPlan;
   status: CreatorStatus;
   createdAt: string;
+  coverImageUrl?: string;
+  artistStatement?: string;
+  artForms?: string;
+  awards?: string;
+  cvUrl?: string;
 }
 
 export interface CreatorFilters {

@@ -174,10 +174,7 @@ export function CorApplicationsClient({
       {/* Visual Reference Header matching Prototype */}
       <div className="border-b border-[#E8E8E3] pb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <p className="text-[11px] font-medium tracking-[0.2em] uppercase text-[#865E16] mb-1">
-            Institutional Representation
-          </p>
-          <h1 className="text-3xl font-serif font-normal tracking-tight text-[#141413]">
+          <h1 className="admin-century-title text-3xl tracking-tight text-[#141413]">
             Representation Applications.
           </h1>
           <p className="text-xs sm:text-sm text-[#6E6E69] mt-1 max-w-2xl">
@@ -189,7 +186,8 @@ export function CorApplicationsClient({
           <ExportDropdown exportType="cor-applications" filters={{ query: searchQuery, status: statusFilter === "all" ? undefined : statusFilter, company: companyFilter === "all" ? undefined : companyFilter }} />
           <button
             onClick={() => setApplyModalOpen(true)}
-            className="shrink-0 whitespace-nowrap inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#141413] hover:bg-[#2A2A28] text-white text-xs font-medium tracking-[0.04em] shadow-soft-sm transition-all"
+            aria-label="Apply for Creators"
+            className="admin-btn-premium-gradient shrink-0 whitespace-nowrap inline-flex items-center gap-2 px-5 py-2.5 text-white text-xs font-medium tracking-[0.04em] cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Apply for Creator</span>
@@ -211,13 +209,13 @@ export function CorApplicationsClient({
             }}
             className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
               statusFilter === "all"
-                ? "bg-[#141413] text-white shadow-soft-sm"
-                : "text-[#6E6E69] hover:text-[#141413] hover:bg-[#FAF5EC]"
+                ? "bg-[#000000] text-white font-medium border border-black shadow-soft-sm"
+                : "text-[#6E6E69] hover:text-[#141413] hover:bg-[#F2F0ED]"
             }`}
           >
             <span>All</span>
             <span className={`text-[11px] px-2 py-0.2 rounded-full ${
-              statusFilter === "all" ? "bg-white/20 text-white" : "bg-[#FAF5EC] text-[#865E16]"
+              statusFilter === "all" ? "bg-white text-[#1345EE]" : "bg-[#F2F0ED] text-[#71716D]"
             }`}>
               {statusCounts.all}
             </span>
@@ -234,13 +232,13 @@ export function CorApplicationsClient({
                 }}
                 className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap ${
                   active
-                    ? "bg-[#141413] text-white shadow-soft-sm"
-                    : "text-[#6E6E69] hover:text-[#141413] hover:bg-[#FAF5EC]"
+                    ? "bg-[#000000] text-white font-medium border border-black shadow-soft-sm"
+                    : "text-[#6E6E69] hover:text-[#141413] hover:bg-[#F2F0ED]"
                 }`}
               >
                 <span>{st}</span>
                 <span className={`text-[11px] px-2 py-0.2 rounded-full ${
-                  active ? "bg-white/20 text-white" : "bg-[#FAF5EC] text-[#865E16]"
+                  active ? "bg-white text-[#1345EE]" : "bg-[#F2F0ED] text-[#71716D]"
                 }`}>
                   {statusCounts[st] || 0}
                 </span>
@@ -258,7 +256,7 @@ export function CorApplicationsClient({
                 setCompanyFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="text-xs bg-[#FAF5EC]/50 border border-[#E8E8E3] rounded-full px-3 py-1.5 text-[#141413] focus:outline-none focus:bg-white focus:border-[#865E16] transition-colors"
+              className="text-xs bg-[#F2F0ED]/50 border border-[#E8E8E3] rounded-full px-3 py-1.5 text-[#141413] focus:outline-none focus:bg-white focus:border-[#1345EE] transition-colors"
             >
               <option value="all">All Companies</option>
               {uniqueCompanies.map((c) => (
@@ -279,7 +277,7 @@ export function CorApplicationsClient({
                 setSearchQuery(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full text-xs bg-[#FAF5EC]/50 border border-[#E8E8E3] rounded-full pl-9 pr-3.5 py-2 text-[#141413] placeholder-[#8A8A85] focus:outline-none focus:bg-white focus:border-[#865E16] transition-colors"
+              className="w-full text-xs bg-[#F2F0ED]/50 border border-[#E8E8E3] rounded-full pl-9 pr-3.5 py-2 text-[#141413] placeholder-[#8A8A85] focus:outline-none focus:bg-white focus:border-[#1345EE] transition-colors"
             />
           </div>
         </div>
@@ -289,7 +287,7 @@ export function CorApplicationsClient({
       <div className="bg-white border border-[#E8E8E3] rounded-2xl overflow-hidden shadow-soft-sm">
         <Table>
           <TableHeader>
-            <TableRow className="bg-[#FAF5EC]/70 border-b border-[#E8E8E3]">
+            <TableRow className="bg-[#F2F0ED]/70 border-b border-[#E8E8E3]">
               <TableHead className="py-3 px-5 text-[11px] font-medium text-[#8A8A85] uppercase tracking-wider">
                 Opportunity
               </TableHead>
@@ -327,7 +325,7 @@ export function CorApplicationsClient({
               paginatedApplications.map((app) => (
                 <TableRow
                   key={app.id}
-                  className="hover:bg-[#FAF5EC]/40 transition-colors border-b border-[#E8E8E3] last:border-none"
+                  className="hover:bg-[#F2F0ED]/40 transition-colors border-b border-[#E8E8E3] last:border-none"
                 >
                   {/* Company & Role */}
                   <TableCell className="py-3.5 px-5">
@@ -335,7 +333,7 @@ export function CorApplicationsClient({
                       href={`/admin/cor/applications/${app.id}`}
                       className="group block"
                     >
-                      <div className="font-serif text-base text-[#141413] group-hover:text-[#865E16] transition-colors">
+                      <div className="text-base font-medium text-[#141413] group-hover:text-[#1345EE] transition-colors">
                         {app.company}
                       </div>
                       <div className="text-xs text-[#6E6E69]">
@@ -354,14 +352,14 @@ export function CorApplicationsClient({
                           className="w-8 h-8 rounded-full object-cover border border-[#E8E8E3]"
                         />
                       ) : (
-                        <div className="w-8 h-8 rounded-full bg-[#FAF5EC] border border-[#E8E8E3] flex items-center justify-center text-xs font-serif text-[#141413]">
+                        <div className="w-8 h-8 rounded-full bg-[#000000] border border-black flex items-center justify-center text-xs font-medium text-white">
                           {app.creatorName.slice(0, 2).toUpperCase()}
                         </div>
                       )}
                       <div>
                         <Link
                           href={`/admin/cor/members/${app.corMemberId}`}
-                          className="font-medium text-xs text-[#141413] hover:text-[#865E16] transition-colors"
+                          className="font-medium text-xs text-[#141413] hover:text-[#1345EE] transition-colors"
                         >
                           {app.creatorName}
                         </Link>
@@ -381,15 +379,15 @@ export function CorApplicationsClient({
                         onChange={(e) =>
                           handleStatusChange(app.id, e.target.value as CorApplicationStatus)
                         }
-                        className={`text-xs font-medium rounded-full px-3 py-1 border transition-all cursor-pointer focus:outline-none focus:border-[#865E16] ${
+                        className={`text-xs font-medium rounded-full px-3 py-1 border transition-all cursor-pointer focus:outline-none focus:border-[#1345EE] ${
                           app.status === "Offer"
-                            ? "bg-[#FAF5EC] text-[#865E16] border-[#865E16]/40"
+                            ? "bg-[#000000] text-white border-black"
                             : app.status === "Interview"
-                            ? "bg-[#FAF5EC] text-[#865E16] border-[#865E16]/30"
+                            ? "bg-[#000000] text-white border-black"
                             : app.status === "Screening"
-                            ? "bg-[#FAF5EC] text-[#141413] border-[#E8E8E3]"
+                            ? "bg-[#F2F0ED] text-[#141413] border-[#E8E8E3]"
                             : app.status === "Final Round"
-                            ? "bg-[#FAF5EC] text-[#865E16] border-[#865E16]/40"
+                            ? "bg-[#000000] text-white border-black"
                             : app.status === "Rejected"
                             ? "bg-[#FEF2F2] text-[#B91C1C] border-[#FECACA]"
                             : "bg-white text-[#141413] border-[#E8E8E3]"
@@ -412,7 +410,7 @@ export function CorApplicationsClient({
                   {/* Interview Date */}
                   <TableCell className="py-3.5 px-5 text-xs text-[#141413]">
                     {app.interviewDate ? (
-                      <span className="font-serif text-sm text-[#865E16]">
+                      <span className="text-sm font-medium text-[#1345EE]">
                         {formatDate(app.interviewDate)}
                       </span>
                     ) : (
@@ -429,7 +427,7 @@ export function CorApplicationsClient({
                   <TableCell className="py-3.5 px-5 text-right">
                     <Link
                       href={`/admin/cor/applications/${app.id}`}
-                      className="px-3.5 py-1.5 rounded-full text-xs font-medium border border-[#E8E8E3] bg-white text-[#141413] hover:bg-[#FAF5EC] transition-all whitespace-nowrap inline-flex items-center gap-1 shadow-soft-sm"
+                      className="px-3.5 py-1.5 rounded-full text-xs font-medium border border-[#E8E8E3] bg-white text-[#141413] hover:bg-[#F2F0ED] transition-all whitespace-nowrap inline-flex items-center gap-1 shadow-soft-sm"
                     >
                       <span>View</span>
                       <span>&rarr;</span>

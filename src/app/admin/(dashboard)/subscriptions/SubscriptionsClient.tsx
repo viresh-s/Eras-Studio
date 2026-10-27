@@ -47,18 +47,18 @@ function getInitials(name: string): string {
 
 const PLAN_COLORS: Record<string, string> = {
   Free: "bg-[#F5F5F3] text-[#6E6E69] border-[#E8E8E3]",
-  Lite: "bg-[#EEF3FF] text-[#3B5BDB] border-[#C5D8FF]",
+  Lite: "bg-[#000000] text-white border-black",
   Pro: "bg-[#FFF3E0] text-[#B8532F] border-[#FFDBB3]",
   Elite: "bg-[#FAF0FF] text-[#7048B6] border-[#E5CEFF]",
 };
 
 const AVATAR_COLORS = [
-  "bg-[#E8F0F5] text-[#2D6A9F]",
+  "bg-[#000000] text-white",
   "bg-[#F0EBF8] text-[#6A3D9F]",
   "bg-[#EBF5F0] text-[#2D8A5E]",
   "bg-[#F5EBE8] text-[#9F3D2D]",
   "bg-[#F5F0E8] text-[#8A6D2D]",
-  "bg-[#EBF0F5] text-[#3D6A8A]",
+  "bg-[#262626] text-white",
 ];
 
 function getAvatarColor(name: string): string {
@@ -210,14 +210,8 @@ export function SubscriptionsClient({ initialSubscribers, stats }: Subscriptions
   return (
     <div className="space-y-7 pb-16 animate-in fade-in duration-150">
       <div className="border-b border-[#E8E8E3] pb-6">
-        <div className="flex items-center gap-2 mb-1">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#865E16]" />
-          <span className="text-[11px] uppercase tracking-[0.14em] font-medium text-[#71716D]">
-            Membership & Privileges
-          </span>
-        </div>
-        <h1 className="text-3xl sm:text-4xl font-serif text-[#141413] tracking-tight">
-          Patronage & Subscriptions<span className="italic font-normal">.</span>
+        <h1 className="admin-century-title text-3xl sm:text-4xl text-[#141413] tracking-tight">
+          Patronage & Subscriptions.
         </h1>
         <p className="mt-1 text-xs md:text-sm text-[#71716D] font-light">
           Platform membership administration, creator tier privileges, and active subscriber ledger.
@@ -230,7 +224,7 @@ export function SubscriptionsClient({ initialSubscribers, stats }: Subscriptions
             <p className="text-xs uppercase tracking-[0.1em] font-medium text-[#71716D]">Free Tier</p>
             <span className="w-2 h-2 rounded-full bg-[#8A8A85]" />
           </div>
-          <p className="mt-2 text-4xl font-serif font-semibold text-[#141413]">{stats.freeCount}</p>
+          <p className="mt-2 text-4xl font-semibold text-[#141413]">{stats.freeCount}</p>
           <p className="mt-1.5 text-[11px] text-[#8A8A85]">Standard catalog creators</p>
         </div>
         <div className="bg-white border border-[#E8E8E3] rounded-2xl p-5 shadow-soft-sm hover:shadow-soft-md transition-all">
@@ -238,16 +232,16 @@ export function SubscriptionsClient({ initialSubscribers, stats }: Subscriptions
             <p className="text-xs uppercase tracking-[0.1em] font-medium text-[#71716D]">Lite Tier</p>
             <span className="w-2 h-2 rounded-full bg-[#3B5BDB]" />
           </div>
-          <p className="mt-2 text-4xl font-serif font-semibold text-[#141413]">{stats.liteCount}</p>
+          <p className="mt-2 text-4xl font-semibold text-[#141413]">{stats.liteCount}</p>
           <p className="mt-1.5 text-[11px] text-[#8A8A85]">Emerging talent members</p>
         </div>
         <div className="bg-white border border-[#E8E8E3] rounded-2xl p-5 shadow-soft-sm hover:shadow-soft-md transition-all">
           <div className="flex items-center justify-between">
             <p className="text-xs uppercase tracking-[0.1em] font-medium text-[#71716D]">Pro & Elite Tier</p>
-            <span className="w-2 h-2 rounded-full bg-[#865E16]" />
+            <span className="w-2 h-2 rounded-full bg-[#1345EE]" />
           </div>
-          <p className="mt-2 text-4xl font-serif font-semibold text-[#141413]">{stats.proCount}</p>
-          <p className="mt-1.5 text-[11px] text-[#865E16] font-medium">Curated featured creators</p>
+          <p className="mt-2 text-4xl font-semibold text-[#141413]">{stats.proCount}</p>
+          <p className="mt-1.5 text-[11px] text-[#1345EE] font-medium">Curated featured creators</p>
         </div>
       </div>
 
@@ -259,7 +253,7 @@ export function SubscriptionsClient({ initialSubscribers, stats }: Subscriptions
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Search by name, email, location or discipline..."
-            className="w-full text-xs md:text-sm pl-11 pr-9 py-2.5 rounded-full border border-[#E8E8E3] bg-[#FAF5EC]/40 focus:bg-white text-[#141413] placeholder:text-[#8A8A85] focus:outline-none focus:border-[#865E16] focus:ring-1 focus:ring-[#865E16] transition-all shadow-2xs"
+            className="w-full text-xs md:text-sm pl-11 pr-9 py-2.5 rounded-xl border border-[#E8E8E3] bg-[#F2F0ED]/50 focus:bg-white text-[#141413] placeholder:text-[#8A8A85] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all shadow-2xs"
           />
           {searchInput && (
             <button
@@ -280,9 +274,9 @@ export function SubscriptionsClient({ initialSubscribers, stats }: Subscriptions
                 key={tab.key}
                 type="button"
                 onClick={() => { setActiveTab(tab.key); setCurrentPage(1); }}
-                className={`px-3.5 py-1 rounded-full text-xs font-medium transition-all cursor-pointer whitespace-nowrap select-none ${
+                className={`px-3.5 py-1 rounded-xl text-xs font-medium transition-all cursor-pointer whitespace-nowrap select-none ${
                   isActive
-                    ? "bg-[#141413] text-white shadow-soft-sm"
+                    ? "bg-[#000000] text-white font-medium border border-black shadow-soft-sm"
                     : "bg-white text-[#71716D] border border-[#E8E8E3] hover:text-[#141413] hover:border-[#141413]"
                 }`}
               >
@@ -304,7 +298,7 @@ export function SubscriptionsClient({ initialSubscribers, stats }: Subscriptions
           <div className="bg-white rounded-2xl border border-[#E8E8E3] overflow-visible shadow-soft-sm">
             <Table containerClassName="overflow-visible border-none bg-transparent">
               <TableHeader>
-                <tr className="bg-[#FAF5EC]/60 border-b border-[#E8E8E3]">
+                <tr className="bg-[#F2F0ED]/70 border-b border-[#E8E8E3]">
                   <TableHead className="py-3.5 pl-6 font-medium text-xs uppercase tracking-[0.08em] text-[#71716D]">Name / Email</TableHead>
                   <TableHead className="py-3.5 font-medium text-xs uppercase tracking-[0.08em] text-[#71716D]">Role</TableHead>
                   <TableHead className="py-3.5 font-medium text-xs uppercase tracking-[0.08em] text-[#71716D]">Plan</TableHead>
@@ -323,10 +317,10 @@ export function SubscriptionsClient({ initialSubscribers, stats }: Subscriptions
                   const isPlanDropdownOpen = activePlanDropdownId === sub.id;
 
                   return (
-                    <TableRow key={sub.id} className="hover:bg-[#FAF5EC]/40 transition-colors border-b border-[#F0F0EB] last:border-0">
+                    <TableRow key={sub.id} className="hover:bg-[#F2F0ED]/40 transition-colors border-b border-[#F0F0EB] last:border-0">
                       <TableCell className="pl-6 py-3.5">
                         <div className="flex items-center gap-3">
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold shrink-0 overflow-hidden ${sub.profilePicUrl ? 'border border-[#ECDDBB]' : avatarColor}`}>
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium shrink-0 overflow-hidden ${sub.profilePicUrl ? 'border border-[#E8E8E3]' : avatarColor}`}>
                             {sub.profilePicUrl ? (
                               <img
                                 src={sub.profilePicUrl}
@@ -354,7 +348,7 @@ export function SubscriptionsClient({ initialSubscribers, stats }: Subscriptions
                               e.stopPropagation();
                               setActivePlanDropdownId(isPlanDropdownOpen ? null : sub.id);
                             }}
-                            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-medium cursor-pointer transition-all ${planColorClass} hover:opacity-85`}
+                            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border text-xs font-medium cursor-pointer transition-all ${planColorClass} hover:opacity-85`}
                           >
                             <span>{plan}</span>
                             <ChevronDown className="w-3 h-3 opacity-60" />
@@ -371,8 +365,8 @@ export function SubscriptionsClient({ initialSubscribers, stats }: Subscriptions
                                   onClick={() => handlePlanChange(sub, p.toLowerCase())}
                                   className={`w-full px-3 py-1.5 text-left text-xs font-medium transition-colors cursor-pointer ${
                                     plan === p
-                                      ? "bg-[#FAF5EC] text-[#865E16]"
-                                      : "text-[#141413] hover:bg-[#FAF5EC]"
+                                      ? "bg-[#000000] text-white font-medium"
+                                      : "text-[#141413] hover:bg-[#F2F0ED]"
                                   }`}
                                 >
                                   {p}
@@ -384,7 +378,7 @@ export function SubscriptionsClient({ initialSubscribers, stats }: Subscriptions
                       </TableCell>
 
                       <TableCell className="py-3.5">
-                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium select-none ${
+                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-medium select-none ${
                           isActive
                             ? "bg-[#EAF2EC] text-[#28633B] border border-[#D4E6D8]"
                             : "bg-[#FDF2F2] text-[#9E3333] border border-[#F4CDCD]"
@@ -403,10 +397,10 @@ export function SubscriptionsClient({ initialSubscribers, stats }: Subscriptions
                           <button
                             type="button"
                             onClick={() => handleSuspend(sub)}
-                            className={`px-3 py-1 text-xs font-medium rounded-full transition-all cursor-pointer whitespace-nowrap border ${
+                            className={`px-3 py-1 text-xs font-medium rounded-lg transition-all cursor-pointer whitespace-nowrap border ${
                               sub.status === "suspended"
                                 ? "text-emerald-700 border-emerald-300 bg-emerald-50 hover:bg-emerald-100"
-                                : "text-[#71716D] border-[#E8E8E3] bg-white hover:bg-[#FAF5EC] hover:text-[#141413]"
+                                : "text-[#71716D] border-[#E8E8E3] bg-white hover:bg-[#F2F0ED] hover:text-[#141413]"
                             }`}
                           >
                             {sub.status === "suspended" ? "Revert Suspension" : "Suspend"}
@@ -415,7 +409,7 @@ export function SubscriptionsClient({ initialSubscribers, stats }: Subscriptions
                             type="button"
                             onClick={() => handleCancelToFree(sub)}
                             disabled={!sub.plan || sub.plan === "free"}
-                            className="px-3 py-1 text-xs font-medium text-[#71716D] border border-[#E8E8E3] rounded-full bg-white hover:bg-[#FAF5EC] hover:text-[#141413] transition-all cursor-pointer whitespace-nowrap disabled:opacity-40 disabled:cursor-not-allowed"
+                            className="px-3 py-1 text-xs font-medium text-[#71716D] border border-[#E8E8E3] rounded-lg bg-white hover:bg-[#F2F0ED] hover:text-[#141413] transition-all cursor-pointer whitespace-nowrap disabled:opacity-40 disabled:cursor-not-allowed"
                           >
                             Cancel to Free
                           </button>
