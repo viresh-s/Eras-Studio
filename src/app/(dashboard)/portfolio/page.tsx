@@ -97,8 +97,11 @@ export default async function CreatorDashboard() {
             {/* Progress Bar */}
             <div className="w-full bg-blue-100/70 rounded-full h-2 overflow-hidden mb-1.5">
               <div
-                className="bg-blue-600 h-2 rounded-full transition-all duration-500"
-                style={{ width: `${completeness}%` }}
+                className="h-2 rounded-full transition-all duration-500"
+                style={{
+                  width: `${completeness}%`,
+                  background: 'linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%)',
+                }}
               />
             </div>
             <p className="text-xs text-[var(--color-cor-ink-light)]">
