@@ -45,7 +45,7 @@ export default function CorRecentActivity({ activities }: CorRecentActivityProps
                       {act.description}
                     </p>
                   )}
-                  <span className="text-[10px] text-[#8A8A85] flex items-center gap-1 mt-1">
+                  <span suppressHydrationWarning className="text-[10px] text-[#8A8A85] flex items-center gap-1 mt-1">
                     <Clock size={10} />
                     {timeStr}
                   </span>

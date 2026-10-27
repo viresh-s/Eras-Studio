@@ -276,6 +276,7 @@ export default function ChatInterface({
                   {message.content}
                 </p>
                 <p
+                  suppressHydrationWarning
                   style={{
                     fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
                     fontWeight: 500,

@@ -34,6 +34,16 @@ const getInitials = (name?: string | null) => {
   return name.substring(0, 2).toUpperCase();
 };
 
+const formatChatTime = (dateStr: string) => {
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return '';
+    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  } catch {
+    return '';
+  }
+};
+
 interface ChatListClientProps {
   initialChats: any[];
   currentUserId: string;
@@ -331,10 +341,7 @@ export default function ChatListClient({ initialChats, currentUserId }: ChatList
                     const contactName = otherPerson?.full_name || 'Studio Participant';
                     const avatarColor = getAvatarColor(contactName);
 
-                    const formattedTime = new Date(chat.created_at).toLocaleTimeString([], {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    });
+                    const formattedTime = formatChatTime(chat.created_at);
 
                     return (
                       <button
@@ -382,6 +389,7 @@ export default function ChatListClient({ initialChats, currentUserId }: ChatList
                               {contactName}
                             </p>
                             <span
+                              suppressHydrationWarning
                               style={{
                                 fontFamily: "var(--font-inter), 'Inter', sans-serif",
                                 color: '#8A909D',
@@ -587,7 +595,7 @@ export default function ChatListClient({ initialChats, currentUserId }: ChatList
 
                         {/* Bottom Row / Action Buttons */}
                         <div className="pt-2 border-t border-[#F3F4F6] flex items-center justify-between gap-3">
-                          <span className="text-[11px] text-[#8A909D] font-mono">{formattedDate}</span>
+                          <span suppressHydrationWarning className="text-[11px] text-[#8A909D] font-mono">{formattedDate}</span>
 
                           {isGuest ? (
                             <span className="text-xs text-[#71716D] font-medium bg-gray-100 px-3 py-1 rounded-full">
@@ -779,13 +787,7 @@ function ConversationActiveView({
     }
   };
 
-  const formatMessageTime = (dateStr: string) => {
-    try {
-      return new Date(dateStr).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    } catch {
-      return '';
-    }
-  };
+  const formatMessageTime = (dateStr: string) => formatChatTime(dateStr);
 
   return (
     <>
@@ -1005,6 +1007,7 @@ function ConversationActiveView({
 
               {/* Timestamp */}
               <p
+                suppressHydrationWarning
                 style={{
                   fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
                   fontWeight: 500,
@@ -1081,6 +1084,7 @@ function ConversationActiveView({
                 </p>
 
                 <p
+                  suppressHydrationWarning
                   style={{
                     fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
                     fontWeight: 500,
