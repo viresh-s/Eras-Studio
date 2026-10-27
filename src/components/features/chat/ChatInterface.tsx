@@ -19,7 +19,7 @@ interface ChatInterfaceProps {
   chatId: string;
   userId: string;
   otherPerson: { full_name: string; profile_pic_url: string | null };
-  artwork: { title: string; image_url: string };
+  artwork: { id?: string; title: string; image_url: string };
   initialMessages: ChatMessage[];
 }
 
@@ -175,40 +175,52 @@ export default function ChatInterface({
               }}
               className="p-3 shadow-2xs w-full"
             >
-              <div className="w-full h-44 rounded-xl overflow-hidden bg-gray-200 mb-2.5 shadow-2xs">
+              <Link
+                href={artwork.id ? `/artwork/${artwork.id}` : '#'}
+                className="w-full h-44 rounded-xl overflow-hidden bg-gray-200 mb-2.5 shadow-2xs block cursor-pointer group"
+              >
                 {artwork.image_url ? (
-                  <img src={artwork.image_url} alt="" className="w-full h-full object-cover" />
+                  <img
+                    src={artwork.image_url}
+                    alt=""
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-gray-400">
                     <Eye size={24} />
                   </div>
                 )}
-              </div>
+              </Link>
 
               <div className="flex items-center justify-between gap-2">
-                <span
+                <Link
+                  href={artwork.id ? `/artwork/${artwork.id}` : '#'}
                   style={{
                     fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
                     fontWeight: 400,
                     color: '#2C2C2C',
                   }}
-                  className="text-xs sm:text-[13px] truncate"
+                  className="text-xs sm:text-[13px] truncate hover:underline hover:text-[#1345EE] transition-colors"
                 >
                   {artwork.title}
-                </span>
+                </Link>
 
-                <span
+                <Link
+                  href={artwork.id ? `/artwork/${artwork.id}` : '#'}
                   style={{
                     background: 'linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%)',
-                    borderRadius: 40,
+                    boxShadow:
+                      '0px 7.56px 23.76px rgba(35, 77, 255, 0.13), 0px 1px 3.24px rgba(255, 255, 255, 0.65) inset, 0px -13px 6.48px rgba(6, 42, 137, 0.33) inset',
+                    borderRadius: 43.2,
+                    border: '0.65px #2356FF solid',
                     color: 'white',
                     fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
                     fontWeight: 500,
                   }}
-                  className="px-3.5 py-1 text-[11px] shrink-0 shadow-sm"
+                  className="px-3.5 py-1 text-[11px] shrink-0 hover:brightness-110 active:scale-95 transition-all select-none shadow-sm cursor-pointer inline-flex items-center justify-center"
                 >
                   View Art
-                </span>
+                </Link>
               </div>
             </div>
           </div>

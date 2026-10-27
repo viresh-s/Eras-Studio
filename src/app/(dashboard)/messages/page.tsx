@@ -12,9 +12,9 @@ export default async function MessagesPage() {
     .from('inquiries_chats')
     .select(`
       *,
-      artworks(title, image_url),
-      guest:profiles!inquiries_chats_guest_id_fkey(full_name, profile_pic_url),
-      creator:profiles!inquiries_chats_creator_id_fkey(full_name, profile_pic_url)
+      artworks(id, title, image_url),
+      guest:profiles!inquiries_chats_guest_id_fkey(id, full_name, profile_pic_url),
+      creator:profiles!inquiries_chats_creator_id_fkey(id, full_name, profile_pic_url)
     `)
     .or(`guest_id.eq.${user.id},creator_id.eq.${user.id}`)
     .order('created_at', { ascending: false });

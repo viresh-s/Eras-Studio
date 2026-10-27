@@ -492,6 +492,7 @@ export default function ChatListClient({ initialChats, currentUserId }: ChatList
                   const isGuest = chat.guest_id === currentUserId;
                   const otherPerson = isGuest ? chat.creator : chat.guest;
                   const artwork = chat.artworks;
+                  const artworkId = chat.artwork_id || artwork?.id;
                   const contactName = otherPerson?.full_name || 'Collector';
                   const avatarColor = getAvatarColor(contactName);
                   const formattedDate = new Date(chat.created_at).toLocaleDateString('en-US', {
@@ -511,19 +512,22 @@ export default function ChatListClient({ initialChats, currentUserId }: ChatList
                       className="p-5 sm:p-6 shadow-xs flex flex-col sm:flex-row gap-5"
                     >
                       {/* Artwork Thumbnail */}
-                      <div className="w-full sm:w-32 h-32 rounded-2xl bg-gray-100 shrink-0 overflow-hidden relative shadow-2xs">
+                      <Link
+                        href={artworkId ? `/artwork/${artworkId}` : '#'}
+                        className="w-full sm:w-32 h-32 rounded-2xl bg-gray-100 shrink-0 overflow-hidden relative shadow-2xs block cursor-pointer group"
+                      >
                         {artwork?.image_url ? (
                           <img
                             src={artwork.image_url}
                             alt={artwork.title || 'Artwork'}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-gray-400">
                             <Eye size={24} />
                           </div>
                         )}
-                      </div>
+                      </Link>
 
                       {/* Info & Actions */}
                       <div className="flex-1 min-w-0 flex flex-col justify-between">
@@ -696,6 +700,7 @@ function ConversationActiveView({
   const isGuest = chat.guest_id === currentUserId;
   const otherPerson = isGuest ? chat.creator : chat.guest;
   const artwork = chat.artworks;
+  const artworkId = chat.artwork_id || artwork?.id;
   const contactName = otherPerson?.full_name || 'Studio Participant';
   const avatarColor = getAvatarColor(contactName);
 
@@ -879,9 +884,9 @@ function ConversationActiveView({
               }}
               className="absolute right-0 top-11 w-48 border border-gray-100 p-1.5 z-30 animate-in fade-in zoom-in-95 duration-150"
             >
-              {artwork?.id && (
+              {artworkId && (
                 <Link
-                  href={`/artwork/${artwork.id}`}
+                  href={`/artwork/${artworkId}`}
                   className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-[#171E2C] hover:bg-gray-50 rounded-lg transition-colors"
                   onClick={() => setMenuOpen(false)}
                 >
@@ -948,36 +953,40 @@ function ConversationActiveView({
               }}
               className="p-3 shadow-2xs w-full"
             >
-              {/* Artwork Image */}
-              <div className="w-full h-44 sm:h-48 rounded-xl overflow-hidden bg-gray-200 mb-2.5 shadow-2xs">
+              {/* Artwork Image Link */}
+              <Link
+                href={artworkId ? `/artwork/${artworkId}` : '#'}
+                className="w-full h-44 sm:h-48 rounded-xl overflow-hidden bg-gray-200 mb-2.5 shadow-2xs block cursor-pointer group"
+              >
                 {artwork.image_url ? (
                   <img
                     src={artwork.image_url}
                     alt={artwork.title || 'Artwork'}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-gray-400">
                     <Eye size={24} />
                   </div>
                 )}
-              </div>
+              </Link>
 
               {/* Title & "View Art" Action Row */}
               <div className="flex items-center justify-between gap-2">
-                <span
+                <Link
+                  href={artworkId ? `/artwork/${artworkId}` : '#'}
                   style={{
                     fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
                     fontWeight: 400,
                     color: '#2C2C2C',
                   }}
-                  className="text-xs sm:text-[13px] truncate"
+                  className="text-xs sm:text-[13px] truncate hover:underline hover:text-[#1345EE] transition-colors"
                 >
                   {artwork.title || 'Untitled Artwork'}
-                </span>
+                </Link>
 
                 <Link
-                  href={artwork.id ? `/artwork/${artwork.id}` : '#'}
+                  href={artworkId ? `/artwork/${artworkId}` : '#'}
                   style={{
                     background: 'linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%)',
                     boxShadow:
@@ -988,7 +997,7 @@ function ConversationActiveView({
                     fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
                     fontWeight: 500,
                   }}
-                  className="px-3.5 py-1 text-[11px] shrink-0 hover:brightness-110 active:scale-95 transition-all select-none shadow-sm cursor-pointer"
+                  className="px-3.5 py-1 text-[11px] shrink-0 hover:brightness-110 active:scale-95 transition-all select-none shadow-sm cursor-pointer inline-flex items-center justify-center"
                 >
                   View Art
                 </Link>
