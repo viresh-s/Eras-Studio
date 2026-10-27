@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { sendMessage } from '@/actions/chatActions';
 import { useChatSubscription } from '@/hooks/useChatSubscription';
-import { Send, ArrowLeft } from 'lucide-react';
+import { Send, ArrowLeft, Eye } from 'lucide-react';
 import Link from 'next/link';
 
 interface ChatMessage {
@@ -22,6 +22,13 @@ interface ChatInterfaceProps {
   artwork: { title: string; image_url: string };
   initialMessages: ChatMessage[];
 }
+
+const getInitials = (name?: string | null) => {
+  if (!name) return 'A';
+  const parts = name.trim().split(' ');
+  if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+  return name.substring(0, 2).toUpperCase();
+};
 
 export default function ChatInterface({
   chatId,
@@ -68,48 +75,202 @@ export default function ChatInterface({
   };
 
   const formatTime = (dateStr: string) => {
-    return new Date(dateStr).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    try {
+      return new Date(dateStr).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } catch {
+      return '';
+    }
   };
 
+  const contactName = otherPerson?.full_name || 'Studio Participant';
+
   return (
-    <div className="flex flex-col h-[calc(100vh-140px)]">
+    <div
+      style={{
+        background: '#F3F3F3',
+        borderRadius: 20,
+        outline: '0.50px #E4E4E4 solid',
+        outlineOffset: '-0.25px',
+      }}
+      className="flex flex-col h-[calc(100vh-140px)] min-h-[550px] overflow-hidden shadow-xs"
+    >
       {/* Chat Header */}
-      <div className="bg-white border-b border-gray-100 p-4 flex items-center gap-4">
-        <Link href="/messages" className="p-2 rounded-xl text-gray-500 hover:bg-gray-100 transition-colors">
-          <ArrowLeft size={16} />
-        </Link>
+      <div
+        style={{
+          background: 'white',
+          borderBottom: '0.50px #ECEEF2 solid',
+        }}
+        className="h-16 px-5 sm:px-6 flex items-center justify-between shrink-0"
+      >
+        <div className="flex items-center gap-3">
+          <Link
+            href="/messages"
+            className="p-1.5 -ml-1 text-[#8A909D] hover:text-[#171E2C] rounded-lg transition-colors"
+          >
+            <ArrowLeft size={18} />
+          </Link>
 
-        <div className="w-10 h-10 rounded-xl bg-gray-100 flex-shrink-0 overflow-hidden">
-          {artwork.image_url && (
-            <img src={artwork.image_url} alt="" className="w-full h-full object-cover" />
-          )}
-        </div>
+          <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-700 shrink-0 shadow-2xs">
+            {otherPerson?.profile_pic_url ? (
+              <img src={otherPerson.profile_pic_url} alt="" className="w-full h-full object-cover" />
+            ) : (
+              getInitials(contactName)
+            )}
+          </div>
 
-        <div className="flex-1 min-w-0">
-          <p className="font-semibold text-gray-900 truncate text-sm">{artwork.title}</p>
-          <p className="text-gray-500 text-xs">with {otherPerson.full_name}</p>
+          <div>
+            <div className="flex items-center gap-1.5">
+              <h3
+                style={{
+                  fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
+                  fontWeight: 500,
+                  color: '#171E2C',
+                }}
+                className="text-sm sm:text-[15px]"
+              >
+                {contactName}
+              </h3>
+              <div
+                style={{
+                  background: '#26BD68',
+                  boxShadow: '0px 0px 4px #26BD68',
+                  borderRadius: 9999,
+                }}
+                className="w-2 h-2 shrink-0"
+              />
+            </div>
+            <p
+              style={{
+                fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
+                color: '#8A909D',
+              }}
+              className="text-[11px]"
+            >
+              Online
+            </p>
+          </div>
         </div>
       </div>
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 bg-[#F3F3F3]">
+        {/* Artwork Card Attachment */}
+        {artwork && (
+          <div className="flex items-end gap-2.5 max-w-sm">
+            <div className="w-7 h-7 rounded-full overflow-hidden shrink-0 flex items-center justify-center text-[9px] font-bold text-white bg-[#8C3EF2] shadow-2xs mb-1">
+              {otherPerson?.profile_pic_url ? (
+                <img src={otherPerson.profile_pic_url} alt="" className="w-full h-full object-cover" />
+              ) : (
+                getInitials(contactName)
+              )}
+            </div>
+
+            <div
+              style={{
+                background: '#E7E7E7',
+                borderTopLeftRadius: 14,
+                borderTopRightRadius: 14,
+                borderBottomRightRadius: 14,
+                borderBottomLeftRadius: 2,
+              }}
+              className="p-3 shadow-2xs w-full"
+            >
+              <div className="w-full h-44 rounded-xl overflow-hidden bg-gray-200 mb-2.5 shadow-2xs">
+                {artwork.image_url ? (
+                  <img src={artwork.image_url} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-gray-400">
+                    <Eye size={24} />
+                  </div>
+                )}
+              </div>
+
+              <div className="flex items-center justify-between gap-2">
+                <span
+                  style={{
+                    fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
+                    fontWeight: 400,
+                    color: '#2C2C2C',
+                  }}
+                  className="text-xs sm:text-[13px] truncate"
+                >
+                  {artwork.title}
+                </span>
+
+                <span
+                  style={{
+                    background: 'linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%)',
+                    borderRadius: 40,
+                    color: 'white',
+                    fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
+                    fontWeight: 500,
+                  }}
+                  className="px-3.5 py-1 text-[11px] shrink-0 shadow-sm"
+                >
+                  View Art
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Message Stream */}
         {messages.map((message) => {
           const isMine = message.sender_id === userId;
 
           return (
             <div
               key={message.id}
-              className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}
+              className={`flex items-end gap-2.5 ${isMine ? 'justify-end' : 'justify-start'}`}
             >
+              {!isMine && (
+                <div className="w-7 h-7 rounded-full overflow-hidden shrink-0 flex items-center justify-center text-[9px] font-bold text-white bg-[#8C3EF2] shadow-2xs mb-1">
+                  {otherPerson?.profile_pic_url ? (
+                    <img src={otherPerson.profile_pic_url} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    getInitials(contactName)
+                  )}
+                </div>
+              )}
+
               <div
-                className={`max-w-[75%] rounded-2xl px-4 py-3 ${
+                style={
                   isMine
-                    ? 'bg-gray-900 text-white'
-                    : 'bg-white shadow-[0_2px_8px_rgb(0,0,0,0.04)]'
-                }`}
+                    ? {
+                        background: '#1A1A1A',
+                        borderTopLeftRadius: 14,
+                        borderTopRightRadius: 14,
+                        borderBottomRightRadius: 2,
+                        borderBottomLeftRadius: 14,
+                      }
+                    : {
+                        background: '#EAEAEA',
+                        borderTopLeftRadius: 14,
+                        borderTopRightRadius: 14,
+                        borderBottomRightRadius: 14,
+                        borderBottomLeftRadius: 2,
+                      }
+                }
+                className="px-4 py-3 max-w-[80%] sm:max-w-[70%] shadow-2xs"
               >
-                <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
-                <p className={`text-xs mt-1.5 ${isMine ? 'text-gray-400' : 'text-gray-400'}`}>
+                <p
+                  style={{
+                    fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
+                    fontWeight: 400,
+                    color: isMine ? 'white' : '#101828',
+                  }}
+                  className="text-xs sm:text-[13px] leading-relaxed whitespace-pre-wrap break-words"
+                >
+                  {message.content}
+                </p>
+                <p
+                  style={{
+                    fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
+                    fontWeight: 500,
+                    color: isMine ? 'rgba(255, 255, 255, 0.50)' : 'rgba(16, 24, 40, 0.50)',
+                  }}
+                  className={`text-[9.5px] sm:text-[10px] mt-1.5 ${isMine ? 'text-right' : 'text-left'}`}
+                >
                   {formatTime(message.created_at)}
                 </p>
               </div>
@@ -120,24 +281,45 @@ export default function ChatInterface({
       </div>
 
       {/* Input Area */}
-      <div className="bg-white border-t border-gray-100 p-4">
-        <div className="flex gap-3">
+      <div className="p-3.5 sm:p-5 pt-2 bg-transparent shrink-0">
+        <div
+          style={{
+            background: 'white',
+            borderRadius: 40,
+            boxShadow: '0 2px 12px rgba(0,0,0,0.03)',
+          }}
+          className="p-1.5 pl-5 sm:pl-6 flex items-center justify-between gap-3 border border-[#E8E8E3]"
+        >
           <input
             type="text"
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Type a message..."
-            className="flex-1 px-4 py-3 text-sm bg-gray-50 border border-gray-200 rounded-full outline-none transition-all duration-200 placeholder:text-gray-400 focus:ring-2 focus:ring-gray-900/10 focus:border-gray-400 focus:bg-white"
+            placeholder="Type Your Message"
+            style={{
+              fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
+              fontWeight: 400,
+            }}
+            className="flex-1 bg-transparent text-xs sm:text-sm text-[#101828] placeholder:text-[rgba(0,0,0,0.35)] outline-none w-full"
           />
           <button
+            type="button"
             onClick={handleSend}
             disabled={!newMessage.trim() || isSending}
-            className={`w-11 h-11 rounded-full bg-gray-900 text-white flex items-center justify-center transition-all hover:bg-gray-800 hover:scale-[1.02] ${
-              !newMessage.trim() ? 'opacity-40 cursor-not-allowed hover:scale-100' : ''
-            }`}
+            style={{
+              background: 'linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%)',
+              boxShadow:
+                '0px 7px 22px rgba(35, 77, 255, 0.13), 0px 3px 3px rgba(255, 255, 255, 0.65) inset, 0px -3px 6px rgba(6, 42, 137, 0.33) inset',
+              borderRadius: 40,
+              border: '0.70px #2356FF solid',
+              color: 'white',
+              fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
+              fontWeight: 500,
+            }}
+            className="px-5 sm:px-6 py-2.5 text-xs sm:text-[13px] flex items-center justify-center gap-1.5 cursor-pointer hover:brightness-110 active:scale-95 transition-all disabled:opacity-40 select-none shadow-md shrink-0"
           >
-            <Send size={16} />
+            <span>Send</span>
+            <Send size={13} className="text-white" />
           </button>
         </div>
       </div>

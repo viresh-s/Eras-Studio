@@ -20,17 +20,8 @@ export default async function MessagesPage() {
     .order('created_at', { ascending: false });
 
   return (
-    <div>
-      {/* Header */}
-      <div className="mb-6">
-        <p className="text-xs font-semibold tracking-[0.2em] text-gray-400 uppercase mb-2">
-          Direct Inquiries · Eras Studio
-        </p>
-        <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight mb-1">Your inbox</h1>
-        <p className="text-gray-500 text-sm">Interest first. A meaningful conversation next.</p>
-      </div>
-
-      <Suspense fallback={<div className="h-64 flex items-center justify-center text-gray-400">Loading inbox...</div>}>
+    <div className="py-4">
+      <Suspense fallback={<div className="h-96 flex items-center justify-center text-gray-400 font-sans">Loading your inbox...</div>}>
         <ChatListClient initialChats={chats || []} currentUserId={user.id} />
       </Suspense>
     </div>
