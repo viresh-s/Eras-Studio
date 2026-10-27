@@ -5,6 +5,7 @@ import { sendMessage } from '@/actions/chatActions';
 import { useChatSubscription } from '@/hooks/useChatSubscription';
 import { Send, ArrowLeft, Eye } from 'lucide-react';
 import Link from 'next/link';
+import { createClient } from '@/lib/supabase/client';
 
 interface ChatMessage {
   id: string;
@@ -18,7 +19,7 @@ interface ChatMessage {
 interface ChatInterfaceProps {
   chatId: string;
   userId: string;
-  otherPerson: { full_name: string; profile_pic_url: string | null };
+  otherPerson: { id?: string; full_name: string; profile_pic_url: string | null };
   artwork: { id?: string; title: string; image_url: string };
   initialMessages: ChatMessage[];
 }
@@ -40,7 +41,55 @@ export default function ChatInterface({
   const messages = useChatSubscription(chatId, initialMessages);
   const [newMessage, setNewMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
+  const [isOnline, setIsOnline] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const otherPersonId = otherPerson?.id;
+
+  useEffect(() => {
+    if (!chatId || !userId) return;
+    const supabase = createClient();
+    const channelName = `chat-presence:${chatId}`;
+
+    for (const ch of supabase.getChannels()) {
+      if (ch.topic === `realtime:${channelName}` || ch.topic === channelName) {
+        supabase.removeChannel(ch);
+      }
+    }
+
+    const channel = supabase.channel(channelName, {
+      config: { presence: { key: userId } },
+    });
+
+    const syncPresence = () => {
+      const state = channel.presenceState();
+      if (otherPersonId) {
+        setIsOnline(Boolean(state[otherPersonId]));
+      }
+    };
+
+    channel
+      .on('presence', { event: 'sync' }, syncPresence)
+      .on('presence', { event: 'join' }, syncPresence)
+      .on('presence', { event: 'leave' }, syncPresence)
+      .subscribe(async (status) => {
+        if (status === 'SUBSCRIBED') {
+          try {
+            await channel.track({
+              user_id: userId,
+              online_at: new Date().toISOString(),
+            });
+          } catch {
+            // Ignore presence errors
+          }
+          syncPresence();
+        }
+      });
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [chatId, userId, otherPersonId]);
 
   // Scroll to bottom
   const scrollToBottom = () => {
@@ -130,14 +179,17 @@ export default function ChatInterface({
               >
                 {contactName}
               </h3>
-              <div
-                style={{
-                  background: '#26BD68',
-                  boxShadow: '0px 0px 4px #26BD68',
-                  borderRadius: 9999,
-                }}
-                className="w-2 h-2 shrink-0"
-              />
+              {isOnline && (
+                <div
+                  style={{
+                    background: '#26BD68',
+                    boxShadow: '0px 0px 4px #26BD68',
+                    borderRadius: 9999,
+                  }}
+                  className="w-2 h-2 shrink-0 animate-pulse"
+                  title="Online"
+                />
+              )}
             </div>
             <p
               style={{
@@ -146,7 +198,7 @@ export default function ChatInterface({
               }}
               className="text-[11px]"
             >
-              Online
+              {isOnline ? 'Online' : 'Offline'}
             </p>
           </div>
         </div>

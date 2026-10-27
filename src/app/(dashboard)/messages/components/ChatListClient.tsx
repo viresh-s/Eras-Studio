@@ -59,6 +59,53 @@ export default function ChatListClient({ initialChats, currentUserId }: ChatList
   const [loadingIds, setLoadingIds] = useState<Record<string, boolean>>({});
   const [selectedChatId, setSelectedChatId] = useState<string | null>(initialChatId || null);
 
+  // Real-time Presence: track online status for contacts across the platform
+  const [onlineUserIds, setOnlineUserIds] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (!currentUserId) return;
+    const supabase = createClient();
+    const channelName = 'online-presence';
+
+    // Purge any stale channel instance before subscribing
+    for (const ch of supabase.getChannels()) {
+      if (ch.topic === `realtime:${channelName}` || ch.topic === channelName) {
+        supabase.removeChannel(ch);
+      }
+    }
+
+    const channel = supabase.channel(channelName, {
+      config: { presence: { key: currentUserId } },
+    });
+
+    const syncPresence = () => {
+      const state = channel.presenceState();
+      setOnlineUserIds(new Set(Object.keys(state)));
+    };
+
+    channel
+      .on('presence', { event: 'sync' }, syncPresence)
+      .on('presence', { event: 'join' }, syncPresence)
+      .on('presence', { event: 'leave' }, syncPresence)
+      .subscribe(async (status) => {
+        if (status === 'SUBSCRIBED') {
+          try {
+            await channel.track({
+              user_id: currentUserId,
+              online_at: new Date().toISOString(),
+            });
+          } catch {
+            // Ignore presence errors
+          }
+          syncPresence();
+        }
+      });
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [currentUserId]);
+
   const pendingChats = useMemo(() => {
     return chats.filter((c) => {
       if (c.status !== 'Pending') return false;
@@ -286,7 +333,7 @@ export default function ChatListClient({ initialChats, currentUserId }: ChatList
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search conversations..."
                   style={{
-                    fontFamily: "var(--font-inter), 'Inter', sans-serif",
+                    fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
                   }}
                   className="bg-transparent text-xs sm:text-[13px] text-[#171E2C] placeholder-[#7E8491] outline-none w-full"
                 />
@@ -340,6 +387,7 @@ export default function ChatListClient({ initialChats, currentUserId }: ChatList
                     const isSelected = selectedChatId === chat.id;
                     const contactName = otherPerson?.full_name || 'Studio Participant';
                     const avatarColor = getAvatarColor(contactName);
+                    const isContactOnline = otherPerson?.id ? onlineUserIds.has(otherPerson.id) : false;
 
                     const formattedTime = formatChatTime(chat.created_at);
 
@@ -356,22 +404,34 @@ export default function ChatListClient({ initialChats, currentUserId }: ChatList
                           isSelected ? '' : 'hover:bg-white active:bg-gray-100'
                         }`}
                       >
-                        {/* Avatar */}
-                        <div
-                          style={{
-                            background: otherPerson?.profile_pic_url ? '#E5E5E5' : avatarColor,
-                            borderRadius: 9999,
-                          }}
-                          className="w-10 h-10 sm:w-11 sm:h-11 rounded-full overflow-hidden shrink-0 flex items-center justify-center text-xs font-bold text-white shadow-2xs relative"
-                        >
-                          {otherPerson?.profile_pic_url ? (
-                            <img
-                              src={otherPerson.profile_pic_url}
-                              alt={contactName}
-                              className="w-full h-full object-cover"
+                        {/* Avatar with Realtime Online Indicator */}
+                        <div className="relative shrink-0">
+                          <div
+                            style={{
+                              background: otherPerson?.profile_pic_url ? '#E5E5E5' : avatarColor,
+                              borderRadius: 9999,
+                            }}
+                            className="w-10 h-10 sm:w-11 sm:h-11 rounded-full overflow-hidden flex items-center justify-center text-xs font-bold text-white shadow-2xs"
+                          >
+                            {otherPerson?.profile_pic_url ? (
+                              <img
+                                src={otherPerson.profile_pic_url}
+                                alt={contactName}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              getInitials(contactName)
+                            )}
+                          </div>
+                          {isContactOnline && (
+                            <span
+                              style={{
+                                background: '#26BD68',
+                                boxShadow: '0px 0px 4px #26BD68',
+                              }}
+                              className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full ring-2 ring-white"
+                              title="Online"
                             />
-                          ) : (
-                            getInitials(contactName)
                           )}
                         </div>
 
@@ -391,7 +451,7 @@ export default function ChatListClient({ initialChats, currentUserId }: ChatList
                             <span
                               suppressHydrationWarning
                               style={{
-                                fontFamily: "var(--font-inter), 'Inter', sans-serif",
+                                fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
                                 color: '#8A909D',
                               }}
                               className="text-[10px] sm:text-[11px] shrink-0"
@@ -440,6 +500,12 @@ export default function ChatListClient({ initialChats, currentUserId }: ChatList
                 <ConversationActiveView
                   chat={selectedChat}
                   currentUserId={currentUserId}
+                  isOnline={
+                    (() => {
+                      const other = selectedChat.guest_id === currentUserId ? selectedChat.creator : selectedChat.guest;
+                      return other?.id ? onlineUserIds.has(other.id) : false;
+                    })()
+                  }
                   onBack={() => setSelectedChatId(null)}
                 />
               ) : (
@@ -692,10 +758,12 @@ export default function ChatListClient({ initialChats, currentUserId }: ChatList
 function ConversationActiveView({
   chat,
   currentUserId,
+  isOnline,
   onBack,
 }: {
   chat: any;
   currentUserId: string;
+  isOnline: boolean;
   onBack: () => void;
 }) {
   const [messages, setMessages] = useState<any[]>([]);
@@ -726,6 +794,7 @@ function ConversationActiveView({
   // Fetch initial messages and set up realtime subscription
   useEffect(() => {
     const supabase = createClient();
+    const channelName = `chat:${chat.id}`;
 
     // 1. Fetch initial messages
     supabase
@@ -735,9 +804,16 @@ function ConversationActiveView({
       .order('created_at', { ascending: true })
       .then(({ data }) => setMessages(data || []));
 
-    // 2. Realtime Postgres Changes
+    // 2. Purge stale channel before creating new one
+    for (const ch of supabase.getChannels()) {
+      if (ch.topic === `realtime:${channelName}` || ch.topic === channelName) {
+        supabase.removeChannel(ch);
+      }
+    }
+
+    // 3. Realtime Postgres Changes
     const channel = supabase
-      .channel(`chat:${chat.id}`)
+      .channel(channelName)
       .on(
         'postgres_changes',
         {
@@ -811,21 +887,33 @@ function ConversationActiveView({
           </button>
 
           {/* Contact Avatar */}
-          <div
-            style={{
-              background: otherPerson?.profile_pic_url ? '#E5E5E5' : avatarColor,
-              borderRadius: 9999,
-            }}
-            className="w-10 h-10 rounded-full overflow-hidden shrink-0 flex items-center justify-center text-xs font-bold text-white shadow-2xs relative"
-          >
-            {otherPerson?.profile_pic_url ? (
-              <img
-                src={otherPerson.profile_pic_url}
-                alt={contactName}
-                className="w-full h-full object-cover"
+          <div className="relative shrink-0">
+            <div
+              style={{
+                background: otherPerson?.profile_pic_url ? '#E5E5E5' : avatarColor,
+                borderRadius: 9999,
+              }}
+              className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center text-xs font-bold text-white shadow-2xs"
+            >
+              {otherPerson?.profile_pic_url ? (
+                <img
+                  src={otherPerson.profile_pic_url}
+                  alt={contactName}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                getInitials(contactName)
+              )}
+            </div>
+            {isOnline && (
+              <span
+                style={{
+                  background: '#26BD68',
+                  boxShadow: '0px 0px 4px #26BD68',
+                }}
+                className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full ring-2 ring-white"
+                title="Online"
               />
-            ) : (
-              getInitials(contactName)
             )}
           </div>
 
@@ -842,15 +930,18 @@ function ConversationActiveView({
               >
                 {contactName}
               </h3>
-              {/* Online indicator green dot */}
-              <div
-                style={{
-                  background: '#26BD68',
-                  boxShadow: '0px 0px 4px #26BD68',
-                  borderRadius: 9999,
-                }}
-                className="w-2 h-2 shrink-0"
-              />
+              {/* Online indicator green dot - only when online */}
+              {isOnline && (
+                <div
+                  style={{
+                    background: '#26BD68',
+                    boxShadow: '0px 0px 4px #26BD68',
+                    borderRadius: 9999,
+                  }}
+                  className="w-2 h-2 shrink-0 animate-pulse"
+                  title="Online"
+                />
+              )}
             </div>
             <p
               style={{
@@ -860,7 +951,7 @@ function ConversationActiveView({
               }}
               className="text-[11px] leading-tight"
             >
-              Online
+              {isOnline ? 'Online' : 'Offline'}
             </p>
           </div>
         </div>

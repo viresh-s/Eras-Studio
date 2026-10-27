@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { changeEmail, changePassword, deleteAccount } from '@/actions/accountActions';
 import Button from '@/components/ui/Button';
@@ -61,6 +61,21 @@ export default function AccountSettingsForm({
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteSubmitting, setDeleteSubmitting] = useState(false);
   const [deleteState, setDeleteState] = useState<{ error?: string } | null>(null);
+
+  // Auto-dismiss feedback notifications after 4.5 seconds
+  useEffect(() => {
+    if (emailState) {
+      const timer = setTimeout(() => setEmailState(null), 4500);
+      return () => clearTimeout(timer);
+    }
+  }, [emailState]);
+
+  useEffect(() => {
+    if (passwordState) {
+      const timer = setTimeout(() => setPasswordState(null), 4500);
+      return () => clearTimeout(timer);
+    }
+  }, [passwordState]);
 
   // Active navigation section
   const [activeTab, setActiveTab] = useState<'credentials' | 'password' | 'security' | 'danger'>('credentials');
@@ -228,17 +243,25 @@ export default function AccountSettingsForm({
               setActiveTab('credentials');
               document.getElementById('email-section')?.scrollIntoView({ behavior: 'smooth' });
             }}
-            className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all ${
+            style={{
+              background: activeTab === 'credentials' ? '#F1F2FF' : 'transparent',
+              borderRadius: 12,
+            }}
+            className={`w-full flex items-center justify-between px-3.5 py-2.5 text-xs font-medium transition-all duration-200 cursor-pointer ${
               activeTab === 'credentials'
-                ? 'bg-[#141413] text-white'
-                : 'text-[#4A4A45] hover:bg-[#F5F5F5] hover:text-[#141413]'
+                ? 'text-[#1345EE] font-semibold'
+                : 'text-[#646A77] hover:bg-[#F1F2FF] hover:text-[#1345EE]'
             }`}
           >
             <div className="flex items-center gap-2.5">
               <Mail className="w-4 h-4" />
               <span>Email & Identity</span>
             </div>
-            <ArrowRight className="w-3.5 h-3.5 opacity-60" />
+            {activeTab === 'credentials' ? (
+              <span className="w-2 h-2 rounded-full bg-[#1345EE] shrink-0" />
+            ) : (
+              <ArrowRight className="w-3.5 h-3.5 opacity-60" />
+            )}
           </button>
 
           <button
@@ -247,17 +270,25 @@ export default function AccountSettingsForm({
               setActiveTab('password');
               document.getElementById('password-section')?.scrollIntoView({ behavior: 'smooth' });
             }}
-            className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all ${
+            style={{
+              background: activeTab === 'password' ? '#F1F2FF' : 'transparent',
+              borderRadius: 12,
+            }}
+            className={`w-full flex items-center justify-between px-3.5 py-2.5 text-xs font-medium transition-all duration-200 cursor-pointer ${
               activeTab === 'password'
-                ? 'bg-[#141413] text-white'
-                : 'text-[#4A4A45] hover:bg-[#F5F5F5] hover:text-[#141413]'
+                ? 'text-[#1345EE] font-semibold'
+                : 'text-[#646A77] hover:bg-[#F1F2FF] hover:text-[#1345EE]'
             }`}
           >
             <div className="flex items-center gap-2.5">
               <KeyRound className="w-4 h-4" />
               <span>Password & Security</span>
             </div>
-            <ArrowRight className="w-3.5 h-3.5 opacity-60" />
+            {activeTab === 'password' ? (
+              <span className="w-2 h-2 rounded-full bg-[#1345EE] shrink-0" />
+            ) : (
+              <ArrowRight className="w-3.5 h-3.5 opacity-60" />
+            )}
           </button>
 
           <button
@@ -266,17 +297,25 @@ export default function AccountSettingsForm({
               setActiveTab('security');
               document.getElementById('security-section')?.scrollIntoView({ behavior: 'smooth' });
             }}
-            className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all ${
+            style={{
+              background: activeTab === 'security' ? '#F1F2FF' : 'transparent',
+              borderRadius: 12,
+            }}
+            className={`w-full flex items-center justify-between px-3.5 py-2.5 text-xs font-medium transition-all duration-200 cursor-pointer ${
               activeTab === 'security'
-                ? 'bg-[#141413] text-white'
-                : 'text-[#4A4A45] hover:bg-[#F5F5F5] hover:text-[#141413]'
+                ? 'text-[#1345EE] font-semibold'
+                : 'text-[#646A77] hover:bg-[#F1F2FF] hover:text-[#1345EE]'
             }`}
           >
             <div className="flex items-center gap-2.5">
               <Shield className="w-4 h-4" />
               <span>Security Protocols</span>
             </div>
-            <ArrowRight className="w-3.5 h-3.5 opacity-60" />
+            {activeTab === 'security' ? (
+              <span className="w-2 h-2 rounded-full bg-[#1345EE] shrink-0" />
+            ) : (
+              <ArrowRight className="w-3.5 h-3.5 opacity-60" />
+            )}
           </button>
 
           <button
@@ -350,8 +389,8 @@ export default function AccountSettingsForm({
 
           {/* Feedback messages */}
           {emailState?.success && (
-            <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-[#F0F5F1] border border-[#CDE3D4] text-[#28633B] text-xs leading-relaxed animate-in fade-in duration-200">
-              <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-[#28633B]" />
+            <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-[#F1F4FF] border border-[#D1E0FF] text-[#0B2E8A] text-xs leading-relaxed animate-in fade-in duration-200 shadow-2xs">
+              <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-[#1345EE]" />
               <div className="flex-1 font-medium">{emailState.success}</div>
             </div>
           )}
@@ -415,8 +454,8 @@ export default function AccountSettingsForm({
 
           {/* Feedback messages */}
           {passwordState?.success && (
-            <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-[#F0F5F1] border border-[#CDE3D4] text-[#28633B] text-xs leading-relaxed animate-in fade-in duration-200">
-              <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-[#28633B]" />
+            <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-[#F1F4FF] border border-[#D1E0FF] text-[#0B2E8A] text-xs leading-relaxed animate-in fade-in duration-200 shadow-2xs">
+              <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-[#1345EE]" />
               <div className="flex-1 font-medium">{passwordState.success}</div>
             </div>
           )}

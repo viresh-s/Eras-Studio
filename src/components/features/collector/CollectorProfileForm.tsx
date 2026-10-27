@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { updateProfile, updateProfileAvatar } from '@/actions/profileActions';
@@ -21,6 +21,25 @@ export default function CollectorProfileForm({ profile, email }: CollectorProfil
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Auto-dismiss popups after 4.5 seconds
+  useEffect(() => {
+    if (success) {
+      const timer = setTimeout(() => {
+        setSuccess(false);
+      }, 4500);
+      return () => clearTimeout(timer);
+    }
+  }, [success]);
+
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        setError(null);
+      }, 4500);
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
 
   const [fullName, setFullName] = useState(profile.full_name || '');
   const [location, setLocation] = useState(profile.location_city || '');
@@ -153,17 +172,21 @@ export default function CollectorProfileForm({ profile, email }: CollectorProfil
       style={{ fontFamily: "'Poppins', sans-serif" }}
       className="w-full text-[#181A1F] pb-12"
     >
-      {/* Notifications */}
+      {/* Notifications - Consistent Blue Theme with Auto-Dismiss */}
       {success && (
-        <div className="max-w-5xl mx-auto mb-4 bg-emerald-50 border border-emerald-200 rounded-[14px] p-3.5 text-emerald-800 text-xs sm:text-sm flex items-center justify-between shadow-2xs">
-          <div className="flex items-center gap-2">
-            <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
-            <span>Profile updated successfully!</span>
+        <div
+          style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+          className="max-w-5xl mx-auto mb-4 bg-[#F1F4FF] border border-[#D1E0FF] rounded-[14px] p-3.5 text-[#0B2E8A] text-xs sm:text-sm flex items-center justify-between shadow-2xs transition-all duration-300 animate-in fade-in slide-in-from-top-1"
+        >
+          <div className="flex items-center gap-2.5">
+            <CheckCircle2 size={16} className="text-[#1345EE] shrink-0" />
+            <span className="font-medium">Profile updated successfully!</span>
           </div>
           <button
             type="button"
             onClick={() => setSuccess(false)}
-            className="text-emerald-500 hover:text-emerald-800 text-xs font-semibold ml-4 cursor-pointer"
+            className="text-[#1345EE] hover:text-[#082779] text-xs font-semibold ml-4 p-1 hover:bg-blue-100/60 rounded-full cursor-pointer transition-colors"
+            aria-label="Dismiss notification"
           >
             ✕
           </button>
@@ -171,15 +194,19 @@ export default function CollectorProfileForm({ profile, email }: CollectorProfil
       )}
 
       {error && (
-        <div className="max-w-5xl mx-auto mb-4 bg-red-50 border border-red-200 rounded-[14px] p-3.5 text-red-800 text-xs sm:text-sm flex items-center justify-between shadow-2xs">
-          <div className="flex items-center gap-2">
+        <div
+          style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+          className="max-w-5xl mx-auto mb-4 bg-red-50 border border-red-200 rounded-[14px] p-3.5 text-red-800 text-xs sm:text-sm flex items-center justify-between shadow-2xs transition-all duration-300 animate-in fade-in slide-in-from-top-1"
+        >
+          <div className="flex items-center gap-2.5">
             <AlertCircle size={16} className="text-red-600 shrink-0" />
-            <span>{error}</span>
+            <span className="font-medium">{error}</span>
           </div>
           <button
             type="button"
             onClick={() => setError(null)}
-            className="text-red-500 hover:text-red-800 text-xs font-semibold ml-4 cursor-pointer"
+            className="text-red-500 hover:text-red-800 text-xs font-semibold ml-4 p-1 hover:bg-red-100/60 rounded-full cursor-pointer transition-colors"
+            aria-label="Dismiss notification"
           >
             ✕
           </button>
@@ -217,36 +244,60 @@ export default function CollectorProfileForm({ profile, email }: CollectorProfil
                 </div>
               </div>
 
-              {/* 2. Primary Navigation (Clean text only, minimalist design) */}
-              <div className="py-2 divide-y divide-[#E8E8E3]/60 bg-white">
+              {/* 2. Primary Navigation with Signature Soft Pill Hover & Active Effect */}
+              <div className="p-3 sm:p-3.5 space-y-1.5 bg-white">
                 {/* Tab 1: Basic Information */}
                 <button
                   type="button"
                   onClick={() => setActiveTab('basic')}
-                  className={`w-full text-left px-6 py-3.5 transition-colors cursor-pointer block relative focus:outline-none ${
+                  style={{
+                    background: activeTab === 'basic' ? '#F1F2FF' : 'transparent',
+                    borderRadius: 12,
+                  }}
+                  className={`w-full text-left px-4 py-3 flex items-center justify-between transition-all duration-200 cursor-pointer group focus:outline-none ${
                     activeTab === 'basic'
-                      ? 'bg-[#F3F3F3] text-[#181A1F] font-semibold border-l-2 border-[#181A1F]'
-                      : 'hover:bg-[#F8F8F8] text-[#7A7A78] hover:text-[#181A1F] font-normal border-l-2 border-transparent'
+                      ? 'text-[#1345EE] font-semibold'
+                      : 'text-[#646A77] hover:bg-[#F1F2FF] hover:text-[#1345EE] font-medium'
                   }`}
                 >
-                  <span className="text-sm block">
+                  <span
+                    style={{
+                      fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
+                    }}
+                    className="text-[13.5px] block transition-colors"
+                  >
                     Basic Information
                   </span>
+                  {activeTab === 'basic' && (
+                    <span className="w-2 h-2 rounded-full bg-[#1345EE] shrink-0" />
+                  )}
                 </button>
 
                 {/* Tab 2: Account & Activity */}
                 <button
                   type="button"
                   onClick={() => setActiveTab('activity')}
-                  className={`w-full text-left px-6 py-3.5 transition-colors cursor-pointer block relative focus:outline-none ${
+                  style={{
+                    background: activeTab === 'activity' ? '#F1F2FF' : 'transparent',
+                    borderRadius: 12,
+                  }}
+                  className={`w-full text-left px-4 py-3 flex items-center justify-between transition-all duration-200 cursor-pointer group focus:outline-none ${
                     activeTab === 'activity'
-                      ? 'bg-[#F3F3F3] text-[#181A1F] font-semibold border-l-2 border-[#181A1F]'
-                      : 'hover:bg-[#F8F8F8] text-[#7A7A78] hover:text-[#181A1F] font-normal border-l-2 border-transparent'
+                      ? 'text-[#1345EE] font-semibold'
+                      : 'text-[#646A77] hover:bg-[#F1F2FF] hover:text-[#1345EE] font-medium'
                   }`}
                 >
-                  <span className="text-sm block">
+                  <span
+                    style={{
+                      fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
+                    }}
+                    className="text-[13.5px] block transition-colors"
+                  >
                     Account & Activity
                   </span>
+                  {activeTab === 'activity' && (
+                    <span className="w-2 h-2 rounded-full bg-[#1345EE] shrink-0" />
+                  )}
                 </button>
               </div>
 

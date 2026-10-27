@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useForm, Controller, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -683,6 +683,222 @@ function DocumentSlidingWindow({ documents, userId }: DocumentSlidingWindowProps
   );
 }
 
+const PROPOSAL_GUIDELINES = [
+  {
+    step: '01',
+    num: 1,
+    title: 'Core Conceptual Premise',
+    shortTitle: 'Concept',
+    tagline: 'Research context & thesis driving the work',
+    summary:
+      'State the conceptual inquiry or thematic question driving the new body of work. Focus on research context and intent rather than promotional language.',
+    keyPoints: [
+      'Define the central artistic premise or research hypothesis in 2-3 focused paragraphs.',
+      'Clarify theoretical, philosophical, or socio-cultural lineage without promotional jargon.',
+      'Explain what makes this body of work urgent or relevant in contemporary dialogue.',
+    ],
+  },
+  {
+    step: '02',
+    num: 2,
+    title: 'Medium, Scale & Installation',
+    shortTitle: 'Medium & Scale',
+    tagline: 'Physical dimensions, materials & display setup',
+    summary:
+      'Specify anticipated physical dimensions, materials, wall/floor mounting needs, lighting, or spatial requirements for presentation.',
+    keyPoints: [
+      'Provide metric & imperial dimensions (H × W × D) and total installation footprint.',
+      'Specify archival properties, substrate, lighting, rigging, or AV/power needs.',
+      'Document site-specific requirements, load tolerances, and humidity or security needs.',
+    ],
+  },
+  {
+    step: '03',
+    num: 3,
+    title: 'Production Stage & Timeline',
+    shortTitle: 'Timeline',
+    tagline: 'Active stage, milestones & delivery dates',
+    summary:
+      'Clarify if the project is in early research, active production, or near completion, along with estimated dates for shipping or exhibition readiness.',
+    keyPoints: [
+      'State current status: Conceptual R&D, Active Studio Fabrication, or Exhibition Ready.',
+      'List key production milestones, fabrication dependencies, and team collaborators.',
+      'Provide estimated dates for crate packing, condition reporting, and shipping dispatch.',
+    ],
+  },
+  {
+    step: '04',
+    num: 4,
+    title: 'Visual Documentation & Studies',
+    shortTitle: 'Visuals',
+    tagline: 'High-res renders, sketches & spatial studies',
+    summary:
+      'Embed clear sketches, material samples, 3D mockups, or related previous works so curators can visualize the physical exhibition in space.',
+    keyPoints: [
+      'Include high-resolution 300 DPI sketches, CAD models, or 3D gallery simulations.',
+      'Add human scale references or architectural perspective drawings.',
+      'Display tactile material tests, swatches, maquettes, or related prior artworks.',
+    ],
+  },
+];
+
+function GuidelineSlidingBox() {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+
+  const current = PROPOSAL_GUIDELINES[activeIndex];
+
+  const handlePrev = () => {
+    if (activeIndex > 0) setActiveIndex(activeIndex - 1);
+  };
+
+  const handleNext = () => {
+    if (activeIndex < PROPOSAL_GUIDELINES.length - 1) setActiveIndex(activeIndex + 1);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStartX(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX === null) return;
+    const diff = touchStartX - e.changedTouches[0].clientX;
+    if (diff > 40 && activeIndex < PROPOSAL_GUIDELINES.length - 1) {
+      setActiveIndex((prev) => prev + 1);
+    } else if (diff < -40 && activeIndex > 0) {
+      setActiveIndex((prev) => prev - 1);
+    }
+    setTouchStartX(null);
+  };
+
+  return (
+    <div
+      style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+      className="bg-white rounded-[16px] border border-[#E8E8E3] p-5 sm:p-6 shadow-2xs space-y-4 select-none"
+    >
+      {/* 1. Header Row */}
+      <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1 border-b border-[#F0F0EB] pb-3.5">
+        <div>
+          <h3 className="text-sm font-medium text-[#181A1F] tracking-tight">
+            Curatorial Proposal Dossier Guide
+          </h3>
+          <p className="text-xs text-[#71716D] mt-0.5">
+            Recommended structure for exhibitions, institution reviews, and residency applications on Eras.
+          </p>
+        </div>
+        <span className="text-[11px] text-[#8E8E88] shrink-0 font-normal">
+          Format: PDF (3–8 pages recommended)
+        </span>
+      </div>
+
+      {/* 2. The Active Slidable Box */}
+      <div
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        className="bg-[#FAFAFB] rounded-[14px] border border-[#EAEAEC] p-5 sm:p-6 transition-all duration-300 relative overflow-hidden"
+      >
+        {/* Title on Left, Slidable 1 - 2 - 3 - 4 on Right */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3.5 pb-3 border-b border-[#EAEAEC]">
+          <div>
+            <h4 className="text-sm sm:text-base font-semibold text-[#181A1F] tracking-tight">
+              {current.step}. {current.title}
+            </h4>
+            <p className="text-xs text-[#71716D] mt-0.5">
+              {current.tagline}
+            </p>
+          </div>
+
+          {/* Slidable 1 - 2 - 3 - 4 Step Navigation */}
+          <div className="flex items-center gap-1.5 self-end sm:self-auto shrink-0">
+            <button
+              type="button"
+              onClick={handlePrev}
+              disabled={activeIndex === 0}
+              className="w-7 h-7 rounded-full border border-[#E8E8E3] bg-white hover:border-[#181A1F] hover:bg-[#F3F4F6] text-[#181A1F] disabled:opacity-25 disabled:pointer-events-none transition-all flex items-center justify-center cursor-pointer shadow-2xs"
+              aria-label="Previous guideline"
+            >
+              <ChevronLeft size={14} />
+            </button>
+            <div className="flex items-center gap-1 bg-[#EFEFF1] p-0.5 rounded-full">
+              {PROPOSAL_GUIDELINES.map((item, idx) => (
+                <button
+                  key={item.step}
+                  type="button"
+                  onClick={() => setActiveIndex(idx)}
+                  className={`w-6 h-6 rounded-full text-xs font-medium transition-all duration-150 cursor-pointer flex items-center justify-center ${
+                    activeIndex === idx
+                      ? 'bg-[#181A1F] text-white shadow-xs font-semibold'
+                      : 'text-[#71716D] hover:text-[#181A1F] hover:bg-black/5'
+                  }`}
+                  aria-label={`Guideline ${item.num}`}
+                >
+                  {item.num}
+                </button>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={handleNext}
+              disabled={activeIndex === PROPOSAL_GUIDELINES.length - 1}
+              className="w-7 h-7 rounded-full border border-[#E8E8E3] bg-white hover:border-[#181A1F] hover:bg-[#F3F4F6] text-[#181A1F] disabled:opacity-25 disabled:pointer-events-none transition-all flex items-center justify-center cursor-pointer shadow-2xs"
+              aria-label="Next guideline"
+            >
+              <ChevronRight size={14} />
+            </button>
+          </div>
+        </div>
+
+        {/* Summary text */}
+        <p className="text-xs sm:text-[13px] text-[#555A64] leading-relaxed mb-4">
+          {current.summary}
+        </p>
+
+        {/* Structured Key Points */}
+        <div className="bg-white rounded-[10px] border border-[#E8E8E3] p-3.5 space-y-2">
+          <p className="text-[11px] font-medium text-[#181A1F] uppercase tracking-wider text-black/60">
+            Recommended Details to Include:
+          </p>
+          <ul className="space-y-1.5">
+            {current.keyPoints.map((point, i) => (
+              <li key={i} className="flex items-start gap-2 text-xs text-[#71716D] leading-snug">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#1345EE] shrink-0 mt-1.5" />
+                <span>{point}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Bottom In-Box Slide Action Triggers */}
+        <div className="flex items-center justify-between pt-4 mt-4 border-t border-[#EAEAEC]">
+          <button
+            type="button"
+            onClick={handlePrev}
+            disabled={activeIndex === 0}
+            className="text-xs font-medium text-[#71716D] hover:text-[#181A1F] disabled:opacity-0 transition-colors inline-flex items-center gap-1 cursor-pointer"
+          >
+            <ChevronLeft size={13} />
+            <span>Previous</span>
+          </button>
+
+          <span className="text-[11px] text-[#8A909D] font-mono">
+            {activeIndex + 1} of {PROPOSAL_GUIDELINES.length}
+          </span>
+
+          <button
+            type="button"
+            onClick={handleNext}
+            disabled={activeIndex === PROPOSAL_GUIDELINES.length - 1}
+            className="text-xs font-medium text-[#1345EE] hover:text-blue-800 disabled:opacity-0 transition-colors inline-flex items-center gap-1 cursor-pointer"
+          >
+            <span>Next Guideline</span>
+            <ChevronRight size={13} />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function cleanLocationString(city?: string | null, country?: string | null): string {
   const raw = [city, country].filter(Boolean).join(', ');
   const parts = raw.split(',').map(s => s.trim()).filter(Boolean);
@@ -725,6 +941,25 @@ export default function EditProfileForm({ userProfile }: { userProfile: Profile 
   const [isLoading, setIsLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  // Auto-dismiss popups after 4.5 seconds
+  useEffect(() => {
+    if (successMsg) {
+      const timer = setTimeout(() => {
+        setSuccessMsg(null);
+      }, 4500);
+      return () => clearTimeout(timer);
+    }
+  }, [successMsg]);
+
+  useEffect(() => {
+    if (errorMsg) {
+      const timer = setTimeout(() => {
+        setErrorMsg(null);
+      }, 4500);
+      return () => clearTimeout(timer);
+    }
+  }, [errorMsg]);
 
   // Profile Headshot upload
   const [avatarPreview, setAvatarPreview] = useState<string | null>(userProfile.profile_pic_url || null);
@@ -834,7 +1069,7 @@ export default function EditProfileForm({ userProfile }: { userProfile: Profile 
     email: userProfile.email || '',
     location: initialLocation,
     primary_medium: userProfile.primary_medium || '',
-    about_me: userProfile.about_me || '',
+    about_me: (userProfile.about_me?.trim().toLowerCase() === 'wertyuiop' ? '' : userProfile.about_me) || '',
     artist_statement: userProfile.artist_statement || '',
     art_forms: initialArtForms,
     instagram: userProfile.social_links?.instagram || '',
@@ -1064,17 +1299,21 @@ export default function EditProfileForm({ userProfile }: { userProfile: Profile 
       style={{ fontFamily: "'Poppins', sans-serif" }}
       className="w-full text-[#181A1F] pb-12"
     >
-      {/* Notifications */}
+      {/* Notifications - Consistent Blue Theme with Auto-Dismiss */}
       {successMsg && (
-        <div className="max-w-5xl mx-auto mb-4 bg-emerald-50 border border-emerald-200 rounded-[14px] p-3.5 text-emerald-800 text-xs sm:text-sm flex items-center justify-between shadow-2xs">
-          <div className="flex items-center gap-2">
-            <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
-            <span>{successMsg}</span>
+        <div
+          style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+          className="max-w-5xl mx-auto mb-4 bg-[#F1F4FF] border border-[#D1E0FF] rounded-[14px] p-3.5 text-[#0B2E8A] text-xs sm:text-sm flex items-center justify-between shadow-2xs transition-all duration-300 animate-in fade-in slide-in-from-top-1"
+        >
+          <div className="flex items-center gap-2.5">
+            <CheckCircle2 size={16} className="text-[#1345EE] shrink-0" />
+            <span className="font-medium">{successMsg}</span>
           </div>
           <button
             type="button"
             onClick={() => setSuccessMsg(null)}
-            className="text-emerald-500 hover:text-emerald-800 text-xs font-semibold ml-4 cursor-pointer"
+            className="text-[#1345EE] hover:text-[#082779] text-xs font-semibold ml-4 p-1 hover:bg-blue-100/60 rounded-full cursor-pointer transition-colors"
+            aria-label="Dismiss notification"
           >
             ✕
           </button>
@@ -1082,15 +1321,19 @@ export default function EditProfileForm({ userProfile }: { userProfile: Profile 
       )}
 
       {errorMsg && (
-        <div className="max-w-5xl mx-auto mb-4 bg-red-50 border border-red-200 rounded-[14px] p-3.5 text-red-800 text-xs sm:text-sm flex items-center justify-between shadow-2xs">
-          <div className="flex items-center gap-2">
+        <div
+          style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+          className="max-w-5xl mx-auto mb-4 bg-red-50 border border-red-200 rounded-[14px] p-3.5 text-red-800 text-xs sm:text-sm flex items-center justify-between shadow-2xs transition-all duration-300 animate-in fade-in slide-in-from-top-1"
+        >
+          <div className="flex items-center gap-2.5">
             <AlertCircle size={16} className="text-red-600 shrink-0" />
-            <span>{errorMsg}</span>
+            <span className="font-medium">{errorMsg}</span>
           </div>
           <button
             type="button"
             onClick={() => setErrorMsg(null)}
-            className="text-red-500 hover:text-red-800 text-xs font-semibold ml-4 cursor-pointer"
+            className="text-red-500 hover:text-red-800 text-xs font-semibold ml-4 p-1 hover:bg-red-100/60 rounded-full cursor-pointer transition-colors"
+            aria-label="Dismiss notification"
           >
             ✕
           </button>
@@ -1128,8 +1371,8 @@ export default function EditProfileForm({ userProfile }: { userProfile: Profile 
                 </div>
               </div>
 
-              {/* 2. Menu Item Buttons (Clean neutral grey, no cream) */}
-              <div className="py-2 divide-y divide-[#E8E8E3]/60 bg-white">
+              {/* 2. Menu Item Buttons with Signature Soft Pill Hover & Active Effect */}
+              <div className="p-3 sm:p-3.5 space-y-1.5 bg-white">
                 {CREATOR_TABS.map((tab) => {
                   const isActive = activeTab === tab.key;
                   return (
@@ -1137,15 +1380,27 @@ export default function EditProfileForm({ userProfile }: { userProfile: Profile 
                       key={tab.key}
                       type="button"
                       onClick={() => setActiveTab(tab.key)}
-                      className={`w-full text-left px-6 py-3.5 transition-colors cursor-pointer block relative focus:outline-none ${
+                      style={{
+                        background: isActive ? '#F1F2FF' : 'transparent',
+                        borderRadius: 12,
+                      }}
+                      className={`w-full text-left px-4 py-3 flex items-center justify-between transition-all duration-200 cursor-pointer group focus:outline-none ${
                         isActive
-                          ? 'bg-[#F3F3F3] text-[#181A1F] font-semibold border-l-2 border-[#181A1F]'
-                          : 'hover:bg-[#F8F8F8] text-[#7A7A78] hover:text-[#181A1F] font-normal border-l-2 border-transparent'
+                          ? 'text-[#1345EE] font-semibold'
+                          : 'text-[#646A77] hover:bg-[#F1F2FF] hover:text-[#1345EE] font-medium'
                       }`}
                     >
-                      <span className="text-sm block">
+                      <span
+                        style={{
+                          fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
+                        }}
+                        className="text-[13.5px] block transition-colors"
+                      >
                         {tab.label}
                       </span>
+                      {isActive && (
+                        <span className="w-2 h-2 rounded-full bg-[#1345EE] shrink-0" />
+                      )}
                     </button>
                   );
                 })}
@@ -1368,7 +1623,7 @@ export default function EditProfileForm({ userProfile }: { userProfile: Profile 
                         placeholder="Exploring the quiet relationship between place, memory and everyday life..."
                         error={errors.about_me?.message}
                         {...register('about_me')}
-                        defaultValue={userProfile.about_me || ''}
+                        defaultValue={(userProfile.about_me?.trim().toLowerCase() === 'wertyuiop' ? '' : userProfile.about_me) || ''}
                       />
 
                       <TextArea
@@ -1446,7 +1701,10 @@ export default function EditProfileForm({ userProfile }: { userProfile: Profile 
 
                 {/* TAB 4: PROJECT PROPOSALS */}
                 {activeTab === 'proposals' && (
-                  <section aria-label="Project Proposals" className="space-y-6">
+                  <section
+                    aria-label="Project Proposals"
+                    className="space-y-6 max-h-[540px] sm:max-h-[560px] overflow-y-auto pr-1.5 sm:pr-2.5 [scrollbar-width:thin] [scrollbar-color:#D5D7DD_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
+                  >
                     <div className="bg-white rounded-[16px] border border-[#E8E8E3] p-5 sm:p-6 shadow-2xs space-y-4">
                       <div>
                         <label
@@ -1556,72 +1814,8 @@ export default function EditProfileForm({ userProfile }: { userProfile: Profile 
                       )}
                     </div>
 
-                    {/* Curatorial Submission Guidelines (Editorial, Human, Non-AI Layout) */}
-                    <div
-                      style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
-                      className="bg-white rounded-[16px] border border-[#E8E8E3] p-6 shadow-2xs space-y-5"
-                    >
-                      <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1 border-b border-[#F0F0EB] pb-4">
-                        <div>
-                          <h3 className="text-sm font-medium text-[#181A1F] tracking-tight">
-                            Curatorial Proposal Dossier Guide
-                          </h3>
-                          <p className="text-xs text-[#71716D] mt-0.5">
-                            Recommended structure for exhibitions, institution reviews, and residency applications on Eras.
-                          </p>
-                        </div>
-                        <span className="text-[11px] text-[#8E8E88] shrink-0 font-normal">
-                          Format: PDF (3–8 pages recommended)
-                        </span>
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs font-semibold text-[#8E8E88] font-mono">01</span>
-                            <h4 className="text-xs font-medium text-[#181A1F]">Core Conceptual Premise</h4>
-                          </div>
-                          <p className="text-xs text-[#71716D] leading-relaxed pl-6">
-                            State the conceptual inquiry or thematic question driving the new body of work. Focus on research context and intent rather than promotional language.
-                          </p>
-                        </div>
-
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs font-semibold text-[#8E8E88] font-mono">02</span>
-                            <h4 className="text-xs font-medium text-[#181A1F]">Medium, Scale & Installation</h4>
-                          </div>
-                          <p className="text-xs text-[#71716D] leading-relaxed pl-6">
-                            Specify anticipated physical dimensions, materials, wall/floor mounting needs, lighting, or spatial requirements for presentation.
-                          </p>
-                        </div>
-
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs font-semibold text-[#8E8E88] font-mono">03</span>
-                            <h4 className="text-xs font-medium text-[#181A1F]">Production Stage & Timeline</h4>
-                          </div>
-                          <p className="text-xs text-[#71716D] leading-relaxed pl-6">
-                            Clarify if the project is in early research, active production, or near completion, along with estimated dates for shipping or exhibition readiness.
-                          </p>
-                        </div>
-
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs font-semibold text-[#8E8E88] font-mono">04</span>
-                            <h4 className="text-xs font-medium text-[#181A1F]">Visual Documentation & Studies</h4>
-                          </div>
-                          <p className="text-xs text-[#71716D] leading-relaxed pl-6">
-                            Embed clear sketches, material samples, 3D mockups, or related previous works so curators can visualize the physical exhibition in space.
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="pt-3 border-t border-[#F0F0EB] flex items-center gap-2 text-[11px] text-[#71716D]">
-                        <span className="font-medium text-[#181A1F]">Editorial Tip:</span>
-                        <span>Jurists review dozens of dossiers in one sitting—prioritize clarity, high-resolution visual documentation, and succinct writing.</span>
-                      </div>
-                    </div>
+                    {/* Curatorial Submission Guidelines (Slidable Box with 1 - 2 - 3 - 4 Navigation) */}
+                    <GuidelineSlidingBox />
                   </section>
                 )}
               </div>
