@@ -110,3 +110,38 @@ export interface ContactSubmission {
 }
 export type { Report, ReportReason, ReportStatus } from './report';
 export * from './cor';
+
+
+export interface CareerOpportunityRow {
+  id: string;
+  title: string;
+  department: string;
+  employment_type: string;
+  location: string;
+  work_mode: string;
+  description: string;
+  responsibilities: string | null;
+  requirements: string | null;
+  experience: string | null;
+  application_deadline: string | null;
+  openings: number;
+  status: 'draft' | 'published' | 'closed';
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CareerApplicationRow {
+  id: string;
+  opportunity_id: string;
+  candidate_name: string;
+  email: string;
+  phone: string;
+  resume_url: string;
+  portfolio_url: string | null;
+  linkedin_url: string | null;
+  cover_letter: string;
+  status: 'Applied' | 'Under Review' | 'Shortlisted' | 'Interview' | 'Selected' | 'Rejected';
+  admin_notes: string | null;
+  applied_at: string;
+  updated_at: string;
+}

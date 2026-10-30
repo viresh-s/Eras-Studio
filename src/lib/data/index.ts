@@ -20,3 +20,4 @@ export * from "./cor-activity";
 export * from "./cor-matching";
 export * from "./utils";
 
+export * from "./careers";

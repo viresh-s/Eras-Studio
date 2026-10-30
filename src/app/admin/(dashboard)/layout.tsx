@@ -13,6 +13,7 @@ import {
   ShieldAlert,
   CreditCard,
   Sliders,
+  Briefcase,
   Menu,
   X,
   LogOut,
@@ -23,6 +24,7 @@ import {
 import { ToastProvider } from "@/components/ui";
 import { isBrowserSupabaseConfigured } from "@/lib/supabase/client";
 import { getAdminSidebarCountsAction, SidebarCounts } from "@/app/admin/sidebar-actions";
+import { motion, LayoutGroup } from "framer-motion";
 
 interface NavItem {
   name: string;
@@ -39,6 +41,7 @@ const navItems: NavItem[] = [
   { name: "Artworks", href: "/admin/artworks", icon: Palette },
   { name: "Reports", href: "/admin/reports", icon: ShieldAlert },
   { name: "COR", href: "/admin/cor", icon: Award },
+  { name: "Careers", href: "/admin/careers", icon: Briefcase },
   { name: "Studio Settings", href: "/admin/settings", icon: Sliders },
 ];
 
@@ -62,6 +65,7 @@ function getPageTitle(pathname: string): string {
   if (pathname.includes("/admin/cor/applications")) return "Representation Applications";
   if (pathname.includes("/admin/cor/opportunities")) return "Institutional Opportunities";
   if (pathname.includes("/admin/cor")) return "COR";
+  if (pathname.includes("/admin/careers")) return "Careers Management";
   if (pathname.includes("/admin/settings")) return "Studio Settings";
   return "Overview";
 }
@@ -84,6 +88,10 @@ export default function DashboardLayout({
     totalCor: 0,
   });
   const [clearedCounts, setClearedCounts] = useState<Partial<SidebarCounts>>({});
+  const [hoveredHref, setHoveredHref] = useState<string | null>(null);
+  const [hoveredSubHref, setHoveredSubHref] = useState<string | null>(null);
+  const [mobileHoveredHref, setMobileHoveredHref] = useState<string | null>(null);
+  const [mobileHoveredSubHref, setMobileHoveredSubHref] = useState<string | null>(null);
 
   // Initialize cleared counts from localStorage
   useEffect(() => {
@@ -206,9 +214,6 @@ export default function DashboardLayout({
               Studio
             </span>
             <span className="w-1.5 h-1.5 rounded-full bg-[#1345EE] mb-1 ml-0.5 inline-block" />
-            <span className="text-[10px] uppercase tracking-[0.15em] font-medium text-white px-2 py-0.5 rounded-lg border border-black bg-[#000000] ml-1.5">
-              Admin
-            </span>
           </Link>
 
           <div className="flex items-center gap-2">
@@ -243,115 +248,214 @@ export default function DashboardLayout({
             />
 
             <div className="relative bg-white border-b border-[#E8E8E3] px-5 py-6 shadow-soft-xl space-y-6 animate-in slide-in-from-top-2 duration-200">
-              <div className="space-y-1">
-                {navItems.map((item) => {
-                  const Icon = item.icon;
-                  const isCor = item.href === "/admin/cor";
-                  const isCorActive = isCor && (pathname === "/admin/cor" || pathname.startsWith("/admin/cor/"));
-                  const isActive =
-                    pathname === item.href ||
-                    (!isCor && pathname.startsWith(`${item.href}/`)) ||
-                    (isCor && pathname === "/admin/cor");
-                  return (
-                    <div key={item.href} className="space-y-1">
-                      <Link
-                        href={item.href}
-                        onClick={closeMobileDrawer}
-                        className={`flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
-                          isActive || (isCor && isCorActive)
-                            ? "bg-[#000000] text-white font-medium border border-black shadow-xs"
-                            : "text-[#6E6E69] hover:text-[#141413] hover:bg-[#F2F0ED]"
-                        }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <Icon
-                            className={`w-4 h-4 stroke-[1.75] ${
-                              isActive || (isCor && isCorActive) ? "text-white" : "text-[#8A8A85]"
-                            }`}
-                          />
-                          <span>{item.name}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {item.name === "Creators" && displayCounts.creators > 0 && (
-                            <span
-                              className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
-                                isActive || (isCor && isCorActive)
-                                  ? "bg-white text-[#1345EE]"
-                                  : "bg-[#F2F0ED] text-[#1345EE] border border-[#1345EE]/25"
-                              }`}
-                            >
-                              {displayCounts.creators}
-                            </span>
-                          )}
-                          {item.name === "Artworks" && displayCounts.artworks > 0 && (
-                            <span
-                              className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
-                                isActive || (isCor && isCorActive)
-                                  ? "bg-white text-[#1345EE]"
-                                  : "bg-[#F2F0ED] text-[#1345EE] border border-[#1345EE]/25"
-                              }`}
-                            >
-                              {displayCounts.artworks}
-                            </span>
-                          )}
-                          {item.name === "Reports" && displayCounts.reports > 0 && (
-                            <span
-                              className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
-                                isActive || (isCor && isCorActive)
-                                  ? "bg-white text-[#1345EE]"
-                                  : "bg-[#F2F0ED] text-[#1345EE] border border-[#1345EE]/25"
-                              }`}
-                            >
-                              {displayCounts.reports}
-                            </span>
-                          )}
-                          {item.name === "COR" && displayTotalCor > 0 && !isCorActive && (
-                            <span className="text-[10px] font-bold bg-[#F2F0ED] text-[#1345EE] px-2 py-0.5 rounded-md border border-[#1345EE]/25">
-                              {displayTotalCor}
-                            </span>
-                          )}
-                          {(isActive || (isCor && isCorActive)) && (
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#1345EE]" />
-                          )}
-                        </div>
-                      </Link>
+              <LayoutGroup id="admin-mobile-sidebar">
+                <nav
+                  className="space-y-1 relative"
+                  onMouseLeave={() => {
+                    setMobileHoveredHref(null);
+                    setMobileHoveredSubHref(null);
+                  }}
+                >
+                  {navItems.map((item) => {
+                    const Icon = item.icon;
+                    const isCor = item.href === "/admin/cor";
+                    const isCorActive = isCor && (pathname === "/admin/cor" || pathname.startsWith("/admin/cor/"));
+                    const isActive =
+                      pathname === item.href ||
+                      (!isCor && pathname.startsWith(`${item.href}/`)) ||
+                      (isCor && pathname === "/admin/cor");
+                    const isItemActive = isActive || (isCor && isCorActive);
+                    const isHovered = mobileHoveredHref === item.href;
 
-                      {isCor && isCorActive && (
-                        <div className="pl-6 py-1 space-y-1 border-l-2 border-[#E8E8E3] ml-5 my-1">
-                          {corSubNav.map((sub) => {
-                            const isSubActive =
-                              pathname === sub.href || pathname.startsWith(`${sub.href}/`);
-                            return (
-                              <Link
-                                key={sub.href}
-                                href={sub.href}
-                                onClick={closeMobileDrawer}
-                                className={`flex items-center justify-between px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                                  isSubActive
-                                    ? "bg-[#000000] text-white font-medium border border-black"
-                                    : "text-[#6E6E69] hover:text-[#141413] hover:bg-[#F2F0ED]/50"
+                    return (
+                      <div key={item.href} className="space-y-1">
+                        <Link
+                          href={item.href}
+                          onClick={closeMobileDrawer}
+                          onMouseEnter={() => setMobileHoveredHref(item.href)}
+                          className={`relative flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-medium transition-colors duration-200 select-none ${
+                            isItemActive
+                              ? "text-[#1345EE] font-medium"
+                              : isHovered
+                              ? "text-[#1345EE]"
+                              : "text-[#6E6E69] hover:text-[#1345EE]"
+                          }`}
+                        >
+                          {/* Active page animated soft light-blue background */}
+                          {isItemActive && (
+                            <motion.div
+                              layoutId="mobile-active-pill"
+                              className="absolute inset-0 rounded-xl bg-[#EEF2FE] border border-[#1345EE]/15 shadow-2xs -z-10"
+                              transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                            />
+                          )}
+
+                          {/* Hover gliding pill when item is not active */}
+                          {isHovered && !isItemActive && (
+                            <motion.div
+                              layoutId="mobile-hover-pill"
+                              className="absolute inset-0 rounded-xl bg-[#1345EE]/[0.06] border border-[#1345EE]/10 -z-10"
+                              transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              exit={{ opacity: 0 }}
+                            />
+                          )}
+
+                          <div className="flex items-center gap-3">
+                            <Icon
+                              className={`w-4 h-4 stroke-[1.75] transition-colors duration-200 ${
+                                isItemActive || isHovered ? "text-[#1345EE]" : "text-[#8A8A85]"
+                              }`}
+                            />
+                            <span className="transition-colors duration-200">{item.name}</span>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            {item.name === "Creators" && displayCounts.creators > 0 && (
+                              <span
+                                className={`text-[10px] font-bold px-2 py-0.5 rounded-md min-w-[20px] text-center transition-all duration-200 ${
+                                  isItemActive
+                                    ? "bg-[#1345EE] text-white shadow-2xs"
+                                    : isHovered
+                                    ? "bg-[#1345EE]/15 text-[#1345EE] border border-[#1345EE]/30"
+                                    : "bg-[#F2F0ED] text-[#1345EE] border border-[#1345EE]/25"
                                 }`}
                               >
-                                <span>{sub.name}</span>
-                                {sub.name === "Requests" && displayCounts.corRequests > 0 && (
-                                  <span className="text-[9px] font-bold bg-white border border-[#1345EE]/30 text-[#1345EE] px-1.5 py-0.5 rounded-md">
-                                    {displayCounts.corRequests}
-                                  </span>
-                                )}
-                                {sub.name === "Applications" && displayCounts.corApplications > 0 && (
-                                  <span className="text-[9px] font-bold bg-white border border-[#1345EE]/30 text-[#1345EE] px-1.5 py-0.5 rounded-md">
-                                    {displayCounts.corApplications}
-                                  </span>
-                                )}
-                              </Link>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+                                {displayCounts.creators}
+                              </span>
+                            )}
+                            {item.name === "Artworks" && displayCounts.artworks > 0 && (
+                              <span
+                                className={`text-[10px] font-bold px-2 py-0.5 rounded-md min-w-[20px] text-center transition-all duration-200 ${
+                                  isItemActive
+                                    ? "bg-[#1345EE] text-white shadow-2xs"
+                                    : isHovered
+                                    ? "bg-[#1345EE]/15 text-[#1345EE] border border-[#1345EE]/30"
+                                    : "bg-[#F2F0ED] text-[#1345EE] border border-[#1345EE]/25"
+                                }`}
+                              >
+                                {displayCounts.artworks}
+                              </span>
+                            )}
+                            {item.name === "Reports" && displayCounts.reports > 0 && (
+                              <span
+                                className={`text-[10px] font-bold px-2 py-0.5 rounded-md min-w-[20px] text-center transition-all duration-200 ${
+                                  isItemActive
+                                    ? "bg-[#1345EE] text-white shadow-2xs"
+                                    : isHovered
+                                    ? "bg-[#1345EE]/15 text-[#1345EE] border border-[#1345EE]/30"
+                                    : "bg-[#F2F0ED] text-[#1345EE] border border-[#1345EE]/25"
+                                }`}
+                              >
+                                {displayCounts.reports}
+                              </span>
+                            )}
+                            {item.name === "COR" && displayTotalCor > 0 && !isCorActive && (
+                              <span
+                                className={`text-[10px] font-bold px-2 py-0.5 rounded-md min-w-[20px] text-center transition-all duration-200 ${
+                                  isHovered
+                                    ? "bg-[#1345EE]/15 text-[#1345EE] border border-[#1345EE]/30"
+                                    : "bg-[#F2F0ED] text-[#1345EE] border border-[#1345EE]/25"
+                                }`}
+                              >
+                                {displayTotalCor}
+                              </span>
+                            )}
+
+                            {/* Animated Small Blue Circular Indicator */}
+                            {isItemActive && (
+                              <motion.span
+                                layoutId="mobile-active-indicator"
+                                className="w-1.5 h-1.5 rounded-full bg-[#1345EE] shadow-[0_0_6px_rgba(19,69,238,0.45)] shrink-0"
+                                transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                              />
+                            )}
+                          </div>
+                        </Link>
+
+                        {isCor && isCorActive && (
+                          <div
+                            className="pl-6 py-1 space-y-1 border-l-2 border-[#1345EE]/20 ml-5 my-1 relative"
+                            onMouseLeave={() => setMobileHoveredSubHref(null)}
+                          >
+                            {corSubNav.map((sub) => {
+                              const isSubActive =
+                                pathname === sub.href || pathname.startsWith(`${sub.href}/`);
+                              const isSubHovered = mobileHoveredSubHref === sub.href;
+                              return (
+                                <Link
+                                  key={sub.href}
+                                  href={sub.href}
+                                  onClick={closeMobileDrawer}
+                                  onMouseEnter={() => setMobileHoveredSubHref(sub.href)}
+                                  className={`relative flex items-center justify-between px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors duration-200 select-none ${
+                                    isSubActive
+                                      ? "text-[#1345EE] font-medium"
+                                      : isSubHovered
+                                      ? "text-[#1345EE]"
+                                      : "text-[#6E6E69] hover:text-[#1345EE]"
+                                  }`}
+                                >
+                                  {isSubActive && (
+                                    <motion.div
+                                      layoutId="mobile-sub-active-pill"
+                                      className="absolute inset-0 rounded-lg bg-[#EEF2FE] border border-[#1345EE]/15 -z-10"
+                                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                                    />
+                                  )}
+                                  {isSubHovered && !isSubActive && (
+                                    <motion.div
+                                      layoutId="mobile-sub-hover-pill"
+                                      className="absolute inset-0 rounded-lg bg-[#1345EE]/[0.06] -z-10"
+                                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                                      initial={{ opacity: 0 }}
+                                      animate={{ opacity: 1 }}
+                                      exit={{ opacity: 0 }}
+                                    />
+                                  )}
+                                  <span>{sub.name}</span>
+                                  <div className="flex items-center gap-1.5">
+                                    {sub.name === "Requests" && displayCounts.corRequests > 0 && (
+                                      <span
+                                        className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md ${
+                                          isSubActive
+                                            ? "bg-[#1345EE] text-white"
+                                            : "bg-white border border-[#1345EE]/30 text-[#1345EE]"
+                                        }`}
+                                      >
+                                        {displayCounts.corRequests}
+                                      </span>
+                                    )}
+                                    {sub.name === "Applications" && displayCounts.corApplications > 0 && (
+                                      <span
+                                        className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md ${
+                                          isSubActive
+                                            ? "bg-[#1345EE] text-white"
+                                            : "bg-white border border-[#1345EE]/30 text-[#1345EE]"
+                                        }`}
+                                      >
+                                        {displayCounts.corApplications}
+                                      </span>
+                                    )}
+                                    {isSubActive && (
+                                      <motion.span
+                                        layoutId="mobile-sub-active-dot"
+                                        className="w-1.5 h-1.5 rounded-full bg-[#1345EE] shrink-0"
+                                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                                      />
+                                    )}
+                                  </div>
+                                </Link>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </nav>
+              </LayoutGroup>
 
               <div className="pt-4 border-t border-[#E8E8E3] flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
@@ -402,9 +506,6 @@ export default function DashboardLayout({
               </span>
               <span className="w-1.5 h-1.5 rounded-full bg-[#1345EE] mb-1 ml-0.5 inline-block" />
             </Link>
-            <span className="text-[10px] font-medium tracking-[0.15em] uppercase text-white px-2.5 py-0.5 rounded-lg border border-black bg-[#000000]">
-              Admin
-            </span>
           </div>
 
           {/* Navigation Links */}
@@ -413,116 +514,215 @@ export default function DashboardLayout({
               <span className="w-1.5 h-1.5 rounded-full bg-[#1345EE]" />
               Platform
             </div>
-            <nav className="space-y-1">
-              {navItems.map((item) => {
-                const Icon = item.icon;
-                const isCor = item.href === "/admin/cor";
-                const isCorActive = isCor && (pathname === "/admin/cor" || pathname.startsWith("/admin/cor/"));
-                const isActive =
-                  pathname === item.href ||
-                  (!isCor && pathname.startsWith(`${item.href}/`)) ||
-                  (isCor && pathname === "/admin/cor");
-                return (
-                  <div key={item.href} className="space-y-1">
-                    <Link
-                      href={item.href}
-                      className={`group flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs md:text-sm font-medium transition-all duration-200 ${
-                        isActive || (isCor && isCorActive)
-                          ? "bg-[#000000] text-white font-medium border border-black shadow-xs"
-                          : "text-[#6E6E69] hover:text-[#141413] hover:bg-[#F2F0ED]"
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <Icon
-                          className={`w-4 h-4 stroke-[1.75] transition-colors ${
-                            isActive || (isCor && isCorActive)
-                              ? "text-white"
-                              : "text-[#8A8A85] group-hover:text-[#141413]"
-                          }`}
-                        />
-                        <span>{item.name}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {item.name === "Creators" && displayCounts.creators > 0 && (
-                          <span
-                            className={`text-[10px] font-bold px-2 py-0.5 rounded-md min-w-[20px] text-center ${
-                              isActive || (isCor && isCorActive)
-                                ? "bg-white text-[#1345EE]"
-                                : "bg-[#F2F0ED] text-[#1345EE] border border-[#1345EE]/25"
-                            }`}
-                          >
-                            {displayCounts.creators}
-                          </span>
-                        )}
-                        {item.name === "Artworks" && displayCounts.artworks > 0 && (
-                          <span
-                            className={`text-[10px] font-bold px-2 py-0.5 rounded-md min-w-[20px] text-center ${
-                              isActive || (isCor && isCorActive)
-                                ? "bg-white text-[#1345EE]"
-                                : "bg-[#F2F0ED] text-[#1345EE] border border-[#1345EE]/25"
-                            }`}
-                          >
-                            {displayCounts.artworks}
-                          </span>
-                        )}
-                        {item.name === "Reports" && displayCounts.reports > 0 && (
-                          <span
-                            className={`text-[10px] font-bold px-2 py-0.5 rounded-md min-w-[20px] text-center ${
-                              isActive || (isCor && isCorActive)
-                                ? "bg-white text-[#1345EE]"
-                                : "bg-[#F2F0ED] text-[#1345EE] border border-[#1345EE]/25"
-                            }`}
-                          >
-                            {displayCounts.reports}
-                          </span>
-                        )}
-                        {item.name === "COR" && displayTotalCor > 0 && !isCorActive && (
-                          <span className="text-[10px] font-bold bg-[#F2F0ED] text-[#1345EE] border border-[#1345EE]/25 px-2 py-0.5 rounded-md min-w-[20px] text-center">
-                            {displayTotalCor}
-                          </span>
-                        )}
-                        {(isActive || (isCor && isCorActive)) && (
-                          <span className="w-1.5 h-1.5 rounded-full bg-[#1345EE]" />
-                        )}
-                      </div>
-                    </Link>
+            <LayoutGroup id="admin-desktop-sidebar">
+              <nav
+                className="space-y-1 relative"
+                onMouseLeave={() => {
+                  setHoveredHref(null);
+                  setHoveredSubHref(null);
+                }}
+              >
+                {navItems.map((item) => {
+                  const Icon = item.icon;
+                  const isCor = item.href === "/admin/cor";
+                  const isCorActive = isCor && (pathname === "/admin/cor" || pathname.startsWith("/admin/cor/"));
+                  const isActive =
+                    pathname === item.href ||
+                    (!isCor && pathname.startsWith(`${item.href}/`)) ||
+                    (isCor && pathname === "/admin/cor");
+                  const isItemActive = isActive || (isCor && isCorActive);
+                  const isHovered = hoveredHref === item.href;
 
-                    {/* Render COR sub-nav when in COR section */}
-                    {isCor && isCorActive && (
-                      <div className="pl-5 pr-2 py-1 space-y-1 border-l-2 border-[#E8E8E3] ml-5 my-1">
-                        {corSubNav.map((sub) => {
-                          const isSubActive =
-                            pathname === sub.href || pathname.startsWith(`${sub.href}/`);
-                          return (
-                            <Link
-                              key={sub.href}
-                              href={sub.href}
-                              className={`flex items-center justify-between px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                                isSubActive
-                                  ? "bg-[#000000] text-white font-medium border border-black"
-                                  : "text-[#6E6E69] hover:text-[#141413] hover:bg-[#F2F0ED]/60"
+                  return (
+                    <div key={item.href} className="space-y-1">
+                      <Link
+                        href={item.href}
+                        onMouseEnter={() => setHoveredHref(item.href)}
+                        className={`relative group flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs md:text-sm font-medium transition-colors duration-200 select-none ${
+                          isItemActive
+                            ? "text-[#1345EE] font-medium"
+                            : isHovered
+                            ? "text-[#1345EE]"
+                            : "text-[#6E6E69] hover:text-[#1345EE]"
+                        }`}
+                      >
+                        {/* Active Page Animated Pill */}
+                        {isItemActive && (
+                          <motion.div
+                            layoutId="desktop-active-pill"
+                            className="absolute inset-0 rounded-xl bg-[#EEF2FE] border border-[#1345EE]/15 shadow-2xs -z-10"
+                            transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                          />
+                        )}
+
+                        {/* Hover Gliding Pill (when not active item) */}
+                        {isHovered && !isItemActive && (
+                          <motion.div
+                            layoutId="desktop-hover-pill"
+                            className="absolute inset-0 rounded-xl bg-[#1345EE]/[0.06] border border-[#1345EE]/10 -z-10"
+                            transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                          />
+                        )}
+
+                        <div className="flex items-center gap-3">
+                          <Icon
+                            className={`w-4 h-4 stroke-[1.75] transition-colors duration-200 ${
+                              isItemActive || isHovered
+                                ? "text-[#1345EE]"
+                                : "text-[#8A8A85] group-hover:text-[#1345EE]"
+                            }`}
+                          />
+                          <span className="transition-colors duration-200">{item.name}</span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          {item.name === "Creators" && displayCounts.creators > 0 && (
+                            <span
+                              className={`text-[10px] font-bold px-2 py-0.5 rounded-md min-w-[20px] text-center transition-all duration-200 ${
+                                isItemActive
+                                  ? "bg-[#1345EE] text-white shadow-2xs"
+                                  : isHovered
+                                  ? "bg-[#1345EE]/15 text-[#1345EE] border border-[#1345EE]/30"
+                                  : "bg-[#F2F0ED] text-[#1345EE] border border-[#1345EE]/25"
                               }`}
                             >
-                              <span>{sub.name}</span>
-                              {sub.name === "Requests" && displayCounts.corRequests > 0 && (
-                                <span className="text-[9px] font-bold bg-white border border-[#1345EE]/30 text-[#1345EE] px-1.5 py-0.5 rounded-md">
-                                  {displayCounts.corRequests}
-                                </span>
-                              )}
-                              {sub.name === "Applications" && displayCounts.corApplications > 0 && (
-                                <span className="text-[9px] font-bold bg-white border border-[#1345EE]/30 text-[#1345EE] px-1.5 py-0.5 rounded-md">
-                                  {displayCounts.corApplications}
-                                </span>
-                              )}
-                            </Link>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </nav>
+                              {displayCounts.creators}
+                            </span>
+                          )}
+                          {item.name === "Artworks" && displayCounts.artworks > 0 && (
+                            <span
+                              className={`text-[10px] font-bold px-2 py-0.5 rounded-md min-w-[20px] text-center transition-all duration-200 ${
+                                isItemActive
+                                  ? "bg-[#1345EE] text-white shadow-2xs"
+                                  : isHovered
+                                  ? "bg-[#1345EE]/15 text-[#1345EE] border border-[#1345EE]/30"
+                                  : "bg-[#F2F0ED] text-[#1345EE] border border-[#1345EE]/25"
+                              }`}
+                            >
+                              {displayCounts.artworks}
+                            </span>
+                          )}
+                          {item.name === "Reports" && displayCounts.reports > 0 && (
+                            <span
+                              className={`text-[10px] font-bold px-2 py-0.5 rounded-md min-w-[20px] text-center transition-all duration-200 ${
+                                isItemActive
+                                  ? "bg-[#1345EE] text-white shadow-2xs"
+                                  : isHovered
+                                  ? "bg-[#1345EE]/15 text-[#1345EE] border border-[#1345EE]/30"
+                                  : "bg-[#F2F0ED] text-[#1345EE] border border-[#1345EE]/25"
+                              }`}
+                            >
+                              {displayCounts.reports}
+                            </span>
+                          )}
+                          {item.name === "COR" && displayTotalCor > 0 && !isCorActive && (
+                            <span
+                              className={`text-[10px] font-bold px-2 py-0.5 rounded-md min-w-[20px] text-center transition-all duration-200 ${
+                                isHovered
+                                  ? "bg-[#1345EE]/15 text-[#1345EE] border border-[#1345EE]/30"
+                                  : "bg-[#F2F0ED] text-[#1345EE] border border-[#1345EE]/25"
+                              }`}
+                            >
+                              {displayTotalCor}
+                            </span>
+                          )}
+
+                          {/* Animated Small Blue Circular Indicator */}
+                          {isItemActive && (
+                            <motion.span
+                              layoutId="desktop-active-indicator"
+                              className="w-1.5 h-1.5 rounded-full bg-[#1345EE] shadow-[0_0_6px_rgba(19,69,238,0.45)] shrink-0"
+                              transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                            />
+                          )}
+                        </div>
+                      </Link>
+
+                      {/* Render COR sub-nav when in COR section */}
+                      {isCor && isCorActive && (
+                        <div
+                          className="pl-5 pr-2 py-1 space-y-1 border-l-2 border-[#1345EE]/20 ml-5 my-1 relative"
+                          onMouseLeave={() => setHoveredSubHref(null)}
+                        >
+                          {corSubNav.map((sub) => {
+                            const isSubActive =
+                              pathname === sub.href || pathname.startsWith(`${sub.href}/`);
+                            const isSubHovered = hoveredSubHref === sub.href;
+                            return (
+                              <Link
+                                key={sub.href}
+                                href={sub.href}
+                                onMouseEnter={() => setHoveredSubHref(sub.href)}
+                                className={`relative flex items-center justify-between px-3 py-1.5 rounded-lg text-xs font-medium transition-colors duration-200 select-none ${
+                                  isSubActive
+                                    ? "text-[#1345EE] font-medium"
+                                    : isSubHovered
+                                    ? "text-[#1345EE]"
+                                    : "text-[#6E6E69] hover:text-[#1345EE]"
+                                }`}
+                              >
+                                {isSubActive && (
+                                  <motion.div
+                                    layoutId="desktop-sub-active-pill"
+                                    className="absolute inset-0 rounded-lg bg-[#EEF2FE] border border-[#1345EE]/15 -z-10"
+                                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                                  />
+                                )}
+                                {isSubHovered && !isSubActive && (
+                                  <motion.div
+                                    layoutId="desktop-sub-hover-pill"
+                                    className="absolute inset-0 rounded-lg bg-[#1345EE]/[0.06] -z-10"
+                                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                  />
+                                )}
+                                <span>{sub.name}</span>
+                                <div className="flex items-center gap-1.5">
+                                  {sub.name === "Requests" && displayCounts.corRequests > 0 && (
+                                    <span
+                                      className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md ${
+                                        isSubActive
+                                          ? "bg-[#1345EE] text-white"
+                                          : "bg-white border border-[#1345EE]/30 text-[#1345EE]"
+                                      }`}
+                                    >
+                                      {displayCounts.corRequests}
+                                    </span>
+                                  )}
+                                  {sub.name === "Applications" && displayCounts.corApplications > 0 && (
+                                    <span
+                                      className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md ${
+                                        isSubActive
+                                          ? "bg-[#1345EE] text-white"
+                                          : "bg-white border border-[#1345EE]/30 text-[#1345EE]"
+                                      }`}
+                                    >
+                                      {displayCounts.corApplications}
+                                    </span>
+                                  )}
+                                  {isSubActive && (
+                                    <motion.span
+                                      layoutId="desktop-sub-active-dot"
+                                      className="w-1.5 h-1.5 rounded-full bg-[#1345EE] shrink-0"
+                                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                                    />
+                                  )}
+                                </div>
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </nav>
+            </LayoutGroup>
 
             <div className="mt-8 mb-3 px-3 text-[11px] font-medium uppercase tracking-[0.2em] text-[#1345EE] font-sans flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-[#1345EE]" />

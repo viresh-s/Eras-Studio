@@ -28,6 +28,7 @@ export default function Footer() {
                   { label: 'Browse Art', href: '/discovery' },
                   { label: 'About', href: '/about' },
                   { label: 'Services', href: '/services' },
+                  { label: 'Careers', href: '/careers' },
                   { label: 'FAQ', href: '/faq' },
                 ].map((link) => (
                   <li key={link.label}>

@@ -34,7 +34,9 @@ export type Permission =
   | "cor:decline_request"
   | "cor:apply"
   | "cor:update_application"
-  | "cor:manage_opportunities";
+  | "cor:manage_opportunities"
+  | "careers:view"
+  | "careers:manage";
 
 const ROLE_PERMISSIONS: Record<AppRole, readonly Permission[]> = {
   super_admin: [
@@ -60,6 +62,8 @@ const ROLE_PERMISSIONS: Record<AppRole, readonly Permission[]> = {
     "cor:apply",
     "cor:update_application",
     "cor:manage_opportunities",
+    "careers:view",
+    "careers:manage",
   ],
   admin: [
     "report:view",
@@ -83,6 +87,8 @@ const ROLE_PERMISSIONS: Record<AppRole, readonly Permission[]> = {
     "cor:apply",
     "cor:update_application",
     "cor:manage_opportunities",
+    "careers:view",
+    "careers:manage",
   ],
   moderator: [
     "report:view",

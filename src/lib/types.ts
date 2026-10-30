@@ -523,3 +523,67 @@ export interface SettingsAuditLog {
   changedSettings: Record<string, { previous: any; current: any }>;
   createdAt: string;
 }
+
+
+// ==============================================================================
+// Careers & Applications Management Types
+// ==============================================================================
+
+export type CareerOpportunityStatus = "draft" | "published" | "closed";
+
+export interface CareerOpportunity {
+  id: string;
+  title: string;
+  department: string;
+  employmentType: string;
+  location: string;
+  workMode: "On-site" | "Hybrid" | "Remote" | string;
+  description: string;
+  responsibilities?: string;
+  requirements?: string;
+  experience?: string;
+  applicationDeadline?: string | null;
+  openings: number;
+  status: CareerOpportunityStatus;
+  createdAt: string;
+  updatedAt: string;
+  applicationCount?: number;
+}
+
+export interface CareerOpportunityFilters {
+  query?: string;
+  status?: CareerOpportunityStatus | "all";
+  department?: string;
+  workMode?: string;
+}
+
+export type CareerApplicationStatus =
+  | "Applied"
+  | "Under Review"
+  | "Shortlisted"
+  | "Interview"
+  | "Selected"
+  | "Rejected";
+
+export interface CareerApplication {
+  id: string;
+  opportunityId: string;
+  opportunityTitle?: string;
+  candidateName: string;
+  email: string;
+  phone: string;
+  resumeUrl: string;
+  portfolioUrl?: string | null;
+  linkedinUrl?: string | null;
+  coverLetter: string;
+  status: CareerApplicationStatus;
+  adminNotes?: string | null;
+  appliedAt: string;
+  updatedAt: string;
+}
+
+export interface CareerApplicationFilters {
+  query?: string;
+  opportunityId?: string | "all";
+  status?: CareerApplicationStatus | "all";
+}

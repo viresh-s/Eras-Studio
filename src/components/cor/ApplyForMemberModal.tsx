@@ -293,7 +293,7 @@ export function ApplyForMemberModal({
           <button
             type="submit"
             disabled={isSubmitting}
-            className="px-5 py-2 rounded-xl bg-[#1345EE] text-white text-xs font-medium hover:bg-[#0E35B8] transition-all shadow-soft-sm tracking-[0.04em] inline-flex items-center justify-center cursor-pointer"
+            className="admin-btn-premium-gradient px-5 py-2.5 text-white text-xs uppercase tracking-[0.08em] font-medium inline-flex items-center justify-center cursor-pointer select-none active:scale-[0.98]"
           >
             <span>{isSubmitting ? "Submitting..." : "Submit Application on Behalf"}</span>
             <ArrowRight className="w-3.5 h-3.5 ml-1.5 shrink-0" />

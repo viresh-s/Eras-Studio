@@ -378,11 +378,12 @@ export function CorOpportunityDetailClient({
 
               <div className="pt-4 border-t border-[#E8E8E3] flex justify-end">
                 <button
+                  type="button"
                   onClick={() => {
                     setSelectedMemberId(match.member.id);
                     setApplyModalOpen(true);
                   }}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#1345EE] text-white text-xs font-medium hover:bg-[#0E35B8] transition-all shadow-soft-sm"
+                  className="admin-btn-premium-gradient inline-flex items-center gap-1.5 px-4 py-2 text-white text-xs uppercase tracking-[0.08em] font-medium cursor-pointer"
                 >
                   <Send className="w-3 h-3 shrink-0" />
                   <span>Apply for {match.member.name}</span>

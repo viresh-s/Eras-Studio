@@ -318,11 +318,11 @@ export function GenerateReportButton() {
                 >
                   Cancel
                 </Button>
-                <Button
-                  variant="primary"
+                <button
+                  type="button"
                   onClick={handleGenerate}
                   disabled={isGenerating}
-                  className="min-w-[150px] rounded-xl px-6 py-2.5 !bg-[#1345EE] hover:!bg-[#0E35B8] !border-[#1345EE] text-white"
+                  className="admin-btn-premium-gradient min-w-[150px] px-6 py-2.5 text-white text-xs uppercase tracking-[0.08em] font-medium cursor-pointer select-none active:scale-[0.98]"
                 >
                   {isGenerating ? (
                     <span className="flex items-center gap-2">
@@ -334,7 +334,7 @@ export function GenerateReportButton() {
                   ) : (
                     "Generate PDF Report"
                   )}
-                </Button>
+                </button>
               </div>
             </>
           )}
