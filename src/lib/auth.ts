@@ -42,10 +42,9 @@ function getSessionSecret(): Uint8Array {
 
   if (process.env.NODE_ENV === "production") {
     if (!secret || secret.length < 32) {
-      console.warn(
-        "[SECURITY WARNING] SESSION_SECRET is not configured or shorter than 32 chars. Using fallback."
+      throw new Error(
+        "[SECURITY CRITICAL] SESSION_SECRET environment variable is missing or shorter than 32 characters in production. Aborting session token generation."
       );
-      return new TextEncoder().encode(secret || "erasstudio_prod_fallback_session_secret_32_chars");
     }
     return new TextEncoder().encode(secret);
   }

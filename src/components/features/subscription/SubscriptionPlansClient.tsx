@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Check, Sparkles, X, CreditCard, Loader2, ArrowRight } from 'lucide-react';
-import { upgradeUserPlanAction, PlanTier } from '@/actions/subscriptionActions';
+import { upgradeUserPlanAction, createRazorpayOrderAction, PlanTier, type RazorpayPaymentProof } from '@/actions/subscriptionActions';
 
 interface SubscriptionPlansClientProps {
   initialPlan: string | null;
@@ -15,7 +15,7 @@ interface SubscriptionPlansClientProps {
 const loadRazorpayScript = (): Promise<boolean> => {
   return new Promise((resolve) => {
     if (typeof window === 'undefined') return resolve(false);
-    if ((window as any).Razorpay) return resolve(true);
+    if ((window as unknown as { Razorpay?: unknown }).Razorpay) return resolve(true);
     const script = document.createElement('script');
     script.src = 'https://checkout.razorpay.com/v1/checkout.js';
     script.async = true;
@@ -54,10 +54,10 @@ export function SubscriptionPlansClient({
   const razorpayKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
 
   // Handle plan upgrade confirmation and database sync
-  const handleConfirmUpgrade = async (targetPlan: PlanTier, paymentId?: string) => {
+  const handleConfirmUpgrade = async (targetPlan: PlanTier, proof?: RazorpayPaymentProof | string) => {
     setIsLoading(true);
     try {
-      const res = await upgradeUserPlanAction(targetPlan, paymentId);
+      const res = await upgradeUserPlanAction(targetPlan, proof);
       if (res.success && res.plan) {
         setCurrentPlan(res.plan);
         setSelectedPlanForModal(null);
@@ -72,9 +72,9 @@ export function SubscriptionPlansClient({
       } else {
         alert(res.error || 'Failed to update subscription.');
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Upgrade error:', err);
-      alert(err.message || 'An unexpected error occurred.');
+      alert(err instanceof Error ? err.message : 'An unexpected error occurred.');
     } finally {
       setIsLoading(false);
     }
@@ -98,11 +98,23 @@ export function SubscriptionPlansClient({
           return;
         }
 
+        // Attempt to create authorized server-side order
+        let serverOrderId: string | undefined;
+        try {
+          const orderRes = await createRazorpayOrderAction(targetPlan as 'lite' | 'pro');
+          if (orderRes.success && orderRes.orderId) {
+            serverOrderId = orderRes.orderId;
+          }
+        } catch (orderErr) {
+          console.warn('[Razorpay] Server order init note:', orderErr);
+        }
+
         const amountInPaise = targetPlan === 'pro' ? 99900 : 49900;
-        const options = {
+        const options: Record<string, unknown> = {
           key: razorpayKey,
           amount: amountInPaise,
           currency: 'INR',
+          order_id: serverOrderId,
           name: 'ERAS Studio',
           description: `${targetPlan.toUpperCase()} Membership Subscription`,
           image: '/favicon.ico',
@@ -113,8 +125,12 @@ export function SubscriptionPlansClient({
           theme: {
             color: '#141413',
           },
-          handler: async function (response: any) {
-            await handleConfirmUpgrade(targetPlan, response.razorpay_payment_id);
+          handler: async function (response: { razorpay_payment_id: string; razorpay_order_id?: string; razorpay_signature?: string }) {
+            await handleConfirmUpgrade(targetPlan, {
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_signature: response.razorpay_signature,
+            });
           },
           modal: {
             ondismiss: function () {
@@ -123,14 +139,15 @@ export function SubscriptionPlansClient({
           },
         };
 
-        const rzp = new (window as any).Razorpay(options);
-        rzp.on('payment.failed', function (response: any) {
+        const RazorpayConstructor = (window as unknown as { Razorpay: new (opts: unknown) => { on: (event: string, handler: (resp: { error?: { description?: string } }) => void) => void; open: () => void } }).Razorpay;
+        const rzp = new RazorpayConstructor(options);
+        rzp.on('payment.failed', function (response: { error?: { description?: string } }) {
           console.error('Razorpay payment failed:', response.error);
-          alert(`Payment failed: ${response.error.description || 'Transaction declined'}`);
+          alert(`Payment failed: ${response.error?.description || 'Transaction declined'}`);
           setIsLoading(false);
         });
         rzp.open();
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Razorpay execution error:', err);
         setIsLoading(false);
         // Fallback direct activation

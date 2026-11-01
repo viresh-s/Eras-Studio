@@ -1298,22 +1298,51 @@ export class CorService {
       updated_at: now,
     };
 
+    // Step 1: Pre-flight check to prevent overlapping/duplicate slot bookings
     try {
-      const { data } = await this.supabase
+      const { data: existingSlot } = await this.supabase
         .from('cor_consultations')
-        .insert({
-          creator_id: creatorId,
-          consultant_name: DEFAULT_CONSULTANT,
-          slot_time: slotTime,
-          duration_minutes: 30,
-          purpose,
-          status: 'scheduled',
-          creator_notes: creatorNotes || null,
-        })
-        .select()
-        .single();
-      if (data) newConsultation.id = data.id;
-    } catch {}
+        .select('id')
+        .eq('consultant_name', DEFAULT_CONSULTANT)
+        .eq('slot_time', slotTime)
+        .eq('status', 'scheduled')
+        .maybeSingle();
+
+      if (existingSlot) {
+        throw new Error(`The consultation slot "${slotTime}" is already reserved. Please select another time.`);
+      }
+    } catch (checkErr: unknown) {
+      if (checkErr instanceof Error && checkErr.message.includes('already reserved')) {
+        throw checkErr;
+      }
+    }
+
+    // Step 2: Atomic insert with unique constraint protection
+    const { data, error } = await this.supabase
+      .from('cor_consultations')
+      .insert({
+        creator_id: creatorId,
+        consultant_name: DEFAULT_CONSULTANT,
+        slot_time: slotTime,
+        duration_minutes: 30,
+        purpose,
+        status: 'scheduled',
+        creator_notes: creatorNotes || null,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      // PostgreSQL unique_violation code 23505
+      if (error && typeof error === 'object' && 'code' in error && (error as { code: string }).code === '23505') {
+        throw new Error(`The slot "${slotTime}" was just reserved by another creator. Please select another time.`);
+      }
+      console.warn('[corService.bookConsultation] Database insert error:', error.message);
+    }
+
+    if (data) {
+      newConsultation.id = data.id;
+    }
 
     await this.logActivity(
       creatorId,
