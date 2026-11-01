@@ -7,7 +7,6 @@ import {
   CheckCircle2,
   FileText,
   User,
-  Sparkles,
   ArrowRight,
   Briefcase,
   GraduationCap,
@@ -217,8 +216,7 @@ export default function CorRequestPending({
 
           <div className="p-4 rounded-2xl bg-[#FAF9F6] border border-[#E8E8E3] text-xs text-[#6E6E69] space-y-1">
             <div className="flex items-center gap-1.5 font-medium text-[#141413]">
-              <Sparkles size={13} className="text-[#865E16]" />
-              <span>Assigned Reviewer</span>
+                            <span>Assigned Reviewer</span>
             </div>
             <p>
               Lead Curator: <strong>Priya Nair</strong> (Eras Career Advisory Team).

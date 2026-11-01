@@ -10,7 +10,6 @@ import {
   CheckCircle2,
   AlertCircle,
   XCircle,
-  Sparkles,
 } from 'lucide-react';
 import type { CorConsultation } from '@/types/cor';
 import { bookCorConsultationAction, cancelCorConsultationAction } from '@/actions/corActions';

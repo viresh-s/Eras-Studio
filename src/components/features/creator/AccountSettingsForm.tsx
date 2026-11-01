@@ -18,7 +18,6 @@ import {
   AlertCircle,
   KeyRound,
   Calendar,
-  Sparkles,
   Check,
   ArrowRight,
   Fingerprint,
@@ -202,7 +201,6 @@ export default function AccountSettingsForm({
               <p className="text-xs text-[#6E6E69] truncate mt-0.5">{currentEmail}</p>
               <div className="flex items-center gap-2 mt-2">
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wider bg-[#F4F4ED] text-[#141413] border border-[#E5E5DF]">
-                  <Sparkles className="w-2.5 h-2.5 text-[#865E16]" />
                   {userProfile?.role || 'Creator'}
                 </span>
                 <span className="inline-flex items-center gap-1 text-[11px] font-medium text-[#28633B]">

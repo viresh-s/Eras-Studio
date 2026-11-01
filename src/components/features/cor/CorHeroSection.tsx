@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { ArrowRight, Briefcase, Sparkles, CheckCircle2, UserCheck } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import type { CorProfile } from '@/types/cor';
 import CorStatusBadge from './CorStatusBadge';
 
@@ -30,9 +30,8 @@ export default function CorHeroSection({ profile, completeness }: CorHeroSection
               : 'Your career profile is active.'}
           </h2>
 
-          <p className="text-xs sm:text-sm text-[#6E6E69] flex items-center gap-1.5">
-            <UserCheck size={14} className="text-[#865E16]" />
-            <span>Assigned consultant: <strong className="text-[#141413]">{consultant}</strong></span>
+          <p className="text-xs sm:text-sm text-[#6E6E69]">
+            Assigned consultant: <strong className="text-[#141413]">{consultant}</strong>
           </p>
         </div>
 
@@ -49,23 +48,16 @@ export default function CorHeroSection({ profile, completeness }: CorHeroSection
 
   return (
     <div className="bg-[#FAF9F6] border border-[#E8E8E3] rounded-3xl p-7 sm:p-10 mb-8 flex flex-col lg:flex-row lg:items-center justify-between gap-8 shadow-xs">
-      <div className="max-w-2xl space-y-4">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] sm:text-xs font-semibold uppercase tracking-wider bg-[#FAF5EC] text-[#865E16] border border-[#EADFCF]">
-          <Sparkles size={11} className="text-[#865E16]" />
-          <span>{completeness > 0 ? `Profile ${completeness}% Complete` : 'Your Profile is Not Started'}</span>
+      <div className="max-w-2xl space-y-5">
+        <div className="inline-flex items-center px-3 py-1 rounded-full text-[10px] sm:text-xs font-semibold uppercase tracking-wider bg-[#FAF5EC] text-[#865E16] border border-[#EADFCF]">
+          <span>{completeness > 0 ? `Profile ${completeness}% Complete` : 'Profile Not Started'}</span>
         </div>
 
         <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-semibold text-[#141413] tracking-tight leading-tight">
-          More than your next job.
-          <br />
-          <em className="font-serif font-normal italic text-[#6E6E69]">Your next possibility.</em>
+          Your Next Possibility
         </h2>
 
-        <p className="text-xs sm:text-sm text-[#6E6E69] leading-relaxed max-w-xl font-normal">
-          Tell us about your skills, experience and ambitions. The Eras career team will review your profile and help you find your direction.
-        </p>
-
-        <div className="pt-2">
+        <div>
           <Link
             href="/cor/profile"
             className="px-7 py-3.5 rounded-full bg-[#141413] text-white text-xs sm:text-sm font-medium hover:bg-[#2A2A28] active:bg-black transition-all inline-flex items-center gap-2 cursor-pointer shadow-xs"
@@ -74,15 +66,6 @@ export default function CorHeroSection({ profile, completeness }: CorHeroSection
             <ArrowRight size={15} />
           </Link>
         </div>
-      </div>
-
-      <div className="hidden lg:flex flex-col items-center justify-center w-52 h-52 rounded-full border border-dashed border-[#D5D3CE] p-6 text-center bg-white shadow-2xs">
-        <div className="w-14 h-14 rounded-full bg-[#FAF9F6] flex items-center justify-center text-[#141413] mb-3 border border-[#E8E8E3]">
-          <Briefcase size={26} />
-        </div>
-        <p className="text-[10px] tracking-widest uppercase text-[#8A8A85] font-semibold">
-          CAREER / COMMUNITY / CREATIVITY
-        </p>
       </div>
     </div>
   );

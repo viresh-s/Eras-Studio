@@ -115,7 +115,7 @@ export default async function CreatorDashboard() {
               </span>
             </div>
             {/* Progress Bar */}
-            <div className="w-full bg-blue-100/70 rounded-full h-2 overflow-hidden mb-1.5">
+            <div className="w-full bg-blue-100/70 rounded-full h-2 overflow-hidden">
               <div
                 className="h-2 rounded-full transition-all duration-500"
                 style={{
@@ -124,9 +124,6 @@ export default async function CreatorDashboard() {
                 }}
               />
             </div>
-            <p className="text-xs text-[var(--color-cor-ink-light)]">
-              A little more about you makes a lasting impression.
-            </p>
           </div>
           <Link
             href="/profile"
@@ -140,24 +137,20 @@ export default async function CreatorDashboard() {
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
         <div className="bg-[var(--color-cor-surface)] rounded-3xl border border-[var(--color-cor-border)] p-5">
-          <p className="text-[11px] font-semibold tracking-[0.15em] text-[var(--color-cor-ink-light)] uppercase mb-3">Published Artworks</p>
+          <p className="text-[11px] font-semibold tracking-[0.15em] text-[var(--color-cor-ink-light)] uppercase mb-2">Published Artworks</p>
           <p className="text-3xl font-serif font-semibold text-[var(--color-cor-ink)]">{artworkCount || 0}</p>
-          <p className="text-xs text-[var(--color-cor-ink-light)] mt-1">Pieces listed</p>
         </div>
         <div className="bg-[var(--color-cor-surface)] rounded-3xl border border-[var(--color-cor-border)] p-5">
-          <p className="text-[11px] font-semibold tracking-[0.15em] text-[var(--color-cor-ink-light)] uppercase mb-3">Collections</p>
+          <p className="text-[11px] font-semibold tracking-[0.15em] text-[var(--color-cor-ink-light)] uppercase mb-2">Collections</p>
           <p className="text-3xl font-serif font-semibold text-[var(--color-cor-ink)]">0</p>
-          <p className="text-xs text-[var(--color-cor-ink-light)] mt-1">Curated sets</p>
         </div>
         <div className="bg-[var(--color-cor-surface)] rounded-3xl border border-[var(--color-cor-border)] p-5">
-          <p className="text-[11px] font-semibold tracking-[0.15em] text-[var(--color-cor-ink-light)] uppercase mb-3">Profile Views</p>
+          <p className="text-[11px] font-semibold tracking-[0.15em] text-[var(--color-cor-ink-light)] uppercase mb-2">Profile Views</p>
           <p className="text-3xl font-serif font-semibold text-[var(--color-cor-ink)]">0</p>
-          <p className="text-xs text-[var(--color-cor-ink-light)] mt-1">Visitors</p>
         </div>
         <div className="bg-[var(--color-cor-surface)] rounded-3xl border border-[var(--color-cor-border)] p-5">
-          <p className="text-[11px] font-semibold tracking-[0.15em] text-[var(--color-cor-ink-light)] uppercase mb-3">Shortlisted</p>
+          <p className="text-[11px] font-semibold tracking-[0.15em] text-[var(--color-cor-ink-light)] uppercase mb-2">Shortlisted</p>
           <p className="text-3xl font-serif font-semibold text-[var(--color-cor-ink)]">{chatCount || 0}</p>
-          <p className="text-xs text-[var(--color-cor-ink-light)] mt-1">Inquiries</p>
         </div>
       </div>
 
@@ -166,9 +159,6 @@ export default async function CreatorDashboard() {
         <div className="flex items-center justify-between mb-5">
           <div>
             <h2 className="text-2xl font-sans font-semibold text-[var(--color-cor-ink)]">Your works</h2>
-            <p className="text-xs text-[var(--color-cor-ink-light)] mt-0.5">
-              {artworkCount || 0} Artworks in total · Portfolio
-            </p>
           </div>
           <Link
             href="/portfolio/artworks"
@@ -188,11 +178,7 @@ export default async function CreatorDashboard() {
           </div>
         ) : (
           <div className="bg-[var(--color-cor-surface)] rounded-3xl border border-[var(--color-cor-border)] p-16 text-center">
-            <div className="w-16 h-16 rounded-full bg-[#F4F4ED] flex items-center justify-center mx-auto mb-4">
-              <Eye size={24} className="text-[var(--color-cor-ink-light)]" />
-            </div>
-            <p className="font-serif font-semibold text-[var(--color-cor-ink)] text-lg mb-2">No artworks yet</p>
-            <p className="text-[var(--color-cor-ink-light)] text-sm mb-6">Start showcasing your work to the world</p>
+            <p className="font-serif font-semibold text-[var(--color-cor-ink)] text-xl mb-6">No artworks yet</p>
             <RestrictedUploadAction 
               isLimited={isLimited} 
               label="Upload Your First Artwork"

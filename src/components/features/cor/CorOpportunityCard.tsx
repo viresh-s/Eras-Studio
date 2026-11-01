@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { Building, MapPin, Sparkles, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, CheckCircle2 } from 'lucide-react';
 import type { CorOpportunity } from '@/types/cor';
 
 interface CorOpportunityCardProps {
@@ -15,13 +15,12 @@ export default function CorOpportunityCard({ opportunity, isApplied = false }: C
         {/* Top Badges Row */}
         <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-[#141413] text-[#FAF5EC]">
-              <Sparkles size={10} className="text-[#FBBF24]" />
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-[#141413] text-[#FAF5EC]">
               <span>{opportunity.workplace_type}</span>
             </span>
 
             {opportunity.match_reasons && opportunity.match_reasons.length > 0 && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-[#FAF5EC] text-[#865E16] border border-[#EADFCF]">
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-[#FAF5EC] text-[#865E16] border border-[#EADFCF]">
                 {opportunity.match_reasons[0]}
               </span>
             )}
@@ -38,12 +37,10 @@ export default function CorOpportunityCard({ opportunity, isApplied = false }: C
         </h3>
 
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-[#6E6E69] mt-2 mb-3.5">
-          <span className="flex items-center gap-1.5 font-medium text-[#141413]">
-            <Building size={13} className="text-[#8A8A85]" />
+          <span className="font-medium text-[#141413]">
             {opportunity.company}
           </span>
-          <span className="flex items-center gap-1.5">
-            <MapPin size={13} className="text-[#8A8A85]" />
+          <span>
             {opportunity.location}
           </span>
         </div>

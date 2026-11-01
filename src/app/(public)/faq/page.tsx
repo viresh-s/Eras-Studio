@@ -87,10 +87,9 @@ export default function FaqPage() {
     <div>
       <section className="py-20">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-gray-900 mb-5">FAQ</h1>
-          <p className="text-xl text-gray-500">
-            Frequently asked questions about Eras Studio
-          </p>
+          <h1 className="text-5xl md:text-6xl font-serif font-bold tracking-tight text-[#141413]">
+            Frequently Asked Questions
+          </h1>
         </div>
       </section>
 

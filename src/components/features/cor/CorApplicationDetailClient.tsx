@@ -15,7 +15,6 @@ import {
   Phone,
   Briefcase,
   Layers,
-  Sparkles,
   Info,
 } from 'lucide-react';
 import type {

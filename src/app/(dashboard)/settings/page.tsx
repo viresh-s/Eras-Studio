@@ -2,7 +2,7 @@ import { getAuthenticatedUser, getAuthenticatedProfile } from '@/lib/supabase/se
 import { redirect } from 'next/navigation';
 import AccountSettingsForm from '@/components/features/creator/AccountSettingsForm';
 import Link from 'next/link';
-import { ShieldCheck, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 
 export default async function SettingsPage() {
   const user = await getAuthenticatedUser();
@@ -22,19 +22,10 @@ export default async function SettingsPage() {
           <ChevronRight className="w-3.5 h-3.5" />
           <span className="text-[#141413]">Account Settings</span>
         </div>
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-3xl sm:text-4xl font-serif font-bold text-[#141413] tracking-tight">
-              Account & Security
-            </h1>
-            <p className="mt-1.5 text-xs sm:text-sm text-[#6E6E69] max-w-2xl leading-relaxed">
-              Manage your credentials, authentication preferences, and security settings across Eras Studio.
-            </p>
-          </div>
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-[#E8E8E3] text-xs font-medium text-[#141413] shadow-2xs self-start sm:self-auto">
-            <ShieldCheck className="w-4 h-4 text-[#28633B]" />
-            <span>Account Protected</span>
-          </div>
+        <div>
+          <h1 className="text-3xl sm:text-4xl font-serif font-bold text-[#141413] tracking-tight">
+            Account & Security
+          </h1>
         </div>
       </div>
 

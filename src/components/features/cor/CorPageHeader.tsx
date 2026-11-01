@@ -8,7 +8,7 @@ interface CorPageHeaderProps {
 }
 
 export default function CorPageHeader({
-  eyebrow = 'CAREER OPPORTUNITY RESOURCE',
+  eyebrow,
   title,
   description,
   actions,

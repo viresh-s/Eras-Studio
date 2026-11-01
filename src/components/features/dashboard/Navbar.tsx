@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Settings, LogOut, ChevronDown, User, Sparkles } from 'lucide-react';
+import { Settings, LogOut, ChevronDown, User } from 'lucide-react';
 import { logout } from '@/actions/authActions';
 import type { Profile } from '@/types/database';
 import NotificationBell from './NotificationBell';
@@ -182,7 +182,7 @@ export default function Navbar({ profile }: NavbarProps) {
                   onClick={() => setDropdownOpen(false)}
                   className="flex items-center gap-2 px-4 py-2 text-sm text-[var(--color-cor-ink)] hover:bg-[#F5F5F5] transition-colors w-full text-left"
                 >
-                  <Sparkles size={16} className="text-[#865E16]" /> Subscription
+                  Subscription
                 </Link>
 
                 <div className="h-px bg-[var(--color-cor-border-light)] my-1"></div>

@@ -221,29 +221,7 @@ export function CareersPublicClient({ initialOpportunities }: CareersPublicClien
             Build Your Future With Us
           </h1>
 
-          {/* Intro Text */}
-          <p className="text-base sm:text-lg text-[#6E6E69] max-w-2xl mx-auto leading-relaxed mb-10">
-            Join our mission to connect independent creators with passionate art patrons
-            worldwide. We are building the editorial marketplace and institutional provenance
-            layer for contemporary culture.
-          </p>
-
-          {/* Value Badges */}
-          <div className="flex flex-wrap items-center justify-center gap-6 pt-4 text-xs text-[#6E6E69]">
-            <div className="flex items-center gap-2">
-              <Globe className="w-4 h-4 text-[#1345EE]" />
-              <span>Global Remote & Hybrid</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-[#865E16]" />
-              <span>Artist-First Stewardship</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-[#28633B]" />
-              <span>Institutional Excellence</span>
-            </div>
           </div>
-        </div>
       </section>
 
       {/* ========================================================================= */}

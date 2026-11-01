@@ -6,7 +6,6 @@ import {
   AlertCircle,
   ArrowRight,
   FileEdit,
-  Sparkles,
   HelpCircle,
   RefreshCw,
 } from 'lucide-react';

@@ -15,7 +15,7 @@ import CorPipelineGrid from '@/components/features/cor/CorPipelineGrid';
 import CorConsultationCard from '@/components/features/cor/CorConsultationCard';
 import CorRecentActivity from '@/components/features/cor/CorRecentActivity';
 import CorOpportunityCard from '@/components/features/cor/CorOpportunityCard';
-import { Calendar, ArrowRight, Sparkles } from 'lucide-react';
+import { Calendar, ArrowRight } from 'lucide-react';
 
 export const metadata = {
   title: 'COR PRO Dashboard | ErasStudio®',
@@ -76,9 +76,7 @@ export default async function CorDashboardPage() {
     <div className="max-w-6xl mx-auto py-4 sm:py-6 space-y-8 animate-in fade-in duration-200">
       {/* Page Header */}
       <CorPageHeader
-        eyebrow="CAREER OPPORTUNITY RESOURCE · MEMBER"
         title="Your next chapter starts here."
-        description="Human guidance. Thoughtful opportunities. A clearer way forward."
         actions={
           <Link
             href="/cor/consultations"
@@ -117,9 +115,6 @@ export default async function CorDashboardPage() {
               <h2 className="font-serif text-xl sm:text-2xl font-semibold text-[#141413]">
                 Recommended opportunities
               </h2>
-              <p className="text-xs text-[#6E6E69] mt-0.5">
-                Curated calls matched against your practice and desired roles.
-              </p>
             </div>
 
             <Link
@@ -143,12 +138,8 @@ export default async function CorDashboardPage() {
             </div>
           ) : (
             <div className="bg-white rounded-3xl border border-[#E8E8E3] p-12 text-center">
-              <Sparkles size={24} className="text-[#865E16] mx-auto mb-2" />
               <p className="font-serif text-lg font-semibold text-[#141413]">
                 Opportunities in Preparation
-              </p>
-              <p className="text-xs text-[#6E6E69] mt-1 max-w-sm mx-auto">
-                Our curatorial network is actively reviewing new calls for your medium. Check back soon or view the general directory.
               </p>
             </div>
           )}

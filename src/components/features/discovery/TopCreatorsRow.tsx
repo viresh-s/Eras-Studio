@@ -3,7 +3,7 @@
 import React, { useRef } from 'react';
 import Link from 'next/link';
 import { RankedCreator } from '@/lib/services/rankingService';
-import { ChevronLeft, ChevronRight, Sparkles, Check, ArrowRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Check, ArrowRight } from 'lucide-react';
 
 interface TopCreatorsRowProps {
   creators: RankedCreator[];

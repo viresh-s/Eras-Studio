@@ -3,7 +3,6 @@ import { notFound } from 'next/navigation';
 import ProfileTabs from '@/components/features/creator/ProfileTabs';
 import ReportUserButton from '@/components/features/user/ReportUserButton';
 import ArtistProfileAvatar from '@/components/features/creator/ArtistProfileAvatar';
-import { Sparkles } from 'lucide-react';
 
 interface ArtistProfilePageProps {
   params: Promise<{ id: string }>;
@@ -111,23 +110,13 @@ export default async function ArtistProfilePage({ params }: ArtistProfilePagePro
           >
             {profile.full_name}
           </h1>
-          
-          {profile.about_me && (
-            <p className="text-sm text-gray-600 mb-6 leading-relaxed max-w-lg mx-auto">
-              {profile.about_me}
-            </p>
-          )}
 
           <div className="flex justify-center items-center gap-3">
              <span
                className={`inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold rounded-full border shadow-2xs ${tierConfig.badgeClass}`}
                style={{ fontFamily: "'Poppins', sans-serif" }}
              >
-               {isPro ? (
-                 <Sparkles size={13} className="text-blue-600 shrink-0" />
-               ) : (
-                 <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${tierConfig.dotClass}`} />
-               )}
+               <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${tierConfig.dotClass}`} />
                <span>{tierConfig.label}</span>
              </span>
              {user && !isOwner && (

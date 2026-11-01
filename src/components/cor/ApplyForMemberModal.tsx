@@ -7,7 +7,7 @@ import { CorMember, CorOpportunity, CorApplicationStatus } from "@/lib/types";
 import { calculateMatch } from "@/lib/data/cor-matching";
 import { createCorApplicationAction } from "@/app/admin/actions";
 import { useToast } from "@/components/ui";
-import { Briefcase, UserCheck, Sparkles, CheckCircle2, AlertCircle, ArrowRight } from "lucide-react";
+import { Briefcase, UserCheck, CheckCircle2, AlertCircle, ArrowRight } from "lucide-react";
 
 interface ApplyForMemberModalProps {
   isOpen: boolean;
@@ -168,8 +168,7 @@ export function ApplyForMemberModal({
           <div className="p-5 rounded-2xl border border-[#E8E8E3] bg-[#F2F0ED]/70 space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-[#1345EE]" />
-                <span className="text-xs font-medium uppercase tracking-[0.1em] text-[#141413]">
+                                <span className="text-xs font-medium uppercase tracking-[0.1em] text-[#141413]">
                   Rule-based Match Profile
                 </span>
               </div>

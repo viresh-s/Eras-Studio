@@ -15,7 +15,7 @@ import {
   Shield,
   Users,
   BarChart3,
-  Sparkles,
+  Briefcase,
 } from 'lucide-react';
 import type { UserRole } from '@/types/database';
 
@@ -36,7 +36,7 @@ interface SidebarLink {
 
 const creatorLinks: SidebarLink[] = [
   { href: '/portfolio', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/cor', label: 'COR Hub', icon: Sparkles, badge: 'Pro' },
+  { href: '/cor', label: 'COR Hub', icon: Briefcase, badge: 'Pro' },
   { href: '/portfolio/artworks', label: 'My Artworks', icon: Image },
   { href: '/messages', label: 'Messages', icon: MessageCircle },
 ];
@@ -44,14 +44,14 @@ const creatorLinks: SidebarLink[] = [
 const userLinks: SidebarLink[] = [
   { href: '/user', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/discovery', label: 'Browse Art', icon: Search },
-  { href: '/cor', label: 'COR Hub', icon: Sparkles, badge: 'New' },
+  { href: '/cor', label: 'COR Hub', icon: Briefcase, badge: 'New' },
   { href: '/messages', label: 'Messages', icon: MessageCircle },
   { href: '/user/profile', label: 'Profile', icon: UserCircle },
 ];
 
 const adminLinks: SidebarLink[] = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/cor', label: 'COR Hub', icon: Sparkles, badge: 'Active' },
+  { href: '/cor', label: 'COR Hub', icon: Briefcase, badge: 'Active' },
   { href: '/admin/users', label: 'Users', icon: Users },
   { href: '/admin/artworks', label: 'Artworks', icon: Image },
   { href: '/admin/analytics', label: 'Analytics', icon: BarChart3 },

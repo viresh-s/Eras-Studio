@@ -5,7 +5,6 @@ import Link from 'next/link';
 import {
   Building,
   MapPin,
-  Sparkles,
   ExternalLink,
   CheckCircle2,
   ArrowRight,
@@ -35,8 +34,7 @@ export default function CorOpportunityDetailClient({
           <div className="border-b border-[#F0F0EB] pb-6 space-y-3">
             <div className="flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-[#141413] text-[#FAF5EC]">
-                <Sparkles size={12} className="text-[#FBBF24]" />
-                <span>{opportunity.workplace_type}</span>
+                                <span>{opportunity.workplace_type}</span>
               </span>
 
               {opportunity.match_reasons?.map((reason, idx) => (
@@ -171,8 +169,7 @@ export default function CorOpportunityDetailClient({
             <div className="space-y-4">
               <div className="p-4 bg-white border border-[#E8E8E3] rounded-2xl space-y-2.5">
                 <div className="flex items-center gap-1.5 font-semibold text-xs text-[#865E16]">
-                  <Sparkles size={14} />
-                  <span>COR Team Managed</span>
+                                    <span>COR Team Managed</span>
                 </div>
                 <p className="text-xs text-[#141413] font-medium leading-snug">
                   Our career advisors apply on your behalf.

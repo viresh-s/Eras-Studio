@@ -24,7 +24,6 @@ import {
   Save,
   CheckCircle2,
   AlertCircle,
-  Sparkles,
   ExternalLink,
   ChevronDown,
   ChevronUp,
@@ -1105,8 +1104,7 @@ export default function CorProfileWorkflow({ initialProfile }: CorProfileWorkflo
               {/* SECTION F: Significant Platforms */}
               <div className="space-y-4 pt-4 border-t border-[#F0F0EB]">
                 <div className="flex items-center gap-2 border-b border-[#E8E8E3] pb-2">
-                  <Sparkles size={16} className="text-[#B8532F]" />
-                  <h3 className="text-sm font-bold uppercase tracking-wider text-[#141413]">
+                                    <h3 className="text-sm font-bold uppercase tracking-wider text-[#141413]">
                     Section F — Significant Platforms
                   </h3>
                 </div>

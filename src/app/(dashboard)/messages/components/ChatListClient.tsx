@@ -13,7 +13,6 @@ import {
   Eye,
   Check,
   Clock,
-  Sparkles,
 } from 'lucide-react';
 import { acceptChatRequest, sendMessage, rejectChatRequest } from '@/actions/chatActions';
 import { createClient } from '@/lib/supabase/client';

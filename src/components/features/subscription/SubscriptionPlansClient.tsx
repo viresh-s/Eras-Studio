@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Check, Sparkles, X, CreditCard, Loader2, ArrowRight } from 'lucide-react';
+import { Check, X, CreditCard, Loader2, ArrowRight } from 'lucide-react';
 import { upgradeUserPlanAction, createRazorpayOrderAction, PlanTier, type RazorpayPaymentProof } from '@/actions/subscriptionActions';
 
 interface SubscriptionPlansClientProps {
@@ -164,7 +164,7 @@ export function SubscriptionPlansClient({
       {/* Toast Notification */}
       {successToast && (
         <div className="fixed top-20 right-6 z-50 max-w-md bg-[#141413] text-white p-4 rounded-2xl shadow-2xl border border-white/10 flex items-start gap-3 animate-in fade-in slide-in-from-top-4 duration-300">
-          <Sparkles className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+          
           <div className="flex-1 text-xs">
             <p className="font-semibold text-sm text-white">Subscription Updated</p>
             <p className="text-[#A1A19A] mt-0.5">{successToast}</p>
@@ -180,15 +180,9 @@ export function SubscriptionPlansClient({
 
       {/* Header */}
       <div className="max-w-2xl mb-12 sm:mb-16">
-        <p className="text-[11px] uppercase tracking-[0.2em] font-semibold text-[#8A8A85] mb-3">
-          ROOM TO GROW
-        </p>
-        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-bold text-[#141413] tracking-tight mb-3">
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-bold text-[#141413] tracking-tight">
           A plan for your practice.
         </h1>
-        <p className="text-sm sm:text-base text-[#6E6E69] leading-relaxed">
-          Start with your art. Add more possibilities when you&apos;re ready.
-        </p>
       </div>
 
       {/* Active Subscription Status Banner */}
@@ -223,9 +217,7 @@ export function SubscriptionPlansClient({
               </span>
             </div>
 
-            <p className="text-xs sm:text-sm text-[#6E6E69] mb-8 pb-6 border-b border-[#F0F0EB] min-h-[44px]">
-              A simple space to begin.
-            </p>
+
 
             {/* Features */}
             <ul className="space-y-4 mb-8">
@@ -280,9 +272,7 @@ export function SubscriptionPlansClient({
               <span className="text-xs sm:text-sm text-[#6E6E69] font-medium">/ month</span>
             </div>
 
-            <p className="text-xs sm:text-sm text-[#6E6E69] mb-8 pb-6 border-b border-[#F0F0EB] min-h-[44px]">
-              Give your portfolio room to grow.
-            </p>
+
 
             {/* Features */}
             <ul className="space-y-4 mb-8">
@@ -331,9 +321,7 @@ export function SubscriptionPlansClient({
             {/* Top Right Pill Badge */}
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-serif text-3xl font-bold text-white">Pro</h2>
-              <span className="px-3 py-1 rounded-full border border-white/20 bg-white/10 text-white text-[11px] font-medium tracking-wide">
-                Art + opportunity
-              </span>
+
             </div>
 
             <div className="mb-4 flex items-baseline gap-1.5">
@@ -343,9 +331,7 @@ export function SubscriptionPlansClient({
               <span className="text-xs sm:text-sm text-[#A1A19A] font-medium">/ month</span>
             </div>
 
-            <p className="text-xs sm:text-sm text-[#A1A19A] mb-8 pb-6 border-b border-white/10 min-h-[44px]">
-              Your art. Your next chapter.
-            </p>
+
 
             {/* Features */}
             <ul className="space-y-4 mb-8">

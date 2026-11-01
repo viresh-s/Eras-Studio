@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { Search, Sparkles, Filter, Briefcase, ArrowLeft } from 'lucide-react';
+import { Search, Filter, Briefcase, ArrowLeft } from 'lucide-react';
 import type { CorOpportunity } from '@/types/cor';
 import CorOpportunityCard from './CorOpportunityCard';
 
@@ -76,7 +76,6 @@ export default function CorOpportunitiesDirectory({
                 : 'text-[#6E6E69] hover:text-[#141413]'
             }`}
           >
-            <Sparkles size={11} className={onlyMatched ? 'text-[#865E16]' : ''} />
             <span>High Matches</span>
           </button>
         </div>

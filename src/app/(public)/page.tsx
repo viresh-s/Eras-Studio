@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowRight, Palette, Sparkles, MessageCircle, ShieldCheck, Compass } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import Marquee from 'react-fast-marquee';
 import LandingHeroVisual from '@/components/features/public/LandingHeroVisual';
 import { createClient } from '@/lib/supabase/server';
@@ -88,20 +88,10 @@ export default async function HomePage() {
             
             {/* Left Content */}
             <div className="lg:col-span-7 flex flex-col items-start z-10">
-              <div className="inline-flex items-center gap-2.5 px-4 py-2 bg-white/80 rounded-full text-xs font-semibold tracking-[0.2em] text-[#6E6E69] uppercase border border-[#E8E8E3] mb-8 shadow-sm">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#865E16] block" />
-                A SPACE FOR THE CREATIVE SPIRIT
-              </div>
-
-              <h1 className="text-5xl sm:text-7xl lg:text-[84px] font-bold text-[#141413] tracking-tight leading-[1.04] mb-8 font-serif">
+              <h1 className="text-5xl sm:text-7xl lg:text-[84px] font-bold text-[#141413] tracking-tight leading-[1.04] mb-10 font-serif">
                 Where art meets<br />
                 its <span className="italic font-normal">true collector.</span>
               </h1>
-
-              <p className="text-lg md:text-xl text-[#6E6E69] leading-relaxed mb-10 max-w-xl font-normal">
-                Eras Studio connects visionary independent artists with discerning patrons.
-                Discover original perspectives, acquire directly from creators, and build a collection of authentic significance.
-              </p>
 
               <div className="flex flex-wrap items-center gap-3">
                 <Link
@@ -156,10 +146,6 @@ export default async function HomePage() {
         <div className="max-w-[1400px] mx-auto px-6">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-14 gap-6">
             <div>
-              <p className="text-xs font-semibold tracking-[0.2em] text-[#6E6E69] uppercase mb-3 flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#865E16]" />
-                CURATED SELECTIONS
-              </p>
               <h2 className="text-3xl md:text-5xl font-bold font-serif tracking-tight text-[#141413]">
                 Recent works from the studio
               </h2>
@@ -242,70 +228,45 @@ export default async function HomePage() {
       <section className="py-24 md:py-32 bg-[#FAFAFA] border-y border-[#E8E8E3]">
         <div className="max-w-[1400px] mx-auto px-6">
           <div className="max-w-2xl mb-16">
-            <p className="text-xs font-semibold tracking-[0.2em] text-[#6E6E69] uppercase mb-3 flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#865E16]" />
-              THE ERAS STANDARD
-            </p>
-            <h2 className="text-3xl md:text-5xl font-bold font-serif tracking-tight text-[#141413] mb-4">
+            <h2 className="text-3xl md:text-5xl font-bold font-serif tracking-tight text-[#141413]">
               A gallery without walls, built for authentic craft.
             </h2>
-            <p className="text-base md:text-lg text-[#6E6E69] leading-relaxed">
-              We reimagined the relationship between artists and collectors—replacing opaque gallery politics with direct human dialogue.
-            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Pillar 1 */}
             <div className="bg-white rounded-3xl p-10 border border-[#E8E8E3] shadow-[0_4px_24px_rgba(0,0,0,0.02)] flex flex-col justify-between">
               <div>
-                <span className="text-xs font-mono font-bold tracking-widest text-[#865E16] uppercase block mb-6">
+                <span className="text-xs font-mono font-bold tracking-widest text-[#865E16] uppercase block mb-4">
                   01 / CREATOR AUTONOMY
                 </span>
-                <div className="w-12 h-12 rounded-2xl bg-[#F7F7F7] border border-[#E8E8E3] flex items-center justify-center mb-6">
-                  <Palette size={22} className="text-[#141413]" />
-                </div>
-                <h3 className="text-2xl font-serif font-bold text-[#141413] mb-3">
+                <h3 className="text-2xl font-serif font-bold text-[#141413]">
                   Sovereign Exhibition
                 </h3>
-                <p className="text-[#6E6E69] text-sm leading-relaxed">
-                  Artists retain total creative independence, curate their personal portfolio, and set their own acquisition terms without traditional commission gouging.
-                </p>
               </div>
             </div>
 
             {/* Pillar 2 */}
             <div className="bg-white rounded-3xl p-10 border border-[#E8E8E3] shadow-[0_4px_24px_rgba(0,0,0,0.02)] flex flex-col justify-between">
               <div>
-                <span className="text-xs font-mono font-bold tracking-widest text-[#865E16] uppercase block mb-6">
+                <span className="text-xs font-mono font-bold tracking-widest text-[#865E16] uppercase block mb-4">
                   02 / CERTIFIED PROVENANCE
                 </span>
-                <div className="w-12 h-12 rounded-2xl bg-[#F7F7F7] border border-[#E8E8E3] flex items-center justify-center mb-6">
-                  <ShieldCheck size={22} className="text-[#141413]" />
-                </div>
-                <h3 className="text-2xl font-serif font-bold text-[#141413] mb-3">
+                <h3 className="text-2xl font-serif font-bold text-[#141413]">
                   Direct Acquisition
                 </h3>
-                <p className="text-[#6E6E69] text-sm leading-relaxed">
-                  Every work is published directly from the verified artist’s studio. Patrons receive uncompromised authenticity, provenance, and narrative depth.
-                </p>
               </div>
             </div>
 
             {/* Pillar 3 */}
             <div className="bg-white rounded-3xl p-10 border border-[#E8E8E3] shadow-[0_4px_24px_rgba(0,0,0,0.02)] flex flex-col justify-between">
               <div>
-                <span className="text-xs font-mono font-bold tracking-widest text-[#865E16] uppercase block mb-6">
+                <span className="text-xs font-mono font-bold tracking-widest text-[#865E16] uppercase block mb-4">
                   03 / INTIMATE DIALOGUE
                 </span>
-                <div className="w-12 h-12 rounded-2xl bg-[#F7F7F7] border border-[#E8E8E3] flex items-center justify-center mb-6">
-                  <MessageCircle size={22} className="text-[#141413]" />
-                </div>
-                <h3 className="text-2xl font-serif font-bold text-[#141413] mb-3">
+                <h3 className="text-2xl font-serif font-bold text-[#141413]">
                   Private Studio Chat
                 </h3>
-                <p className="text-[#6E6E69] text-sm leading-relaxed">
-                  Direct one-on-one correspondence between creator and collector. Inquire about inspiration, discuss bespoke framing, or commission personalized creations.
-                </p>
               </div>
             </div>
           </div>
@@ -315,15 +276,9 @@ export default async function HomePage() {
       {/* 5. Curatorial Pull-Quote */}
       <section className="py-24 md:py-32">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <div className="w-10 h-10 rounded-full bg-[#F5F5F5] flex items-center justify-center mx-auto mb-8 text-[#865E16]">
-            <Compass size={20} />
-          </div>
-          <blockquote className="font-serif text-3xl sm:text-4xl md:text-5xl font-normal italic text-[#141413] leading-snug mb-8">
+          <blockquote className="font-serif text-3xl sm:text-4xl md:text-5xl font-normal italic text-[#141413] leading-snug">
             &ldquo;Art is not a passive decorative commodity—it is an authentic human dialogue waiting to be discovered.&rdquo;
           </blockquote>
-          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[#6E6E69]">
-            The Eras Studio Curatorial Direction
-          </p>
         </div>
       </section>
 
@@ -360,19 +315,10 @@ export default async function HomePage() {
             <div className="absolute top-0 right-0 w-96 h-96 bg-[#865E16] opacity-10 blur-3xl pointer-events-none rounded-full" />
 
             <div className="max-w-2xl mx-auto text-center relative z-10">
-              <p className="text-xs font-semibold tracking-[0.25em] text-[#865E16] uppercase mb-6 flex items-center justify-center gap-2">
-                <Sparkles size={14} />
-                THE CONTEMPORARY SALON
-              </p>
-
-              <h2 className="text-4xl sm:text-6xl font-serif font-bold tracking-tight mb-6 leading-tight">
+              <h2 className="text-4xl sm:text-6xl font-serif font-bold tracking-tight mb-10 leading-tight">
                 Begin your collection.<br />
                 <span className="italic font-normal text-white/80">Or share your craft.</span>
               </h2>
-
-              <p className="text-base md:text-lg text-[#9E9E98] leading-relaxed mb-10 max-w-xl mx-auto">
-                Whether you seek a singular masterpiece to transform your sanctuary, or an artist seeking visionary patrons—Eras Studio is your platform.
-              </p>
 
               <div className="flex flex-wrap items-center justify-center gap-3">
                 <Link
