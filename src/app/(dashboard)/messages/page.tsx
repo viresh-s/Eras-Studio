@@ -1,13 +1,13 @@
-import { createClient } from '@/lib/supabase/server';
+import { createClient, getAuthenticatedUser } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
 import ChatListClient from './components/ChatListClient';
 
 export default async function MessagesPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getAuthenticatedUser();
   if (!user) redirect('/login');
 
+  const supabase = await createClient();
   const { data: chats } = await supabase
     .from('inquiries_chats')
     .select(`

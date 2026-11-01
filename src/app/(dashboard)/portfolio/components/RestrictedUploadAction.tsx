@@ -49,7 +49,7 @@ export default function RestrictedUploadAction({
         <div
           style={{
             color: 'white',
-            fontSize: 16,
+            fontSize: 15,
             fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
             fontWeight: '600',
             lineHeight: '24px',

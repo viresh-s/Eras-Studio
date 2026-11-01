@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Settings, LogOut, ChevronDown, User, Sparkles } from 'lucide-react';
 import { logout } from '@/actions/authActions';
-import type { Profile, UserRole } from '@/types/database';
+import type { Profile } from '@/types/database';
 import NotificationBell from './NotificationBell';
 
 interface NavbarProps {
@@ -106,7 +106,6 @@ export default function Navbar({ profile }: NavbarProps) {
                 <Link
                   key={link.href}
                   href={link.href}
-                  prefetch={false}
                   className={`relative px-4 py-5 text-sm font-medium transition-colors ${
                     isActive
                       ? 'text-[var(--color-cor-ink)]'
@@ -129,7 +128,7 @@ export default function Navbar({ profile }: NavbarProps) {
             <div className="relative flex items-center" ref={dropdownRef}>
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="flex items-center gap-2.5 p-1 rounded-full hover:bg-gray-50 transition-colors"
+                className="flex items-center gap-2.5 p-1 rounded-full hover:bg-gray-50 transition-colors cursor-pointer"
               >
               <div className="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-600 overflow-hidden flex-shrink-0">
                 {profile.profile_pic_url ? (
@@ -191,7 +190,7 @@ export default function Navbar({ profile }: NavbarProps) {
                 <form action={logout}>
                   <button
                     type="submit"
-                    className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-[#FDF2F2] transition-colors w-full text-left"
+                    className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-[#FDF2F2] transition-colors w-full text-left cursor-pointer"
                   >
                     <LogOut size={16} /> Sign out
                   </button>
@@ -215,7 +214,6 @@ export default function Navbar({ profile }: NavbarProps) {
               <Link
                 key={link.href}
                 href={link.href}
-                prefetch={false}
                 className={`relative px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors ${
                   isActive
                     ? 'text-[var(--color-cor-ink)]'

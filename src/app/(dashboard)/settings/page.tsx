@@ -1,20 +1,14 @@
-import { createClient } from '@/lib/supabase/server';
+import { getAuthenticatedUser, getAuthenticatedProfile } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import AccountSettingsForm from '@/components/features/creator/AccountSettingsForm';
 import Link from 'next/link';
 import { ShieldCheck, ChevronRight } from 'lucide-react';
 
 export default async function SettingsPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getAuthenticatedUser();
   if (!user) redirect('/login');
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single();
-
+  const profile = await getAuthenticatedProfile(user.id);
   if (!profile) redirect('/login');
 
   return (

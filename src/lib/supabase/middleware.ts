@@ -6,6 +6,51 @@ export async function updateSession(request: NextRequest) {
     request,
   });
 
+  const pathname = request.nextUrl.pathname;
+  const isAdminLoginRoute = pathname === '/admin/login';
+  const isAdminRoute = pathname.startsWith('/admin');
+  const hasAdminCookie = Boolean(request.cookies.get('erasstudio_admin_session')?.value);
+
+  // If already logged into admin and accessing admin login page, redirect to overview
+  if (isAdminLoginRoute && hasAdminCookie) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/admin/overview';
+    return NextResponse.redirect(url);
+  }
+
+  // Fast-path: Check if any Supabase auth token cookie exists
+  const hasAuthCookie = request.cookies.getAll().some(
+    (c) => c.name.startsWith('sb-') && c.name.includes('-auth-token')
+  );
+
+  const isProtectedRoute =
+    pathname.startsWith('/artwork') ||
+    pathname.startsWith('/portfolio') ||
+    pathname.startsWith('/discovery') ||
+    pathname.startsWith('/cor') ||
+    pathname.startsWith('/messages') ||
+    pathname.startsWith('/settings') ||
+    pathname.startsWith('/subscription') ||
+    pathname.startsWith('/purchases') ||
+    pathname.startsWith('/user');
+
+  // If visiting a protected route without any auth token cookie, redirect to login immediately
+  if (isProtectedRoute && !hasAuthCookie) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/login';
+    return NextResponse.redirect(url);
+  }
+
+  const isAuthOrLandingRoute =
+    pathname === '/login' ||
+    pathname === '/signup' ||
+    pathname === '/';
+
+  // If public/landing/auth route and no auth cookie, proceed without Supabase network call
+  if (!hasAuthCookie && (isAuthOrLandingRoute || !isAdminRoute)) {
+    return supabaseResponse;
+  }
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -32,17 +77,6 @@ export async function updateSession(request: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
-  const isAdminLoginRoute = request.nextUrl.pathname === '/admin/login';
-  const isAdminRoute = request.nextUrl.pathname.startsWith('/admin');
-  const hasAdminCookie = Boolean(request.cookies.get('erasstudio_admin_session')?.value);
-
-  // If already logged into admin and accessing admin login page, redirect to overview
-  if (isAdminLoginRoute && hasAdminCookie) {
-    const url = request.nextUrl.clone();
-    url.pathname = '/admin/overview';
-    return NextResponse.redirect(url);
-  }
 
   // Handle protected admin routes
   if (isAdminRoute && !isAdminLoginRoute) {
@@ -71,16 +105,7 @@ export async function updateSession(request: NextRequest) {
     }
   }
 
-  // Other protected routes: artworks, discovery, portfolio, messages, settings, cor, subscription
-  const isProtectedRoute =
-    request.nextUrl.pathname.startsWith('/artwork') ||
-    request.nextUrl.pathname.startsWith('/portfolio') ||
-    request.nextUrl.pathname.startsWith('/discovery') ||
-    request.nextUrl.pathname.startsWith('/cor') ||
-    request.nextUrl.pathname.startsWith('/messages') ||
-    request.nextUrl.pathname.startsWith('/settings') ||
-    request.nextUrl.pathname.startsWith('/subscription');
-
+  // Handle standard protected user/creator routes
   if (isProtectedRoute && !user) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
@@ -92,13 +117,8 @@ export async function updateSession(request: NextRequest) {
   }
 
   // Redirect logged-in users away from auth pages and the landing page
-  const isAuthOrLandingRoute =
-    request.nextUrl.pathname === '/login' ||
-    request.nextUrl.pathname === '/signup' ||
-    request.nextUrl.pathname === '/';
-
   if (isAuthOrLandingRoute && user) {
-    if (request.nextUrl.pathname === '/login' && request.nextUrl.searchParams.get('verified') === 'true') {
+    if (pathname === '/login' && request.nextUrl.searchParams.get('verified') === 'true') {
       return supabaseResponse;
     }
 

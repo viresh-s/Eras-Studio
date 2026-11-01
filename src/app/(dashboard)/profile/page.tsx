@@ -1,20 +1,14 @@
-import { createClient } from '@/lib/supabase/server';
+import { getAuthenticatedUser, getAuthenticatedProfile } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import EditProfileForm from '@/components/features/creator/EditProfileForm';
 
 export const dynamic = 'force-dynamic';
 
 export default async function EditProfilePage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getAuthenticatedUser();
   if (!user) redirect('/login');
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single();
-
+  const profile = await getAuthenticatedProfile(user.id);
   if (!profile) redirect('/login');
 
   // If a collector somehow navigates to /profile, redirect them to the correct page

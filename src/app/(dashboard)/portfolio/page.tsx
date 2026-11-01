@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { createClient, getAuthenticatedUser, getAuthenticatedProfile } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
@@ -11,18 +11,19 @@ import RestrictedUploadAction from './components/RestrictedUploadAction';
 import { evaluateFreemiumStatus } from '@/lib/freemium/check';
 
 export default async function CreatorDashboard() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getAuthenticatedUser();
   if (!user) redirect('/login');
 
-  // Fetch all dashboard data concurrently in parallel
+  const supabase = await createClient();
+
+  // Fetch profile via request cache (shared with DashboardLayout) and remaining counts in parallel
   const [
-    { data: profile },
+    profile,
     { count: artworkCount },
     { count: chatCount },
     { data: artworks },
   ] = await Promise.all([
-    supabase.from('profiles').select('*').eq('id', user.id).maybeSingle(),
+    getAuthenticatedProfile(user.id),
     supabase.from('artworks').select('*', { count: 'exact', head: true }).eq('creator_id', user.id),
     supabase.from('inquiries_chats').select('*', { count: 'exact', head: true }).eq('creator_id', user.id),
     supabase
@@ -42,11 +43,11 @@ export default async function CreatorDashboard() {
     Boolean(profile?.location_city || profile?.location_country),
     Boolean(profile?.primary_medium),
     Boolean(profile?.about_me || profile?.artist_statement),
-    Boolean(profile?.artist_biography_url),
-    Boolean(profile?.latest_cv_url),
-    Boolean(profile?.artist_statement_doc_url),
-    Boolean(profile?.short_portfolio_url),
-    Boolean(profile?.long_portfolio_url),
+    Boolean(profile?.artist_bio_file_url),
+    Boolean(profile?.cv_file_url),
+    Boolean(profile?.artist_statement_file_url),
+    Boolean(profile?.short_portfolio_file_url),
+    Boolean(profile?.long_portfolio_file_url || profile?.portfolio_url),
     Boolean(profile?.top_artworks_drive_url),
   ];
   const filledFields = profileFields.filter(Boolean).length;
@@ -60,7 +61,12 @@ export default async function CreatorDashboard() {
       <div className="mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-4xl font-serif italic font-semibold text-[var(--color-cor-ink)] tracking-tight" style={{ fontFamily: "'Century Schoolbook', Century, serif", fontStyle: 'italic' }}>Portfolio</h1>
+            <h1
+              className="text-4xl font-serif italic font-semibold text-[var(--color-cor-ink)] tracking-tight"
+              style={{ fontFamily: "'Century Schoolbook', Century, 'TeX Gyre Schola', Georgia, serif", fontStyle: 'italic' }}
+            >
+              Portfolio Work
+            </h1>
           </div>
           <div className="flex flex-wrap items-center gap-3 mt-4 sm:mt-0">
             <Link

@@ -1,7 +1,9 @@
+import { cache } from 'react';
 import { createServerClient } from '@supabase/ssr';
-import { createClient as createSupabaseJsClient, SupabaseClient } from '@supabase/supabase-js';
+import { createClient as createSupabaseJsClient, SupabaseClient, type User } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 import type { Database } from './types';
+import type { Profile } from '@/types/database';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -85,3 +87,38 @@ export async function createClient() {
     }
   );
 }
+
+/**
+ * Memoized authenticated user fetch for the current request lifecycle.
+ * Deduplicates auth.getUser() calls across layout and pages during a single navigation.
+ */
+export const getAuthenticatedUser = cache(async (): Promise<User | null> => {
+  try {
+    const supabase = await createClient();
+    const { data: { user }, error } = await supabase.auth.getUser();
+    if (error || !user) return null;
+    return user;
+  } catch {
+    return null;
+  }
+});
+
+/**
+ * Memoized profile fetch for the current request lifecycle.
+ * Prevents duplicate profile queries across layout and child page components.
+ */
+export const getAuthenticatedProfile = cache(async (userId?: string): Promise<Profile | null> => {
+  try {
+    const user = userId ? { id: userId } : await getAuthenticatedUser();
+    if (!user) return null;
+    const supabase = await createClient();
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .maybeSingle();
+    return (profile as Profile | null) || null;
+  } catch {
+    return null;
+  }
+});

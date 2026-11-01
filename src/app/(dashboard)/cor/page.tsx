@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, getAuthenticatedUser, getAuthenticatedProfile } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { isProUser } from '@/lib/security/authGuard';
 import { CorService } from '@/lib/services/corService';
@@ -23,17 +23,10 @@ export const metadata = {
 };
 
 export default async function CorDashboardPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
+  const user = await getAuthenticatedUser();
   if (!user) redirect('/login');
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single();
-
+  const profile = await getAuthenticatedProfile(user.id);
   const isPro = isProUser(profile);
 
   if (!isPro) {
@@ -44,6 +37,7 @@ export default async function CorDashboardPage() {
     );
   }
 
+  const supabase = await createClient();
   const service = new CorService(supabase);
   const dashboardData = await service.getDashboardData(user.id);
   const { requestStatus, submittedAt, declinedReason, fullProfile } = dashboardData;

@@ -1,26 +1,16 @@
 import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, getAuthenticatedUser, getAuthenticatedProfile } from '@/lib/supabase/server';
 import DashboardShell from '@/components/features/dashboard/DashboardShell';
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const supabase = await createClient();
-
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getAuthenticatedUser();
   if (!user) redirect('/login');
 
-  const { data: profile, error: profileError } = await supabase
-    .from('profiles')
-    .select('full_name, profile_pic_url, role, plan, is_premium')
-    .eq('id', user.id)
-    .maybeSingle();
-
-  if (profileError) {
-    console.error("DashboardLayout Profile Fetch Error:", JSON.stringify(profileError, null, 2));
-  }
+  const profile = await getAuthenticatedProfile(user.id);
 
   if (!profile) {
-    // If we have a user but no profile in the DB, it could mean the trigger failed.
-    // Instead of infinite redirecting to /login, let's just sign them out.
+    // If we have a user but no profile in the DB, gracefully sign them out.
+    const supabase = await createClient();
     await supabase.auth.signOut();
     redirect('/login');
   }

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
+import { Suspense } from "react";
 import "./globals.css";
+import NavigationProgress from "@/components/providers/NavigationProgress";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -19,6 +21,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`h-full antialiased ${poppins.variable}`} suppressHydrationWarning>
       <body className={`min-h-full flex flex-col ${poppins.className}`} suppressHydrationWarning>
+        <Suspense fallback={null}>
+          <NavigationProgress />
+        </Suspense>
         {children}
       </body>
     </html>
