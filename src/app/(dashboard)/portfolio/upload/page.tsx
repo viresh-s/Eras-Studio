@@ -15,7 +15,12 @@ export default async function UploadPage() {
 
   return (
     <div>
-      <h1 className="font-heading text-3xl font-bold mb-6">Upload Artwork</h1>
+      <h1
+        className="text-3xl sm:text-4xl font-serif italic font-semibold text-[#141413] tracking-tight mb-6"
+        style={{ fontFamily: "'Century Schoolbook', Century, serif", fontStyle: 'italic' }}
+      >
+        Upload your artwork
+      </h1>
 
       <ArtworkUploadForm userId={user.id} freemiumStatus={freemiumStatus} />
     </div>

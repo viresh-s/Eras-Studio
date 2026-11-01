@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { Plus, Image } from 'lucide-react';
+import { Plus, Image as ImageIcon } from 'lucide-react';
 import ArtworkGridCard from '@/components/features/creator/ArtworkGridCard';
 import ArtworkCardActions from '@/components/features/creator/ArtworkCardActions';
 
@@ -38,10 +38,40 @@ export default async function CreatorArtworksPage() {
         </div>
         <Link
           href="/portfolio/upload"
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white rounded-full text-sm font-semibold hover:bg-gray-800 transition-all"
+          style={{
+            position: 'relative',
+            background: 'linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%)',
+            boxShadow:
+              '0px 7px 22px rgba(35, 77, 255, 0.13), 0px 3px 3px rgba(255, 255, 255, 0.65) inset, 0px -3px 6px rgba(6, 42, 137, 0.33) inset',
+            overflow: 'hidden',
+            borderRadius: 40,
+            outline: '2px #2356FF solid',
+            outlineOffset: '-2px',
+          }}
+          className="px-8 py-3.5 sm:px-10 sm:py-4 inline-flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 hover:brightness-110 active:scale-[0.98] group select-none shadow-md"
         >
-          <Plus size={16} />
-          Add Artwork
+          <div
+            style={{
+              position: 'absolute',
+              inset: 3,
+              borderRadius: 37,
+              border: '1px rgba(255, 255, 255, 0.15) solid',
+              pointerEvents: 'none',
+            }}
+          />
+          <div
+            style={{
+              color: 'white',
+              fontSize: 16,
+              fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
+              fontWeight: '600',
+              lineHeight: '24px',
+            }}
+            className="flex items-center gap-2 relative z-10"
+          >
+            <Plus size={18} className="text-white" />
+            <span>Add Artwork</span>
+          </div>
         </Link>
       </div>
 
@@ -56,7 +86,7 @@ export default async function CreatorArtworksPage() {
       ) : (
         <div className="bg-white rounded-xl border border-gray-200 p-16 text-center">
           <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
-            <Image size={24} className="text-gray-400" />
+            <ImageIcon size={24} className="text-gray-400" />
           </div>
           <p className="font-bold text-gray-900 text-lg mb-2">No artworks yet</p>
           <p className="text-gray-500 text-sm mb-6">Upload your first artwork to get started</p>

@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 import Link from 'next/link';
-import { Plus, Eye } from 'lucide-react';
+import { Eye } from 'lucide-react';
 import ArtworkGridCard from '@/components/features/creator/ArtworkGridCard';
 import ArtworkCardActions from '@/components/features/creator/ArtworkCardActions';
 import RestrictedUploadAction from './components/RestrictedUploadAction';
@@ -58,25 +58,39 @@ export default async function CreatorDashboard() {
     <div>
       {/* Header Section */}
       <div className="mb-8">
-        <p className="text-xs font-semibold tracking-[0.2em] text-[var(--color-cor-ink-light)] uppercase mb-2">
-          Your Creative Workspace
-        </p>
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-4xl font-serif italic font-semibold text-[var(--color-cor-ink)] tracking-tight mb-1" style={{ fontFamily: "'Century Schoolbook', Century, serif", fontStyle: 'italic' }}>My Portfolio</h1>
-            <p className="text-[var(--color-cor-ink-light)] text-sm">Make space for the work that matters.</p>
+            <h1 className="text-4xl font-serif italic font-semibold text-[var(--color-cor-ink)] tracking-tight" style={{ fontFamily: "'Century Schoolbook', Century, serif", fontStyle: 'italic' }}>Portfolio</h1>
           </div>
           <div className="flex flex-wrap items-center gap-3 mt-4 sm:mt-0">
             <Link
               href={`/artist/${profile?.id}`}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-[var(--color-cor-surface)] border border-[var(--color-cor-border)] text-[var(--color-cor-ink)] rounded-full text-xs uppercase tracking-[0.08em] font-medium hover:bg-[#F4F4ED] hover:border-[var(--color-cor-ink)] transition-all shadow-none"
+              style={{
+                position: 'relative',
+                background: '#181A1F',
+                overflow: 'hidden',
+                borderRadius: 40,
+              }}
+              className="px-8 py-3.5 sm:px-10 sm:py-4 inline-flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 hover:bg-black active:scale-[0.98] shadow-md select-none"
             >
-              <Eye size={15} />
-              Preview Profile
+              <span
+                style={{
+                  color: 'white',
+                  fontSize: 15,
+                  fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
+                  fontWeight: '600',
+                  lineHeight: '24px',
+                }}
+                className="flex items-center gap-2 relative z-10"
+              >
+                <Eye size={17} className="text-white" />
+                <span>Preview Profile</span>
+              </span>
             </Link>
             <RestrictedUploadAction 
               isLimited={isLimited} 
               label="Add Artwork" 
+              variant="gradient"
             />
           </div>
         </div>
