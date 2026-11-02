@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { updateProfile, updateProfileAvatar } from '@/actions/profileActions';
-import { Cloud, Loader2, CheckCircle2, AlertCircle, MessageCircle, ShoppingBag, Compass, User } from 'lucide-react';
+import { Camera, Loader2, CheckCircle2, AlertCircle, MessageCircle, ShoppingBag, Compass } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import type { Profile } from '@/types/database';
@@ -217,7 +217,7 @@ export default function CollectorProfileForm({ profile, email }: CollectorProfil
       <div className="max-w-5xl mx-auto bg-white rounded-[24px] border border-[#E8E8E3] shadow-[0_10px_40px_rgba(0,0,0,0.03)] overflow-hidden">
         <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] min-h-[520px]">
           {/* Left Vertical Navigation Sidebar */}
-          <nav className="border-b md:border-b-0 md:border-r border-[#E8E8E3] bg-white flex flex-col justify-between">
+          <nav className="border-b md:border-b-0 md:border-r border-[#E8E8E3] bg-white flex flex-col">
             <div>
               {/* 1. Collector Mini Identity Banner */}
               <div className="p-5 border-b border-[#E8E8E3] flex items-center gap-3 bg-white">
@@ -301,66 +301,6 @@ export default function CollectorProfileForm({ profile, email }: CollectorProfil
                 </button>
               </div>
 
-              {/* 3. Quick Collector Activity Shortcuts */}
-              <div className="p-5 border-t border-[#E8E8E3] bg-[#FAFAFA]/60 space-y-2">
-                <p className="text-[10px] font-semibold text-[#8E8E88] uppercase tracking-wider">
-                  Quick Access
-                </p>
-                <div className="space-y-1.5">
-                  <Link
-                    href="/messages"
-                    className="flex items-center justify-between px-3 py-2 rounded-[10px] bg-white border border-[#E2E2DC] hover:border-[#181A1F] text-xs font-medium text-[#343434] transition-colors group"
-                  >
-                    <div className="flex items-center gap-2">
-                      <MessageCircle size={14} className="text-[#8E8E88] group-hover:text-[#181A1F]" />
-                      <span>Inquiries & Messages</span>
-                    </div>
-                    <span className="text-[10px] text-[#8E8E88] group-hover:text-[#181A1F]">↗</span>
-                  </Link>
-
-                  <Link
-                    href="/purchases"
-                    className="flex items-center justify-between px-3 py-2 rounded-[10px] bg-white border border-[#E2E2DC] hover:border-[#181A1F] text-xs font-medium text-[#343434] transition-colors group"
-                  >
-                    <div className="flex items-center gap-2">
-                      <ShoppingBag size={14} className="text-[#8E8E88] group-hover:text-[#181A1F]" />
-                      <span>Purchases & Orders</span>
-                    </div>
-                    <span className="text-[10px] text-[#8E8E88] group-hover:text-[#181A1F]">↗</span>
-                  </Link>
-                </div>
-              </div>
-
-              {/* 4. Verified Status Box */}
-              <div className="p-5 border-t border-[#E8E8E3]">
-                <div className="bg-[#FAFAFA] border border-[#E8E8E3] rounded-[14px] p-3.5 space-y-1.5">
-                  <div className="flex items-center gap-1.5 text-xs font-semibold text-[#181A1F]">
-                    <CheckCircle2 size={13} className="text-emerald-600" />
-                    <span>Verified Art Patron</span>
-                  </div>
-                  <p className="text-[10.5px] text-[#71716D] leading-relaxed">
-                    Connected with curated creators for artwork inquiries, private previews, and acquisitions.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* 5. Bottom Discovery Action */}
-            <div className="p-5 border-t border-[#E8E8E3] bg-white space-y-2.5">
-              <Link
-                href="/discovery"
-                style={{
-                  background: '#F3F3F3',
-                  borderRadius: 12,
-                  fontFamily: "'Poppins', sans-serif",
-                  color: '#343434',
-                  fontWeight: 500,
-                }}
-                className="w-full py-2.5 px-3 hover:bg-[#EAEAEA] text-xs flex items-center justify-center gap-2 transition-all group"
-              >
-                <span>Browse Artworks Feed</span>
-                <Compass size={13} className="text-[#71716D] group-hover:text-[#181A1F]" />
-              </Link>
             </div>
           </nav>
 
@@ -373,43 +313,48 @@ export default function CollectorProfileForm({ profile, email }: CollectorProfil
                   <section aria-label="Basic Information">
 
                     <div className="flex flex-col sm:flex-row gap-8 items-start mb-6">
-                      {/* Left Sub-column: Avatar Circle & Replace */}
+                      {/* Left: Avatar Circle with Camera Icon */}
                       <div className="flex flex-col items-center shrink-0 w-full sm:w-44 pt-1">
-                        <div className="w-32 h-32 sm:w-36 sm:h-36 rounded-full overflow-hidden bg-[#F3F3F3] border border-[#E2E2DC] shadow-xs relative flex items-center justify-center">
-                          {avatarPreview ? (
-                            <Image
-                              src={avatarPreview}
-                              alt="Collector Avatar"
-                              fill
-                              sizes="(max-width: 640px) 128px, 144px"
-                              className="object-cover"
-                              unoptimized={avatarPreview.startsWith('blob:') || avatarPreview.startsWith('data:')}
-                              priority
-                            />
-                          ) : (
-                            <span className="text-2xl sm:text-3xl font-serif font-bold text-[#8E8E88]">
-                              {getInitials()}
-                            </span>
-                          )}
+                        <div className="relative">
+                          <div
+                            onClick={() => fileInputRef.current?.click()}
+                            className="w-32 h-32 sm:w-36 sm:h-36 rounded-full overflow-hidden bg-[#F3F3F3] border border-[#E2E2DC] shadow-xs relative flex items-center justify-center cursor-pointer group"
+                            title="Click to change profile headshot"
+                          >
+                            {avatarPreview ? (
+                              <Image
+                                src={avatarPreview}
+                                alt="Profile Headshot"
+                                fill
+                                sizes="(max-width: 640px) 128px, 144px"
+                                className="object-cover group-hover:opacity-90 transition-opacity"
+                                unoptimized={avatarPreview.startsWith('blob:') || avatarPreview.startsWith('data:')}
+                                priority
+                              />
+                            ) : (
+                              <span className="text-2xl sm:text-3xl font-serif font-bold text-[#8E8E88]">
+                                {getInitials()}
+                              </span>
+                            )}
 
-                          {isUploadingAvatar && (
-                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-20">
-                              <Loader2 size={24} className="text-white animate-spin" />
-                            </div>
-                          )}
+                            {isUploadingAvatar && (
+                              <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-20">
+                                <Loader2 size={24} className="text-white animate-spin" />
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Camera Icon Button */}
+                          <button
+                            type="button"
+                            onClick={() => fileInputRef.current?.click()}
+                            disabled={isUploadingAvatar}
+                            className="absolute bottom-1 right-1 w-9 h-9 rounded-full bg-white border border-[#E2E2DC] hover:border-[#181A1F] hover:bg-[#F8F8F8] text-[#181A1F] shadow-sm flex items-center justify-center transition-all cursor-pointer disabled:opacity-50 z-10"
+                            title="Change profile headshot"
+                          >
+                            <Camera size={14} />
+                          </button>
                         </div>
-
-                        {/* Replace Link with Cloud Icon */}
-                        <button
-                          type="button"
-                          onClick={() => fileInputRef.current?.click()}
-                          disabled={isUploadingAvatar}
-                          style={{ fontFamily: "'Poppins', sans-serif" }}
-                          className="mt-3 text-xs font-medium text-[#181A1F] hover:text-black hover:underline transition-all inline-flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
-                        >
-                          <Cloud size={14} className="text-[#181A1F]" />
-                          <span>Replace</span>
-                        </button>
 
                         <input
                           ref={fileInputRef}
@@ -518,16 +463,7 @@ export default function CollectorProfileForm({ profile, email }: CollectorProfil
                           />
                         </div>
 
-                        {/* Advisory helper box with minimalist styling */}
-                        <div className="bg-[#FAFAFA] rounded-[16px] border border-[#E8E8E3] p-4 text-[11px] text-[#555555] space-y-1.5 mt-2">
-                          <p className="font-semibold text-[#181A1F] flex items-center gap-1.5">
-                            <User size={13} className="text-[#181A1F]" />
-                            <span>Collector Verification Notice</span>
-                          </p>
-                          <p className="leading-relaxed text-[#71716D]">
-                            Your full name and location are visible to creators upon submitting acquisition inquiries or provenance registrations. Contact details remain confidential and are solely utilized for certificate verification and art dispatch.
-                          </p>
-                        </div>
+
                       </div>
                     </div>
                   </section>
