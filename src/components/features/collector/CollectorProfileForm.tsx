@@ -497,7 +497,7 @@ export default function CollectorProfileForm({ profile, email }: CollectorProfil
                           }}
                           className="text-[14px] font-normal text-[#181A1F] group-hover:text-[#1345EE] transition-colors"
                         >
-                          Purchases & Orders
+                          Purchase & Saved
                         </span>
                       </Link>
 
