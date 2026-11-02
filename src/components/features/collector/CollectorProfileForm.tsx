@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { updateProfile, updateProfileAvatar } from '@/actions/profileActions';
-import { Camera, Loader2, CheckCircle2, AlertCircle, MessageCircle, ShoppingBag, Compass } from 'lucide-react';
+import { Camera, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import type { Profile } from '@/types/database';
@@ -256,7 +256,7 @@ export default function CollectorProfileForm({ profile, email }: CollectorProfil
                   }}
                   className={`w-full text-left px-4 py-3 flex items-center justify-between transition-all duration-200 cursor-pointer group focus:outline-none ${
                     activeTab === 'basic'
-                      ? 'text-[#1345EE] font-semibold'
+                      ? 'text-[#1345EE] font-medium'
                       : 'text-[#646A77] hover:bg-[#F1F2FF] hover:text-[#1345EE] font-medium'
                   }`}
                 >
@@ -283,7 +283,7 @@ export default function CollectorProfileForm({ profile, email }: CollectorProfil
                   }}
                   className={`w-full text-left px-4 py-3 flex items-center justify-between transition-all duration-200 cursor-pointer group focus:outline-none ${
                     activeTab === 'activity'
-                      ? 'text-[#1345EE] font-semibold'
+                      ? 'text-[#1345EE] font-medium'
                       : 'text-[#646A77] hover:bg-[#F1F2FF] hover:text-[#1345EE] font-medium'
                   }`}
                 >
@@ -475,53 +475,44 @@ export default function CollectorProfileForm({ profile, email }: CollectorProfil
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <Link
                         href="/messages"
-                        className="p-4 rounded-[16px] border border-[#E8E8E3] hover:border-[#181A1F] hover:bg-[#FAFAFA] transition-all flex items-start gap-3.5 group"
+                        className="card-gradient-border-hover p-4 sm:p-5 flex items-center justify-between group cursor-pointer select-none"
                       >
-                        <div className="w-10 h-10 rounded-[12px] bg-[#F3F3F3] text-[#181A1F] flex items-center justify-center shrink-0">
-                          <MessageCircle size={18} />
-                        </div>
-                        <div>
-                          <p className="text-sm font-semibold text-[#181A1F] group-hover:text-black transition-colors">
-                            Inquiries & Messages
-                          </p>
-                          <p className="text-xs text-[#71716D] mt-0.5">
-                            Active conversations with creators and artists.
-                          </p>
-                        </div>
+                        <span
+                          style={{
+                            fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
+                          }}
+                          className="text-[14px] font-normal text-[#181A1F] group-hover:text-[#1345EE] transition-colors"
+                        >
+                          Inquiries & Messages
+                        </span>
                       </Link>
 
                       <Link
                         href="/purchases"
-                        className="p-4 rounded-[16px] border border-[#E8E8E3] hover:border-[#181A1F] hover:bg-[#FAFAFA] transition-all flex items-start gap-3.5 group"
+                        className="card-gradient-border-hover p-4 sm:p-5 flex items-center justify-between group cursor-pointer select-none"
                       >
-                        <div className="w-10 h-10 rounded-[12px] bg-[#F3F3F3] text-[#181A1F] flex items-center justify-center shrink-0">
-                          <ShoppingBag size={18} />
-                        </div>
-                        <div>
-                          <p className="text-sm font-semibold text-[#181A1F] group-hover:text-black transition-colors">
-                            Purchases & Orders
-                          </p>
-                          <p className="text-xs text-[#71716D] mt-0.5">
-                            Your acquired artworks and order history.
-                          </p>
-                        </div>
+                        <span
+                          style={{
+                            fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
+                          }}
+                          className="text-[14px] font-normal text-[#181A1F] group-hover:text-[#1345EE] transition-colors"
+                        >
+                          Purchases & Orders
+                        </span>
                       </Link>
 
                       <Link
                         href="/discovery"
-                        className="p-4 rounded-[16px] border border-[#E8E8E3] hover:border-[#181A1F] hover:bg-[#FAFAFA] transition-all flex items-start gap-3.5 group sm:col-span-2"
+                        className="card-gradient-border-hover p-4 sm:p-5 flex items-center justify-between group cursor-pointer select-none sm:col-span-2"
                       >
-                        <div className="w-10 h-10 rounded-[12px] bg-[#F3F3F3] text-[#181A1F] flex items-center justify-center shrink-0">
-                          <Compass size={18} />
-                        </div>
-                        <div>
-                          <p className="text-sm font-semibold text-[#181A1F]">
-                            Discover Artworks
-                          </p>
-                          <p className="text-xs text-[#71716D] mt-0.5">
-                            Explore trending original paintings, sculptures, and creator drops.
-                          </p>
-                        </div>
+                        <span
+                          style={{
+                            fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
+                          }}
+                          className="text-[14px] font-normal text-[#181A1F] group-hover:text-[#1345EE] transition-colors"
+                        >
+                          Discover Artworks
+                        </span>
                       </Link>
                     </div>
                   </section>

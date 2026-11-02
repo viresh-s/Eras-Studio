@@ -252,3 +252,28 @@ input:-webkit-autofill:active {
   cursor: not-allowed;
   pointer-events: none;
 }
+
+
+/* Card with Blue Gradient Border on Hover */
+.card-gradient-border-hover {
+  position: relative;
+  border-radius: 16px;
+  background-color: #ffffff;
+  border: 1.5px solid #E8E8E3;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-gradient-border-hover:hover {
+  border-color: transparent;
+  background: linear-gradient(#ffffff, #ffffff) padding-box,
+              linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%) border-box;
+  box-shadow: 0 4px 18px rgba(19, 69, 238, 0.08);
+  transform: translateY(-1px);
+}
+
+.card-gradient-border-hover:focus-visible {
+  border-color: transparent;
+  background: linear-gradient(#ffffff, #ffffff) padding-box,
+              linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%) border-box;
+  outline: none;
+}
