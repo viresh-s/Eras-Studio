@@ -25,6 +25,7 @@ import { Artwork, ArtworkStatus, Creator } from "@/lib/types";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { useToast } from "@/components/ui";
+import CollectionSelect from "@/components/collections/CollectionSelect";
 import {
   createArtworkAction,
   uploadArtworkMediaAction,
@@ -765,15 +766,10 @@ export function ArtworkUploadForm({
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-[#141413] mb-1">
-              Collection / Series
-            </label>
-            <input
-              type="text"
-              placeholder="e.g. Monsoon Studies"
+            <CollectionSelect
               value={collection}
-              onChange={(e) => setCollection(e.target.value)}
-              className="w-full text-xs px-3 py-2 rounded-lg border border-[#E8E8E3] bg-white text-[#141413] placeholder:text-[#8A8A85] focus:outline-none focus:border-[#B8532F]"
+              onChange={setCollection}
+              creatorId={selectedCreatorId}
             />
           </div>
         </div>

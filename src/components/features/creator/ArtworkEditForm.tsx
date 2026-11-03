@@ -15,6 +15,7 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { buildMediumOptions, getCustomMediums, saveCustomMedium } from '@/lib/constants/mediums';
 import { buildCollectionOptions, getCustomCollections, saveCustomCollection } from '@/lib/constants/collections';
+import { getCreatorCollections, createCollection } from '@/actions/collectionActions';
 import {
   MAX_PRICE_INR,
   MAX_PRICE_INR_FORMATTED,
@@ -175,11 +176,16 @@ export default function ArtworkEditForm({ userId, artwork }: ArtworkEditFormProp
   const [customStyle, setCustomStyle] = useState('');
   const [customCollection, setCustomCollection] = useState('');
 
-  // Load custom mediums and collections from localStorage on mount
+  // Load custom mediums and collections from localStorage & Supabase on mount
   useEffect(() => {
     setCustomMediums(getCustomMediums());
-    setCustomCollections(getCustomCollections());
-  }, []);
+    const localCols = getCustomCollections();
+    setCustomCollections(localCols);
+    getCreatorCollections(userId).then((items) => {
+      const titles = items.map((i) => i.title);
+      setCustomCollections((prev) => Array.from(new Set([...prev, ...titles])));
+    }).catch(() => {});
+  }, [userId]);
 
   const mediumOptions = useMemo(
     () => buildMediumOptions(customMediums, artwork.art_type),
@@ -421,6 +427,7 @@ export default function ArtworkEditForm({ userId, artwork }: ArtworkEditFormProp
       const finalCollection = data.collection === 'Other' ? customCollection.trim() : data.collection;
       if (data.collection === 'Other' && finalCollection) {
         saveCustomCollection(finalCollection);
+        createCollection({ title: finalCollection }).catch(() => {});
         setCustomCollections((prev) => {
           if (prev.some((c) => c.toLowerCase() === finalCollection.toLowerCase())) return prev;
           return [...prev, finalCollection];

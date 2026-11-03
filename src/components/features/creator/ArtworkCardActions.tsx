@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { updateArtwork, deleteArtwork } from '@/actions/artworkActions';
+import { getCreatorCollections, assignArtworkToCollection } from '@/actions/collectionActions';
 import { ChevronDown, Loader2, Check } from 'lucide-react';
 
 interface ArtworkCardActionsProps {
@@ -34,11 +35,26 @@ export default function ArtworkCardActions({ artwork, userId }: ArtworkCardActio
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const [isUpdatingCollection, setIsUpdatingCollection] = useState(false);
   const [collectionSaved, setCollectionSaved] = useState(false);
+  const [dynamicCollections, setDynamicCollections] = useState<string[]>([]);
+
+  useEffect(() => {
+    let mounted = true;
+    getCreatorCollections(userId).then((cols) => {
+      if (mounted) {
+        setDynamicCollections(cols.map((c) => c.title));
+      }
+    }).catch(() => {});
+    return () => { mounted = false; };
+  }, [userId]);
 
   // Dynamically include custom collection if present and not in standard list
-  const collectionList = artwork.collection && !standardCollections.includes(artwork.collection)
-    ? [...standardCollections, artwork.collection]
-    : standardCollections;
+  const collectionList = Array.from(
+    new Set([
+      ...dynamicCollections,
+      ...(artwork.collection ? [artwork.collection] : []),
+      ...standardCollections,
+    ])
+  );
 
   const handleEdit = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -112,7 +128,7 @@ export default function ArtworkCardActions({ artwork, userId }: ArtworkCardActio
     setIsUpdatingCollection(true);
 
     try {
-      await updateArtwork(artwork.id, { userId, collection: newCollection });
+      await assignArtworkToCollection(artwork.id, newCollection, newCollection);
       setCollectionSaved(true);
       setTimeout(() => setCollectionSaved(false), 2000);
       router.refresh();
