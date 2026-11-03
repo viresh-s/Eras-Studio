@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import NextImage from 'next/image';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
@@ -77,10 +78,17 @@ export default function Sidebar({ role, isCollapsed, onToggle }: SidebarProps) {
       }`}
     >
       {/* Logo */}
-      <div className="border-b border-gray-100 p-4 flex items-center justify-between">
+      <div className="border-b border-gray-100 p-4 flex items-center justify-between min-h-[65px]">
         {!isCollapsed && (
-          <Link href="/" className="text-lg font-extrabold tracking-tight text-gray-900 font-heading">
-            Eras Studio
+          <Link href="/" className="hover:opacity-90 transition-opacity flex items-center">
+            <NextImage
+              src="/images/eras-logo.png"
+              alt="ERAS"
+              width={90}
+              height={29}
+              className="h-7 w-auto object-contain select-none"
+              priority
+            />
           </Link>
         )}
         <button

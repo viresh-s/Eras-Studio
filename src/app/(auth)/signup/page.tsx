@@ -130,18 +130,17 @@ function SignupFormContent() {
         <div className="w-full max-w-[390px] mx-auto flex flex-col justify-center">
           
           {/* Brand Header: ERAS */}
-          <div className="text-center mb-1">
-            <span
-              style={{
-                fontFamily: "'Century Schoolbook', Century, 'TeX Gyre Schola', Georgia, serif",
-                color: '#123C83',
-                fontWeight: 700,
-                letterSpacing: '0.04em',
-              }}
-              className="text-2xl sm:text-[26px] uppercase block select-none"
-            >
-              ERAS
-            </span>
+          <div className="text-center mb-1 flex justify-center">
+            <Link href="/" className="hover:opacity-90 transition-opacity inline-flex items-center">
+              <Image
+                src="/images/eras-logo.png"
+                alt="ERAS"
+                width={120}
+                height={38}
+                className="h-8 w-auto object-contain select-none"
+                priority
+              />
+            </Link>
           </div>
 
           {/* Subtitle: Pick a side */}

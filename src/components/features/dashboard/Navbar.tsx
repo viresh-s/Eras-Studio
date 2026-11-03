@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { Settings, LogOut, ChevronDown, User } from 'lucide-react';
 import { logout } from '@/actions/authActions';
@@ -86,13 +87,15 @@ export default function Navbar({ profile }: NavbarProps) {
       <div className="max-w-[1400px] mx-auto px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/discovery" className="flex items-center gap-1 flex-shrink-0">
-            <span className="text-2xl font-semibold tracking-tight text-[var(--color-cor-ink)] font-serif italic">
-              Eras
-            </span>
-            <span className="text-xl font-medium tracking-tight text-[var(--color-cor-ink)] font-serif">
-              Studio
-            </span>
+          <Link href="/discovery" className="flex items-center flex-shrink-0 hover:opacity-90 transition-opacity">
+            <Image
+              src="/images/eras-logo.png"
+              alt="ERAS"
+              width={100}
+              height={32}
+              className="h-8 w-auto object-contain select-none"
+              priority
+            />
           </Link>
 
           {/* Center Navigation */}

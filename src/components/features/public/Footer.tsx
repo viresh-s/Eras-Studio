@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Footer() {
   return (
@@ -9,9 +10,14 @@ export default function Footer() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {/* Brand */}
             <div className="col-span-2 md:col-span-1">
-              <Link href="/" className="font-serif text-2xl font-bold tracking-tight text-white flex items-center gap-2">
-                <span>Eras Studio</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-[#865E16] inline-block mb-1"></span>
+              <Link href="/" className="hover:opacity-90 transition-opacity inline-flex items-center mb-1">
+                <Image
+                  src="/images/eras-logo.png"
+                  alt="ERAS"
+                  width={110}
+                  height={35}
+                  className="h-8 w-auto object-contain select-none"
+                />
               </Link>
               <p className="mt-3 text-[#9E9E98] text-sm leading-relaxed max-w-xs">
                 Where art meets its collector. An editorial marketplace connecting independent creators with passionate art patrons worldwide.

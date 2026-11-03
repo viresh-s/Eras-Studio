@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
 
@@ -22,9 +23,15 @@ export default function Navbar() {
     <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-[#E8E8E3]">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="font-serif text-2xl font-bold tracking-tight text-[#141413] hover:opacity-80 transition-opacity flex items-center gap-2">
-          <span>Eras Studio</span>
-          <span className="w-1.5 h-1.5 rounded-full bg-[#865E16] inline-block mb-1"></span>
+        <Link href="/" className="hover:opacity-90 transition-opacity flex items-center">
+          <Image
+            src="/images/eras-logo.png"
+            alt="ERAS"
+            width={105}
+            height={34}
+            className="h-8 w-auto object-contain select-none"
+            priority
+          />
         </Link>
 
         {/* Desktop Nav */}
