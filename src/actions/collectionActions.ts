@@ -386,3 +386,4 @@ export async function assignArtworkToCollection(
     return { success: false, error: err?.message || 'Failed to assign collection' };
   }
 }
+

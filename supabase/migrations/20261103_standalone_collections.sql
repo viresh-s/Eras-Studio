@@ -131,3 +131,4 @@ BEGIN
       AND (collection_id IS NULL OR collection_id <> new_col_id);
   END LOOP;
 END $$;
+
