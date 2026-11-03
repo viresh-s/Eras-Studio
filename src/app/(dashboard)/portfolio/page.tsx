@@ -127,9 +127,27 @@ export default async function CreatorDashboard() {
           </div>
           <Link
             href="/profile"
-            className="px-5 py-2.5 text-xs font-semibold text-[var(--color-cor-ink)] bg-[var(--color-cor-surface)] border border-[var(--color-cor-border)] rounded-full hover:bg-[#F4F4ED] hover:border-[var(--color-cor-ink)] transition-colors whitespace-nowrap self-start sm:self-center shrink-0"
+            style={{
+              position: 'relative',
+              background: '#F3F3F3',
+              overflow: 'hidden',
+              borderRadius: 42.35,
+            }}
+            className="px-7 py-3 sm:px-8 sm:py-3.5 inline-flex items-center justify-center transition-all duration-200 hover:bg-[#EAEAEA] active:scale-[0.98] cursor-pointer select-none whitespace-nowrap self-start sm:self-center shrink-0"
           >
-            Edit Profile →
+            <span
+              style={{
+                color: '#343434',
+                fontSize: 14.82,
+                fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
+                fontWeight: '600',
+                lineHeight: '17.05px',
+                wordWrap: 'break-word',
+              }}
+              className="text-center"
+            >
+              Edit Profile
+            </span>
           </Link>
         </div>
       )}
