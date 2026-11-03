@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import ProfileTabs from '@/components/features/creator/ProfileTabs';
 import ReportUserButton from '@/components/features/user/ReportUserButton';
 import ArtistProfileAvatar from '@/components/features/creator/ArtistProfileAvatar';
+import { getCreatorCollections } from '@/actions/collectionActions';
 
 interface ArtistProfilePageProps {
   params: Promise<{ id: string }>;
@@ -12,11 +13,12 @@ export default async function ArtistProfilePage({ params }: ArtistProfilePagePro
   const { id } = await params;
   const supabase = await createClient();
 
-  // Concurrently fetch profile, published artworks, and auth user
+  // Concurrently fetch profile, published artworks, auth user, and collections
   const [
     { data: profile },
     { data: artworks },
-    { data: { user } }
+    { data: { user } },
+    collections,
   ] = await Promise.all([
     supabase
       .from('profiles')
@@ -30,6 +32,7 @@ export default async function ArtistProfilePage({ params }: ArtistProfilePagePro
       .eq('is_published', true)
       .order('created_at', { ascending: false }),
     supabase.auth.getUser(),
+    getCreatorCollections(id),
   ]);
 
   if (!profile || profile.role !== 'Creator') {
@@ -132,7 +135,7 @@ export default async function ArtistProfilePage({ params }: ArtistProfilePagePro
 
         {/* Profile Tabs */}
         <div className="mt-8 max-w-6xl mx-auto">
-          <ProfileTabs artworks={artworks || []} profile={profile} />
+          <ProfileTabs artworks={artworks || []} profile={profile} collections={collections || []} />
         </div>
       </div>
     </div>
