@@ -65,7 +65,7 @@ export default async function CreatorArtworksPage() {
               color: 'white',
               fontSize: 15,
               fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
-              fontWeight: '600',
+              fontWeight: '400',
               lineHeight: '24px',
             }}
             className="flex items-center gap-2 relative z-10"
@@ -87,14 +87,14 @@ export default async function CreatorArtworksPage() {
       ) : (
         <div className="bg-white rounded-3xl border border-gray-200 p-16 text-center">
           <p
-            className="font-serif italic font-semibold text-gray-900 text-xl mb-6"
+            className="font-serif italic font-normal text-gray-900 text-xl mb-6"
             style={{ fontFamily: "'Century Schoolbook', Century, 'TeX Gyre Schola', Georgia, serif", fontStyle: 'italic' }}
           >
             No artworks yet
           </p>
           <Link
             href="/portfolio/upload"
-            className="inline-flex items-center gap-2 px-6 py-2.5 bg-gray-900 text-white rounded-full text-sm font-semibold hover:bg-black transition-all"
+            className="inline-flex items-center gap-2 px-6 py-2.5 bg-gray-900 text-white rounded-full text-sm font-normal hover:bg-black transition-all"
           >
             <Plus size={16} /> Add Artwork
           </Link>

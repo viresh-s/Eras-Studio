@@ -84,7 +84,7 @@ export default async function CreatorDashboard() {
                   color: 'white',
                   fontSize: 15,
                   fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
-                  fontWeight: '600',
+                  fontWeight: '400',
                   lineHeight: '24px',
                 }}
                 className="flex items-center gap-2 relative z-10"
@@ -107,10 +107,10 @@ export default async function CreatorDashboard() {
         <div className="bg-[var(--color-cor-surface)] rounded-3xl border border-[var(--color-cor-border)] p-5 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-5 shadow-2xs">
           <div className="flex-1 max-w-xl">
             <div className="flex items-center justify-between mb-1.5">
-              <span className="text-xs font-semibold text-[var(--color-cor-ink)]">
+              <span className="text-xs font-normal text-[var(--color-cor-ink)]">
                 Profile Completeness
               </span>
-              <span className="text-xs font-semibold text-[var(--color-cor-ink)]">
+              <span className="text-xs font-normal text-[var(--color-cor-ink)]">
                 {completeness}%
               </span>
             </div>
@@ -140,7 +140,7 @@ export default async function CreatorDashboard() {
                 color: '#343434',
                 fontSize: 14.82,
                 fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
-                fontWeight: '600',
+                fontWeight: '400',
                 lineHeight: '17.05px',
                 wordWrap: 'break-word',
               }}
@@ -155,20 +155,20 @@ export default async function CreatorDashboard() {
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
         <div className="bg-[var(--color-cor-surface)] rounded-3xl border border-[var(--color-cor-border)] p-5">
-          <p className="text-[11px] font-semibold tracking-[0.15em] text-[var(--color-cor-ink-light)] uppercase mb-2">Published Artworks</p>
-          <p className="text-3xl font-semibold text-[var(--color-cor-ink)]">{artworkCount || 0}</p>
+          <p className="text-[11px] font-normal tracking-[0.15em] text-[var(--color-cor-ink-light)] uppercase mb-2">Published Artworks</p>
+          <p className="text-3xl font-normal text-[var(--color-cor-ink)]">{artworkCount || 0}</p>
         </div>
         <div className="bg-[var(--color-cor-surface)] rounded-3xl border border-[var(--color-cor-border)] p-5">
-          <p className="text-[11px] font-semibold tracking-[0.15em] text-[var(--color-cor-ink-light)] uppercase mb-2">Collections</p>
-          <p className="text-3xl font-semibold text-[var(--color-cor-ink)]">0</p>
+          <p className="text-[11px] font-normal tracking-[0.15em] text-[var(--color-cor-ink-light)] uppercase mb-2">Collections</p>
+          <p className="text-3xl font-normal text-[var(--color-cor-ink)]">0</p>
         </div>
         <div className="bg-[var(--color-cor-surface)] rounded-3xl border border-[var(--color-cor-border)] p-5">
-          <p className="text-[11px] font-semibold tracking-[0.15em] text-[var(--color-cor-ink-light)] uppercase mb-2">Profile Views</p>
-          <p className="text-3xl font-semibold text-[var(--color-cor-ink)]">0</p>
+          <p className="text-[11px] font-normal tracking-[0.15em] text-[var(--color-cor-ink-light)] uppercase mb-2">Profile Views</p>
+          <p className="text-3xl font-normal text-[var(--color-cor-ink)]">0</p>
         </div>
         <div className="bg-[var(--color-cor-surface)] rounded-3xl border border-[var(--color-cor-border)] p-5">
-          <p className="text-[11px] font-semibold tracking-[0.15em] text-[var(--color-cor-ink-light)] uppercase mb-2">Shortlisted</p>
-          <p className="text-3xl font-semibold text-[var(--color-cor-ink)]">{chatCount || 0}</p>
+          <p className="text-[11px] font-normal tracking-[0.15em] text-[var(--color-cor-ink-light)] uppercase mb-2">Shortlisted</p>
+          <p className="text-3xl font-normal text-[var(--color-cor-ink)]">{chatCount || 0}</p>
         </div>
       </div>
 
@@ -177,7 +177,7 @@ export default async function CreatorDashboard() {
         <div className="flex items-center justify-between mb-5">
           <div>
             <h2
-              className="text-2xl font-serif italic font-semibold text-[var(--color-cor-ink)] tracking-tight"
+              className="text-2xl font-serif italic font-normal text-[var(--color-cor-ink)] tracking-tight"
               style={{ fontFamily: "'Century Schoolbook', Century, 'TeX Gyre Schola', Georgia, serif", fontStyle: 'italic' }}
             >
               Your works
@@ -185,7 +185,7 @@ export default async function CreatorDashboard() {
           </div>
           <Link
             href="/portfolio/artworks"
-            className="px-4 py-2 text-sm font-semibold text-[var(--color-cor-ink)] bg-[var(--color-cor-surface)] border border-[var(--color-cor-border)] rounded-full hover:bg-[#F4F4ED] transition-colors"
+            className="px-4 py-2 text-sm font-normal text-[var(--color-cor-ink)] bg-[var(--color-cor-surface)] border border-[var(--color-cor-border)] rounded-full hover:bg-[#F4F4ED] transition-colors"
           >
             Manage Collections
           </Link>
@@ -202,7 +202,7 @@ export default async function CreatorDashboard() {
         ) : (
           <div className="bg-[var(--color-cor-surface)] rounded-3xl border border-[var(--color-cor-border)] p-16 text-center">
             <p
-              className="font-serif italic font-semibold text-[var(--color-cor-ink)] text-xl mb-6"
+              className="font-serif italic font-normal text-[var(--color-cor-ink)] text-xl mb-6"
               style={{ fontFamily: "'Century Schoolbook', Century, 'TeX Gyre Schola', Georgia, serif", fontStyle: 'italic' }}
             >
               No artworks yet
@@ -210,7 +210,7 @@ export default async function CreatorDashboard() {
             <RestrictedUploadAction 
               isLimited={isLimited} 
               label="Upload Your First Artwork"
-              className="inline-flex items-center gap-2 px-6 py-2.5 bg-[var(--color-cor-ink)] text-white rounded-full text-sm font-semibold hover:bg-[#2A2A28] transition-all" 
+              className="inline-flex items-center gap-2 px-6 py-2.5 bg-[var(--color-cor-ink)] text-white rounded-full text-sm font-normal hover:bg-[#2A2A28] transition-all" 
             />
           </div>
         )}

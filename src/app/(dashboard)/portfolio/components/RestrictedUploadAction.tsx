@@ -51,7 +51,7 @@ export default function RestrictedUploadAction({
             color: 'white',
             fontSize: 15,
             fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
-            fontWeight: '600',
+            fontWeight: '400',
             lineHeight: '24px',
           }}
           className="flex items-center gap-2 relative z-10"
@@ -65,7 +65,7 @@ export default function RestrictedUploadAction({
 
   const buttonClass =
     className ||
-    'inline-flex items-center gap-2 px-5 py-2.5 bg-[#141413] text-white border border-[#141413] rounded-full text-xs uppercase tracking-[0.08em] font-medium hover:bg-black transition-all cursor-pointer shadow-xs';
+    'inline-flex items-center gap-2 px-5 py-2.5 bg-[#141413] text-white border border-[#141413] rounded-full text-xs uppercase tracking-[0.08em] font-normal hover:bg-black transition-all cursor-pointer shadow-xs';
 
   return (
     <Link
