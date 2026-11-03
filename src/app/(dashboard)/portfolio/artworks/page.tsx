@@ -27,10 +27,15 @@ export default async function CreatorArtworksPage() {
   ]);
 
   return (
-    <div>
+    <div style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}>
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-4xl font-serif font-bold text-gray-900 tracking-tight">My Artworks</h1>
+          <h1
+            className="text-4xl font-serif italic font-semibold text-gray-900 tracking-tight"
+            style={{ fontFamily: "'Century Schoolbook', Century, 'TeX Gyre Schola', Georgia, serif", fontStyle: 'italic' }}
+          >
+            My Artworks
+          </h1>
         </div>
         <Link
           href="/portfolio/upload"
@@ -81,7 +86,12 @@ export default async function CreatorArtworksPage() {
         </div>
       ) : (
         <div className="bg-white rounded-3xl border border-gray-200 p-16 text-center">
-          <p className="font-serif font-bold text-gray-900 text-xl mb-6">No artworks yet</p>
+          <p
+            className="font-serif italic font-semibold text-gray-900 text-xl mb-6"
+            style={{ fontFamily: "'Century Schoolbook', Century, 'TeX Gyre Schola', Georgia, serif", fontStyle: 'italic' }}
+          >
+            No artworks yet
+          </p>
           <Link
             href="/portfolio/upload"
             className="inline-flex items-center gap-2 px-6 py-2.5 bg-gray-900 text-white rounded-full text-sm font-semibold hover:bg-black transition-all"

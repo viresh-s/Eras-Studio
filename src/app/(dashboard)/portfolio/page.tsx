@@ -56,7 +56,7 @@ export default async function CreatorDashboard() {
   const isLimited = freemiumStatus.isLocked;
 
   return (
-    <div>
+    <div style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}>
       {/* Header Section */}
       <div className="mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -156,19 +156,19 @@ export default async function CreatorDashboard() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
         <div className="bg-[var(--color-cor-surface)] rounded-3xl border border-[var(--color-cor-border)] p-5">
           <p className="text-[11px] font-semibold tracking-[0.15em] text-[var(--color-cor-ink-light)] uppercase mb-2">Published Artworks</p>
-          <p className="text-3xl font-serif font-semibold text-[var(--color-cor-ink)]">{artworkCount || 0}</p>
+          <p className="text-3xl font-semibold text-[var(--color-cor-ink)]">{artworkCount || 0}</p>
         </div>
         <div className="bg-[var(--color-cor-surface)] rounded-3xl border border-[var(--color-cor-border)] p-5">
           <p className="text-[11px] font-semibold tracking-[0.15em] text-[var(--color-cor-ink-light)] uppercase mb-2">Collections</p>
-          <p className="text-3xl font-serif font-semibold text-[var(--color-cor-ink)]">0</p>
+          <p className="text-3xl font-semibold text-[var(--color-cor-ink)]">0</p>
         </div>
         <div className="bg-[var(--color-cor-surface)] rounded-3xl border border-[var(--color-cor-border)] p-5">
           <p className="text-[11px] font-semibold tracking-[0.15em] text-[var(--color-cor-ink-light)] uppercase mb-2">Profile Views</p>
-          <p className="text-3xl font-serif font-semibold text-[var(--color-cor-ink)]">0</p>
+          <p className="text-3xl font-semibold text-[var(--color-cor-ink)]">0</p>
         </div>
         <div className="bg-[var(--color-cor-surface)] rounded-3xl border border-[var(--color-cor-border)] p-5">
           <p className="text-[11px] font-semibold tracking-[0.15em] text-[var(--color-cor-ink-light)] uppercase mb-2">Shortlisted</p>
-          <p className="text-3xl font-serif font-semibold text-[var(--color-cor-ink)]">{chatCount || 0}</p>
+          <p className="text-3xl font-semibold text-[var(--color-cor-ink)]">{chatCount || 0}</p>
         </div>
       </div>
 
@@ -176,7 +176,12 @@ export default async function CreatorDashboard() {
       <div className="mb-8">
         <div className="flex items-center justify-between mb-5">
           <div>
-            <h2 className="text-2xl font-sans font-semibold text-[var(--color-cor-ink)]">Your works</h2>
+            <h2
+              className="text-2xl font-serif italic font-semibold text-[var(--color-cor-ink)] tracking-tight"
+              style={{ fontFamily: "'Century Schoolbook', Century, 'TeX Gyre Schola', Georgia, serif", fontStyle: 'italic' }}
+            >
+              Your works
+            </h2>
           </div>
           <Link
             href="/portfolio/artworks"
@@ -196,7 +201,12 @@ export default async function CreatorDashboard() {
           </div>
         ) : (
           <div className="bg-[var(--color-cor-surface)] rounded-3xl border border-[var(--color-cor-border)] p-16 text-center">
-            <p className="font-serif font-semibold text-[var(--color-cor-ink)] text-xl mb-6">No artworks yet</p>
+            <p
+              className="font-serif italic font-semibold text-[var(--color-cor-ink)] text-xl mb-6"
+              style={{ fontFamily: "'Century Schoolbook', Century, 'TeX Gyre Schola', Georgia, serif", fontStyle: 'italic' }}
+            >
+              No artworks yet
+            </p>
             <RestrictedUploadAction 
               isLimited={isLimited} 
               label="Upload Your First Artwork"
