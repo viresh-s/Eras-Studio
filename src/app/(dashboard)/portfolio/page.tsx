@@ -7,6 +7,7 @@ import { Eye } from 'lucide-react';
 import ArtworkGridCard from '@/components/features/creator/ArtworkGridCard';
 import ArtworkCardActions from '@/components/features/creator/ArtworkCardActions';
 import RestrictedUploadAction from './components/RestrictedUploadAction';
+import { getCreatorCollections } from '@/actions/collectionActions';
 
 import { evaluateFreemiumStatus } from '@/lib/freemium/check';
 
@@ -22,6 +23,7 @@ export default async function CreatorDashboard() {
     { count: artworkCount },
     { count: chatCount },
     { data: artworks },
+    collections,
   ] = await Promise.all([
     getAuthenticatedProfile(user.id),
     supabase.from('artworks').select('*', { count: 'exact', head: true }).eq('creator_id', user.id),
@@ -32,6 +34,7 @@ export default async function CreatorDashboard() {
       .eq('creator_id', user.id)
       .eq('is_published', true)
       .order('created_at', { ascending: false }),
+    getCreatorCollections(user.id),
   ]);
 
   const freemiumStatus = evaluateFreemiumStatus(profile, artworkCount || 0);
@@ -160,7 +163,7 @@ export default async function CreatorDashboard() {
         </div>
         <div className="bg-[var(--color-cor-surface)] rounded-3xl border border-[var(--color-cor-border)] p-5">
           <p className="text-[11px] font-normal tracking-[0.15em] text-[var(--color-cor-ink-light)] uppercase mb-2">Collections</p>
-          <p className="text-3xl font-normal text-[var(--color-cor-ink)]">0</p>
+          <p className="text-3xl font-normal text-[var(--color-cor-ink)]">{collections?.length || 0}</p>
         </div>
         <div className="bg-[var(--color-cor-surface)] rounded-3xl border border-[var(--color-cor-border)] p-5">
           <p className="text-[11px] font-normal tracking-[0.15em] text-[var(--color-cor-ink-light)] uppercase mb-2">Profile Views</p>
@@ -184,7 +187,7 @@ export default async function CreatorDashboard() {
             </h2>
           </div>
           <Link
-            href="/portfolio/artworks"
+            href="/portfolio/collections"
             className="px-4 py-2 text-sm font-normal text-[var(--color-cor-ink)] bg-[var(--color-cor-surface)] border border-[var(--color-cor-border)] rounded-full hover:bg-[#F4F4ED] transition-colors"
           >
             Manage Collections
