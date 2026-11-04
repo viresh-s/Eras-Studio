@@ -1,8 +1,38 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import PurchasesClient from '@/components/features/collector/PurchasesClient';
+import PurchasesClient, {
+  FormattedAcquisition,
+  SavedArtwork,
+} from '@/components/features/collector/PurchasesClient';
 
 export const dynamic = 'force-dynamic';
+
+interface InquiryArtwork {
+  id?: string;
+  title?: string;
+  image_url?: string;
+  price?: number | null;
+  status?: string;
+  art_type?: string | null;
+  artist_name?: string | null;
+  profiles?: {
+    full_name?: string | null;
+    profile_pic_url?: string | null;
+  } | null;
+}
+
+interface RawSavedArtworkRecord {
+  id?: string;
+  title?: string;
+  image_url?: string;
+  art_type?: string | null;
+  artist_name?: string | null;
+  status?: string | null;
+  profiles?: {
+    full_name?: string | null;
+    profile_pic_url?: string | null;
+  } | null;
+}
 
 export default async function PurchasesPage() {
   const supabase = await createClient();
@@ -49,16 +79,35 @@ export default async function PurchasesPage() {
     .eq('user_id', user.id)
     .order('created_at', { ascending: false });
 
-  const savedArtworks = savedItems?.map(item => item.artworks).filter(Boolean) || [];
+  const savedArtworks: SavedArtwork[] = [];
+  (savedItems || []).forEach((item) => {
+    const art = (Array.isArray(item.artworks) ? item.artworks[0] : item.artworks) as RawSavedArtworkRecord | null;
+    if (art && art.id && art.image_url) {
+      savedArtworks.push({
+        id: art.id,
+        title: art.title || 'Untitled',
+        image_url: art.image_url,
+        art_type: art.art_type ?? null,
+        artist_name: art.artist_name ?? null,
+        status: art.status ?? 'Available',
+        profiles: art.profiles
+          ? {
+              full_name: art.profiles.full_name ?? null,
+              profile_pic_url: art.profiles.profile_pic_url ?? null,
+            }
+          : null,
+      });
+    }
+  });
 
   // Format data safely for client
-  const formattedAcquisitions = (inquiries || [])
-    .filter(inq => Boolean(inq.artworks))
-    .map(inq => {
-      const artwork = inq.artworks as any;
+  const formattedAcquisitions: FormattedAcquisition[] = (inquiries || [])
+    .filter((inq) => Boolean(inq.artworks))
+    .map((inq) => {
+      const artwork = inq.artworks as InquiryArtwork | null;
       return {
         id: inq.id,
-        artworkId: artwork?.id,
+        artworkId: artwork?.id || '',
         title: artwork?.title || 'Untitled Artwork',
         imageUrl: artwork?.image_url || '',
         price: artwork?.price ?? null,

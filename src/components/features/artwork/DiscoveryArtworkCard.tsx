@@ -17,7 +17,7 @@ export interface DiscoveryArtworkCardProps {
       profile_pic_url?: string | null;
     } | null;
   };
-  creatorName?: string;
+  creatorName?: string | null;
   creatorAvatar?: string | null;
   className?: string;
 }
@@ -47,7 +47,7 @@ export default function DiscoveryArtworkCard({
     null;
 
   return (
-    <div className={`break-inside-avoid mb-4 sm:mb-5 group ${className}`}>
+    <div className={`break-inside-avoid group ${className !== '' ? className : 'mb-4 sm:mb-5'}`}>
       <div className="relative bg-white rounded-[22px] p-2 border border-[#EBEBE6] shadow-[0_2px_10px_rgba(20,20,19,0.03)] hover:shadow-[0_10px_28px_rgba(20,20,19,0.08)] transition-all duration-300">
         <Link href={`/artwork/${artwork.id}`} className="block cursor-pointer">
           {/* Artwork Image Container with Anti-Download Shield */}
