@@ -5,7 +5,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
-  Mail,
   Eye,
   EyeOff,
   CheckCircle2,
@@ -32,6 +31,7 @@ const ResendCountdownButton = memo(function ResendCountdownButton({
   disabled = false,
 }: ResendCountdownButtonProps) {
   const [countdown, setCountdown] = useState(60);
+  const [isResending, setIsResending] = useState(false);
 
   useEffect(() => {
     if (countdown <= 0) return;
@@ -41,24 +41,48 @@ const ResendCountdownButton = memo(function ResendCountdownButton({
     return () => clearInterval(timer);
   }, [countdown]);
 
-  const handleClick = async () => {
-    if (countdown > 0 || disabled) return;
-    setCountdown(60);
-    await onResend();
+  const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (countdown > 0 || disabled || isResending) return;
+    setIsResending(true);
+    try {
+      await onResend();
+      setCountdown(60);
+    } finally {
+      setIsResending(false);
+    }
   };
 
   return (
     <button
       type="button"
       onClick={handleClick}
-      disabled={countdown > 0 || disabled}
+      disabled={countdown > 0 || disabled || isResending}
       style={{ fontFamily: "'Poppins', sans-serif" }}
-      className={`transition-colors flex items-center gap-1.5 cursor-pointer ${
-        countdown > 0 ? 'text-[#A1A1A1] cursor-not-allowed' : 'text-[#181A1F] hover:underline font-medium'
+      className={`transition-colors flex items-center gap-1.5 cursor-pointer select-none ${
+        countdown > 0 || isResending
+          ? 'text-[#A1A1A1] cursor-not-allowed'
+          : 'text-[#181A1F] hover:underline font-medium'
       }`}
     >
-      <RefreshCw size={13} className={countdown > 0 ? 'opacity-40' : ''} />
-      {countdown > 0 ? `Resend in ${countdown}s` : 'Resend code'}
+      <RefreshCw
+        size={13}
+        className={`${
+          isResending
+            ? 'animate-spin text-[#181A1F]'
+            : countdown > 0
+            ? 'opacity-40'
+            : ''
+        }`}
+      />
+      <span>
+        {isResending
+          ? 'Resending code...'
+          : countdown > 0
+          ? `Resend in ${countdown}s`
+          : 'Resend code'}
+      </span>
     </button>
   );
 });
@@ -228,6 +252,17 @@ function ForgotPasswordContent() {
   const searchParams = useSearchParams();
   const supabase = useMemo(() => createClient(), []);
 
+  const initialError = useMemo(() => {
+    const errParam = searchParams.get('error');
+    const errDesc = searchParams.get('error_description');
+    if (errParam || errDesc) {
+      return errDesc
+        ? decodeURIComponent(errDesc)
+        : 'Your password reset link is invalid or has expired. Please enter your email to get a new code.';
+    }
+    return null;
+  }, [searchParams]);
+
   const [step, setStep] = useState<Step>('email');
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
@@ -238,9 +273,16 @@ function ForgotPasswordContent() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const [isLoading, setIsLoading] = useState(false);
+  const hasUrlTokens = useMemo(() => {
+    return Boolean(searchParams.get('code') || (searchParams.get('token_hash') && searchParams.get('type')));
+  }, [searchParams]);
+
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
+  const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+  const [isSavingPassword, setIsSavingPassword] = useState(false);
+  const [isUrlVerifying, setIsUrlVerifying] = useState(hasUrlTokens && !initialError);
   const [isCheckingSession, setIsCheckingSession] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(initialError);
   const [infoMessage, setInfoMessage] = useState<string | null>(null);
 
   // Guard to ensure initial URL verification runs strictly once on mount
@@ -251,27 +293,18 @@ function ForgotPasswordContent() {
     if (hasInitializedRef.current) return;
     hasInitializedRef.current = true;
 
-    const code = searchParams.get('code');
-    const token_hash = searchParams.get('token_hash');
-    const type = searchParams.get('type');
-    const errParam = searchParams.get('error');
-    const errDesc = searchParams.get('error_description');
-
-    if (errParam || errDesc) {
-      setError(
-        errDesc
-          ? decodeURIComponent(errDesc)
-          : 'Your password reset link is invalid or has expired. Please enter your email to get a new code.'
-      );
-      setStep('email');
+    if (initialError) {
       return;
     }
 
+    const code = searchParams.get('code');
+    const token_hash = searchParams.get('token_hash');
+    const type = searchParams.get('type');
+
     // 1. If code was passed directly in query param (e.g. PKCE email redirect)
     if (code) {
-      setIsLoading(true);
       supabase.auth.exchangeCodeForSession(code).then(({ data, error: exchangeError }) => {
-        setIsLoading(false);
+        setIsUrlVerifying(false);
         if (!exchangeError && data?.session) {
           setStep('password');
           setInfoMessage('Email verification successful! Please enter your new password.');
@@ -285,9 +318,8 @@ function ForgotPasswordContent() {
 
     // 2. If token_hash was passed directly in query param
     if (token_hash && type) {
-      setIsLoading(true);
       supabase.auth.verifyOtp({ token_hash, type }).then(({ data, error: verifyError }) => {
-        setIsLoading(false);
+        setIsUrlVerifying(false);
         if (!verifyError && data?.session) {
           setStep('password');
           setInfoMessage('Email verification successful! Please enter your new password.');
@@ -332,7 +364,7 @@ function ForgotPasswordContent() {
       return;
     }
 
-    setIsLoading(true);
+    setIsSendingEmail(true);
 
     try {
       const result = await sendPasswordResetOtp(trimmedEmail);
@@ -342,7 +374,7 @@ function ForgotPasswordContent() {
         });
         if (clientError) {
           setError(clientError.message || result.error);
-          setIsLoading(false);
+          setIsSendingEmail(false);
           return;
         }
       }
@@ -353,15 +385,14 @@ function ForgotPasswordContent() {
       const msg = err instanceof Error ? err.message : 'Failed to send password reset request. Please try again.';
       setError(msg);
     } finally {
-      setIsLoading(false);
+      setIsSendingEmail(false);
     }
   };
 
-  // Resend Reset Email / Code
+  // Resend Reset Email / Code (Isolated from Verify button state)
   const handleResendOtp = async () => {
     if (!email) return;
     setError(null);
-    setIsLoading(true);
 
     try {
       const result = await sendPasswordResetOtp(email.trim());
@@ -371,7 +402,6 @@ function ForgotPasswordContent() {
         });
         if (clientError) {
           setError(clientError.message || result.error);
-          setIsLoading(false);
           return;
         }
       }
@@ -380,8 +410,6 @@ function ForgotPasswordContent() {
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Failed to resend. Please try again.';
       setError(msg);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -418,7 +446,7 @@ function ForgotPasswordContent() {
       return;
     }
 
-    setIsLoading(true);
+    setIsVerifyingOtp(true);
 
     try {
       let { error: verifyError } = await supabase.auth.verifyOtp({
@@ -441,7 +469,7 @@ function ForgotPasswordContent() {
 
       if (verifyError) {
         setError(verifyError.message || 'Invalid or expired verification code. Please check your email or request a new code.');
-        setIsLoading(false);
+        setIsVerifyingOtp(false);
         return;
       }
 
@@ -451,7 +479,7 @@ function ForgotPasswordContent() {
       const msg = err instanceof Error ? err.message : 'Verification failed. Please check the code.';
       setError(msg);
     } finally {
-      setIsLoading(false);
+      setIsVerifyingOtp(false);
     }
   };
 
@@ -471,7 +499,7 @@ function ForgotPasswordContent() {
       return;
     }
 
-    setIsLoading(true);
+    setIsSavingPassword(true);
 
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -498,18 +526,18 @@ function ForgotPasswordContent() {
             setError(
               'Your password reset session has expired or could not be found. Please request a new reset email or enter the verification code.'
             );
-            setIsLoading(false);
+            setIsSavingPassword(false);
             return;
           }
           setError(serverResult.error);
-          setIsLoading(false);
+          setIsSavingPassword(false);
           return;
         }
       }
 
       if (!updated) {
         setError('Your session has expired. Please request a new password reset link.');
-        setIsLoading(false);
+        setIsSavingPassword(false);
         return;
       }
 
@@ -518,9 +546,13 @@ function ForgotPasswordContent() {
       const msg = err instanceof Error ? err.message : 'An error occurred while updating your password';
       setError(msg);
     } finally {
-      setIsLoading(false);
+      setIsSavingPassword(false);
     }
   };
+
+  if (isUrlVerifying) {
+    return <ForgotPasswordLoading />;
+  }
 
   return (
     <div
@@ -647,7 +679,7 @@ function ForgotPasswordContent() {
               <div className="pt-2">
                 <button
                   type="submit"
-                  disabled={isLoading}
+                  disabled={isSendingEmail}
                   style={{
                     background: '#181A1F',
                     borderRadius: 16.22,
@@ -657,7 +689,7 @@ function ForgotPasswordContent() {
                   }}
                   className="w-full h-12 sm:h-[52px] px-6 hover:bg-black active:scale-[0.99] text-[15px] transition-all duration-200 shadow-sm flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  {isLoading ? (
+                  {isSendingEmail ? (
                     <div className="flex items-center gap-2">
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                       <span>Sending link...</span>
@@ -692,7 +724,7 @@ function ForgotPasswordContent() {
                   onLengthChange={(len) => {
                     setOtpLength(len);
                   }}
-                  disabled={isLoading}
+                  disabled={isVerifyingOtp}
                   hasError={Boolean(error)}
                 />
 
@@ -729,7 +761,7 @@ function ForgotPasswordContent() {
 
                 <ResendCountdownButton
                   onResend={handleResendOtp}
-                  disabled={isLoading}
+                  disabled={isVerifyingOtp}
                 />
               </div>
 
@@ -737,7 +769,7 @@ function ForgotPasswordContent() {
               <div className="pt-2">
                 <button
                   type="submit"
-                  disabled={isLoading || otp.length < otpLength}
+                  disabled={isVerifyingOtp || otp.length < otpLength}
                   style={{
                     background: '#181A1F',
                     borderRadius: 16.22,
@@ -747,7 +779,7 @@ function ForgotPasswordContent() {
                   }}
                   className="w-full h-12 sm:h-[52px] px-6 hover:bg-black active:scale-[0.99] text-[15px] transition-all duration-200 shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  {isLoading ? (
+                  {isVerifyingOtp ? (
                     <div className="flex items-center gap-2">
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                       <span>Verifying code...</span>
@@ -856,7 +888,7 @@ function ForgotPasswordContent() {
               <div className="pt-2">
                 <button
                   type="submit"
-                  disabled={isLoading}
+                  disabled={isSavingPassword}
                   style={{
                     background: '#181A1F',
                     borderRadius: 16.22,
@@ -866,7 +898,7 @@ function ForgotPasswordContent() {
                   }}
                   className="w-full h-12 sm:h-[52px] px-6 hover:bg-black active:scale-[0.99] text-[15px] transition-all duration-200 shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  {isLoading ? (
+                  {isSavingPassword ? (
                     <div className="flex items-center gap-2">
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                       <span>Saving password...</span>
