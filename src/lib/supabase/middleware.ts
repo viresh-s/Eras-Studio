@@ -7,12 +7,13 @@ export async function updateSession(request: NextRequest) {
   });
 
   const pathname = request.nextUrl.pathname;
+  const isServerAction = Boolean(request.headers.get('next-action'));
   const isAdminLoginRoute = pathname === '/admin/login';
   const isAdminRoute = pathname.startsWith('/admin');
   const hasAdminCookie = Boolean(request.cookies.get('erasstudio_admin_session')?.value);
 
   // If already logged into admin and accessing admin login page, redirect to overview
-  if (isAdminLoginRoute && hasAdminCookie) {
+  if (isAdminLoginRoute && hasAdminCookie && !isServerAction) {
     const url = request.nextUrl.clone();
     url.pathname = '/admin/overview';
     return NextResponse.redirect(url);
@@ -35,7 +36,7 @@ export async function updateSession(request: NextRequest) {
     pathname.startsWith('/user');
 
   // If visiting a protected route without any auth token cookie, redirect to login immediately
-  if (isProtectedRoute && !hasAuthCookie) {
+  if (isProtectedRoute && !hasAuthCookie && !isServerAction) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     return NextResponse.redirect(url);
@@ -106,7 +107,7 @@ export async function updateSession(request: NextRequest) {
   }
 
   // Handle standard protected user/creator routes
-  if (isProtectedRoute && !user) {
+  if (isProtectedRoute && !user && !isServerAction) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     const response = NextResponse.redirect(url);
@@ -117,7 +118,7 @@ export async function updateSession(request: NextRequest) {
   }
 
   // Redirect logged-in users away from auth pages and the landing page
-  if (isAuthOrLandingRoute && user) {
+  if (isAuthOrLandingRoute && user && !isServerAction) {
     if (pathname === '/login' && request.nextUrl.searchParams.get('verified') === 'true') {
       return supabaseResponse;
     }

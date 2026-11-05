@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { Settings, LogOut, ChevronDown, User } from 'lucide-react';
-import { logout } from '@/actions/authActions';
+import { createClient } from '@/lib/supabase/client';
 import type { Profile } from '@/types/database';
 import NotificationBell from './NotificationBell';
 
@@ -61,7 +61,25 @@ export default function Navbar({ profile }: NavbarProps) {
       : userNavLinks;
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const handleLogout = async () => {
+    if (isLoggingOut) return;
+    setIsLoggingOut(true);
+    try {
+      const supabase = createClient();
+      await supabase.auth.signOut();
+    } catch (err) {
+      console.warn('Client signOut notice:', err);
+    }
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch (err) {
+      console.warn('Server signOut notice:', err);
+    }
+    window.location.href = '/login';
+  };
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -190,14 +208,14 @@ export default function Navbar({ profile }: NavbarProps) {
 
                 <div className="h-px bg-[var(--color-cor-border-light)] my-1"></div>
 
-                <form action={logout}>
-                  <button
-                    type="submit"
-                    className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-[#FDF2F2] transition-colors w-full text-left cursor-pointer"
-                  >
-                    <LogOut size={16} /> Sign out
-                  </button>
-                </form>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  disabled={isLoggingOut}
+                  className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-[#FDF2F2] transition-colors w-full text-left cursor-pointer disabled:opacity-50"
+                >
+                  <LogOut size={16} /> {isLoggingOut ? 'Signing out...' : 'Sign out'}
+                </button>
               </div>
             )}
           </div>

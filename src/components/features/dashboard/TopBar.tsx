@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
+import { useState } from 'react';
 import { LogOut, Menu, UserCircle } from 'lucide-react';
-import { logout } from '@/actions/authActions';
+import { createClient } from '@/lib/supabase/client';
 import type { Profile } from '@/types/database';
 
 interface TopBarProps {
@@ -11,7 +12,25 @@ interface TopBarProps {
 }
 
 export default function TopBar({ profile, onMenuToggle }: TopBarProps) {
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const profileHref = profile.role === 'Creator' ? '/profile' : profile.role === 'Admin' ? '/admin/profile' : '/user/profile';
+
+  const handleLogout = async () => {
+    if (isLoggingOut) return;
+    setIsLoggingOut(true);
+    try {
+      const supabase = createClient();
+      await supabase.auth.signOut();
+    } catch (err) {
+      console.warn('Client signOut notice:', err);
+    }
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch (err) {
+      console.warn('Server signOut notice:', err);
+    }
+    window.location.href = '/login';
+  };
 
   return (
     <header className="bg-white border-b border-gray-100 px-6 py-3 flex items-center justify-between">
@@ -43,15 +62,15 @@ export default function TopBar({ profile, onMenuToggle }: TopBarProps) {
         </Link>
 
         {/* Logout */}
-        <form action={logout}>
-          <button
-            type="submit"
-            className="flex items-center gap-2 px-3 py-2 rounded-full text-gray-500 text-sm font-medium hover:bg-gray-100 hover:text-gray-700 transition-colors"
-          >
-            <LogOut size={16} />
-            <span className="hidden sm:inline">Logout</span>
-          </button>
-        </form>
+        <button
+          type="button"
+          onClick={handleLogout}
+          disabled={isLoggingOut}
+          className="flex items-center gap-2 px-3 py-2 rounded-full text-gray-500 text-sm font-medium hover:bg-gray-100 hover:text-gray-700 transition-colors disabled:opacity-50 cursor-pointer"
+        >
+          <LogOut size={16} />
+          <span className="hidden sm:inline">{isLoggingOut ? 'Signing out...' : 'Logout'}</span>
+        </button>
       </div>
     </header>
   );
