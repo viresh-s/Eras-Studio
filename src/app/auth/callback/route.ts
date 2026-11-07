@@ -9,6 +9,18 @@ export async function GET(request: NextRequest) {
   const type = searchParams.get('type') as EmailOtpType | null;
   const next = searchParams.get('next');
   const roleParam = searchParams.get('role');
+  const source = searchParams.get('source');
+
+  // 1. Immediately handle OAuth error or user cancellation from provider (e.g. access_denied)
+  const oauthError =
+    searchParams.get('error_description') ||
+    searchParams.get('error') ||
+    searchParams.get('error_code');
+
+  if (oauthError) {
+    const errorTarget = source === 'signup' || Boolean(roleParam) ? '/signup' : '/login';
+    return NextResponse.redirect(`${origin}${errorTarget}?error=${encodeURIComponent(oauthError)}`);
+  }
 
   const isPasswordRecovery = type === 'recovery' || (Boolean(next) && next!.includes('forgot-password'));
   const isEmailVerification = type === 'signup' || type === 'email' || (Boolean(next) && next!.includes('verified=true'));
@@ -142,10 +154,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(`${origin}/forgot-password?mode=reset`);
   }
 
-  const oauthError = searchParams.get('error_description') || searchParams.get('error');
-  if (oauthError) {
-    return NextResponse.redirect(`${origin}/login?error=${encodeURIComponent(oauthError)}`);
-  }
-
-  return NextResponse.redirect(`${origin}/login`);
+  const fallbackTarget = source === 'signup' || Boolean(roleParam) ? '/signup' : '/login';
+  return NextResponse.redirect(`${origin}${fallbackTarget}`);
 }
