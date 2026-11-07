@@ -58,8 +58,6 @@ const styleOptions = [
   { value: 'Other', label: 'Other' },
 ];
 
-
-
 const tagsOptions = [
   { value: 'oil, canvas', label: 'Oil on Canvas' },
   { value: 'acrylic, canvas', label: 'Acrylic on Canvas' },
@@ -70,79 +68,82 @@ const tagsOptions = [
   { value: 'sculpture', label: 'Sculpture' },
 ];
 
-const uploadSchema = z.object({
-  title: z.string().min(2, 'Title is required'),
-  artType: z.string().min(1, 'Please select a medium'), // We map this to Medium
-  artistName: z.string().min(2, 'Artist name is required'),
-  year: z.string().optional(),
-  dimensions: z.string().optional(),
-  dimensionUnit: z.string().optional(),
-  width: z
-    .string()
-    .optional()
-    .refine(
-      (val) => {
-        if (!val || val.trim() === '') return true;
-        const num = Number(val);
-        return !isNaN(num) && num > 0;
-      },
-      { message: 'Width must be a positive number' }
-    ),
-  height: z
-    .string()
-    .optional()
-    .refine(
-      (val) => {
-        if (!val || val.trim() === '') return true;
-        const num = Number(val);
-        return !isNaN(num) && num > 0;
-      },
-      { message: 'Height must be a positive number' }
-    ),
-  location: z.string().optional(),
-  style: z.string().optional(),
-  collection: z.string().optional(),
-  tags: z.array(z.string()).optional(),
-  description: z.string().optional(),
-  externalLink: z.string().url('Please enter a valid URL').optional().or(z.literal('')),
-  price: z
-    .string()
-    .optional()
-    .refine(
-      (val) => {
-        if (!val || val.trim() === '') return true;
-        const num = parseIndianCurrency(val);
-        return num !== null && num > 0 && num <= MAX_PRICE_INR;
-      },
-      {
-        message: `Price must be positive and cannot exceed ${MAX_PRICE_INR_FORMATTED}`,
+const uploadSchema = z
+  .object({
+    title: z.string().min(2, 'Title is required'),
+    artType: z.string().min(1, 'Please select a medium'),
+    artistName: z.string().min(2, 'Artist name is required'),
+    year: z.string().optional(),
+    dimensions: z.string().optional(),
+    dimensionUnit: z.string().optional(),
+    width: z
+      .string()
+      .optional()
+      .refine(
+        (val) => {
+          if (!val || val.trim() === '') return true;
+          const num = Number(val);
+          return !isNaN(num) && num > 0;
+        },
+        { message: 'Width must be a positive number' }
+      ),
+    height: z
+      .string()
+      .optional()
+      .refine(
+        (val) => {
+          if (!val || val.trim() === '') return true;
+          const num = Number(val);
+          return !isNaN(num) && num > 0;
+        },
+        { message: 'Height must be a positive number' }
+      ),
+    location: z.string().optional(),
+    style: z.string().optional(),
+    collection: z.string().optional(),
+    tags: z.array(z.string()).optional(),
+    description: z.string().optional(),
+    externalLink: z.string().url('Please enter a valid URL').optional().or(z.literal('')),
+    price: z
+      .string()
+      .optional()
+      .refine(
+        (val) => {
+          if (!val || val.trim() === '') return true;
+          const num = parseIndianCurrency(val);
+          return num !== null && num > 0 && num <= MAX_PRICE_INR;
+        },
+        {
+          message: `Price must be positive and cannot exceed ${MAX_PRICE_INR_FORMATTED}`,
+        }
+      ),
+    priceVisibility: z.enum(['Show Price', 'Price on Request', 'Hide Price']),
+    status: z.enum(['Available', 'For Sale', 'Not for sale', 'Sold']),
+  })
+  .refine(
+    (data) => {
+      if ((data.width || data.height) && !data.dimensionUnit) {
+        return false;
       }
-    ),
-  priceVisibility: z.enum(['Show Price', 'Price on Request', 'Hide Price']),
-  status: z.enum(['Available', 'For Sale', 'Not for sale', 'Sold']),
-}).refine(
-  (data) => {
-    if ((data.width || data.height) && !data.dimensionUnit) {
-      return false;
+      return true;
+    },
+    {
+      message: 'Please select a dimension unit first',
+      path: ['dimensionUnit'],
     }
-    return true;
-  },
-  {
-    message: 'Please select a dimension unit first',
-    path: ['dimensionUnit'],
-  }
-).refine(
-  (data) => {
-    if (data.dimensionUnit && ((data.width && !data.height) || (!data.width && data.height))) {
-      return false;
+  )
+  .refine(
+    (data) => {
+      if (data.dimensionUnit && ((data.width && !data.height) || (!data.width && data.height))) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: 'Please enter both width and height',
+      path: ['height'],
     }
-    return true;
-  },
-  {
-    message: 'Please enter both width and height',
-    path: ['height'],
-  }
-);
+  );
 
 type UploadForm = z.infer<typeof uploadSchema>;
 
@@ -210,7 +211,7 @@ export default function ArtworkUploadForm({ userId, freemiumStatus }: UploadForm
     defaultValues: {
       priceVisibility: 'Show Price',
       status: 'Available',
-    }
+    },
   });
 
   const selectedMedium = watch('artType');
@@ -241,13 +242,15 @@ export default function ArtworkUploadForm({ userId, freemiumStatus }: UploadForm
     if (validFiles.length > 0) {
       const remainingSlots = 5 - selectedFiles.length;
       if (validFiles.length > remainingSlots) {
-        setError(`Only ${remainingSlots} more image${remainingSlots > 1 ? 's' : ''} can be added (max 5 images allowed).`);
+        setError(
+          `Only ${remainingSlots} more image${remainingSlots > 1 ? 's' : ''} can be added (max 5 images allowed).`
+        );
       }
       const filesToAdd = validFiles.slice(0, remainingSlots);
       const newFiles = [...selectedFiles, ...filesToAdd];
       setSelectedFiles(newFiles);
 
-      const newUrls = newFiles.map(file => URL.createObjectURL(file));
+      const newUrls = newFiles.map((file) => URL.createObjectURL(file));
       setPreviewUrls(newUrls);
     }
   };
@@ -433,37 +436,42 @@ export default function ArtworkUploadForm({ userId, freemiumStatus }: UploadForm
     }
   };
 
-
   return (
-    <div className="bg-white rounded-2xl shadow-[0_2px_20px_rgb(0,0,0,0.04)] p-8">
+    <div
+      className="bg-white rounded-3xl border border-[#EBEBE6] shadow-xs p-6 sm:p-8 lg:p-10 select-none"
+      style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+    >
+      {/* Freemium Limit Notice */}
       {!freemiumStatus.isLocked && freemiumStatus.artworksLimit > 0 && (
-        <div className="mb-4 p-4 bg-amber-50 rounded-xl border border-amber-200">
-          <p className="text-sm font-medium text-amber-800">
-            Free Plan: {freemiumStatus.artworksUsed}/{freemiumStatus.artworksLimit} uploads used
+        <div className="mb-6 p-4 bg-amber-50/90 rounded-2xl border border-amber-200/80">
+          <p className="text-xs sm:text-sm font-normal text-amber-900">
+            Free Plan: <span className="font-semibold">{freemiumStatus.artworksUsed}/{freemiumStatus.artworksLimit}</span> uploads used
             {freemiumStatus.daysRemaining > 0 && ` · ${freemiumStatus.daysRemaining} days remaining`}
           </p>
         </div>
       )}
 
+      {/* Error Banner */}
       {error && (
-        <div className="mb-4 bg-red-50 border border-red-200 rounded-xl p-3 text-red-600 text-sm">
+        <div className="mb-6 bg-red-50 border border-red-200 rounded-2xl p-4 text-red-700 text-xs sm:text-sm">
           {error}
         </div>
       )}
 
       {/* Compression & Upload Progress Bar */}
       {isLoading && uploadStage && (
-        <div className="mb-6 bg-gray-50 rounded-xl border border-gray-200 p-4">
+        <div className="mb-6 bg-gray-50 rounded-2xl border border-gray-200 p-4">
           <div className="flex items-center gap-3 mb-2">
-            <Loader2 size={16} className="animate-spin text-gray-600" />
-            <span className="text-sm font-medium text-gray-700">{uploadStage}</span>
+            <Loader2 size={16} className="animate-spin text-[#1345EE]" />
+            <span className="text-xs sm:text-sm font-medium text-gray-800">{uploadStage}</span>
           </div>
           {compressionProgress && (
             <div className="space-y-1">
               <div className="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
                 <div
-                  className="h-full bg-gray-900 rounded-full transition-all duration-300 ease-out"
+                  className="h-full rounded-full transition-all duration-300 ease-out"
                   style={{
+                    background: 'linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%)',
                     width: `${Math.round(
                       ((compressionProgress.fileIndex * 100 + compressionProgress.percent) /
                         (compressionProgress.totalFiles * 100)) *
@@ -472,7 +480,7 @@ export default function ArtworkUploadForm({ userId, freemiumStatus }: UploadForm
                   }}
                 />
               </div>
-              <p className="text-[10px] text-gray-500">
+              <p className="text-[10px] text-gray-500 font-normal">
                 File {compressionProgress.fileIndex + 1} of {compressionProgress.totalFiles}
                 {compressionProgress.stage !== 'complete' && ` — ${compressionProgress.stage.replace(/-/g, ' ')}`}
               </p>
@@ -481,277 +489,480 @@ export default function ArtworkUploadForm({ userId, freemiumStatus }: UploadForm
         </div>
       )}
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        {/* Image Upload */}
-        <div>
-          <label className="text-sm font-medium text-gray-700 block mb-2">
-            Artwork Images * (First image is the cover)
-          </label>
-          <div
-            onDragEnter={handleDragEnter}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-            className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4"
-          >
-            {previewUrls.map((url, idx) => (
-              <div key={idx} className="relative group aspect-square rounded-xl overflow-hidden bg-gray-100 border border-gray-200">
-                <img src={url} alt={`Preview ${idx + 1}`} className="w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button
-                    type="button"
-                    onClick={() => removeFile(idx)}
-                    className="bg-red-500 text-white w-10 h-10 flex items-center justify-center rounded-full hover:bg-red-600 shadow-lg transform hover:scale-105 transition-all"
-                  >
-                    <Trash2 size={18} />
-                  </button>
-                </div>
-                {idx === 0 && (
-                  <div className="absolute bottom-2 left-2 bg-gray-900/90 text-white text-[10px] font-bold px-2 py-1 rounded">
-                    COVER
-                  </div>
-                )}
-              </div>
-            ))}
+      <form onSubmit={handleSubmit(onSubmit)}>
+        {/* ======================================================== */}
+        {/* TWO-COLUMN SPLIT LAYOUT (Reference: Behance Style) */}
+        {/* ======================================================== */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
+          {/* ────────────────────────────────────────────────────── */}
+          {/* LEFT COLUMN: Project Cover / Image Upload Area */}
+          {/* ────────────────────────────────────────────────────── */}
+          <div className="lg:col-span-5 xl:col-span-5 space-y-4">
+            <div className="flex items-center justify-between px-1">
+              <label className="text-xs font-semibold text-gray-800 tracking-wider uppercase">
+                Project Cover <span className="text-red-500">*</span>
+              </label>
+              <span className="text-[11px] text-gray-500 font-normal">
+                {selectedFiles.length}/5 images
+              </span>
+            </div>
 
-            {previewUrls.length < 5 && (
+            {/* Main Cover Dropzone / Featured Preview */}
+            {previewUrls.length === 0 ? (
               <div
-                className={`aspect-square border-2 border-dashed rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all ${
-                  isDragging
-                    ? 'border-blue-500 bg-blue-50/60'
-                    : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                }`}
+                onDragEnter={handleDragEnter}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
+                className={`relative w-full aspect-[4/3] rounded-2xl border-2 border-dashed flex flex-col items-center justify-center p-6 text-center cursor-pointer transition-all ${
+                  isDragging
+                    ? 'border-[#1345EE] bg-blue-50/50'
+                    : 'border-[#D9D9D4] hover:border-[#1345EE]/60 hover:bg-[#FAFAF8]'
+                }`}
               >
-                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center mb-2">
-                  <Upload size={18} className={isDragging ? 'text-blue-600' : 'text-gray-400'} />
-                </div>
-                <p className="font-semibold text-gray-900 text-xs">
-                  {isDragging ? 'Drop Image Here' : 'Add Image'}
+                {/* Upload Image Button (matches ERAS blue gradient button) */}
+                <button
+                  type="button"
+                  style={{
+                    position: 'relative',
+                    background: 'linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%)',
+                    borderRadius: 40,
+                    outline: '2px #2356FF solid',
+                    outlineOffset: '-2px',
+                  }}
+                  className="px-6 py-2.5 inline-flex items-center gap-2 text-white text-xs font-normal shadow-sm hover:brightness-110 active:scale-[0.98] transition-all cursor-pointer pointer-events-none mb-3 select-none"
+                >
+                  <Upload size={14} className="text-white" />
+                  <span>Upload Image</span>
+                </button>
+
+                <p className="text-xs font-normal text-gray-600 max-w-[220px] leading-relaxed">
+                  Drag & drop your artwork or click to browse
                 </p>
-                <p className="text-[10px] text-gray-400 mt-1">Up to 5 images (max {MAX_INPUT_SIZE_MB} MB each)</p>
+                <p className="text-[10px] text-gray-400 mt-2">
+                  Minimum size of &quot;800 × 600px&quot; · Up to 5 images (max {MAX_INPUT_SIZE_MB}MB each)
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {/* Featured Primary Cover Image */}
+                <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-neutral-900 border border-[#EBEBE6] group shadow-xs">
+                  <img
+                    src={previewUrls[0]}
+                    alt="Cover preview"
+                    className="w-full h-full object-cover select-none"
+                  />
+                  <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-xs text-[#141413] text-[10px] font-semibold tracking-wider uppercase px-2.5 py-1 rounded-full shadow-xs">
+                    Cover Image
+                  </div>
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => removeFile(0)}
+                      className="w-9 h-9 rounded-full bg-white text-red-600 hover:bg-red-50 flex items-center justify-center shadow-md transition-transform hover:scale-105 cursor-pointer"
+                      title="Remove image"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Additional Images Thumbnails (Slots 2 to 5) */}
+                <div className="pt-1">
+                  <div className="flex items-center justify-between mb-2 px-1">
+                    <span className="text-[11px] font-medium text-gray-600 uppercase tracking-wider">
+                      Additional Views ({previewUrls.length - 1}/4)
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-4 gap-2.5">
+                    {previewUrls.slice(1).map((url, idx) => (
+                      <div
+                        key={idx + 1}
+                        className="relative group aspect-square rounded-xl overflow-hidden bg-gray-100 border border-[#EBEBE6]"
+                      >
+                        <img
+                          src={url}
+                          alt={`Preview ${idx + 2}`}
+                          className="w-full h-full object-cover"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeFile(idx + 1)}
+                          className="absolute inset-0 bg-black/45 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white cursor-pointer"
+                        >
+                          <Trash2 size={14} className="text-red-400 hover:text-red-300" />
+                        </button>
+                      </div>
+                    ))}
+
+                    {previewUrls.length < 5 && (
+                      <div
+                        onClick={() => fileInputRef.current?.click()}
+                        className="aspect-square rounded-xl border border-dashed border-[#D9D9D4] hover:border-[#1345EE] hover:bg-blue-50/30 flex flex-col items-center justify-center cursor-pointer transition-all text-gray-400 hover:text-[#1345EE]"
+                      >
+                        <Upload size={14} />
+                        <span className="text-[10px] mt-1 font-normal">+ Add</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             )}
+
+            {/* Hidden Input for file selection */}
+            <input
+              ref={fileInputRef}
+              id="file-upload"
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleFileChange}
+              className="hidden"
+            />
           </div>
 
-          <input
-            ref={fileInputRef}
-            id="file-upload"
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={handleFileChange}
-            className="hidden"
-          />
-        </div>
+          {/* ────────────────────────────────────────────────────── */}
+          {/* RIGHT COLUMN: Project / Artwork Information Fields */}
+          {/* ────────────────────────────────────────────────────── */}
+          <div className="lg:col-span-7 xl:col-span-7 space-y-5">
+            {/* Section Header */}
+            <div className="border-b border-[#EBEBE6] pb-2.5 px-1">
+              <h2 className="text-xs font-semibold text-gray-800 tracking-wider uppercase">
+                Artwork Information
+              </h2>
+            </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <Input label="Title *" placeholder="Name of the artwork" error={errors.title?.message} {...register('title')} />
-          <Input label="Artist Name *" placeholder="Who created this?" error={errors.artistName?.message} {...register('artistName')} />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <div className="flex flex-col gap-2">
-            <Select
-              label="Medium *"
-              options={mediumOptions}
-              placeholder="Select Medium"
-              error={errors.artType?.message}
-              {...register('artType')}
-            />
-            {selectedMedium === 'Other' && (
+            {/* Row 1: Title & Artist Name */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Input
-                autoFocus
-                label="Custom Medium"
-                placeholder="Specify your medium..."
-                value={customMediumInput}
-                onChange={(e) => setCustomMediumInput(e.target.value)}
-                onBlur={() => {
-                  const trimmed = customMediumInput.trim();
-                  if (trimmed && trimmed.toLowerCase() !== 'other') {
-                    saveCustomMedium(trimmed);
-                    setCustomMediums((prev) => {
-                      if (prev.some((m) => m.toLowerCase() === trimmed.toLowerCase())) return prev;
-                      return [...prev, trimmed];
-                    });
-                  }
-                }}
+                label="Title *"
+                placeholder="Give your artwork a title"
+                error={errors.title?.message}
+                {...register('title')}
               />
-            )}
-          </div>
-          <Input label="Year" placeholder="e.g. 2024" error={errors.year?.message} {...register('year')} />
+              <Input
+                label="Artist Name *"
+                placeholder="Who created this?"
+                error={errors.artistName?.message}
+                {...register('artistName')}
+              />
+            </div>
 
-          <div className="flex flex-col gap-2">
-            <Select
-              label="Dimension Unit"
-              options={DIMENSION_UNIT_OPTIONS}
-              placeholder="Select Unit (e.g. in, cm, px)"
-              error={errors.dimensionUnit?.message}
-              {...register('dimensionUnit')}
-            />
-
-            <div className="flex flex-col gap-1.5">
-              <div className="flex items-center justify-between">
-                <label
-                  style={{ color: '#929292', fontWeight: 500 }}
-                  className="block text-xs mb-1"
-                >
-                  Dimensions
-                </label>
-                {!selectedDimensionUnit && (
-                  <span className="text-[10px] text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded font-normal mb-1">
-                    Select unit first
-                  </span>
+            {/* Row 2: Medium & Style */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="flex flex-col gap-2">
+                <Select
+                  label="Medium *"
+                  options={mediumOptions}
+                  placeholder="Select Medium"
+                  error={errors.artType?.message}
+                  {...register('artType')}
+                />
+                {selectedMedium === 'Other' && (
+                  <Input
+                    autoFocus
+                    label="Custom Medium"
+                    placeholder="Specify your medium..."
+                    value={customMediumInput}
+                    onChange={(e) => setCustomMediumInput(e.target.value)}
+                    onBlur={() => {
+                      const trimmed = customMediumInput.trim();
+                      if (trimmed && trimmed.toLowerCase() !== 'other') {
+                        saveCustomMedium(trimmed);
+                        setCustomMediums((prev) => {
+                          if (prev.some((m) => m.toLowerCase() === trimmed.toLowerCase())) return prev;
+                          return [...prev, trimmed];
+                        });
+                      }
+                    }}
+                  />
                 )}
               </div>
-              <div className="flex items-center gap-3">
-                <input
-                  type="number"
-                  step={selectedDimensionUnit === 'px' ? '1' : '0.1'}
-                  min={selectedDimensionUnit === 'px' ? '1' : '0.1'}
-                  placeholder={selectedDimensionUnit ? `W (${selectedDimensionUnit})` : 'Select unit first'}
-                  disabled={!selectedDimensionUnit}
-                  onKeyDown={(e) => {
-                    if (e.key === '-' || e.key === 'e' || e.key === 'E') {
-                      e.preventDefault();
-                    }
-                  }}
-                  className={`w-full px-2 py-3 text-sm bg-transparent border-b-2 outline-none transition-all placeholder:text-gray-400 text-center ${
-                    !selectedDimensionUnit
-                      ? 'opacity-40 cursor-not-allowed border-gray-200 bg-gray-50/50'
-                      : errors.width
-                      ? 'border-red-300 focus:border-red-500'
-                      : 'border-gray-300 focus:border-gray-900'
-                  }`}
-                  {...register('width')}
+
+              <div className="flex flex-col gap-2">
+                <Select
+                  label="Style"
+                  options={styleOptions}
+                  placeholder="Select Style"
+                  error={errors.style?.message}
+                  {...register('style')}
                 />
-                <span className={`text-[10px] ${!selectedDimensionUnit ? 'text-gray-300' : 'text-gray-400'}`}>✕</span>
-                <input
-                  type="number"
-                  step={selectedDimensionUnit === 'px' ? '1' : '0.1'}
-                  min={selectedDimensionUnit === 'px' ? '1' : '0.1'}
-                  placeholder={selectedDimensionUnit ? `H (${selectedDimensionUnit})` : 'Select unit first'}
-                  disabled={!selectedDimensionUnit}
-                  onKeyDown={(e) => {
-                    if (e.key === '-' || e.key === 'e' || e.key === 'E') {
-                      e.preventDefault();
-                    }
-                  }}
-                  className={`w-full px-2 py-3 text-sm bg-transparent border-b-2 outline-none transition-all placeholder:text-gray-400 text-center ${
-                    !selectedDimensionUnit
-                      ? 'opacity-40 cursor-not-allowed border-gray-200 bg-gray-50/50'
-                      : errors.height
-                      ? 'border-red-300 focus:border-red-500'
-                      : 'border-gray-300 focus:border-gray-900'
-                  }`}
-                  {...register('height')}
-                />
+                {selectedStyle === 'Other' && (
+                  <Input
+                    autoFocus
+                    label="Custom Style"
+                    placeholder="Specify your style..."
+                    value={customStyle}
+                    onChange={(e) => setCustomStyle(e.target.value)}
+                  />
+                )}
               </div>
-              {(errors.width || errors.height) && (
-                <p className="text-[11px] text-red-500 font-normal mt-1">
-                  {errors.width?.message || errors.height?.message}
-                </p>
-              )}
+            </div>
+
+            {/* Row 3: Year & Dimensions */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Input
+                label="Year"
+                placeholder="e.g. 2024"
+                error={errors.year?.message}
+                {...register('year')}
+              />
+
+              <div className="flex flex-col gap-2">
+                <Select
+                  label="Dimension Unit"
+                  options={DIMENSION_UNIT_OPTIONS}
+                  placeholder="Select Unit (e.g. in, cm, px)"
+                  error={errors.dimensionUnit?.message}
+                  {...register('dimensionUnit')}
+                />
+
+                <div className="flex flex-col gap-1.5">
+                  <div className="flex items-center justify-between">
+                    <label
+                      style={{ color: '#929292', fontWeight: 500 }}
+                      className="block text-xs mb-1"
+                    >
+                      Dimensions
+                    </label>
+                    {!selectedDimensionUnit && (
+                      <span className="text-[10px] text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded font-normal mb-1">
+                        Select unit first
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2.5">
+                    <input
+                      type="number"
+                      step={selectedDimensionUnit === 'px' ? '1' : '0.1'}
+                      min={selectedDimensionUnit === 'px' ? '1' : '0.1'}
+                      placeholder={selectedDimensionUnit ? `W (${selectedDimensionUnit})` : 'Select unit'}
+                      disabled={!selectedDimensionUnit}
+                      onKeyDown={(e) => {
+                        if (e.key === '-' || e.key === 'e' || e.key === 'E') {
+                          e.preventDefault();
+                        }
+                      }}
+                      className={`w-full px-2 py-2.5 text-xs sm:text-sm bg-transparent border-b-2 outline-none transition-all placeholder:text-gray-400 text-center ${
+                        !selectedDimensionUnit
+                          ? 'opacity-40 cursor-not-allowed border-gray-200 bg-gray-50/50'
+                          : errors.width
+                          ? 'border-red-300 focus:border-red-500'
+                          : 'border-gray-300 focus:border-gray-900'
+                      }`}
+                      {...register('width')}
+                    />
+                    <span className={`text-[10px] ${!selectedDimensionUnit ? 'text-gray-300' : 'text-gray-400'}`}>✕</span>
+                    <input
+                      type="number"
+                      step={selectedDimensionUnit === 'px' ? '1' : '0.1'}
+                      min={selectedDimensionUnit === 'px' ? '1' : '0.1'}
+                      placeholder={selectedDimensionUnit ? `H (${selectedDimensionUnit})` : 'Select unit'}
+                      disabled={!selectedDimensionUnit}
+                      onKeyDown={(e) => {
+                        if (e.key === '-' || e.key === 'e' || e.key === 'E') {
+                          e.preventDefault();
+                        }
+                      }}
+                      className={`w-full px-2 py-2.5 text-xs sm:text-sm bg-transparent border-b-2 outline-none transition-all placeholder:text-gray-400 text-center ${
+                        !selectedDimensionUnit
+                          ? 'opacity-40 cursor-not-allowed border-gray-200 bg-gray-50/50'
+                          : errors.height
+                          ? 'border-red-300 focus:border-red-500'
+                          : 'border-gray-300 focus:border-gray-900'
+                      }`}
+                      {...register('height')}
+                    />
+                  </div>
+                  {(errors.width || errors.height) && (
+                    <p className="text-[11px] text-red-500 font-normal mt-1">
+                      {errors.width?.message || errors.height?.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Row 4: Collection & Location */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="flex flex-col gap-2">
+                <Select
+                  label="Collection"
+                  options={collectionOptions}
+                  placeholder="Select Collection"
+                  error={errors.collection?.message}
+                  {...register('collection')}
+                />
+                {selectedCollection === 'Other' && (
+                  <Input
+                    autoFocus
+                    label="Custom Collection"
+                    placeholder="Specify collection name..."
+                    value={customCollection}
+                    onChange={(e) => setCustomCollection(e.target.value)}
+                    onBlur={() => {
+                      const trimmed = customCollection.trim();
+                      if (trimmed && trimmed.toLowerCase() !== 'other') {
+                        saveCustomCollection(trimmed);
+                        setCustomCollections((prev) => {
+                          if (prev.some((c) => c.toLowerCase() === trimmed.toLowerCase())) return prev;
+                          return [...prev, trimmed];
+                        });
+                      }
+                    }}
+                  />
+                )}
+              </div>
+
+              <Input
+                label="Location"
+                placeholder="e.g. New York, NY"
+                error={errors.location?.message}
+                {...register('location')}
+              />
+            </div>
+
+            {/* Row 5: Tags (Full Width MultiSelect) */}
+            <div>
+              <Controller
+                name="tags"
+                control={control}
+                render={({ field }) => (
+                  <MultiSelect
+                    label="Tags (up to 10 keywords)"
+                    options={tagsOptions}
+                    placeholder="Select keywords to help discover this piece"
+                    value={field.value || []}
+                    onChange={field.onChange}
+                    error={errors.tags?.message}
+                  />
+                )}
+              />
+            </div>
+
+            {/* Row 6: Availability & Price Visibility */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Select
+                label="Availability"
+                options={availabilityOptions}
+                error={errors.status?.message}
+                {...register('status')}
+              />
+              <Select
+                label="Price Visibility"
+                options={visibilityOptions}
+                error={errors.priceVisibility?.message}
+                {...register('priceVisibility')}
+              />
+            </div>
+
+            {/* Row 7: Price & Related Link */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Controller
+                name="price"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    label={
+                      selectedPriceVisibility === 'Hide Price'
+                        ? 'Price · Hidden from public view'
+                        : selectedPriceVisibility === 'Price on Request'
+                        ? 'Price · Will display as "On Request"'
+                        : 'Price (₹)'
+                    }
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="0"
+                    helperText={`Max amount: ${MAX_PRICE_INR_FORMATTED}`}
+                    error={errors.price?.message}
+                    value={field.value || ''}
+                    onChange={(e) => {
+                      const formatted = formatIndianCurrency(e.target.value);
+                      field.onChange(formatted);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === '-' || e.key === '+' || e.key === 'e' || e.key === 'E') {
+                        e.preventDefault();
+                      }
+                    }}
+                  />
+                )}
+              />
+
+              <div className="relative">
+                <Input
+                  label="Related Link"
+                  placeholder="https://..."
+                  error={errors.externalLink?.message}
+                  {...register('externalLink')}
+                />
+                <LinkIcon className="absolute right-3 top-9 text-gray-400" size={16} />
+              </div>
+            </div>
+
+            {/* Row 8: Description */}
+            <div>
+              <TextArea
+                label="Description"
+                placeholder="Tell collectors about this piece, its inspiration, technique, or history..."
+                error={errors.description?.message}
+                {...register('description')}
+              />
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <Input label="Location" placeholder="e.g. New York, NY" error={errors.location?.message} {...register('location')} />
+        {/* ======================================================== */}
+        {/* BOTTOM ACTION BAR (Reference: Right-Aligned Cancel, Save Draft, Publish) */}
+        {/* ======================================================== */}
+        <div className="flex flex-col-reverse sm:flex-row items-center justify-end gap-3 pt-6 mt-8 border-t border-[#EBEBE6]">
+          {/* Cancel Button */}
+          <button
+            type="button"
+            onClick={() => router.push('/portfolio/artworks')}
+            className="w-full sm:w-auto px-7 py-3 rounded-full border border-[#EBEBE6] text-xs sm:text-sm font-normal text-gray-700 hover:bg-[#F9F9F7] hover:text-black transition-colors cursor-pointer select-none"
+          >
+            Cancel
+          </button>
 
-          <div className="flex flex-col gap-2">
-            <Select label="Style" options={styleOptions} placeholder="Select Style" error={errors.style?.message} {...register('style')} />
-            {selectedStyle === 'Other' && (
-              <Input autoFocus label="Custom Style" placeholder="Specify your style..." value={customStyle} onChange={(e) => setCustomStyle(e.target.value)} />
-            )}
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <Select label="Collection" options={collectionOptions} placeholder="Select Collection" error={errors.collection?.message} {...register('collection')} />
-            {selectedCollection === 'Other' && (
-              <Input
-                autoFocus
-                label="Custom Collection"
-                placeholder="Specify collection name..."
-                value={customCollection}
-                onChange={(e) => setCustomCollection(e.target.value)}
-                onBlur={() => {
-                  const trimmed = customCollection.trim();
-                  if (trimmed && trimmed.toLowerCase() !== 'other') {
-                    saveCustomCollection(trimmed);
-                    setCustomCollections((prev) => {
-                      if (prev.some((c) => c.toLowerCase() === trimmed.toLowerCase())) return prev;
-                      return [...prev, trimmed];
-                    });
-                  }
-                }}
-              />
-            )}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <div className="flex flex-col gap-2">
-            <Controller
-              name="tags"
-              control={control}
-              render={({ field }) => (
-                <MultiSelect
-                  label="Tags"
-                  options={tagsOptions}
-                  placeholder="Select Tags"
-                  value={field.value || []}
-                  onChange={field.onChange}
-                  error={errors.tags?.message}
-                />
+          {/* Save Draft Button (Black Capsule) */}
+          <button
+            type="submit"
+            disabled={isLoading || freemiumStatus.isLocked}
+            onClick={() => setSubmitAction('draft')}
+            style={{
+              position: 'relative',
+              background: '#181A1F',
+              overflow: 'hidden',
+              borderRadius: 40,
+            }}
+            className="w-full sm:w-auto px-7 py-3 inline-flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 hover:bg-black active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed shadow-xs select-none"
+          >
+            <span
+              style={{
+                color: 'white',
+                fontSize: 14,
+                fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
+                fontWeight: '400',
+              }}
+              className="flex items-center gap-2 relative z-10"
+            >
+              {isLoading && submitAction === 'draft' ? (
+                <>
+                  <Loader2 size={15} className="animate-spin text-white" />
+                  <span>Saving Draft...</span>
+                </>
+              ) : (
+                <>
+                  <Save size={15} className="text-white" />
+                  <span>Save as Draft</span>
+                </>
               )}
-            />
-          </div>
-          <Select label="Availability" options={availabilityOptions} error={errors.status?.message} {...register('status')} />
-          <Select label="Price Visibility" options={visibilityOptions} error={errors.priceVisibility?.message} {...register('priceVisibility')} />
-        </div>
+            </span>
+          </button>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <Controller
-            name="price"
-            control={control}
-            render={({ field }) => (
-              <Input
-                label={
-                  selectedPriceVisibility === 'Hide Price'
-                    ? 'Price · Hidden from public view'
-                    : selectedPriceVisibility === 'Price on Request'
-                    ? 'Price · Will display as "On Request"'
-                    : 'Price'
-                }
-                type="text"
-                inputMode="numeric"
-                placeholder="0"
-                helperText={`Max amount: ${MAX_PRICE_INR_FORMATTED}`}
-                error={errors.price?.message}
-                value={field.value || ''}
-                onChange={(e) => {
-                  const formatted = formatIndianCurrency(e.target.value);
-                  field.onChange(formatted);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === '-' || e.key === '+' || e.key === 'e' || e.key === 'E') {
-                    e.preventDefault();
-                  }
-                }}
-              />
-            )}
-          />
-          <div className="relative">
-            <Input label="Related Link" placeholder="https://..." error={errors.externalLink?.message} {...register('externalLink')} />
-            <LinkIcon className="absolute right-3 top-9 text-gray-400" size={16} />
-          </div>
-        </div>
-
-        <TextArea label="Description" placeholder="Tell collectors about this piece..." error={errors.description?.message} {...register('description')} />
-
-        <div className="flex flex-col sm:flex-row items-center gap-3.5 pt-6 border-t border-gray-100">
-          {/* Blue Gradient Publish Button */}
+          {/* Primary Publish Button (Signature ERAS Blue Gradient) */}
           <button
             type="submit"
             disabled={isLoading || freemiumStatus.isLocked}
@@ -766,7 +977,7 @@ export default function ArtworkUploadForm({ userId, freemiumStatus }: UploadForm
               outline: '2px #2356FF solid',
               outlineOffset: '-2px',
             }}
-            className="w-full sm:w-auto px-8 py-3.5 sm:px-10 sm:py-4 inline-flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 hover:brightness-110 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed group select-none shadow-md"
+            className="w-full sm:w-auto px-8 py-3 inline-flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 hover:brightness-110 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed group select-none shadow-md"
           >
             <div
               style={{
@@ -780,93 +991,27 @@ export default function ArtworkUploadForm({ userId, freemiumStatus }: UploadForm
             <div
               style={{
                 color: 'white',
-                fontSize: 16,
+                fontSize: 14,
                 fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
-                fontWeight: '600',
-                lineHeight: '24px',
+                fontWeight: '400',
               }}
               className="flex items-center gap-2 relative z-10"
             >
               {isLoading && submitAction === 'publish' ? (
                 <>
-                  <Loader2 size={18} className="animate-spin text-white" />
+                  <Loader2 size={15} className="animate-spin text-white" />
                   <span>Publishing...</span>
                 </>
               ) : (
                 <>
-                  <ImageIcon size={18} className="text-white" />
+                  <ImageIcon size={15} className="text-white" />
                   <span>Publish</span>
                 </>
               )}
             </div>
           </button>
-
-          {/* Black Save Draft Button */}
-          <button
-            type="submit"
-            disabled={isLoading || freemiumStatus.isLocked}
-            onClick={() => setSubmitAction('draft')}
-            style={{
-              position: 'relative',
-              background: '#181A1F',
-              overflow: 'hidden',
-              borderRadius: 40,
-            }}
-            className="w-full sm:w-auto px-8 py-3.5 sm:px-10 sm:py-4 inline-flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 hover:bg-black active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed shadow-md select-none"
-          >
-            <span
-              style={{
-                color: 'white',
-                fontSize: 15,
-                fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
-                fontWeight: '600',
-                lineHeight: '24px',
-              }}
-              className="flex items-center gap-2 relative z-10"
-            >
-              {isLoading && submitAction === 'draft' ? (
-                <>
-                  <Loader2 size={17} className="animate-spin text-white" />
-                  <span>Saving Draft...</span>
-                </>
-              ) : (
-                <>
-                  <Save size={17} className="text-white" />
-                  <span>Save Draft</span>
-                </>
-              )}
-            </span>
-          </button>
-
-          {/* Cancel Button */}
-          <button
-            type="button"
-            onClick={() => router.push('/portfolio/artworks')}
-            style={{
-              position: 'relative',
-              background: '#F3F3F3',
-              overflow: 'hidden',
-              borderRadius: 40,
-            }}
-            className="w-full sm:w-auto px-8 py-3.5 sm:px-10 sm:py-4 inline-flex items-center justify-center cursor-pointer transition-all duration-200 hover:bg-[#E5E5E5] active:scale-[0.98] select-none"
-          >
-            <span
-              style={{
-                color: '#343434',
-                fontSize: 15,
-                fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
-                fontWeight: '600',
-                lineHeight: '24px',
-                textAlign: 'center',
-              }}
-              className="relative z-10"
-            >
-              Cancel
-            </span>
-          </button>
         </div>
       </form>
-
     </div>
   );
 }
