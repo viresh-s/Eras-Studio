@@ -16,8 +16,6 @@ import {
   Search,
   Image as ImageIcon,
   CheckCircle2,
-  Sparkles,
-  ExternalLink,
 } from 'lucide-react';
 import {
   CollectionItem,
@@ -49,7 +47,7 @@ interface CollectionManagerProps {
 export default function CollectionManager({
   initialCollections,
   initialArtworks = [],
-  userId,
+  userId: _userId,
 }: CollectionManagerProps) {
   const router = useRouter();
   const [collections, setCollections] = useState<CollectionItem[]>(initialCollections);
@@ -182,7 +180,7 @@ export default function CollectionManager({
           const newCount = Math.max(0, (c.artwork_count || 0) + (isCurrentlyIn ? -1 : 1));
           let updatedArtworksList = c.artworks ? [...c.artworks] : [];
           if (isCurrentlyIn) {
-            updatedArtworksList = updatedArtworksList.filter((a: any) => a.id !== artwork.id);
+            updatedArtworksList = updatedArtworksList.filter((a: { id: string }) => a.id !== artwork.id);
           } else {
             updatedArtworksList.push(artwork);
           }
@@ -250,7 +248,7 @@ export default function CollectionManager({
           return {
             ...c,
             artwork_count: newCount,
-            artworks: (c.artworks || []).filter((a: any) => a.id !== artwork.id),
+            artworks: (c.artworks || []).filter((a: { id: string }) => a.id !== artwork.id),
           };
         } else if (!wasInThis && isNowInThis) {
           const newCount = (c.artwork_count || 0) + 1;
@@ -417,8 +415,8 @@ export default function CollectionManager({
         </div>
       </div>
 
-      {/* Small Button Boxes Section (White default, hover effect, signature blue gradient when active) */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+      {/* Small Button Boxes Section (White background, blue gradient border & text on active/hover, no full gradient fill) */}
+      <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 mb-8">
         {statsTabs.map((tab) => {
           const isActive = activeTab === tab.id;
 
@@ -430,58 +428,47 @@ export default function CollectionManager({
               style={
                 isActive
                   ? {
-                      position: 'relative',
-                      background: 'linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%)',
+                      background:
+                        'linear-gradient(#ffffff, #ffffff) padding-box, linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%) border-box',
+                      border: '1.5px solid transparent',
                       boxShadow:
-                        '0px 6px 18px rgba(35, 77, 255, 0.22), 0px 2px 2px rgba(255, 255, 255, 0.65) inset, 0px -2px 4px rgba(6, 42, 137, 0.33) inset',
-                      borderColor: '#2356FF',
+                        '0px 4px 14px rgba(35, 77, 255, 0.12), 0px 1px 3px rgba(35, 77, 255, 0.08)',
                     }
                   : {
-                      borderColor: '#EBEBE6',
                       background: '#FFFFFF',
+                      border: '1.5px solid #EBEBE6',
                     }
               }
-              className={`relative p-3.5 sm:px-4 sm:py-3.5 rounded-2xl border text-left transition-all duration-200 cursor-pointer select-none overflow-hidden group box-border ${
+              className={`relative min-w-[135px] sm:min-w-[155px] flex-1 sm:flex-none px-4 py-2.5 sm:px-5 sm:py-3 rounded-2xl text-left transition-all duration-200 cursor-pointer select-none group box-border ${
                 isActive
-                  ? 'text-white shadow-md'
-                  : 'text-gray-900 hover:border-[#2356FF]/50 hover:bg-[#F8FAFF] hover:shadow-xs active:scale-[0.99]'
+                  ? 'shadow-xs'
+                  : 'hover:border-[#2356FF] hover:shadow-[0_2px_12px_rgba(35,77,255,0.08)] active:scale-[0.99]'
               }`}
             >
-              {isActive && (
-                <div
-                  style={{
-                    position: 'absolute',
-                    inset: 2,
-                    borderRadius: 14,
-                    border: '1px rgba(255, 255, 255, 0.18) solid',
-                    pointerEvents: 'none',
-                  }}
-                />
-              )}
-              <div className="relative z-10 flex flex-col justify-between h-full">
+              <div className="flex flex-col justify-between">
                 <p
-                  className={`text-[10px] sm:text-[11px] font-normal tracking-[0.14em] uppercase mb-1.5 truncate transition-colors ${
-                    isActive ? 'text-white/85' : 'text-gray-500 group-hover:text-[#2356FF]'
+                  className={`text-[10px] sm:text-[11px] font-normal tracking-[0.14em] uppercase mb-1 truncate transition-colors ${
+                    isActive ? 'text-[#1345EE]' : 'text-gray-500 group-hover:text-[#2356FF]'
                   }`}
                 >
                   {tab.label}
                 </p>
-                <div className="flex items-baseline justify-between gap-1">
-                  <span
-                    className={`text-2xl sm:text-3xl font-normal leading-tight transition-colors ${
-                      isActive ? 'text-white' : 'text-gray-900'
-                    }`}
-                  >
-                    {tab.count}
-                  </span>
-                  <span
-                    className={`text-[10px] font-normal transition-opacity ${
-                      isActive ? 'text-white/75 opacity-100' : 'text-gray-400 opacity-0 group-hover:opacity-100'
-                    }`}
-                  >
-                    View &rarr;
-                  </span>
-                </div>
+                <span
+                  style={
+                    isActive
+                      ? {
+                          background: 'linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%)',
+                          WebkitBackgroundClip: 'text',
+                          WebkitTextFillColor: 'transparent',
+                        }
+                      : undefined
+                  }
+                  className={`text-xl sm:text-2xl font-normal leading-tight transition-colors ${
+                    isActive ? '' : 'text-gray-900 group-hover:text-[#2356FF]'
+                  }`}
+                >
+                  {tab.count}
+                </span>
               </div>
             </button>
           );
