@@ -132,3 +132,4 @@ export function formatAuthError(rawError: string | null | undefined): FormattedA
     isCanceled: false,
   };
 }
+

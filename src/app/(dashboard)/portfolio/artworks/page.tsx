@@ -1,9 +1,9 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import Link from 'next/link';
-import { Plus } from 'lucide-react';
 import ArtworkGridCard from '@/components/features/creator/ArtworkGridCard';
 import ArtworkCardActions from '@/components/features/creator/ArtworkCardActions';
+import RestrictedUploadAction from '../components/RestrictedUploadAction';
+import { evaluateFreemiumStatus } from '@/lib/freemium/check';
 
 export default async function CreatorArtworksPage() {
   const supabase = await createClient();
@@ -21,10 +21,13 @@ export default async function CreatorArtworksPage() {
       .order('created_at', { ascending: false }),
     supabase
       .from('profiles')
-      .select('full_name')
+      .select('full_name, plan, is_premium')
       .eq('id', user.id)
       .maybeSingle(),
   ]);
+
+  const freemiumStatus = evaluateFreemiumStatus(profile, artworks?.length || 0);
+  const isLimited = freemiumStatus.isLocked;
 
   return (
     <div style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}>
@@ -37,43 +40,11 @@ export default async function CreatorArtworksPage() {
             My Artworks
           </h1>
         </div>
-        <Link
-          href="/portfolio/upload"
-          style={{
-            position: 'relative',
-            background: 'linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%)',
-            boxShadow:
-              '0px 7px 22px rgba(35, 77, 255, 0.13), 0px 3px 3px rgba(255, 255, 255, 0.65) inset, 0px -3px 6px rgba(6, 42, 137, 0.33) inset',
-            overflow: 'hidden',
-            borderRadius: 40,
-            outline: '2px #2356FF solid',
-            outlineOffset: '-2px',
-          }}
-          className="px-8 py-3.5 sm:px-10 sm:py-4 inline-flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 hover:brightness-110 active:scale-[0.98] group select-none shadow-md"
-        >
-          <div
-            style={{
-              position: 'absolute',
-              inset: 3,
-              borderRadius: 37,
-              border: '1px rgba(255, 255, 255, 0.15) solid',
-              pointerEvents: 'none',
-            }}
-          />
-          <div
-            style={{
-              color: 'white',
-              fontSize: 15,
-              fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
-              fontWeight: '400',
-              lineHeight: '24px',
-            }}
-            className="flex items-center gap-2 relative z-10"
-          >
-            <Plus size={18} className="text-white" />
-            <span>Add Artwork</span>
-          </div>
-        </Link>
+        <RestrictedUploadAction
+          isLimited={isLimited}
+          label="Add Artwork"
+          variant="gradient"
+        />
       </div>
 
       {artworks && artworks.length > 0 ? (
@@ -92,12 +63,11 @@ export default async function CreatorArtworksPage() {
           >
             No artworks yet
           </p>
-          <Link
-            href="/portfolio/upload"
+          <RestrictedUploadAction
+            isLimited={isLimited}
+            label="Add Artwork"
             className="inline-flex items-center gap-2 px-6 py-2.5 bg-gray-900 text-white rounded-full text-sm font-normal hover:bg-black transition-all"
-          >
-            <Plus size={16} /> Add Artwork
-          </Link>
+          />
         </div>
       )}
     </div>
