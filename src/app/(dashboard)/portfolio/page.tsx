@@ -219,7 +219,7 @@ export default async function CreatorDashboard() {
             href="/portfolio/collections"
             className="btn-eras-gradient-hover px-4 py-2 text-sm font-normal inline-flex items-center justify-center cursor-pointer select-none"
           >
-            <span className="btn-eras-gradient-text transition-colors">
+            <span className="btn-eras-gradient-text">
               Manage Collections
             </span>
           </Link>
