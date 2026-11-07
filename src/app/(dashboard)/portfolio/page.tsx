@@ -105,52 +105,32 @@ export default async function CreatorDashboard() {
         </div>
       </div>
 
-      {/* Profile Completion Progress Bar */}
+      {/* Profile Completion Progress Bar - Compact Sleek Capsule */}
       {completeness < 100 && (
-        <div className="bg-[var(--color-cor-surface)] rounded-3xl border border-[var(--color-cor-border)] p-5 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-5 shadow-2xs">
-          <div className="flex-1 max-w-xl">
-            <div className="flex items-center justify-between mb-1.5">
-              <span className="text-xs font-normal text-[var(--color-cor-ink)]">
-                Profile Completeness
-              </span>
-              <span className="text-xs font-normal text-[var(--color-cor-ink)]">
-                {completeness}%
-              </span>
-            </div>
-            {/* Progress Bar */}
-            <div className="w-full bg-blue-100/70 rounded-full h-2 overflow-hidden">
+        <div className="bg-white rounded-full border border-[#EBEBE6] px-3.5 py-2 sm:px-5 sm:py-2.5 mb-6 flex items-center justify-between gap-3 sm:gap-4 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+          <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0 flex-1">
+            <span className="text-[11px] sm:text-xs font-normal text-gray-700 whitespace-nowrap">
+              Profile Completeness
+            </span>
+            <div className="flex-1 max-w-[140px] sm:max-w-xs bg-blue-100/60 rounded-full h-1.5 overflow-hidden">
               <div
-                className="h-2 rounded-full transition-all duration-500"
+                className="h-1.5 rounded-full transition-all duration-500"
                 style={{
                   width: `${completeness}%`,
                   background: 'linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%)',
                 }}
               />
             </div>
+            <span className="text-[11px] sm:text-xs font-medium text-[#1345EE] shrink-0">
+              {completeness}%
+            </span>
           </div>
+
           <Link
             href="/profile"
-            style={{
-              position: 'relative',
-              background: '#F3F3F3',
-              overflow: 'hidden',
-              borderRadius: 42.35,
-            }}
-            className="px-7 py-3 sm:px-8 sm:py-3.5 inline-flex items-center justify-center transition-all duration-200 hover:bg-[#EAEAEA] active:scale-[0.98] cursor-pointer select-none whitespace-nowrap self-start sm:self-center shrink-0"
+            className="h-7 px-3 sm:h-7.5 sm:px-3.5 inline-flex items-center justify-center rounded-full bg-[#181A1F] text-white text-[11px] sm:text-xs font-normal hover:bg-black active:scale-[0.98] transition-all shrink-0 select-none shadow-xs"
           >
-            <span
-              style={{
-                color: '#343434',
-                fontSize: 14.82,
-                fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
-                fontWeight: '400',
-                lineHeight: '17.05px',
-                wordWrap: 'break-word',
-              }}
-              className="text-center"
-            >
-              Edit Profile
-            </span>
+            Edit Profile
           </Link>
         </div>
       )}
