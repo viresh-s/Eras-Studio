@@ -5,6 +5,7 @@ interface CorPageHeaderProps {
   title: string;
   description?: string;
   actions?: React.ReactNode;
+  hasBorder?: boolean;
 }
 
 export default function CorPageHeader({
@@ -12,20 +13,21 @@ export default function CorPageHeader({
   title,
   description,
   actions,
+  hasBorder = true,
 }: CorPageHeaderProps) {
   return (
-    <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-[#E8E8E3] pb-6 mb-8">
+    <div className={`flex flex-col md:flex-row md:items-end justify-between gap-4 ${hasBorder ? 'border-b border-[#E8E8E3] pb-6 mb-8' : 'mb-6'}`}>
       <div>
         {eyebrow && (
           <p className="text-xs uppercase tracking-wider text-[#73736C] font-semibold mb-1 font-sans">
             {eyebrow}
           </p>
         )}
-        <h1 className="font-serif text-3xl sm:text-4xl font-semibold text-[#141413] tracking-tight leading-tight">
+        <h1 className="century-heading text-3xl sm:text-4xl text-[#141413] tracking-tight leading-tight">
           {title}
         </h1>
         {description && (
-          <p className="text-xs sm:text-sm text-[#6E6E69] mt-2 max-w-2xl leading-relaxed">
+          <p className="text-xs sm:text-sm text-[#6E6E69] font-sans mt-2 max-w-2xl leading-relaxed">
             {description}
           </p>
         )}

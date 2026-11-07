@@ -365,7 +365,7 @@ export function CareersPublicClient({ initialOpportunities }: CareersPublicClien
                   </button>
 
                   <Button
-                    variant="primary"
+                    variant="premium-gradient"
                     size="sm"
                     onClick={() => handleOpenApply(opp)}
                     rightIcon={<ArrowRight className="w-3.5 h-3.5" />}
@@ -407,7 +407,7 @@ export function CareersPublicClient({ initialOpportunities }: CareersPublicClien
                 Close
               </Button>
               <Button
-                variant="primary"
+                variant="premium-gradient"
                 size="md"
                 onClick={() => handleOpenApply(selectedOpportunity)}
                 rightIcon={<ArrowRight className="w-4 h-4" />}
@@ -689,7 +689,7 @@ export function CareersPublicClient({ initialOpportunities }: CareersPublicClien
                 </Button>
                 <Button
                   type="submit"
-                  variant="primary"
+                  variant="premium-gradient"
                   size="md"
                   isLoading={isSubmitting}
                   rightIcon={<ArrowRight className="w-4 h-4" />}

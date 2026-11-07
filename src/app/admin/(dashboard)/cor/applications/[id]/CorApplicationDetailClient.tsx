@@ -188,7 +188,7 @@ export function CorApplicationDetailClient({
         <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
           <div>
             <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="text-2xl md:text-3xl font-medium tracking-tight text-[#141413]">
+              <h1 className="admin-century-title text-2xl md:text-3xl text-[#141413] tracking-tight">
                 {application.company} — <span className="italic">{application.opportunityTitle}</span>
               </h1>
               <CorApplicationBadge status={application.status} />

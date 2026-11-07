@@ -149,21 +149,21 @@ export default function ArtworkCardActions({ artwork, userId }: ArtworkCardActio
         <button
           onClick={handleEdit}
           disabled={isDeleting || isPublishing}
-          className="flex-1 py-1.5 px-3 bg-white border border-gray-200 text-gray-700 rounded-full text-xs font-normal hover:bg-gray-50 transition-colors"
+          className="flex-1 py-1.5 px-3 bg-white border border-gray-200 text-gray-700 rounded-full text-xs font-semibold hover:bg-gray-50 transition-colors"
         >
           Edit
         </button>
         <button
           onClick={handleTogglePublish}
           disabled={isDeleting || isPublishing}
-          className="flex-1 py-1.5 px-3 bg-white border border-gray-200 text-gray-700 rounded-full text-xs font-normal hover:bg-gray-50 transition-colors"
+          className="flex-1 py-1.5 px-3 bg-white border border-gray-200 text-gray-700 rounded-full text-xs font-semibold hover:bg-gray-50 transition-colors"
         >
           {isPublishing ? <Loader2 size={12} className="animate-spin inline" /> : (artwork.is_published === false ? 'Publish' : 'Archive')}
         </button>
         <button
           onClick={handleDelete}
           disabled={isDeleting || isPublishing}
-          className="flex-1 py-1.5 px-3 bg-white border border-gray-200 text-gray-700 rounded-full text-xs font-normal hover:bg-red-50 hover:text-red-600 hover:border-red-100 transition-colors flex justify-center items-center"
+          className="flex-1 py-1.5 px-3 bg-white border border-gray-200 text-gray-700 rounded-full text-xs font-semibold hover:bg-red-50 hover:text-red-600 hover:border-red-100 transition-colors flex justify-center items-center"
         >
           {isDeleting ? <Loader2 size={14} className="animate-spin" /> : 'Delete'}
         </button>

@@ -3,8 +3,6 @@ import { redirect } from 'next/navigation';
 import { getCreatorCollections } from '@/actions/collectionActions';
 import CollectionManager from '@/components/collections/CollectionManager';
 
-export const dynamic = 'force-dynamic';
-
 export default async function CollectionsPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -13,20 +11,12 @@ export default async function CollectionsPage() {
     redirect('/login');
   }
 
-  const [collections, { data: artworks }] = await Promise.all([
-    getCreatorCollections(user.id),
-    supabase
-      .from('artworks')
-      .select('id, title, image_url, collection, collection_id, year, price, art_type, status, is_published')
-      .eq('creator_id', user.id)
-      .order('created_at', { ascending: false }),
-  ]);
+  const collections = await getCreatorCollections(user.id);
 
   return (
-    <CollectionManager
-      initialCollections={collections}
-      initialArtworks={artworks || []}
-      userId={user.id}
-    />
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+      <CollectionManager initialCollections={collections} userId={user.id} />
+    </div>
   );
 }
+

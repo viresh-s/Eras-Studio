@@ -209,13 +209,20 @@ export function SubscriptionsClient({ initialSubscribers, stats }: Subscriptions
 
   return (
     <div className="space-y-7 pb-16 animate-in fade-in duration-150">
-      <div className="border-b border-[#E8E8E3] pb-6">
-        <h1 className="admin-century-title text-3xl sm:text-4xl text-[#141413] tracking-tight">
-          Patronage & Subscriptions.
-        </h1>
-        <p className="mt-1 text-xs md:text-sm text-[#71716D] font-light">
-          Platform membership administration, creator tier privileges, and active subscriber ledger.
-        </p>
+      <div className="border-b border-[#E8E8E3] pb-6 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+        <div>
+          <h1 className="admin-century-title text-3xl sm:text-4xl text-[#141413] tracking-tight leading-tight">
+            Patronage & Subscriptions.
+          </h1>
+          <p className="mt-1.5 text-xs sm:text-sm text-[#6E6E69] max-w-2xl leading-relaxed">
+            Platform membership administration, creator tier privileges, and active subscriber ledger.
+          </p>
+        </div>
+        <div className="flex items-center gap-3 shrink-0 self-start sm:self-auto">
+          <div className="text-xs px-3.5 py-1.5 rounded-xl border border-[#E8E8E3] bg-white text-[#6E6E69] font-medium shadow-2xs">
+            Total: <span className="text-[#141413] font-medium">{subscribers.length} members</span>
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

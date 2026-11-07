@@ -177,7 +177,7 @@ export function CorMemberDetailClient({
             )}
             <div>
               <div className="flex items-center gap-3 flex-wrap">
-                <h1 className="text-2xl md:text-3xl font-medium tracking-tight text-[#141413]">
+                <h1 className="admin-century-title text-2xl md:text-3xl text-[#141413] tracking-tight">
                   {member.name}
                 </h1>
                 <CorMemberBadge status={member.status} />

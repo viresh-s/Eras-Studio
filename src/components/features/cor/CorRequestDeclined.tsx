@@ -51,11 +51,19 @@ export default function CorRequestDeclined({ declinedReason }: CorRequestDecline
         <div className="pt-2 flex flex-wrap items-center gap-4">
           <Link
             href="/cor/profile"
-            className="px-6 py-3 rounded-full bg-[#141413] text-white text-xs font-semibold hover:bg-[#2A2A28] transition-colors inline-flex items-center gap-2 cursor-pointer shadow-xs"
+            style={{
+              position: 'relative',
+              background: 'linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%)',
+              boxShadow: '0px 7px 22px rgba(35, 77, 255, 0.18), 0px 3px 3px rgba(255, 255, 255, 0.65) inset, 0px -3px 6px rgba(6, 42, 137, 0.33) inset',
+              borderRadius: 40,
+              outline: '2px #2356FF solid',
+              outlineOffset: '-2px',
+            }}
+            className="px-6 py-3 text-white text-xs sm:text-sm font-semibold transition-all duration-200 hover:brightness-110 active:scale-[0.98] inline-flex items-center gap-2 cursor-pointer shadow-xs select-none"
           >
-            <RefreshCw size={13} />
+            <RefreshCw size={14} className="text-white" />
             <span>Update Profile & Re-apply</span>
-            <ArrowRight size={13} />
+            <ArrowRight size={14} className="text-white" />
           </Link>
         </div>
       </div>

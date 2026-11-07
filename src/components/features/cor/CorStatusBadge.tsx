@@ -47,7 +47,7 @@ export default function CorStatusBadge({
 
   return (
     <span
-      className={`inline-flex items-center rounded-full border tracking-wide uppercase transition-colors ${colorClass} ${sizeClass} ${className}`}
+      className={`inline-flex items-center rounded-full border tracking-wide uppercase transition-colors font-sans ${colorClass} ${sizeClass} ${className}`}
     >
       {formatted}
     </span>

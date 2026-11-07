@@ -366,7 +366,7 @@ export function CreatorsClient({
       {/* Title & Stats */}
       <div className="border-b border-[#E8E8E3] pb-6 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <div>
-          <h1 className="admin-century-title text-3xl sm:text-4xl tracking-tight text-[#141413]">
+          <h1 className="admin-century-title text-3xl sm:text-4xl tracking-tight text-[#141413] leading-tight">
             Creator Roster.
           </h1>
           <p className="mt-1.5 text-xs sm:text-sm text-[#6E6E69] max-w-2xl leading-relaxed">

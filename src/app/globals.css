@@ -147,33 +147,6 @@ input:-webkit-autofill:active {
   transition: background-color 5000s ease-in-out 0s;
 }
 
-
-/* --- Signature ERAS Blue Gradient Hover Button --- */
-.btn-eras-gradient-hover {
-  position: relative;
-  background: #FFFFFF;
-  border: 1.5px solid #EBEBE6;
-  border-radius: 9999px;
-  box-sizing: border-box;
-}
-
-.btn-eras-gradient-hover:hover {
-  background: linear-gradient(#ffffff, #ffffff) padding-box, linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%) border-box;
-  border: 1.5px solid transparent;
-}
-
-.btn-eras-gradient-hover .btn-eras-gradient-text {
-  color: var(--color-cor-ink, #141413);
-  font-weight: 400;
-}
-
-.btn-eras-gradient-hover:hover .btn-eras-gradient-text {
-  background: linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  font-weight: 400;
-}
-
 /* --- Admin Panel Poppins Typography System & Design Tokens --- */
 .admin-scope {
   --admin-accent: #1345EE;
@@ -212,8 +185,9 @@ input:-webkit-autofill:active {
 
 /* Dedicated Century-Style Title Exception: strictly Century, italic, and medium-bold (500) */
 .admin-scope .admin-century-title,
-.admin-century-title {
-  font-family: "Century" !important;
+.admin-century-title,
+.century-heading {
+  font-family: "Century", 'Century Schoolbook', serif !important;
   font-style: italic !important;
   font-weight: 500 !important;
   font-synthesis: style weight !important;
@@ -221,7 +195,8 @@ input:-webkit-autofill:active {
 }
 
 .admin-scope .admin-century-title *,
-.admin-century-title * {
+.admin-century-title *,
+.century-heading * {
   font-family: inherit !important;
   font-style: inherit !important;
   font-weight: inherit !important;

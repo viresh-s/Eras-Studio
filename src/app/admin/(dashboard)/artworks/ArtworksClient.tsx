@@ -634,7 +634,7 @@ export function ArtworksClient({
             </p>
 
             {/* Title */}
-            <h1 className="text-3xl sm:text-4xl font-medium text-[#141413] tracking-tight leading-tight">
+            <h1 className="admin-century-title text-3xl sm:text-4xl text-[#141413] tracking-tight leading-tight">
               {viewingArtwork.title}
             </h1>
 
@@ -824,12 +824,12 @@ export function ArtworksClient({
       {/* 1. MAIN HEADER & ADD ARTWORK ACTION */}
       {/* ========================================================================= */}
       <div className="border-b border-[#E8E8E3] pb-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div>
-            <h1 className="admin-century-title text-3xl sm:text-4xl text-[#141413] tracking-tight">
+            <h1 className="admin-century-title text-3xl sm:text-4xl text-[#141413] tracking-tight leading-tight">
               Curatorial Gallery.
             </h1>
-            <p className="mt-1 text-xs md:text-sm text-[#71716D] font-light">
+            <p className="mt-1.5 text-xs sm:text-sm text-[#6E6E69] max-w-2xl leading-relaxed">
               Catalog of creator submissions, editorial features, medium specifications, and publication review.
             </p>
           </div>

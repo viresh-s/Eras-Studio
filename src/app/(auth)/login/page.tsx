@@ -7,11 +7,10 @@ import { z } from 'zod';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Eye, EyeOff, CheckCircle2, AlertCircle, X } from 'lucide-react';
+import { Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 import { login } from '@/actions/authActions';
 import { createClient } from '@/lib/supabase/client';
 import { GoogleIcon } from '@/components/features/auth/SocialAuthButtons';
-import { formatAuthError } from '@/lib/authErrorHandling';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -39,33 +38,6 @@ function LoginFormContent() {
   const searchParams = useSearchParams();
   const isVerified = searchParams.get('verified') === 'true';
   const urlError = searchParams.get('error');
-
-  const rawError = error || urlError;
-  const formattedError = formatAuthError(rawError);
-
-  // Capture OAuth error from URL hash (e.g., #error=access_denied&error_description=...)
-  useEffect(() => {
-    if (typeof window !== 'undefined' && window.location.hash) {
-      const hash = window.location.hash.replace(/^#/, '');
-      const hashParams = new URLSearchParams(hash);
-      const hashError = hashParams.get('error_description') || hashParams.get('error');
-      if (hashError) {
-        setError(hashError);
-        window.history.replaceState({}, '', window.location.pathname + window.location.search);
-      }
-    }
-  }, []);
-
-  const handleClearError = () => {
-    setError(null);
-    if (typeof window !== 'undefined') {
-      const url = new URL(window.location.href);
-      url.searchParams.delete('error');
-      url.searchParams.delete('error_description');
-      url.searchParams.delete('error_code');
-      window.history.replaceState({}, '', url.pathname + (url.search ? url.search : ''));
-    }
-  };
 
   const router = useRouter();
 
@@ -133,7 +105,7 @@ function LoginFormContent() {
       const { error: oauthError } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${origin}/auth/callback?provider=google&source=login`,
+          redirectTo: `${origin}/auth/callback?provider=google`,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
@@ -230,39 +202,11 @@ function LoginFormContent() {
             </div>
           )}
 
-          {/* Error / Cancellation Feedback */}
-          {formattedError && (
-            formattedError.isWarning ? (
-              <div className="mb-5 bg-amber-50/90 border border-amber-200/80 rounded-xl p-3 text-amber-900 text-xs flex items-center justify-between gap-2 shadow-2xs">
-                <div className="flex items-center gap-2">
-                  <AlertCircle size={15} className="text-amber-600 shrink-0" />
-                  <span>{formattedError.message}</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleClearError}
-                  className="text-amber-600 hover:text-amber-900 p-0.5 rounded-md hover:bg-amber-100/70 transition-colors shrink-0"
-                  aria-label="Dismiss notice"
-                >
-                  <X size={13} />
-                </button>
-              </div>
-            ) : (
-              <div className="mb-5 bg-red-50 border border-red-200 rounded-xl p-3 text-red-600 text-xs flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2">
-                  <AlertCircle size={15} className="text-red-600 shrink-0" />
-                  <span>{formattedError.message}</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleClearError}
-                  className="text-red-500 hover:text-red-800 p-0.5 rounded-md hover:bg-red-100 transition-colors shrink-0"
-                  aria-label="Dismiss error"
-                >
-                  <X size={13} />
-                </button>
-              </div>
-            )
+          {/* Error Message */}
+          {(error || urlError) && (
+            <div className="mb-5 bg-red-50 border border-red-200 rounded-xl p-3 text-red-600 text-xs">
+              {error || urlError}
+            </div>
           )}
 
           {/* Credentials Form */}

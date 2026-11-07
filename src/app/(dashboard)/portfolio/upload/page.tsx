@@ -14,14 +14,10 @@ export default async function UploadPage() {
   }
 
   return (
-    <div style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}>
+    <div>
       <h1
-        className="text-3xl sm:text-4xl font-serif italic font-normal text-[#141413] tracking-tight mb-6"
-        style={{
-          fontFamily: "'Century Schoolbook', Century, 'TeX Gyre Schola', Georgia, serif",
-          fontStyle: 'italic',
-          fontWeight: 400,
-        }}
+        className="text-3xl sm:text-4xl font-serif italic font-semibold text-[#141413] tracking-tight mb-6"
+        style={{ fontFamily: "'Century Schoolbook', Century, serif", fontStyle: 'italic' }}
       >
         Upload your artwork
       </h1>

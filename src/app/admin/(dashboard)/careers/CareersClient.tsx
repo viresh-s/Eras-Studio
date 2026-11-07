@@ -512,16 +512,16 @@ export function CareersClient({
       {/* 1. CAREERS OVERVIEW METRICS CARDS */}
       {/* ========================================================================= */}
       <div>
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
           <div>
-            <h2 className="admin-century-title text-2xl tracking-tight text-[#141413]">
+            <h1 className="admin-century-title text-3xl sm:text-4xl text-[#141413] tracking-tight leading-tight">
               Careers Overview
-            </h2>
-            <p className="text-xs text-[#6E6E69] mt-1 font-sans">
+            </h1>
+            <p className="mt-1.5 text-xs sm:text-sm text-[#6E6E69] max-w-2xl leading-relaxed">
               Manage open positions, review applicants, and publish institutional career paths.
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 self-start sm:self-auto shrink-0">
             <Button
               variant="premium-gradient"
               onClick={handleOpenAddModal}
@@ -590,7 +590,7 @@ export function CareersClient({
           </div>
 
           {/* Card: Total Applications */}
-          <div className="bg-white p-5 rounded-2xl border border-[#1345EE]/20 shadow-soft-sm bg-gradient-to-br from-white to-[#EEF2FE]/30 col-span-2 md:col-span-1">
+          <div className="bg-white p-5 rounded-2xl border border-[#E8E8E3] shadow-soft-sm col-span-2 md:col-span-1">
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium text-[#1345EE]">Applications</span>
               <div className="w-8 h-8 rounded-xl bg-[#EEF2FE] flex items-center justify-center text-[#1345EE]">

@@ -58,12 +58,12 @@ export function CorClient({
   return (
     <div className="space-y-8 animate-in fade-in duration-150">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#E8E8E3]">
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 pb-6 border-b border-[#E8E8E3]">
         <div>
-          <h1 className="admin-century-title text-3xl sm:text-4xl text-[#141413] tracking-tight">
+          <h1 className="admin-century-title text-3xl sm:text-4xl text-[#141413] tracking-tight leading-tight">
             Representation.
           </h1>
-          <p className="text-xs md:text-sm text-[#71716D] font-light mt-1">
+          <p className="mt-1.5 text-xs sm:text-sm text-[#6E6E69] max-w-2xl leading-relaxed">
             Manage creator career opportunities, institutional applications, and represented artist rosters.
           </p>
         </div>

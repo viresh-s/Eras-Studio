@@ -57,9 +57,9 @@ function getPageTitle(pathname: string): string {
   if (pathname.includes("/admin/users")) return "Users";
   if (pathname.includes("/admin/subscriptions")) return "Subscriptions";
   if (pathname.includes("/admin/creators")) return "Creators";
-  if (pathname.includes("/admin/collectors")) return "Overview";
+  if (pathname.includes("/admin/collectors")) return "Collectors";
   if (pathname.includes("/admin/artworks")) return "Artworks";
-  if (pathname.includes("/admin/reports")) return "Reports & Moderation";
+  if (pathname.includes("/admin/reports")) return "Reports";
   if (pathname.includes("/admin/cor/requests")) return "Creator Requests";
   if (pathname.includes("/admin/cor/members")) return "COR Members";
   if (pathname.includes("/admin/cor/applications")) return "Representation Applications";

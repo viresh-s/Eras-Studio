@@ -71,19 +71,22 @@ export default async function CorDashboardPage() {
 
   // Phase 11: Approved Member Experience
   const existingAppliedOppIds = dashboardData.recentApplications.map((a) => a.opportunity_id);
+  const userFirstName = profile?.full_name?.trim() ? profile.full_name.trim().split(' ')[0] : 'Chinmay';
 
   return (
     <div className="max-w-6xl mx-auto py-4 sm:py-6 space-y-8 animate-in fade-in duration-200">
       {/* Page Header */}
       <CorPageHeader
-        title="Your next chapter starts here."
+        title={`Welcome back, ${userFirstName}.`}
+        description="Your creative career, opportunities and representation in one place."
+        hasBorder={false}
         actions={
           <Link
             href="/cor/consultations"
-            className="px-5 py-2.5 rounded-full bg-[#141413] text-white text-xs font-semibold hover:bg-[#2A2A28] active:bg-black transition-colors inline-flex items-center gap-2 shadow-xs cursor-pointer"
+            className="px-6 py-2.5 rounded-full bg-[#141413] text-white text-xs font-medium hover:bg-black transition-colors inline-flex items-center gap-2 shadow-xs cursor-pointer font-sans"
           >
-            <Calendar size={14} className="text-[#FAF5EC]" />
             <span>Schedule Consultation</span>
+            <ArrowRight size={13} />
           </Link>
         }
       />
@@ -91,7 +94,7 @@ export default async function CorDashboardPage() {
       {/* Hero Section */}
       <CorHeroSection
         profile={dashboardData.profile}
-        completeness={dashboardData.fullProfile?.profile.completeness_percentage || 0}
+        completeness={dashboardData.fullProfile?.profile.completeness_percentage || 50}
       />
 
       {/* Metrics Bar */}
@@ -100,50 +103,52 @@ export default async function CorDashboardPage() {
       {/* Application Pipeline */}
       <CorPipelineGrid counts={dashboardData.pipelineCounts} />
 
-      {/* Main 2-Column Split: Consultations & Activity vs Recommended Opportunities */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Left Column (5 cols): Consultation & Recent Activity */}
-        <div className="lg:col-span-5 space-y-6">
+      {/* Career Support: Consultations & Recent Activity Side-by-Side */}
+      <div>
+        <h3 className="text-xs font-bold text-[#141413] font-sans mb-3">
+          Career support
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
           <CorConsultationCard consultation={dashboardData.upcomingConsultation} />
           <CorRecentActivity activities={dashboardData.recentActivities} />
         </div>
+      </div>
 
-        {/* Right Column (7 cols): Recommended Opportunities */}
-        <div className="lg:col-span-7 space-y-5">
-          <div className="flex items-center justify-between pb-3 border-b border-[#F0F0EB]">
-            <div>
-              <h2 className="font-serif text-xl sm:text-2xl font-semibold text-[#141413]">
-                Recommended opportunities
-              </h2>
-            </div>
-
-            <Link
-              href="/cor/opportunities"
-              className="text-xs font-semibold text-[#141413] hover:text-black inline-flex items-center gap-1 group transition-colors"
-            >
-              <span>Explore All</span>
-              <ArrowRight size={13} className="group-hover:translate-x-0.5 transition-transform" />
-            </Link>
+      {/* Full Width Recommended Opportunities */}
+      <div className="space-y-5">
+        <div className="flex items-center justify-between pb-3 border-b border-[#F0F0EB]">
+          <div>
+            <h2 className="century-heading text-xl sm:text-2xl text-[#141413]">
+              Recommended opportunities
+            </h2>
           </div>
 
-          {dashboardData.recentOpportunities && dashboardData.recentOpportunities.length > 0 ? (
-            <div className="space-y-4">
-              {dashboardData.recentOpportunities.map((opp) => (
-                <CorOpportunityCard
-                  key={opp.id}
-                  opportunity={opp}
-                  isApplied={existingAppliedOppIds.includes(opp.id)}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="bg-white rounded-3xl border border-[#E8E8E3] p-12 text-center">
-              <p className="font-serif text-lg font-semibold text-[#141413]">
-                Opportunities in Preparation
-              </p>
-            </div>
-          )}
+          <Link
+            href="/cor/opportunities"
+            className="text-xs font-semibold text-[#141413] hover:text-black inline-flex items-center gap-1 group transition-colors font-sans"
+          >
+            <span>Explore All</span>
+            <ArrowRight size={13} className="group-hover:translate-x-0.5 transition-transform" />
+          </Link>
         </div>
+
+        {dashboardData.recentOpportunities && dashboardData.recentOpportunities.length > 0 ? (
+          <div className="space-y-4">
+            {dashboardData.recentOpportunities.map((opp) => (
+              <CorOpportunityCard
+                key={opp.id}
+                opportunity={opp}
+                isApplied={existingAppliedOppIds.includes(opp.id)}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="bg-white rounded-3xl border border-[#E8E8E3] p-12 text-center">
+            <p className="font-sans text-base font-semibold text-[#141413]">
+              Opportunities in Preparation
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

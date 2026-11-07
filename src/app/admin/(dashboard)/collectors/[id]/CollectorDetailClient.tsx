@@ -270,7 +270,7 @@ export function CollectorDetailClient({
             )}
             <div>
               <div className="flex items-center gap-3">
-                <h1 className="text-2xl sm:text-3xl font-medium tracking-tight text-[#141413]">
+                <h1 className="admin-century-title text-2xl sm:text-3xl text-[#141413] tracking-tight">
                   {collectorState.name}
                 </h1>
                 <Badge

@@ -46,8 +46,8 @@ export default function CorRequestPending({
       {/* Header Banner */}
       <div className="bg-[#FAF9F6] border border-[#E8E8E3] rounded-3xl p-7 sm:p-10 shadow-xs space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-[#FAF5EC] text-[#865E16] border border-[#EADFCF]">
-            <Clock size={13} className="text-[#865E16]" />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-[#1345EE] border border-blue-200">
+            <Clock size={13} className="text-[#1345EE]" />
             <span>REQUEST UNDER REVIEW</span>
           </div>
 
@@ -68,11 +68,19 @@ export default function CorRequestPending({
         <div className="pt-2 flex flex-wrap items-center gap-4">
           <Link
             href="/cor/profile"
-            className="px-5 py-2.5 rounded-full bg-[#141413] text-white text-xs font-semibold hover:bg-[#2A2A28] transition-colors inline-flex items-center gap-2 cursor-pointer shadow-xs"
+            style={{
+              position: 'relative',
+              background: 'linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%)',
+              boxShadow: '0px 7px 22px rgba(35, 77, 255, 0.18), 0px 3px 3px rgba(255, 255, 255, 0.65) inset, 0px -3px 6px rgba(6, 42, 137, 0.33) inset',
+              borderRadius: 40,
+              outline: '2px #2356FF solid',
+              outlineOffset: '-2px',
+            }}
+            className="px-6 py-3 text-white text-xs sm:text-sm font-semibold transition-all duration-200 hover:brightness-110 active:scale-[0.98] inline-flex items-center gap-2 cursor-pointer shadow-xs select-none"
           >
-            <FileText size={13} />
+            <FileText size={14} className="text-white" />
             <span>Review or Edit Questionnaire</span>
-            <ArrowRight size={13} />
+            <ArrowRight size={14} className="text-white" />
           </Link>
         </div>
       </div>

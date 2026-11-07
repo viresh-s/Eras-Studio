@@ -138,12 +138,12 @@ export function SettingsClient({ initialSettings }: SettingsClientProps) {
       {/* ========================================================================= */}
       {/* 1. PAGE HEADER (ERAS Studio Editorial Style)                              */}
       {/* ========================================================================= */}
-      <div className="border-b border-[#E8E8E3] pb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="border-b border-[#E8E8E3] pb-6 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <div>
-          <h1 className="admin-century-title text-3xl sm:text-4xl text-[#141413] tracking-tight">
+          <h1 className="admin-century-title text-3xl sm:text-4xl text-[#141413] tracking-tight leading-tight">
             Studio Settings.
           </h1>
-          <p className="mt-1 text-xs sm:text-sm text-[#6E6E69]">
+          <p className="mt-1.5 text-xs sm:text-sm text-[#6E6E69] max-w-2xl leading-relaxed">
             Configure rules and platform controls. Saved changes apply to the live marketplace.
           </p>
         </div>

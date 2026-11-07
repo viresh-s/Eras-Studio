@@ -254,91 +254,146 @@ export default function CorProfileWorkflow({ initialProfile }: CorProfileWorkflo
 
       {/* Main Grid: Left Step Navigator + Right Form Panel */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Left Step Sidebar */}
-        <aside className="lg:col-span-4 bg-white border border-[#E8E8E3] rounded-3xl p-5 sm:p-6 shadow-xs sticky top-24">
-          <div className="mb-6 pb-5 border-b border-[#F0F0EB]">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-[#73736C]">
-              Artist Intake Questionnaire
-            </p>
-            <div className="flex items-center justify-between mt-2">
-              <h3 className="font-serif text-xl font-semibold text-[#141413]">
-                Profile Progress
-              </h3>
-              <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#FAF5EC] text-[#865E16] border border-[#EADFCF]">
-                {completeness}%
-              </span>
+        {/* Left Step Sidebar - Unified Profile Design */}
+        <aside className="lg:col-span-4 bg-white border border-[#E8E8E3] rounded-[24px] shadow-[0_10px_40px_rgba(0,0,0,0.03)] overflow-hidden sticky top-24 flex flex-col justify-between">
+          <div>
+            {/* 1. Artist Mini Identity Banner */}
+            <div className="p-4 sm:p-5 border-b border-[#E8E8E3] flex items-center gap-3 bg-white">
+              <div className="relative w-11 h-11 rounded-full overflow-hidden bg-[#F3F3F3] border border-[#E2E2DC] shrink-0 flex items-center justify-center">
+                {initialProfile.personal?.avatar_url ? (
+                  <img
+                    src={initialProfile.personal.avatar_url}
+                    alt={initialProfile.personal.full_name || 'Artist'}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span className="text-xs font-semibold text-[#6E6E69]">
+                    {(initialProfile.personal?.full_name || 'Artist')
+                      .split(' ')
+                      .map((n) => n[0])
+                      .slice(0, 2)
+                      .join('')
+                      .toUpperCase()}
+                  </span>
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-semibold text-[#181A1F] truncate">
+                  {initialProfile.personal?.full_name || 'Artist'}
+                </p>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                  <p className="text-[10px] text-[#71716D] font-medium">COR Candidate</p>
+                </div>
+              </div>
             </div>
-            <div className="w-full bg-[#F0F0EB] h-1.5 rounded-full mt-3 overflow-hidden">
-              <div
-                className="bg-[#B8532F] h-full transition-all duration-300 rounded-full"
-                style={{ width: `${completeness}%` }}
-              />
-            </div>
-            {lastSaved && (
-              <p className="text-[10px] text-[#8A8A85] mt-2 flex items-center gap-1">
-                <Check size={11} className="text-emerald-600" />
-                <span>{lastSaved}</span>
-              </p>
-            )}
-          </div>
 
-          <nav className="space-y-1.5">
-            {STEPS.map((step) => {
-              const Icon = step.icon;
-              const isActive = activeStep === step.id;
-              const isPast = activeStep > step.id;
+            {/* 2. Step Navigator with Signature Soft Pill Hover & Active Effect */}
+            <nav className="p-3 sm:p-3.5 space-y-1.5 bg-white">
+              {STEPS.map((step) => {
+                const Icon = step.icon;
+                const isActive = activeStep === step.id;
+                const isPast = activeStep > step.id;
 
-              return (
-                <button
-                  key={step.id}
-                  type="button"
-                  onClick={async () => {
-                    await handleSaveDraft(true);
-                    setActiveStep(step.id);
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
-                  className={`w-full flex items-center gap-3 p-3 rounded-2xl text-left transition-all cursor-pointer ${
-                    isActive
-                      ? 'bg-[#141413] text-white shadow-xs'
-                      : 'hover:bg-[#FAF9F6] text-[#6E6E69] hover:text-[#141413]'
-                  }`}
-                >
-                  <div
-                    className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-xs font-semibold ${
+                return (
+                  <button
+                    key={step.id}
+                    type="button"
+                    onClick={async () => {
+                      await handleSaveDraft(true);
+                      setActiveStep(step.id);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    style={{
+                      background: isActive ? '#F1F2FF' : 'transparent',
+                      borderRadius: 12,
+                    }}
+                    className={`w-full text-left px-3.5 py-2.5 flex items-center justify-between transition-all duration-200 cursor-pointer group focus:outline-none ${
                       isActive
-                        ? 'bg-white/10 text-white'
-                        : isPast
-                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                        : 'bg-[#F0F0EB] text-[#6E6E69]'
+                        ? 'text-[#1345EE] font-semibold'
+                        : 'text-[#646A77] hover:bg-[#F1F2FF] hover:text-[#1345EE] font-medium'
                     }`}
                   >
-                    {isPast ? <Check size={14} /> : <Icon size={14} />}
-                  </div>
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                      <div
+                        className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 text-xs font-semibold transition-colors ${
+                          isActive
+                            ? 'bg-[#1345EE] text-white shadow-xs'
+                            : isPast
+                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                            : 'bg-[#F4F4F6] text-[#71716D] group-hover:bg-[#E8EAFF] group-hover:text-[#1345EE]'
+                        }`}
+                      >
+                        {isPast ? <Check size={13} /> : <Icon size={13} />}
+                      </div>
 
-                  <div className="min-w-0 flex-1">
-                    <p className={`text-xs font-semibold truncate ${isActive ? 'text-white' : 'text-[#141413]'}`}>
-                      {step.title}
-                    </p>
-                    <p className={`text-[10px] truncate ${isActive ? 'text-neutral-400' : 'text-[#8A8A85]'}`}>
-                      {step.sub}
-                    </p>
-                  </div>
-                </button>
-              );
-            })}
-          </nav>
+                      <div className="min-w-0 flex-1">
+                        <p className={`text-xs truncate ${isActive ? 'text-[#1345EE] font-semibold' : 'text-[#141413]'}`}>
+                          {step.title}
+                        </p>
+                        <p className={`text-[10px] truncate ${isActive ? 'text-[#1345EE]/70' : 'text-[#8A8A85]'}`}>
+                          {step.sub}
+                        </p>
+                      </div>
+                    </div>
 
-          <div className="mt-6 pt-5 border-t border-[#F0F0EB] flex gap-2">
-            <Button
-              size="sm"
-              variant="secondary"
-              onClick={() => handleSaveDraft(false)}
-              disabled={saving}
-              className="w-full text-xs flex items-center justify-center gap-1.5 border border-[#E8E8E3] bg-[#FAF9F6] hover:bg-[#F2F1ED]"
-            >
-              <Save size={13} />
-              <span>{saving ? 'Saving...' : 'Save Draft'}</span>
-            </Button>
+                    {isActive && (
+                      <span className="w-2 h-2 rounded-full bg-[#1345EE] shrink-0 ml-2" />
+                    )}
+                  </button>
+                );
+              })}
+            </nav>
+          </div>
+
+          <div>
+            {/* 3. Profile Completeness Progress Bar (Signature Blue Gradient) */}
+            <div className="p-4 sm:p-5 border-t border-[#E8E8E3] bg-white space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-medium text-[#71716D]">Profile Completeness</span>
+                <span className="font-semibold text-[#1345EE]">{completeness}%</span>
+              </div>
+              <div className="w-full bg-blue-100/70 rounded-full h-2 overflow-hidden">
+                <div
+                  className="h-2 rounded-full transition-all duration-500"
+                  style={{
+                    width: `${completeness}%`,
+                    background: 'linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%)',
+                  }}
+                />
+              </div>
+              {lastSaved ? (
+                <p className="text-[10px] text-[#8E8E88] flex items-center gap-1">
+                  <Check size={11} className="text-emerald-600" />
+                  <span>{lastSaved}</span>
+                </p>
+              ) : (
+                <p className="text-[10px] text-[#8E8E88]">
+                  {activeStep} of {STEPS.length} sections reviewed
+                </p>
+              )}
+            </div>
+
+            {/* 4. Save Draft Action */}
+            <div className="p-3 sm:p-4 border-t border-[#E8E8E3] bg-white">
+              <button
+                type="button"
+                onClick={() => handleSaveDraft(false)}
+                disabled={saving}
+                className="w-full py-2.5 px-4 rounded-xl border border-[#E8E8E3] bg-[#FAF9F6] text-xs font-semibold text-[#141413] hover:bg-[#F1F2FF] hover:text-[#1345EE] hover:border-[#1345EE]/30 transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+              >
+                <Save size={13} />
+                <span>{saving ? 'Saving...' : 'Save Draft'}</span>
+              </button>
+            </div>
+
+            {/* 5. Trust Badge */}
+            <div className="p-3 sm:p-4 border-t border-[#E8E8E3] bg-[#FCFCFA]">
+              <div className="flex items-center justify-center gap-1.5 text-[10px] text-[#8E8E88]">
+                <CheckCircle2 size={12} className="text-emerald-600" />
+                <span>Verified COR Curatorial Intake</span>
+              </div>
+            </div>
           </div>
         </aside>
 
@@ -347,7 +402,7 @@ export default function CorProfileWorkflow({ initialProfile }: CorProfileWorkflo
           {/* STEP HEADER */}
           <div className="border-b border-[#F0F0EB] pb-5 flex items-start justify-between gap-4">
             <div>
-              <span className="text-[11px] font-bold uppercase tracking-wider text-[#B8532F]">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[#1345EE]">
                 Step {activeStep + 1} of 8 · {STEPS[activeStep].sub}
               </span>
               <h2 className="font-serif text-2xl font-bold text-[#141413] mt-1">
@@ -367,7 +422,7 @@ export default function CorProfileWorkflow({ initialProfile }: CorProfileWorkflo
               {/* SECTION A: Personal Details */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2 border-b border-[#E8E8E3] pb-2">
-                  <User size={16} className="text-[#B8532F]" />
+                  <User size={16} className="text-[#1345EE]" />
                   <h3 className="text-sm font-bold uppercase tracking-wider text-[#141413]">
                     Section A — Personal Details
                   </h3>
@@ -504,7 +559,7 @@ export default function CorProfileWorkflow({ initialProfile }: CorProfileWorkflo
               {/* SECTION B: Artistic Practice */}
               <div className="space-y-4 pt-4 border-t border-[#F0F0EB]">
                 <div className="flex items-center gap-2 border-b border-[#E8E8E3] pb-2">
-                  <Palette size={16} className="text-[#B8532F]" />
+                  <Palette size={16} className="text-[#1345EE]" />
                   <h3 className="text-sm font-bold uppercase tracking-wider text-[#141413]">
                     Section B — Artistic Practice
                   </h3>
@@ -590,7 +645,7 @@ export default function CorProfileWorkflow({ initialProfile }: CorProfileWorkflo
                               }}
                               className={`text-[11px] px-3 py-1.5 rounded-lg border transition-colors cursor-pointer ${
                                 active
-                                  ? 'bg-[#B8532F] text-white border-[#B8532F]'
+                                  ? 'bg-[#1345EE] text-white border-[#1345EE]'
                                   : 'bg-white text-[#6E6E69] border-[#E8E8E3] hover:border-[#141413]'
                               }`}
                             >
@@ -622,7 +677,7 @@ export default function CorProfileWorkflow({ initialProfile }: CorProfileWorkflo
                               }}
                               className={`text-[11px] px-3 py-1.5 rounded-lg border transition-colors cursor-pointer ${
                                 active
-                                  ? 'bg-[#B8532F] text-white border-[#B8532F]'
+                                  ? 'bg-[#1345EE] text-white border-[#1345EE]'
                                   : 'bg-white text-[#6E6E69] border-[#E8E8E3] hover:border-[#141413]'
                               }`}
                             >
@@ -658,7 +713,7 @@ export default function CorProfileWorkflow({ initialProfile }: CorProfileWorkflo
                             }}
                             className={`text-[11px] px-3 py-1.5 rounded-lg border transition-colors cursor-pointer ${
                               active
-                                ? 'bg-[#B8532F] text-white border-[#B8532F]'
+                                ? 'bg-[#1345EE] text-white border-[#1345EE]'
                                 : 'bg-white text-[#6E6E69] border-[#E8E8E3] hover:border-[#141413]'
                             }`}
                           >
@@ -693,7 +748,7 @@ export default function CorProfileWorkflow({ initialProfile }: CorProfileWorkflo
                             }}
                             className={`text-[11px] px-3 py-1.5 rounded-lg border transition-colors cursor-pointer ${
                               active
-                                ? 'bg-[#B8532F] text-white border-[#B8532F]'
+                                ? 'bg-[#1345EE] text-white border-[#1345EE]'
                                 : 'bg-white text-[#6E6E69] border-[#E8E8E3] hover:border-[#141413]'
                             }`}
                           >
@@ -716,7 +771,7 @@ export default function CorProfileWorkflow({ initialProfile }: CorProfileWorkflo
               {/* SECTION C: Geography and Location */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2 border-b border-[#E8E8E3] pb-2">
-                  <MapPin size={16} className="text-[#B8532F]" />
+                  <MapPin size={16} className="text-[#1345EE]" />
                   <h3 className="text-sm font-bold uppercase tracking-wider text-[#141413]">
                     Section C — Geography & Location
                   </h3>
@@ -811,7 +866,7 @@ export default function CorProfileWorkflow({ initialProfile }: CorProfileWorkflo
               {/* SECTION D: Career History */}
               <div className="space-y-4 pt-4 border-t border-[#F0F0EB]">
                 <div className="flex items-center gap-2 border-b border-[#E8E8E3] pb-2">
-                  <History size={16} className="text-[#B8532F]" />
+                  <History size={16} className="text-[#1345EE]" />
                   <h3 className="text-sm font-bold uppercase tracking-wider text-[#141413]">
                     Section D — Career History
                   </h3>
@@ -1002,7 +1057,7 @@ export default function CorProfileWorkflow({ initialProfile }: CorProfileWorkflo
               {/* SECTION E: Digital Presence */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2 border-b border-[#E8E8E3] pb-2">
-                  <Globe size={16} className="text-[#B8532F]" />
+                  <Globe size={16} className="text-[#1345EE]" />
                   <h3 className="text-sm font-bold uppercase tracking-wider text-[#141413]">
                     Section E — Digital Presence
                   </h3>
@@ -1200,7 +1255,7 @@ export default function CorProfileWorkflow({ initialProfile }: CorProfileWorkflo
               {/* SECTION G: Awards, Funding and Recognition */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2 border-b border-[#E8E8E3] pb-2">
-                  <Award size={16} className="text-[#B8532F]" />
+                  <Award size={16} className="text-[#1345EE]" />
                   <h3 className="text-sm font-bold uppercase tracking-wider text-[#141413]">
                     Section G — Awards, Funding & Recognition
                   </h3>
@@ -1306,7 +1361,7 @@ export default function CorProfileWorkflow({ initialProfile }: CorProfileWorkflo
               {/* SECTION H: Artist Goals and Funding Priorities */}
               <div className="space-y-4 pt-4 border-t border-[#F0F0EB]">
                 <div className="flex items-center gap-2 border-b border-[#E8E8E3] pb-2">
-                  <Target size={16} className="text-[#B8532F]" />
+                  <Target size={16} className="text-[#1345EE]" />
                   <h3 className="text-sm font-bold uppercase tracking-wider text-[#141413]">
                     Section H — Artist Goals & Priorities
                   </h3>
@@ -1408,7 +1463,7 @@ export default function CorProfileWorkflow({ initialProfile }: CorProfileWorkflo
               {/* SECTION I: International Mobility */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2 border-b border-[#E8E8E3] pb-2">
-                  <Plane size={16} className="text-[#B8532F]" />
+                  <Plane size={16} className="text-[#1345EE]" />
                   <h3 className="text-sm font-bold uppercase tracking-wider text-[#141413]">
                     Section I — International Mobility
                   </h3>
@@ -1577,7 +1632,7 @@ export default function CorProfileWorkflow({ initialProfile }: CorProfileWorkflo
               {/* SECTION J: Target Opportunities and Exclusions */}
               <div className="space-y-4 pt-4 border-t border-[#F0F0EB]">
                 <div className="flex items-center gap-2 border-b border-[#E8E8E3] pb-2">
-                  <Building size={16} className="text-[#B8532F]" />
+                  <Building size={16} className="text-[#1345EE]" />
                   <h3 className="text-sm font-bold uppercase tracking-wider text-[#141413]">
                     Section J — Target Opportunities & Exclusions
                   </h3>
@@ -1657,7 +1712,7 @@ export default function CorProfileWorkflow({ initialProfile }: CorProfileWorkflo
               {/* SECTION K: Facilities and Resources */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2 border-b border-[#E8E8E3] pb-2">
-                  <Wrench size={16} className="text-[#B8532F]" />
+                  <Wrench size={16} className="text-[#1345EE]" />
                   <h3 className="text-sm font-bold uppercase tracking-wider text-[#141413]">
                     Section K — Facilities & Resources
                   </h3>
@@ -1718,7 +1773,7 @@ export default function CorProfileWorkflow({ initialProfile }: CorProfileWorkflo
               {/* SECTION L: Application Fees and Financial Circumstances */}
               <div className="space-y-4 pt-4 border-t border-[#F0F0EB]">
                 <div className="flex items-center gap-2 border-b border-[#E8E8E3] pb-2">
-                  <DollarSign size={16} className="text-[#B8532F]" />
+                  <DollarSign size={16} className="text-[#1345EE]" />
                   <h3 className="text-sm font-bold uppercase tracking-wider text-[#141413]">
                     Section L — Fees & Financial Circumstances
                   </h3>
@@ -1828,7 +1883,7 @@ export default function CorProfileWorkflow({ initialProfile }: CorProfileWorkflo
               {/* SECTION M: Participation Preferences */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2 border-b border-[#E8E8E3] pb-2">
-                  <Users size={16} className="text-[#B8532F]" />
+                  <Users size={16} className="text-[#1345EE]" />
                   <h3 className="text-sm font-bold uppercase tracking-wider text-[#141413]">
                     Section M — Participation Preferences
                   </h3>
@@ -1887,7 +1942,7 @@ export default function CorProfileWorkflow({ initialProfile }: CorProfileWorkflo
               {/* SECTION N: Previous Applications */}
               <div className="space-y-4 pt-4 border-t border-[#F0F0EB]">
                 <div className="flex items-center gap-2 border-b border-[#E8E8E3] pb-2">
-                  <FileCheck size={16} className="text-[#B8532F]" />
+                  <FileCheck size={16} className="text-[#1345EE]" />
                   <h3 className="text-sm font-bold uppercase tracking-wider text-[#141413]">
                     Section N — Previous Applications
                   </h3>
@@ -1986,7 +2041,7 @@ export default function CorProfileWorkflow({ initialProfile }: CorProfileWorkflo
               {/* SECTION O: Application Representation and Restrictions */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2 border-b border-[#E8E8E3] pb-2">
-                  <ShieldAlert size={16} className="text-[#B8532F]" />
+                  <ShieldAlert size={16} className="text-[#1345EE]" />
                   <h3 className="text-sm font-bold uppercase tracking-wider text-[#141413]">
                     Section O — Representation & Restrictions
                   </h3>
@@ -2059,7 +2114,7 @@ export default function CorProfileWorkflow({ initialProfile }: CorProfileWorkflo
               {/* SECTION P: Outreach and Approval Preferences */}
               <div className="space-y-4 pt-4 border-t border-[#F0F0EB]">
                 <div className="flex items-center gap-2 border-b border-[#E8E8E3] pb-2">
-                  <SlidersHorizontal size={16} className="text-[#B8532F]" />
+                  <SlidersHorizontal size={16} className="text-[#1345EE]" />
                   <h3 className="text-sm font-bold uppercase tracking-wider text-[#141413]">
                     Section P — Outreach & Approval Preferences
                   </h3>
@@ -2096,8 +2151,8 @@ export default function CorProfileWorkflow({ initialProfile }: CorProfileWorkflo
                         key={item.value}
                         className={`flex items-start gap-3 p-3.5 rounded-2xl border cursor-pointer transition-all ${
                           formData.approval_preferences.outreach_involvement === item.value
-                            ? 'bg-[#FAF5EC] border-[#B8532F]'
-                            : 'bg-white border-[#E8E8E3] hover:border-[#141413]'
+                            ? 'bg-[#F1F2FF]/60 border-[#1345EE] ring-1 ring-[#1345EE]/20 shadow-xs'
+                            : 'bg-white border-[#E8E8E3] hover:border-[#1345EE]/40'
                         }`}
                       >
                         <input
@@ -2114,7 +2169,7 @@ export default function CorProfileWorkflow({ initialProfile }: CorProfileWorkflo
                               },
                             })
                           }
-                          className="mt-0.5"
+                          className="mt-0.5 accent-[#1345EE]"
                         />
                         <div>
                           <p className="text-xs font-bold text-[#141413]">{item.title}</p>
@@ -2168,8 +2223,8 @@ export default function CorProfileWorkflow({ initialProfile }: CorProfileWorkflo
                         key={item.value}
                         className={`flex items-start gap-3 p-3.5 rounded-2xl border cursor-pointer transition-all ${
                           formData.approval_preferences.final_approval_preference === item.value
-                            ? 'bg-[#FAF5EC] border-[#B8532F]'
-                            : 'bg-white border-[#E8E8E3] hover:border-[#141413]'
+                            ? 'bg-[#F1F2FF]/60 border-[#1345EE] ring-1 ring-[#1345EE]/20 shadow-xs'
+                            : 'bg-white border-[#E8E8E3] hover:border-[#1345EE]/40'
                         }`}
                       >
                         <input
@@ -2186,7 +2241,7 @@ export default function CorProfileWorkflow({ initialProfile }: CorProfileWorkflo
                               },
                             })
                           }
-                          className="mt-0.5"
+                          className="mt-0.5 accent-[#1345EE]"
                         />
                         <div>
                           <p className="text-xs font-bold text-[#141413]">{item.title}</p>
@@ -2200,41 +2255,58 @@ export default function CorProfileWorkflow({ initialProfile }: CorProfileWorkflo
             </div>
           )}
 
-          {/* BOTTOM STEP CONTROLS */}
-          <div className="pt-6 border-t border-[#F0F0EB] flex items-center justify-between">
-            <Button
-              size="sm"
-              variant="secondary"
+          {/* BOTTOM STEP CONTROLS - Inspired by Edit Profile Action Bar */}
+          <div className="pt-6 border-t border-[#E8E8E3] flex flex-col sm:flex-row items-center justify-between gap-4">
+            <button
+              type="button"
               onClick={handlePrevStep}
               disabled={activeStep === 0 || saving}
-              className="text-xs flex items-center gap-1.5"
+              className="w-full sm:w-auto px-6 py-3 rounded-full border border-[#E8E8E3] bg-white text-xs font-semibold text-[#141413] hover:bg-[#F5F5F0] transition-colors inline-flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
             >
-              <ArrowLeft size={13} />
-              <span>Previous</span>
-            </Button>
+              <ArrowLeft size={14} />
+              <span>Previous Section</span>
+            </button>
 
-            <div className="flex items-center gap-3">
-              <Button
-                size="sm"
-                variant="secondary"
+            <div className="w-full sm:w-auto flex items-center justify-end gap-3">
+              <button
+                type="button"
                 onClick={() => handleSaveDraft(false)}
                 disabled={saving}
-                className="text-xs flex items-center gap-1.5 border border-[#E8E8E3] bg-[#FAF9F6]"
+                className="px-6 py-3 rounded-full border border-[#E8E8E3] bg-white text-xs font-semibold text-[#6E6E69] hover:text-[#141413] hover:bg-[#F5F5F0] transition-colors inline-flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
               >
-                <Save size={13} />
+                <Save size={14} />
                 <span>{saving ? 'Saving...' : 'Save Draft'}</span>
-              </Button>
+              </button>
 
-              <Button
-                size="sm"
-                variant="primary"
+              <button
+                type="button"
                 onClick={handleNextStep}
                 disabled={saving}
-                className="text-xs flex items-center gap-1.5 bg-[#141413] text-white hover:bg-[#2A2A28]"
+                style={{
+                  position: 'relative',
+                  background: 'linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%)',
+                  boxShadow: '0px 7px 22px rgba(35, 77, 255, 0.18), 0px 3px 3px rgba(255, 255, 255, 0.65) inset, 0px -3px 6px rgba(6, 42, 137, 0.33) inset',
+                  overflow: 'hidden',
+                  borderRadius: 40,
+                  outline: '2px #2356FF solid',
+                  outlineOffset: '-2px',
+                }}
+                className="px-8 py-3.5 inline-flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 hover:brightness-110 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed group select-none text-white text-xs sm:text-sm font-semibold"
               >
-                <span>{activeStep === STEPS.length - 1 ? 'Review & Submit' : 'Save & Next'}</span>
-                <ArrowRight size={13} />
-              </Button>
+                <div
+                  style={{
+                    position: 'absolute',
+                    inset: 3,
+                    borderRadius: 37,
+                    border: '1px rgba(255, 255, 255, 0.15) solid',
+                    pointerEvents: 'none',
+                  }}
+                />
+                <div className="flex items-center gap-2 relative z-10 text-white font-semibold">
+                  <span>{activeStep === STEPS.length - 1 ? 'Review & Submit' : 'Save & Next'}</span>
+                  <ArrowRight size={15} className="text-white group-hover:translate-x-0.5 transition-transform" />
+                </div>
+              </button>
             </div>
           </div>
         </main>
@@ -2246,7 +2318,7 @@ export default function CorProfileWorkflow({ initialProfile }: CorProfileWorkflo
           <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 space-y-6 max-h-[90vh] overflow-y-auto border border-[#E8E8E3] shadow-2xl animate-in zoom-in-95 duration-200">
             <div className="flex items-start justify-between border-b border-[#F0F0EB] pb-4">
               <div>
-                <span className="text-[11px] font-bold uppercase tracking-wider text-[#B8532F]">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-[#1345EE]">
                   Final Verification
                 </span>
                 <h3 className="font-serif text-2xl font-bold text-[#141413] mt-0.5">
@@ -2268,28 +2340,28 @@ export default function CorProfileWorkflow({ initialProfile }: CorProfileWorkflo
 
             {/* Summary Sections */}
             <div className="space-y-3 text-xs">
-              <div className="p-3.5 rounded-2xl bg-[#FAF9F6] border border-[#E8E8E3]">
+              <div className="p-3.5 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0]">
                 <p className="font-bold text-[#141413] mb-1">A. Personal & Contact</p>
                 <p className="text-[#6E6E69]">
                   {formData.personal.full_name} · {formData.personal.primary_email} · {formData.personal.primary_phone}
                 </p>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-[#FAF9F6] border border-[#E8E8E3]">
+              <div className="p-3.5 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0]">
                 <p className="font-bold text-[#141413] mb-1">B. Practice & Mediums</p>
                 <p className="text-[#6E6E69]">
                   {formData.artistic_practice.primary_medium.join(', ') || 'None selected'}
                 </p>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-[#FAF9F6] border border-[#E8E8E3]">
+              <div className="p-3.5 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0]">
                 <p className="font-bold text-[#141413] mb-1">C & D. Geography & Career History</p>
                 <p className="text-[#6E6E69]">
                   {formData.geography.city_town}, {formData.geography.home_state} · Stage: {formData.career_history.career_stage} · Practicing since {formData.career_history.practicing_since_year}
                 </p>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-[#FAF9F6] border border-[#E8E8E3]">
+              <div className="p-3.5 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0]">
                 <p className="font-bold text-[#141413] mb-1">Governance & Approval Preference</p>
                 <p className="text-[#6E6E69]">
                   {formData.approval_preferences.final_approval_preference} · Outreach: {formData.approval_preferences.outreach_involvement}
@@ -2298,26 +2370,44 @@ export default function CorProfileWorkflow({ initialProfile }: CorProfileWorkflo
             </div>
 
             <div className="pt-4 border-t border-[#F0F0EB] flex items-center justify-end gap-3">
-              <Button
-                size="sm"
-                variant="secondary"
+              <button
+                type="button"
                 onClick={() => setShowReviewModal(false)}
                 disabled={submitting}
-                className="text-xs"
+                className="px-5 py-2.5 rounded-full border border-[#E8E8E3] bg-white text-xs font-semibold text-[#141413] hover:bg-[#F5F5F0] transition-colors cursor-pointer"
               >
                 Back to Edit
-              </Button>
+              </button>
 
-              <Button
-                size="sm"
-                variant="primary"
+              <button
+                type="button"
                 onClick={handleFinalSubmit}
                 disabled={submitting}
-                className="text-xs bg-[#141413] text-white hover:bg-[#2A2A28] flex items-center gap-1.5"
+                style={{
+                  position: 'relative',
+                  background: 'linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%)',
+                  boxShadow: '0px 7px 22px rgba(35, 77, 255, 0.18), 0px 3px 3px rgba(255, 255, 255, 0.65) inset, 0px -3px 6px rgba(6, 42, 137, 0.33) inset',
+                  overflow: 'hidden',
+                  borderRadius: 40,
+                  outline: '2px #2356FF solid',
+                  outlineOffset: '-2px',
+                }}
+                className="px-6 py-3 inline-flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 hover:brightness-110 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed group select-none text-white text-xs sm:text-sm font-semibold"
               >
-                <span>{submitting ? 'Submitting...' : 'Confirm & Submit to COR'}</span>
-                <Check size={14} />
-              </Button>
+                <div
+                  style={{
+                    position: 'absolute',
+                    inset: 3,
+                    borderRadius: 37,
+                    border: '1px rgba(255, 255, 255, 0.15) solid',
+                    pointerEvents: 'none',
+                  }}
+                />
+                <div className="flex items-center gap-1.5 relative z-10 text-white font-semibold">
+                  <span>{submitting ? 'Submitting to COR...' : 'Confirm & Submit to COR'}</span>
+                  <Check size={15} className="text-white" />
+                </div>
+              </button>
             </div>
           </div>
         </div>

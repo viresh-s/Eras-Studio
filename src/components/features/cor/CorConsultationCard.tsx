@@ -12,34 +12,25 @@ export default function CorConsultationCard({ consultation }: CorConsultationCar
   return (
     <div className="bg-white border border-[#E8E8E3] rounded-3xl p-6 sm:p-7 shadow-xs flex flex-col justify-between">
       <div>
-        <div className="flex items-center justify-between pb-4 border-b border-[#F0F0EB] mb-4">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-[#FAF9F6] border border-[#E8E8E3] flex items-center justify-center text-[#141413]">
-              <Calendar size={16} />
-            </div>
-            <h2 className="font-serif text-lg sm:text-xl font-semibold text-[#141413]">
-              Upcoming consultation
-            </h2>
-          </div>
-
-          {consultation && <CorStatusBadge status={consultation.status} />}
-        </div>
+        <h2 className="century-heading text-xl sm:text-2xl text-[#141413]">
+          Upcoming consultation
+        </h2>
 
         {consultation ? (
-          <div className="space-y-3">
-            <div className="p-4 bg-[#FAF9F6] border border-[#E8E8E3] rounded-2xl">
-              <strong className="block text-sm font-semibold text-[#141413]">
+          <div className="space-y-3 mt-3">
+            <div className="p-4 bg-[#FAF9F6] border border-[#E8E8E3] rounded-2xl font-sans">
+              <strong className="block text-sm font-semibold text-[#141413] font-sans">
                 {consultation.slot_time}
               </strong>
-              <p className="text-xs text-[#6E6E69] mt-1 leading-relaxed">
+              <p className="text-xs text-[#6E6E69] mt-1 leading-relaxed font-sans">
                 {consultation.purpose}
               </p>
-              <div className="flex items-center gap-3 mt-3 pt-3 border-t border-[#E8E8E3] text-[11px] text-[#73736C]">
-                <span className="flex items-center gap-1">
+              <div className="flex items-center gap-3 mt-3 pt-3 border-t border-[#E8E8E3] text-[11px] text-[#73736C] font-sans">
+                <span className="flex items-center gap-1 font-sans">
                   <Clock size={12} />
                   {consultation.duration_minutes} mins
                 </span>
-                <span className="flex items-center gap-1 font-medium text-[#141413]">
+                <span className="flex items-center gap-1 font-medium text-[#141413] font-sans">
                   <Video size={12} />
                   Advisor: {consultation.consultant_name}
                 </span>
@@ -47,19 +38,24 @@ export default function CorConsultationCard({ consultation }: CorConsultationCar
             </div>
           </div>
         ) : (
-          <div className="py-6 text-center text-xs text-[#6E6E69] space-y-2">
-            <p>No consultation scheduled yet.</p>
-            <p className="text-[11px] text-[#8A8A85]">
-              Meet 1-on-1 with an Eras career advisor to review your portfolio and interview strategy.
+          <div className="pt-3 text-xs text-[#6E6E69] space-y-1 font-sans">
+            <p className="font-semibold text-[#141413] text-xs font-sans">
+              No consultation scheduled yet.
+            </p>
+            <p className="text-[11px] text-[#6E6E69] font-sans leading-relaxed">
+              Meet 1 on 1 with an Eras career advisor to review your portfolio and interview strategy.
+            </p>
+            <p className="text-[11px] text-[#6E6E69] font-sans pt-1">
+              Assigned consultant: <strong className="font-semibold text-[#141413] font-sans">Priya Nair</strong>
             </p>
           </div>
         )}
       </div>
 
-      <div className="pt-4 mt-4 border-t border-[#F0F0EB]">
+      <div className="pt-4 mt-2">
         <Link
           href="/cor/consultations"
-          className="w-full py-2.5 px-4 rounded-full border border-[#141413] text-xs font-semibold text-[#141413] hover:bg-neutral-50 transition-colors inline-flex items-center justify-center gap-1.5"
+          className="px-5 py-2 rounded-full border border-[#141413] text-xs font-medium text-[#141413] hover:bg-neutral-50 transition-colors inline-flex items-center justify-center gap-1.5 font-sans"
         >
           <span>{consultation ? 'Manage Consultation' : 'Schedule Consultation'}</span>
           <ArrowRight size={13} />

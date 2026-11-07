@@ -42,12 +42,20 @@ export default function CorIntroSection({ onStartClick }: CorIntroSectionProps) 
               <Link
                 href="/cor/profile"
                 onClick={onStartClick}
-                className="group inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-[#141413] text-[#FAF9F6] text-sm sm:text-base font-medium hover:bg-[#2A2A28] active:bg-black transition-all duration-200 shadow-sm cursor-pointer"
+                style={{
+                  position: 'relative',
+                  background: 'linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%)',
+                  boxShadow: '0px 7px 22px rgba(35, 77, 255, 0.22), 0px 3px 3px rgba(255, 255, 255, 0.65) inset, 0px -3px 6px rgba(6, 42, 137, 0.33) inset',
+                  borderRadius: 40,
+                  outline: '2px #2356FF solid',
+                  outlineOffset: '-2px',
+                }}
+                className="group inline-flex items-center justify-center gap-3 px-8 py-4 text-white text-sm sm:text-base font-semibold hover:brightness-110 active:scale-[0.98] transition-all duration-200 shadow-md cursor-pointer select-none"
               >
                 <span>Apply for COR Membership</span>
                 <ArrowRight
                   size={16}
-                  className="transition-transform duration-200 group-hover:translate-x-1"
+                  className="transition-transform duration-200 group-hover:translate-x-1 text-white"
                 />
               </Link>
             </div>
@@ -81,7 +89,7 @@ export default function CorIntroSection({ onStartClick }: CorIntroSectionProps) 
                 className="py-7 sm:py-8 group transition-colors duration-150 hover:bg-[#FAF9F6] px-4 -mx-4 rounded-xl"
               >
                 <div className="flex items-center gap-6 sm:gap-8">
-                  <span className="font-mono text-xs sm:text-sm text-[#865E16] font-semibold tracking-wider flex-shrink-0">
+                  <span className="font-mono text-xs sm:text-sm text-[#1345EE] font-semibold tracking-wider flex-shrink-0">
                     {item.num}
                   </span>
                   <h3 className="font-serif text-lg sm:text-xl font-medium text-[#141413] tracking-tight">
@@ -128,12 +136,20 @@ export default function CorIntroSection({ onStartClick }: CorIntroSectionProps) 
               <Link
                 href="/cor/profile"
                 onClick={onStartClick}
-                className="group inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-[#FAF9F6] text-[#141413] text-sm sm:text-base font-semibold hover:bg-white active:bg-[#E8E8E3] transition-all duration-200 shadow-sm cursor-pointer"
+                style={{
+                  position: 'relative',
+                  background: 'linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%)',
+                  boxShadow: '0px 7px 22px rgba(35, 77, 255, 0.22), 0px 3px 3px rgba(255, 255, 255, 0.65) inset, 0px -3px 6px rgba(6, 42, 137, 0.33) inset',
+                  borderRadius: 40,
+                  outline: '2px #2356FF solid',
+                  outlineOffset: '-2px',
+                }}
+                className="group inline-flex items-center justify-center gap-3 px-8 py-4 text-white text-sm sm:text-base font-semibold hover:brightness-110 active:scale-[0.98] transition-all duration-200 shadow-md cursor-pointer select-none"
               >
                 <span>Apply for COR Membership</span>
                 <ArrowRight
                   size={16}
-                  className="transition-transform duration-200 group-hover:translate-x-1"
+                  className="transition-transform duration-200 group-hover:translate-x-1 text-white"
                 />
               </Link>
             </div>

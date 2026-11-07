@@ -468,16 +468,18 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
       {/* 1. PAGE HEADER (Eras Studio Editorial Style)                              */}
       {/* ========================================================================= */}
       <div className="border-b border-[#E8E8E3] pb-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div>
-            <h1 className="admin-century-title text-3xl sm:text-4xl text-[#141413] tracking-tight">
+            <h1 className="admin-century-title text-3xl sm:text-4xl text-[#141413] tracking-tight leading-tight">
               Reports & Moderation.
             </h1>
-            <p className="mt-1 text-xs md:text-sm text-[#71716D] font-light">
+            <p className="mt-1.5 text-xs sm:text-sm text-[#6E6E69] max-w-2xl leading-relaxed">
               Community moderation, content disputes, copyright protection, and member conduct reviews.
             </p>
           </div>
-          <ExportDropdown exportType="reports" filters={{ query: debouncedSearch, status: activeTab === "all" ? undefined : activeTab }} />
+          <div className="flex items-center gap-3 shrink-0 self-start sm:self-auto">
+            <ExportDropdown exportType="reports" filters={{ query: debouncedSearch, status: activeTab === "all" ? undefined : activeTab }} />
+          </div>
         </div>
       </div>
 

@@ -65,14 +65,10 @@ export default async function CreatorDashboard() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1
-              className="text-4xl font-serif italic font-normal text-[var(--color-cor-ink)] tracking-tight"
-              style={{
-                fontFamily: "'Century Schoolbook', Century, 'TeX Gyre Schola', Georgia, serif",
-                fontStyle: 'italic',
-                fontWeight: 400,
-              }}
+              className="text-4xl font-serif italic font-semibold text-[var(--color-cor-ink)] tracking-tight"
+              style={{ fontFamily: "'Century Schoolbook', Century, 'TeX Gyre Schola', Georgia, serif", fontStyle: 'italic' }}
             >
-              Portfolio
+              Portfolio Work
             </h1>
           </div>
           <div className="flex flex-wrap items-center gap-3 mt-4 sm:mt-0">
@@ -109,103 +105,78 @@ export default async function CreatorDashboard() {
         </div>
       </div>
 
-      {/* Profile Completion Progress Bar - Compact Sleek Capsule */}
+      {/* Profile Completion Progress Bar */}
       {completeness < 100 && (
-        <div className="bg-white rounded-full border border-[#EBEBE6] px-3.5 py-2 sm:px-5 sm:py-2.5 mb-6 flex items-center justify-between gap-3 sm:gap-4 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
-          <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0 flex-1">
-            <span className="text-[11px] sm:text-xs font-normal text-gray-700 whitespace-nowrap">
-              Profile Completeness
-            </span>
-            <div className="flex-1 max-w-[140px] sm:max-w-xs bg-blue-100/60 rounded-full h-1.5 overflow-hidden">
+        <div className="bg-[var(--color-cor-surface)] rounded-3xl border border-[var(--color-cor-border)] p-5 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-5 shadow-2xs">
+          <div className="flex-1 max-w-xl">
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-xs font-normal text-[var(--color-cor-ink)]">
+                Profile Completeness
+              </span>
+              <span className="text-xs font-normal text-[var(--color-cor-ink)]">
+                {completeness}%
+              </span>
+            </div>
+            {/* Progress Bar */}
+            <div className="w-full bg-blue-100/70 rounded-full h-2 overflow-hidden">
               <div
-                className="h-1.5 rounded-full transition-all duration-500"
+                className="h-2 rounded-full transition-all duration-500"
                 style={{
                   width: `${completeness}%`,
                   background: 'linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%)',
                 }}
               />
             </div>
-            <span className="text-[11px] sm:text-xs font-medium text-[#1345EE] shrink-0">
-              {completeness}%
-            </span>
           </div>
-
           <Link
             href="/profile"
-            className="h-7 px-3 sm:h-7.5 sm:px-3.5 inline-flex items-center justify-center rounded-full bg-[#181A1F] text-white text-[11px] sm:text-xs font-normal hover:bg-black active:scale-[0.98] transition-all shrink-0 select-none shadow-xs"
+            style={{
+              position: 'relative',
+              background: '#F3F3F3',
+              overflow: 'hidden',
+              borderRadius: 42.35,
+            }}
+            className="px-7 py-3 sm:px-8 sm:py-3.5 inline-flex items-center justify-center transition-all duration-200 hover:bg-[#EAEAEA] active:scale-[0.98] cursor-pointer select-none whitespace-nowrap self-start sm:self-center shrink-0"
           >
-            Edit Profile
+            <span
+              style={{
+                color: '#343434',
+                fontSize: 14.82,
+                fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
+                fontWeight: '400',
+                lineHeight: '17.05px',
+                wordWrap: 'break-word',
+              }}
+              className="text-center"
+            >
+              Edit Profile
+            </span>
           </Link>
         </div>
       )}
 
-      {/* Sleek, Compact Filter Buttons (Capsule pill, white background, ERAS blue gradient border & text, smooth hover) */}
-      <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 mb-8">
-        {[
-          { id: 'published', label: 'Published Artworks', count: artworkCount || 0, href: '#your-works', isActive: true },
-          { id: 'collections', label: 'Collections', count: collections?.length || 0, href: '/portfolio/collections', isActive: false },
-          { id: 'views', label: 'Profile Views', count: 0, href: profile?.id ? `/artist/${profile.id}` : '#', isActive: false },
-          { id: 'shortlisted', label: 'Shortlisted', count: chatCount || 0, href: '/messages', isActive: false },
-        ].map((stat) => {
-          const isActive = stat.isActive;
-
-          return (
-            <Link
-              key={stat.id}
-              href={stat.href}
-              style={
-                isActive
-                  ? {
-                      background:
-                        'linear-gradient(#ffffff, #ffffff) padding-box, linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%) border-box',
-                      border: '1.5px solid transparent',
-                      boxShadow:
-                        '0px 3px 12px rgba(35, 77, 255, 0.12), 0px 1px 3px rgba(35, 77, 255, 0.08)',
-                    }
-                  : {
-                      background: '#FFFFFF',
-                      border: '1.5px solid #EBEBE6',
-                    }
-              }
-              className={`relative h-9 px-3.5 sm:px-4 inline-flex items-center gap-2 rounded-full text-left transition-all duration-200 cursor-pointer select-none group box-border shrink-0 ${
-                isActive
-                  ? 'shadow-xs'
-                  : 'hover:border-[#2356FF] hover:shadow-[0_2px_10px_rgba(35,77,255,0.08)] active:scale-[0.98]'
-              }`}
-            >
-              <span
-                style={
-                  isActive
-                    ? {
-                        background: 'linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%)',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                      }
-                    : undefined
-                }
-                className={`text-xs font-normal tracking-wide transition-colors ${
-                  isActive ? 'font-medium' : 'text-gray-700 group-hover:text-[#2356FF]'
-                }`}
-              >
-                {stat.label}
-              </span>
-
-              <span
-                className={`text-[11px] px-2 py-0.5 rounded-full font-medium transition-colors ${
-                  isActive
-                    ? 'bg-[#EEF2FF] text-[#1345EE]'
-                    : 'bg-[#F4F4F0] text-gray-500 group-hover:bg-[#EEF2FF] group-hover:text-[#2356FF]'
-                }`}
-              >
-                {stat.count}
-              </span>
-            </Link>
-          );
-        })}
+      {/* Stats Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+        <div className="bg-[var(--color-cor-surface)] rounded-3xl border border-[var(--color-cor-border)] p-5">
+          <p className="text-[11px] font-normal tracking-[0.15em] text-[var(--color-cor-ink-light)] uppercase mb-2">Published Artworks</p>
+          <p className="text-3xl font-normal text-[var(--color-cor-ink)]">{artworkCount || 0}</p>
+        </div>
+        <div className="bg-[var(--color-cor-surface)] rounded-3xl border border-[var(--color-cor-border)] p-5">
+          <p className="text-[11px] font-normal tracking-[0.15em] text-[var(--color-cor-ink-light)] uppercase mb-2">Collections</p>
+          <p className="text-3xl font-normal text-[var(--color-cor-ink)]">{collections?.length || 0}</p>
+        </div>
+        <div className="bg-[var(--color-cor-surface)] rounded-3xl border border-[var(--color-cor-border)] p-5">
+          <p className="text-[11px] font-normal tracking-[0.15em] text-[var(--color-cor-ink-light)] uppercase mb-2">Profile Views</p>
+          <p className="text-3xl font-normal text-[var(--color-cor-ink)]">0</p>
+        </div>
+        <div className="bg-[var(--color-cor-surface)] rounded-3xl border border-[var(--color-cor-border)] p-5">
+          <p className="text-[11px] font-normal tracking-[0.15em] text-[var(--color-cor-ink-light)] uppercase mb-2">Shortlisted</p>
+          <p className="text-3xl font-normal text-[var(--color-cor-ink)]">{chatCount || 0}</p>
+        </div>
       </div>
 
       {/* Your Works Section */}
-      <div className="mb-8" id="your-works">
+      <div className="mb-8">
         <div className="flex items-center justify-between mb-5">
           <div>
             <h2
@@ -217,11 +188,9 @@ export default async function CreatorDashboard() {
           </div>
           <Link
             href="/portfolio/collections"
-            className="btn-eras-gradient-hover px-4 py-2 text-sm font-normal inline-flex items-center justify-center cursor-pointer select-none"
+            className="px-4 py-2 text-sm font-normal text-[var(--color-cor-ink)] bg-[var(--color-cor-surface)] border border-[var(--color-cor-border)] rounded-full hover:bg-[#F4F4ED] transition-colors"
           >
-            <span className="btn-eras-gradient-text">
-              Manage Collections
-            </span>
+            Manage Collections
           </Link>
         </div>
 
