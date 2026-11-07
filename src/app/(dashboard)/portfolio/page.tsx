@@ -65,10 +65,14 @@ export default async function CreatorDashboard() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1
-              className="text-4xl font-serif italic font-semibold text-[var(--color-cor-ink)] tracking-tight"
-              style={{ fontFamily: "'Century Schoolbook', Century, 'TeX Gyre Schola', Georgia, serif", fontStyle: 'italic' }}
+              className="text-4xl font-serif italic font-normal text-[var(--color-cor-ink)] tracking-tight"
+              style={{
+                fontFamily: "'Century Schoolbook', Century, 'TeX Gyre Schola', Georgia, serif",
+                fontStyle: 'italic',
+                fontWeight: 400,
+              }}
             >
-              Portfolio Work
+              Portfolio
             </h1>
           </div>
           <div className="flex flex-wrap items-center gap-3 mt-4 sm:mt-0">
@@ -213,9 +217,11 @@ export default async function CreatorDashboard() {
           </div>
           <Link
             href="/portfolio/collections"
-            className="px-4 py-2 text-sm font-normal text-[var(--color-cor-ink)] bg-[var(--color-cor-surface)] border border-[var(--color-cor-border)] rounded-full hover:bg-[#F4F4ED] transition-colors"
+            className="btn-eras-gradient-hover px-4 py-2 text-sm font-normal inline-flex items-center justify-center cursor-pointer select-none"
           >
-            Manage Collections
+            <span className="btn-eras-gradient-text transition-colors">
+              Manage Collections
+            </span>
           </Link>
         </div>
 
