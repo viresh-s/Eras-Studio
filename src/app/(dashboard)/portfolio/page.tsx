@@ -155,28 +155,73 @@ export default async function CreatorDashboard() {
         </div>
       )}
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-        <div className="bg-[var(--color-cor-surface)] rounded-3xl border border-[var(--color-cor-border)] p-5">
-          <p className="text-[11px] font-normal tracking-[0.15em] text-[var(--color-cor-ink-light)] uppercase mb-2">Published Artworks</p>
-          <p className="text-3xl font-normal text-[var(--color-cor-ink)]">{artworkCount || 0}</p>
-        </div>
-        <div className="bg-[var(--color-cor-surface)] rounded-3xl border border-[var(--color-cor-border)] p-5">
-          <p className="text-[11px] font-normal tracking-[0.15em] text-[var(--color-cor-ink-light)] uppercase mb-2">Collections</p>
-          <p className="text-3xl font-normal text-[var(--color-cor-ink)]">{collections?.length || 0}</p>
-        </div>
-        <div className="bg-[var(--color-cor-surface)] rounded-3xl border border-[var(--color-cor-border)] p-5">
-          <p className="text-[11px] font-normal tracking-[0.15em] text-[var(--color-cor-ink-light)] uppercase mb-2">Profile Views</p>
-          <p className="text-3xl font-normal text-[var(--color-cor-ink)]">0</p>
-        </div>
-        <div className="bg-[var(--color-cor-surface)] rounded-3xl border border-[var(--color-cor-border)] p-5">
-          <p className="text-[11px] font-normal tracking-[0.15em] text-[var(--color-cor-ink-light)] uppercase mb-2">Shortlisted</p>
-          <p className="text-3xl font-normal text-[var(--color-cor-ink)]">{chatCount || 0}</p>
-        </div>
+      {/* Sleek, Compact Filter Buttons (Capsule pill, white background, ERAS blue gradient border & text, smooth hover) */}
+      <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 mb-8">
+        {[
+          { id: 'published', label: 'Published Artworks', count: artworkCount || 0, href: '#your-works', isActive: true },
+          { id: 'collections', label: 'Collections', count: collections?.length || 0, href: '/portfolio/collections', isActive: false },
+          { id: 'views', label: 'Profile Views', count: 0, href: profile?.id ? `/artist/${profile.id}` : '#', isActive: false },
+          { id: 'shortlisted', label: 'Shortlisted', count: chatCount || 0, href: '/messages', isActive: false },
+        ].map((stat) => {
+          const isActive = stat.isActive;
+
+          return (
+            <Link
+              key={stat.id}
+              href={stat.href}
+              style={
+                isActive
+                  ? {
+                      background:
+                        'linear-gradient(#ffffff, #ffffff) padding-box, linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%) border-box',
+                      border: '1.5px solid transparent',
+                      boxShadow:
+                        '0px 3px 12px rgba(35, 77, 255, 0.12), 0px 1px 3px rgba(35, 77, 255, 0.08)',
+                    }
+                  : {
+                      background: '#FFFFFF',
+                      border: '1.5px solid #EBEBE6',
+                    }
+              }
+              className={`relative h-9 px-3.5 sm:px-4 inline-flex items-center gap-2 rounded-full text-left transition-all duration-200 cursor-pointer select-none group box-border shrink-0 ${
+                isActive
+                  ? 'shadow-xs'
+                  : 'hover:border-[#2356FF] hover:shadow-[0_2px_10px_rgba(35,77,255,0.08)] active:scale-[0.98]'
+              }`}
+            >
+              <span
+                style={
+                  isActive
+                    ? {
+                        background: 'linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                      }
+                    : undefined
+                }
+                className={`text-xs font-normal tracking-wide transition-colors ${
+                  isActive ? 'font-medium' : 'text-gray-700 group-hover:text-[#2356FF]'
+                }`}
+              >
+                {stat.label}
+              </span>
+
+              <span
+                className={`text-[11px] px-2 py-0.5 rounded-full font-medium transition-colors ${
+                  isActive
+                    ? 'bg-[#EEF2FF] text-[#1345EE]'
+                    : 'bg-[#F4F4F0] text-gray-500 group-hover:bg-[#EEF2FF] group-hover:text-[#2356FF]'
+                }`}
+              >
+                {stat.count}
+              </span>
+            </Link>
+          );
+        })}
       </div>
 
       {/* Your Works Section */}
-      <div className="mb-8">
+      <div className="mb-8" id="your-works">
         <div className="flex items-center justify-between mb-5">
           <div>
             <h2
