@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
@@ -111,11 +111,33 @@ export default function PortfolioClient({
   }, [artworks, activeTab, searchQuery, statusFilter, sortOrder]);
 
   const totalPages = Math.max(1, Math.ceil(filteredArtworks.length / PAGE_SIZE));
-  const displayTotalPages = Math.max(2, totalPages);
   const paginatedArtworks = useMemo(() => {
     const start = (currentPage - 1) * PAGE_SIZE;
     return filteredArtworks.slice(start, start + PAGE_SIZE);
   }, [filteredArtworks, currentPage]);
+
+  // Keep currentPage within bounds when filteredArtworks or totalPages change
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [totalPages, currentPage]);
+
+  // Dynamic page numbers for pagination (e.g. 1, 2, 3, 4... or with ellipsis)
+  const visiblePages = useMemo(() => {
+    if (totalPages <= 5) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+    const pages: (number | string)[] = [];
+    if (currentPage <= 3) {
+      pages.push(1, 2, 3, 4, '...', totalPages);
+    } else if (currentPage >= totalPages - 2) {
+      pages.push(1, '...', totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+    } else {
+      pages.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
+    }
+    return pages;
+  }, [totalPages, currentPage]);
 
   // Reset page when filters change
   const handleTabChange = (tab: 'artworks' | 'collections' | 'archived') => {
@@ -483,8 +505,7 @@ export default function PortfolioClient({
           {/* 3-Column Artwork Cards Grid */}
           {filteredArtworks.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-              {paginatedArtworks.length > 0 ? (
-                paginatedArtworks.map((artwork) => {
+              {paginatedArtworks.map((artwork) => {
                   const isArchived = !artwork.is_published || artwork.status === 'Not for sale';
 
                   return (
@@ -608,19 +629,7 @@ export default function PortfolioClient({
                       </div>
                     </div>
                   );
-                })
-              ) : (
-                <div className="col-span-full py-16 text-center bg-white rounded-2xl border border-[#E8E8E3] shadow-xs">
-                  <p className="text-sm text-[#6E6E69] mb-3">No additional artworks on page {currentPage}.</p>
-                  <button
-                    type="button"
-                    onClick={() => setCurrentPage(1)}
-                    className="px-4 py-2 rounded-full bg-black text-white text-xs font-medium hover:bg-gray-800 transition-colors cursor-pointer"
-                  >
-                    Return to Page 1
-                  </button>
-                </div>
-              )}
+                })}
             </div>
           ) : (
             /* Empty State */
@@ -651,7 +660,7 @@ export default function PortfolioClient({
               <button
                 type="button"
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                disabled={currentPage === 1}
+                disabled={currentPage <= 1}
                 className="w-10 h-10 sm:w-11 sm:h-11 bg-white border border-[#E8E8E3] flex items-center justify-center text-[#6E6E69] hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed shadow-2xs transition-all cursor-pointer"
                 style={{ borderRadius: 12 }}
                 aria-label="Previous page"
@@ -660,13 +669,24 @@ export default function PortfolioClient({
               </button>
 
               {/* Page Number Buttons */}
-              {Array.from({ length: displayTotalPages }, (_, i) => i + 1).map((pageNum) => {
-                const isActive = pageNum === currentPage;
+              {visiblePages.map((pageItem, idx) => {
+                if (typeof pageItem === 'string') {
+                  return (
+                    <span
+                      key={`ellipsis-${idx}`}
+                      className="w-8 h-10 sm:w-8 sm:h-11 flex items-center justify-center text-xs sm:text-sm text-[#6E6E69] select-none"
+                    >
+                      ...
+                    </span>
+                  );
+                }
+
+                const isActive = pageItem === currentPage;
                 return (
                   <button
-                    key={pageNum}
+                    key={pageItem}
                     type="button"
-                    onClick={() => setCurrentPage(pageNum)}
+                    onClick={() => setCurrentPage(pageItem)}
                     className={`w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center text-xs sm:text-sm font-medium transition-all cursor-pointer shadow-2xs ${
                       isActive
                         ? 'bg-black text-white'
@@ -677,7 +697,7 @@ export default function PortfolioClient({
                       fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
                     }}
                   >
-                    {pageNum}
+                    {pageItem}
                   </button>
                 );
               })}
@@ -685,8 +705,8 @@ export default function PortfolioClient({
               {/* Next Button */}
               <button
                 type="button"
-                onClick={() => setCurrentPage((p) => Math.min(displayTotalPages, p + 1))}
-                disabled={currentPage === displayTotalPages}
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage >= totalPages}
                 className="w-10 h-10 sm:w-11 sm:h-11 bg-white border border-[#E8E8E3] flex items-center justify-center text-[#6E6E69] hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed shadow-2xs transition-all cursor-pointer"
                 style={{ borderRadius: 12 }}
                 aria-label="Next page"
