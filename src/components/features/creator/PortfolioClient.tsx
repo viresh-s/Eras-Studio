@@ -8,7 +8,7 @@ import {
   ChevronDown,
   Pencil,
   Trash2,
-  Bookmark,
+  Heart,
   Eye,
   ChevronLeft,
   ChevronRight,
@@ -469,12 +469,13 @@ export default function PortfolioClient({
                 return (
                   <div
                     key={artwork.id}
-                    className="bg-white rounded-3xl border border-[#E8E8E3] overflow-hidden flex flex-col justify-between shadow-2xs hover:shadow-md transition-shadow group select-none"
+                    className="bg-white border border-[#E8E8E3] overflow-hidden flex flex-col justify-between shadow-2xs hover:shadow-md transition-shadow group select-none"
+                    style={{ borderRadius: 14 }}
                   >
                     {/* Artwork Image */}
                     <Link
                       href={`/artwork/${artwork.id}`}
-                      className={`block relative w-full aspect-[16/10] bg-gray-100 overflow-hidden ${PROTECTED_CONTAINER_CLASS}`}
+                      className={`block relative w-full aspect-[16/10.5] bg-gray-100 overflow-hidden ${PROTECTED_CONTAINER_CLASS}`}
                     >
                       <img
                         src={artwork.image_url}
@@ -490,34 +491,46 @@ export default function PortfolioClient({
                     </Link>
 
                     {/* Artwork Details Body */}
-                    <div className="p-5 sm:p-6 flex flex-col gap-3.5">
+                    <div className="p-4 sm:p-5 flex flex-col gap-3">
                       {/* Row 1: Title & Year */}
-                      <div className="flex items-baseline justify-between gap-2">
+                      <div className="flex items-center justify-between gap-2">
                         <Link href={`/artwork/${artwork.id}`} className="min-w-0">
-                          <h3 className="text-base sm:text-lg font-medium text-[#141413] truncate hover:text-[#1345EE] transition-colors">
+                          <h3
+                            className="text-[16px] sm:text-[17px] font-medium text-[#141413] truncate hover:text-[#1345EE] transition-colors"
+                            style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+                          >
                             {artwork.title}
                           </h3>
                         </Link>
-                        <span className="text-xs sm:text-sm text-[#6E6E69] font-normal shrink-0">
+                        <span
+                          className="text-[11px] sm:text-xs text-[#6E6E69] font-normal shrink-0"
+                          style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+                        >
                           {artwork.year || ''}
                         </span>
                       </div>
 
                       {/* Row 2: Artist · Medium/Category */}
-                      <div className="flex items-center gap-1.5 text-xs text-[#6E6E69] font-normal truncate">
+                      <div
+                        className="flex items-center gap-1.5 text-[11px] sm:text-xs text-[#6E6E69] font-normal truncate"
+                        style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+                      >
                         <span className="truncate">{displayName}</span>
                         <span className="text-[#E8E8E3]">·</span>
                         <span className="truncate">{artwork.art_type || 'Branding'}</span>
                       </div>
 
-                      {/* Row 3: Stats (Bookmarks & Views) */}
-                      <div className="flex items-center gap-5 text-xs text-[#6E6E69] font-normal pt-0.5">
-                        <div className="flex items-center gap-1.5">
-                          <Bookmark size={14} className="text-[#6E6E69]" />
+                      {/* Row 3: Stats (Heart & Views) */}
+                      <div
+                        className="flex items-center gap-4 text-[11px] sm:text-xs text-[#6E6E69] font-normal pt-0.5"
+                        style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+                      >
+                        <div className="flex items-center gap-1">
+                          <Heart size={13} className="text-[#6E6E69]" strokeWidth={1.75} />
                           <span>0</span>
                         </div>
-                        <div className="flex items-center gap-1.5">
-                          <Eye size={14} className="text-[#6E6E69]" />
+                        <div className="flex items-center gap-1">
+                          <Eye size={13} className="text-[#6E6E69]" strokeWidth={1.75} />
                           <span>{320 + (artwork.title.length * 17) % 500}</span>
                         </div>
                       </div>
@@ -525,43 +538,49 @@ export default function PortfolioClient({
                       {/* Divider Line */}
                       <div className="h-[1px] bg-[#E8E8E3] w-full my-0.5" />
 
-                      {/* Row 4: Action Footer (Edit, Status Pill, Delete) */}
-                      <div className="flex items-center justify-between pt-1">
-                        {/* Edit Button */}
-                        <Link
-                          href={`/portfolio/artworks/${artwork.id}/edit`}
-                          className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white border border-[#E8E8E3] flex items-center justify-center text-[#6E6E69] hover:text-[#141413] hover:border-gray-400 transition-colors shadow-2xs"
-                          title="Edit artwork"
-                        >
-                          <Pencil size={15} />
-                        </Link>
+                      {/* Row 4: Action Footer (Edit + Archive on Left, Delete on Right) */}
+                      <div className="flex items-center justify-between pt-0.5">
+                        {/* Left Group: Edit & Archive Button */}
+                        <div className="flex items-center gap-2">
+                          {/* Edit Button */}
+                          <Link
+                            href={`/portfolio/artworks/${artwork.id}/edit`}
+                            className="w-8 h-9 sm:w-[32px] sm:h-[34px] bg-white border border-[#E8E8E3] flex items-center justify-center text-[#6E6E69] hover:text-[#141413] hover:border-gray-400 transition-colors shadow-2xs"
+                            style={{ borderRadius: 8 }}
+                            title="Edit artwork"
+                          >
+                            <Pencil size={14} className="text-[#6E6E69]" />
+                          </Link>
 
-                        {/* Archive / Status Pill Button */}
-                        <button
-                          type="button"
-                          onClick={() => handleToggleArchive(artwork.id, artwork.status, artwork.is_published)}
-                          disabled={isUpdatingId === artwork.id}
-                          className="px-4 py-1.5 rounded-full bg-[#FAF5EC] border border-[#EACEC0] text-[#865E16] text-xs font-medium hover:bg-[#F5EADB] transition-colors cursor-pointer select-none"
-                        >
-                          {isUpdatingId === artwork.id
-                            ? 'Updating...'
-                            : isArchived
-                            ? 'Unarchive'
-                            : 'Archive'}
-                        </button>
+                          {/* Archive / Status Pill Button */}
+                          <button
+                            type="button"
+                            onClick={() => handleToggleArchive(artwork.id, artwork.status, artwork.is_published)}
+                            disabled={isUpdatingId === artwork.id}
+                            className="h-9 sm:h-[34px] px-3.5 sm:px-4 rounded-full bg-[#FAF5EC] border border-[#EACEC0] text-[#865E16] text-[11px] sm:text-xs font-medium hover:bg-[#F5EADB] transition-colors cursor-pointer select-none flex items-center justify-center"
+                            style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+                          >
+                            {isUpdatingId === artwork.id
+                              ? 'Updating...'
+                              : isArchived
+                              ? 'Unarchive'
+                              : 'Archive'}
+                          </button>
+                        </div>
 
-                        {/* Delete Button */}
+                        {/* Right Group: Delete Button */}
                         <button
                           type="button"
                           onClick={() => handleDelete(artwork.id)}
                           disabled={isDeletingId === artwork.id}
-                          className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white border border-[#E8E8E3] flex items-center justify-center text-[#6E6E69] hover:text-red-600 hover:border-red-200 transition-colors shadow-2xs cursor-pointer"
+                          className="w-8 h-9 sm:w-[32px] sm:h-[34px] bg-white border border-[#E8E8E3] flex items-center justify-center text-[#6E6E69] hover:text-red-600 hover:border-red-200 transition-colors shadow-2xs cursor-pointer ml-auto"
+                          style={{ borderRadius: 8 }}
                           title="Delete artwork"
                         >
                           {isDeletingId === artwork.id ? (
-                            <Loader2 size={15} className="animate-spin text-red-500" />
+                            <Loader2 size={14} className="animate-spin text-red-500" />
                           ) : (
-                            <Trash2 size={15} />
+                            <Trash2 size={14} />
                           )}
                         </button>
                       </div>
