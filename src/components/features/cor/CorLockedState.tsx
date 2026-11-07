@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ArrowRight, Sparkles, Briefcase, Compass, FileCheck, Calendar, ShieldCheck, Check } from 'lucide-react';
+import { ArrowRight, Search, Briefcase, Compass, FileCheck, Calendar, ShieldCheck } from 'lucide-react';
 
 interface CorLockedStateProps {
   isPaused?: boolean;
@@ -15,7 +15,7 @@ const benefits = [
     desc: 'Comprehensive portfolio review and positioning strategy by curatorial advisors.',
   },
   {
-    icon: Sparkles,
+    icon: Search,
     title: 'Opportunity Discovery',
     desc: 'Access curated open calls, prestigious residencies, grants, and high-value commissions.',
   },
@@ -48,7 +48,7 @@ export default function CorLockedState({ isPaused = false }: CorLockedStateProps
       style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
     >
       <div className="bg-white border border-[#EBEBE6] rounded-3xl p-8 sm:p-14 text-center shadow-xs">
-        {/* Pro Pill Badge */}
+        {/* Pro Pill Badge without star/AI icon */}
         <div className="inline-flex items-center gap-2 mb-6">
           <span
             style={{
@@ -56,9 +56,8 @@ export default function CorLockedState({ isPaused = false }: CorLockedStateProps
                 'linear-gradient(#ffffff, #ffffff) padding-box, linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%) border-box',
               border: '1.5px solid transparent',
             }}
-            className="h-8 px-4 rounded-full inline-flex items-center gap-1.5 text-xs font-medium text-[#1345EE] shadow-2xs"
+            className="h-8 px-4 rounded-full inline-flex items-center text-xs font-medium text-[#1345EE] shadow-2xs"
           >
-            <Sparkles size={13} className="text-[#1345EE]" />
             <span className="uppercase tracking-wider">COR Pro Membership</span>
           </span>
         </div>
@@ -78,7 +77,7 @@ export default function CorLockedState({ isPaused = false }: CorLockedStateProps
           Human guidance. Thoughtful curatorial opportunities. A clearer, elevated way forward for dedicated artists, creators, and collectors.
         </p>
 
-        {/* Benefit Grid */}
+        {/* Benefit Grid with clean, generic icons */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 my-10 text-left">
           {benefits.map((b, i) => {
             const Icon = b.icon;
@@ -99,14 +98,6 @@ export default function CorLockedState({ isPaused = false }: CorLockedStateProps
               </div>
             );
           })}
-        </div>
-
-        {/* Plan summary chip */}
-        <div className="inline-flex items-center gap-2 p-1.5 pr-4 rounded-full bg-[#F4F4F0] border border-[#E5E7EB] mb-8 text-xs text-gray-700">
-          <span className="px-2.5 py-0.5 rounded-full bg-white text-[#1345EE] font-semibold text-[11px] shadow-2xs">
-            PRO TIER
-          </span>
-          <span>₹999 / month • Unlimited artworks + full COR access</span>
         </div>
 
         {/* CTA Buttons */}

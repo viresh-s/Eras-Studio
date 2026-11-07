@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Check, X, CreditCard, Loader2, ArrowRight, Sparkles, AlertCircle, ShieldCheck } from 'lucide-react';
+import { Check, X, CreditCard, Loader2, ArrowRight, AlertCircle, ShieldCheck } from 'lucide-react';
 import { upgradeUserPlanAction, createRazorpayOrderAction, PlanTier, type RazorpayPaymentProof } from '@/actions/subscriptionActions';
 
 interface SubscriptionPlansClientProps {
@@ -398,9 +398,8 @@ export function SubscriptionPlansClient({
               >
                 Pro
               </h2>
-              <span className="inline-flex items-center gap-1 text-[10px] tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-blue-50 text-[#1345EE] font-semibold border border-blue-200/60 shadow-2xs">
-                <Sparkles size={11} className="text-[#1345EE]" />
-                <span>Recommended</span>
+              <span className="text-[10px] tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-blue-50 text-[#1345EE] font-semibold border border-blue-200/60 shadow-2xs">
+                Recommended
               </span>
             </div>
 

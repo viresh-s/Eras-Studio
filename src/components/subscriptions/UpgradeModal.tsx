@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import Link from 'next/link';
-import { X, Sparkles, Check, ArrowRight } from 'lucide-react';
+import { X, Check, ArrowRight } from 'lucide-react';
 
 interface UpgradeModalProps {
   isOpen: boolean;
@@ -59,9 +59,8 @@ export default function UpgradeModal({
                 'linear-gradient(#ffffff, #ffffff) padding-box, linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%) border-box',
               border: '1.5px solid transparent',
             }}
-            className="h-7 px-3 rounded-full inline-flex items-center gap-1.5 text-[11px] font-medium text-[#1345EE] shadow-2xs"
+            className="h-7 px-3.5 rounded-full inline-flex items-center text-[11px] font-medium text-[#1345EE] shadow-2xs"
           >
-            <Sparkles size={12} className="text-[#1345EE]" />
             <span>{featureName ? `${featureName} • Upgrade` : 'Gallery Limit Reached'}</span>
           </span>
         </div>
@@ -171,3 +170,4 @@ export default function UpgradeModal({
     </div>
   );
 }
+
