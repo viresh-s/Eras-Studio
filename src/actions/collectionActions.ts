@@ -183,7 +183,6 @@ export async function createCollection(input: {
 
     revalidatePath('/portfolio');
     revalidatePath('/portfolio/collections');
-    revalidatePath('/portfolio/artworks');
     revalidatePath(`/artist/${user.id}`);
 
     return { success: true, collection };
@@ -269,7 +268,6 @@ export async function updateCollection(
 
     revalidatePath('/portfolio');
     revalidatePath('/portfolio/collections');
-    revalidatePath('/portfolio/artworks');
     revalidatePath(`/artist/${user.id}`);
 
     return { success: true, collection: updated };
@@ -313,7 +311,6 @@ export async function deleteCollection(id: string) {
 
     revalidatePath('/portfolio');
     revalidatePath('/portfolio/collections');
-    revalidatePath('/portfolio/artworks');
     revalidatePath(`/artist/${user.id}`);
 
     return { success: true };
@@ -378,7 +375,6 @@ export async function assignArtworkToCollection(
 
     revalidatePath('/portfolio');
     revalidatePath('/portfolio/collections');
-    revalidatePath('/portfolio/artworks');
     revalidatePath(`/artist/${user.id}`);
 
     return { success: true };

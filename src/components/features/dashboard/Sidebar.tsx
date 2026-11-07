@@ -36,9 +36,8 @@ interface SidebarLink {
 }
 
 const creatorLinks: SidebarLink[] = [
-  { href: '/portfolio', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/portfolio', label: 'Portfolio', icon: Image },
   { href: '/cor', label: 'COR Hub', icon: Briefcase, badge: 'Pro' },
-  { href: '/portfolio/artworks', label: 'My Artworks', icon: Image },
   { href: '/messages', label: 'Messages', icon: MessageCircle },
 ];
 

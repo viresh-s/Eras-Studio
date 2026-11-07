@@ -473,7 +473,7 @@ export default function ArtworkEditForm({ userId, artwork }: ArtworkEditFormProp
         } : {}),
       });
 
-      router.push('/portfolio/artworks');
+      router.push('/portfolio');
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong');
@@ -487,10 +487,13 @@ export default function ArtworkEditForm({ userId, artwork }: ArtworkEditFormProp
   return (
     <div className="bg-white rounded-2xl shadow-[0_2px_20px_rgb(0,0,0,0.04)] p-8">
       <div className="flex items-center gap-4 mb-6">
-        <Link href="/portfolio/artworks" className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-50 hover:bg-gray-100 text-gray-600 transition-colors">
+        <Link href="/portfolio" className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-50 hover:bg-gray-100 text-gray-600 transition-colors" title="Back to Portfolio">
           <ArrowLeft size={20} />
         </Link>
-        <h2 className="text-xl font-bold text-gray-900">Edit Artwork</h2>
+        <div>
+          <h2 className="text-xl font-bold text-gray-900">Edit Artwork</h2>
+          <p className="text-xs text-gray-500 font-normal">Update artwork details, pricing, and availability</p>
+        </div>
       </div>
 
       {error && (
@@ -916,7 +919,7 @@ export default function ArtworkEditForm({ userId, artwork }: ArtworkEditFormProp
           {/* Cancel Button */}
           <button
             type="button"
-            onClick={() => router.push('/portfolio/artworks')}
+            onClick={() => router.push('/portfolio')}
             style={{
               position: 'relative',
               background: '#F3F3F3',

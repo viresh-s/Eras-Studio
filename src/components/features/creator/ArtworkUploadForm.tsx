@@ -422,7 +422,7 @@ export default function ArtworkUploadForm({ userId, freemiumStatus }: UploadForm
         isPublished: submitAction === 'publish',
       });
 
-      router.push('/portfolio/artworks');
+      router.push('/portfolio');
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong');
@@ -841,7 +841,7 @@ export default function ArtworkUploadForm({ userId, freemiumStatus }: UploadForm
           {/* Cancel Button */}
           <button
             type="button"
-            onClick={() => router.push('/portfolio/artworks')}
+            onClick={() => router.push('/portfolio')}
             style={{
               position: 'relative',
               background: '#F3F3F3',

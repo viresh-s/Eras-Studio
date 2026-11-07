@@ -18,12 +18,11 @@ export default async function EditArtworkPage({ params }: { params: Promise<{ id
     .single();
 
   if (!artwork) {
-    redirect('/portfolio/artworks'); // If it doesn't exist or doesn't belong to the user
+    redirect('/portfolio'); // If it doesn't exist or doesn't belong to the user
   }
 
   return (
-    <div>
-      <h1 className="font-heading text-3xl font-bold mb-6">Manage Artwork</h1>
+    <div style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}>
       <ArtworkEditForm userId={user.id} artwork={artwork} />
     </div>
   );

@@ -135,7 +135,7 @@ export async function createArtwork(data: CreateArtworkData) {
 
   securityLogger.info('ARTWORK_CREATED', { artworkId: inserted?.id, userId: user.id });
 
-  revalidatePath('/portfolio/artworks');
+  revalidatePath('/portfolio');
   revalidatePath('/discovery');
 }
 
@@ -160,7 +160,7 @@ export async function deleteArtwork(artworkId: string, _optionalUserId?: string)
 
   securityLogger.info('ARTWORK_DELETED', { artworkId, userId: user.id });
 
-  revalidatePath('/portfolio/artworks');
+  revalidatePath('/portfolio');
   revalidatePath('/discovery');
 }
 
@@ -217,7 +217,6 @@ export async function updateArtwork(artworkId: string, data: Partial<CreateArtwo
   securityLogger.info('ARTWORK_UPDATED', { artworkId, userId: user.id });
 
   revalidatePath('/portfolio');
-  revalidatePath('/portfolio/artworks');
   revalidatePath(`/artwork/${artworkId}`);
   revalidatePath('/discovery');
 }
