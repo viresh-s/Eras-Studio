@@ -189,33 +189,67 @@ export default function PortfolioClient({
         <div className="max-w-[1400px] mx-auto px-6">
           {/* Row 1: Profile Capsule Card (Left) & Add Artwork Button (Right) */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mb-8">
-            {/* Profile Capsule Card */}
-            <div className="inline-flex items-center gap-4 sm:gap-5 p-2 sm:p-2.5 pr-6 sm:pr-8 bg-white rounded-full border border-[#E8E8E3] shadow-xs max-w-xl">
-              {/* Avatar with Edit Badge */}
-              <div className="relative w-16 h-16 sm:w-20 sm:h-20 shrink-0">
-                <img
-                  src={profile?.profile_pic_url || '/images/default-avatar.png'}
-                  alt={displayName}
-                  className="w-full h-full rounded-full object-cover border-2 border-white shadow-xs"
-                />
+            {/* Profile Card matching exact Figma specs */}
+            <div
+              className="inline-flex items-center gap-4 sm:gap-6 p-3 sm:p-3.5 pr-8 sm:pr-10 bg-white border border-[#E8E8E3] shadow-xs max-w-xl transition-shadow select-none"
+              style={{ borderRadius: 20 }}
+            >
+              {/* Avatar with Progress Arc & Edit Badge */}
+              <div className="relative w-[72px] h-[72px] sm:w-[80px] sm:h-[80px] shrink-0 flex items-center justify-center">
+                {/* Dynamic conic completion ring around avatar (18% arc as shown in reference) */}
+                <div
+                  className="w-full h-full rounded-full p-[2.5px] flex items-center justify-center"
+                  style={{
+                    background: `conic-gradient(from 0deg, #082779 0%, #1345EE ${Math.max(completeness, 5) * 3.6 * 0.6}deg, #458CFF ${Math.max(completeness, 5) * 3.6}deg, #E8E8E3 ${Math.max(completeness, 5) * 3.6}deg, #E8E8E3 360deg)`,
+                  }}
+                >
+                  <div className="w-full h-full rounded-full bg-white p-[2px]">
+                    <img
+                      src={profile?.profile_pic_url || '/images/default-avatar.png'}
+                      alt={displayName}
+                      className="w-full h-full rounded-full object-cover select-none pointer-events-none"
+                    />
+                  </div>
+                </div>
+
+                {/* Edit Badge Button */}
                 <Link
                   href="/profile"
-                  className="absolute -bottom-1 -right-1 w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-white border border-[#E8E8E3] shadow-xs flex items-center justify-center text-[#6E6E69] hover:text-[#141413] hover:border-gray-400 transition-colors"
+                  className="absolute -bottom-1 -right-1 w-[26px] h-[30px] sm:w-[28px] sm:h-[32px] bg-white border border-[#E8E8E3] shadow-[0px_8px_20px_-8px_rgba(0,0,0,0.08)] flex items-center justify-center text-[#6E6E69] hover:text-[#141413] hover:border-gray-400 transition-colors z-10"
+                  style={{ borderRadius: 8 }}
                   title="Edit profile"
                 >
-                  <Pencil size={12} />
+                  <Pencil size={13} className="text-[#6E6E69]" />
                 </Link>
               </div>
 
               {/* Profile Details */}
-              <div className="min-w-0 flex flex-col justify-center">
-                <h1 className="text-base sm:text-xl font-semibold text-[#141413] truncate">
+              <div className="min-w-0 flex flex-col justify-center gap-1">
+                <h1
+                  className="text-xl sm:text-[22px] font-semibold text-[#141413] truncate tracking-normal"
+                  style={{
+                    fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
+                    lineHeight: '28px',
+                  }}
+                >
                   {displayName}
                 </h1>
-                <p className="text-xs sm:text-sm text-[#6E6E69] font-normal truncate mt-0.5">
+                <p
+                  className="text-xs sm:text-[13px] text-[#6E6E69] font-normal truncate"
+                  style={{
+                    fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
+                    lineHeight: '18px',
+                  }}
+                >
                   {locationText}
                 </p>
-                <p className="text-xs sm:text-sm text-[#6E6E69] font-normal truncate mt-0.5">
+                <p
+                  className="text-xs sm:text-[13px] text-[#6E6E69] font-normal truncate"
+                  style={{
+                    fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
+                    lineHeight: '18px',
+                  }}
+                >
                   {taglineText}
                 </p>
               </div>
