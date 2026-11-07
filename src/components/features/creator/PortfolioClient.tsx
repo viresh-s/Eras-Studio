@@ -54,7 +54,7 @@ export default function PortfolioClient({
   const [isUpdatingId, setIsUpdatingId] = useState<string | null>(null);
   const [isDeletingId, setIsDeletingId] = useState<string | null>(null);
 
-  const PAGE_SIZE = 6;
+  const PAGE_SIZE = 3;
 
   // Filter & Sort Artworks
   const filteredArtworks = useMemo(() => {
@@ -111,6 +111,7 @@ export default function PortfolioClient({
   }, [artworks, activeTab, searchQuery, statusFilter, sortOrder]);
 
   const totalPages = Math.max(1, Math.ceil(filteredArtworks.length / PAGE_SIZE));
+  const displayTotalPages = Math.max(2, totalPages);
   const paginatedArtworks = useMemo(() => {
     const start = (currentPage - 1) * PAGE_SIZE;
     return filteredArtworks.slice(start, start + PAGE_SIZE);
@@ -480,133 +481,146 @@ export default function PortfolioClient({
           </div>
 
           {/* 3-Column Artwork Cards Grid */}
-          {paginatedArtworks.length > 0 ? (
+          {filteredArtworks.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-              {paginatedArtworks.map((artwork) => {
-                const isArchived = !artwork.is_published || artwork.status === 'Not for sale';
+              {paginatedArtworks.length > 0 ? (
+                paginatedArtworks.map((artwork) => {
+                  const isArchived = !artwork.is_published || artwork.status === 'Not for sale';
 
-                return (
-                  <div
-                    key={artwork.id}
-                    className="bg-white border border-[#E8E8E3] overflow-hidden flex flex-col justify-between shadow-2xs hover:shadow-md transition-shadow group select-none"
-                    style={{ borderRadius: 14 }}
-                  >
-                    {/* Artwork Image */}
-                    <Link
-                      href={`/artwork/${artwork.id}`}
-                      className={`block relative w-full aspect-[16/10.5] bg-gray-100 overflow-hidden ${PROTECTED_CONTAINER_CLASS}`}
+                  return (
+                    <div
+                      key={artwork.id}
+                      className="bg-white border border-[#E8E8E3] overflow-hidden flex flex-col justify-between shadow-2xs hover:shadow-md transition-shadow group select-none"
+                      style={{ borderRadius: 14 }}
                     >
-                      <img
-                        src={artwork.image_url}
-                        alt={artwork.title}
-                        className={`w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500 ease-out select-none pointer-events-none ${PROTECTED_IMAGE_CLASS}`}
-                      />
-                      <div className="absolute inset-0 z-[1]" />
-                      {artwork.is_published === false && (
-                        <span className="absolute top-3 left-3 px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-amber-100 text-amber-800 z-[2] shadow-2xs">
-                          Draft
-                        </span>
-                      )}
-                    </Link>
+                      {/* Artwork Image */}
+                      <Link
+                        href={`/artwork/${artwork.id}`}
+                        className={`block relative w-full aspect-[16/10.5] bg-gray-100 overflow-hidden ${PROTECTED_CONTAINER_CLASS}`}
+                      >
+                        <img
+                          src={artwork.image_url}
+                          alt={artwork.title}
+                          className={`w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500 ease-out select-none pointer-events-none ${PROTECTED_IMAGE_CLASS}`}
+                        />
+                        <div className="absolute inset-0 z-[1]" />
+                        {artwork.is_published === false && (
+                          <span className="absolute top-3 left-3 px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-amber-100 text-amber-800 z-[2] shadow-2xs">
+                            Draft
+                          </span>
+                        )}
+                      </Link>
 
-                    {/* Artwork Details Body */}
-                    <div className="p-4 sm:p-5 flex flex-col gap-3">
-                      {/* Row 1: Title & Year */}
-                      <div className="flex items-center justify-between gap-2">
-                        <Link href={`/artwork/${artwork.id}`} className="min-w-0">
-                          <h3
-                            className="text-[16px] sm:text-[17px] font-medium text-[#141413] truncate hover:text-[#1345EE] transition-colors"
+                      {/* Artwork Details Body */}
+                      <div className="p-4 sm:p-5 flex flex-col gap-3">
+                        {/* Row 1: Title & Year */}
+                        <div className="flex items-center justify-between gap-2">
+                          <Link href={`/artwork/${artwork.id}`} className="min-w-0">
+                            <h3
+                              className="text-[16px] sm:text-[17px] font-medium text-[#141413] truncate hover:text-[#1345EE] transition-colors"
+                              style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+                            >
+                              {artwork.title}
+                            </h3>
+                          </Link>
+                          <span
+                            className="text-[11px] sm:text-xs text-[#6E6E69] font-normal shrink-0"
                             style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
                           >
-                            {artwork.title}
-                          </h3>
-                        </Link>
-                        <span
-                          className="text-[11px] sm:text-xs text-[#6E6E69] font-normal shrink-0"
+                            {artwork.year || ''}
+                          </span>
+                        </div>
+
+                        {/* Row 2: Artist · Medium/Category */}
+                        <div
+                          className="flex items-center gap-1.5 text-[11px] sm:text-xs text-[#6E6E69] font-normal truncate"
                           style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
                         >
-                          {artwork.year || ''}
-                        </span>
-                      </div>
-
-                      {/* Row 2: Artist · Medium/Category */}
-                      <div
-                        className="flex items-center gap-1.5 text-[11px] sm:text-xs text-[#6E6E69] font-normal truncate"
-                        style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
-                      >
-                        <span className="truncate">{displayName}</span>
-                        <span className="text-[#E8E8E3]">·</span>
-                        <span className="truncate">{artwork.art_type || 'Branding'}</span>
-                      </div>
-
-                      {/* Row 3: Stats (Heart & Views) */}
-                      <div
-                        className="flex items-center gap-4 text-[11px] sm:text-xs text-[#6E6E69] font-normal pt-0.5"
-                        style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
-                      >
-                        <div className="flex items-center gap-1" title={`${artwork.likes_count || 0} likes`}>
-                          <Heart size={13} className="text-[#6E6E69]" strokeWidth={1.75} />
-                          <span>{artwork.likes_count || 0}</span>
+                          <span className="truncate">{displayName}</span>
+                          <span className="text-[#E8E8E3]">·</span>
+                          <span className="truncate">{artwork.art_type || 'Branding'}</span>
                         </div>
-                        <div className="flex items-center gap-1" title={`${artwork.views_count || 0} views`}>
-                          <Eye size={13} className="text-[#6E6E69]" strokeWidth={1.75} />
-                          <span>{artwork.views_count || 0}</span>
+
+                        {/* Row 3: Stats (Heart & Views) */}
+                        <div
+                          className="flex items-center gap-4 text-[11px] sm:text-xs text-[#6E6E69] font-normal pt-0.5"
+                          style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+                        >
+                          <div className="flex items-center gap-1" title={`${artwork.likes_count || 0} likes`}>
+                            <Heart size={13} className="text-[#6E6E69]" strokeWidth={1.75} />
+                            <span>{artwork.likes_count || 0}</span>
+                          </div>
+                          <div className="flex items-center gap-1" title={`${artwork.views_count || 0} views`}>
+                            <Eye size={13} className="text-[#6E6E69]" strokeWidth={1.75} />
+                            <span>{artwork.views_count || 0}</span>
+                          </div>
                         </div>
-                      </div>
 
-                      {/* Divider Line */}
-                      <div className="h-[1px] bg-[#E8E8E3] w-full my-0.5" />
+                        {/* Divider Line */}
+                        <div className="h-[1px] bg-[#E8E8E3] w-full my-0.5" />
 
-                      {/* Row 4: Action Footer (Edit + Archive on Left, Delete on Right) */}
-                      <div className="flex items-center justify-between pt-0.5">
-                        {/* Left Group: Edit & Archive Button */}
-                        <div className="flex items-center gap-2">
-                          {/* Edit Button */}
-                          <Link
-                            href={`/portfolio/artworks/${artwork.id}/edit`}
-                            className="w-8 h-9 sm:w-[32px] sm:h-[34px] bg-white border border-[#E8E8E3] flex items-center justify-center text-[#6E6E69] hover:text-[#141413] hover:border-gray-400 transition-colors shadow-2xs"
-                            style={{ borderRadius: 8 }}
-                            title="Edit artwork"
-                          >
-                            <Pencil size={14} className="text-[#6E6E69]" />
-                          </Link>
+                        {/* Row 4: Action Footer (Edit + Archive on Left, Delete on Right) */}
+                        <div className="flex items-center justify-between pt-0.5">
+                          {/* Left Group: Edit & Archive Button */}
+                          <div className="flex items-center gap-2">
+                            {/* Edit Button */}
+                            <Link
+                              href={`/portfolio/artworks/${artwork.id}/edit`}
+                              className="w-8 h-9 sm:w-[32px] sm:h-[34px] bg-white border border-[#E8E8E3] flex items-center justify-center text-[#6E6E69] hover:text-[#141413] hover:border-gray-400 transition-colors shadow-2xs"
+                              style={{ borderRadius: 8 }}
+                              title="Edit artwork"
+                            >
+                              <Pencil size={14} className="text-[#6E6E69]" />
+                            </Link>
 
-                          {/* Archive / Status Pill Button */}
+                            {/* Archive / Status Pill Button */}
+                            <button
+                              type="button"
+                              onClick={() => handleToggleArchive(artwork.id, artwork.status, artwork.is_published)}
+                              disabled={isUpdatingId === artwork.id}
+                              className="h-9 sm:h-[34px] px-3.5 sm:px-4 rounded-full bg-[#FAF5EC] border border-[#EACEC0] text-[#865E16] text-[11px] sm:text-xs font-medium hover:bg-[#F5EADB] transition-colors cursor-pointer select-none flex items-center justify-center"
+                              style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+                            >
+                              {isUpdatingId === artwork.id
+                                ? 'Updating...'
+                                : isArchived
+                                ? 'Unarchive'
+                                : 'Archive'}
+                            </button>
+                          </div>
+
+                          {/* Right Group: Delete Button */}
                           <button
                             type="button"
-                            onClick={() => handleToggleArchive(artwork.id, artwork.status, artwork.is_published)}
-                            disabled={isUpdatingId === artwork.id}
-                            className="h-9 sm:h-[34px] px-3.5 sm:px-4 rounded-full bg-[#FAF5EC] border border-[#EACEC0] text-[#865E16] text-[11px] sm:text-xs font-medium hover:bg-[#F5EADB] transition-colors cursor-pointer select-none flex items-center justify-center"
-                            style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+                            onClick={() => handleDelete(artwork.id)}
+                            disabled={isDeletingId === artwork.id}
+                            className="w-8 h-9 sm:w-[32px] sm:h-[34px] bg-white border border-[#E8E8E3] flex items-center justify-center text-[#6E6E69] hover:text-red-600 hover:border-red-200 transition-colors shadow-2xs cursor-pointer ml-auto"
+                            style={{ borderRadius: 8 }}
+                            title="Delete artwork"
                           >
-                            {isUpdatingId === artwork.id
-                              ? 'Updating...'
-                              : isArchived
-                              ? 'Unarchive'
-                              : 'Archive'}
+                            {isDeletingId === artwork.id ? (
+                              <Loader2 size={14} className="animate-spin text-red-500" />
+                            ) : (
+                              <Trash2 size={14} />
+                            )}
                           </button>
                         </div>
-
-                        {/* Right Group: Delete Button */}
-                        <button
-                          type="button"
-                          onClick={() => handleDelete(artwork.id)}
-                          disabled={isDeletingId === artwork.id}
-                          className="w-8 h-9 sm:w-[32px] sm:h-[34px] bg-white border border-[#E8E8E3] flex items-center justify-center text-[#6E6E69] hover:text-red-600 hover:border-red-200 transition-colors shadow-2xs cursor-pointer ml-auto"
-                          style={{ borderRadius: 8 }}
-                          title="Delete artwork"
-                        >
-                          {isDeletingId === artwork.id ? (
-                            <Loader2 size={14} className="animate-spin text-red-500" />
-                          ) : (
-                            <Trash2 size={14} />
-                          )}
-                        </button>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })
+              ) : (
+                <div className="col-span-full py-16 text-center bg-white rounded-2xl border border-[#E8E8E3] shadow-xs">
+                  <p className="text-sm text-[#6E6E69] mb-3">No additional artworks on page {currentPage}.</p>
+                  <button
+                    type="button"
+                    onClick={() => setCurrentPage(1)}
+                    className="px-4 py-2 rounded-full bg-black text-white text-xs font-medium hover:bg-gray-800 transition-colors cursor-pointer"
+                  >
+                    Return to Page 1
+                  </button>
+                </div>
+              )}
             </div>
           ) : (
             /* Empty State */
@@ -631,34 +645,37 @@ export default function PortfolioClient({
           )}
 
           {/* Pagination Controls */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-2.5 pt-10 pb-4">
+          {filteredArtworks.length > 0 && (
+            <div className="flex items-center justify-center gap-3 pt-12 pb-4 select-none">
               {/* Prev Button */}
               <button
                 type="button"
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
-                className="w-10 h-10 sm:w-11 sm:h-11 bg-white border border-[#E8E8E3] flex items-center justify-center text-[#6E6E69] hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed shadow-2xs transition-colors cursor-pointer"
-                style={{ borderRadius: 6 }}
+                className="w-10 h-10 sm:w-11 sm:h-11 bg-white border border-[#E8E8E3] flex items-center justify-center text-[#6E6E69] hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed shadow-2xs transition-all cursor-pointer"
+                style={{ borderRadius: 12 }}
                 aria-label="Previous page"
               >
                 <ChevronLeft size={18} />
               </button>
 
               {/* Page Number Buttons */}
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => {
+              {Array.from({ length: displayTotalPages }, (_, i) => i + 1).map((pageNum) => {
                 const isActive = pageNum === currentPage;
                 return (
                   <button
                     key={pageNum}
                     type="button"
                     onClick={() => setCurrentPage(pageNum)}
-                    className={`w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center text-xs sm:text-sm font-medium transition-colors cursor-pointer shadow-2xs ${
+                    className={`w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center text-xs sm:text-sm font-medium transition-all cursor-pointer shadow-2xs ${
                       isActive
                         ? 'bg-black text-white'
-                        : 'bg-white border border-[#E8E8E3] text-[#6E6E69] hover:bg-gray-50'
+                        : 'bg-white border border-[#E8E8E3] text-[#6E6E69] hover:text-black hover:bg-gray-50'
                     }`}
-                    style={{ borderRadius: 6 }}
+                    style={{
+                      borderRadius: 12,
+                      fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
+                    }}
                   >
                     {pageNum}
                   </button>
@@ -668,10 +685,10 @@ export default function PortfolioClient({
               {/* Next Button */}
               <button
                 type="button"
-                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                disabled={currentPage === totalPages}
-                className="w-10 h-10 sm:w-11 sm:h-11 bg-white border border-[#E8E8E3] flex items-center justify-center text-[#6E6E69] hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed shadow-2xs transition-colors cursor-pointer"
-                style={{ borderRadius: 6 }}
+                onClick={() => setCurrentPage((p) => Math.min(displayTotalPages, p + 1))}
+                disabled={currentPage === displayTotalPages}
+                className="w-10 h-10 sm:w-11 sm:h-11 bg-white border border-[#E8E8E3] flex items-center justify-center text-[#6E6E69] hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed shadow-2xs transition-all cursor-pointer"
+                style={{ borderRadius: 12 }}
                 aria-label="Next page"
               >
                 <ChevronRight size={18} />
