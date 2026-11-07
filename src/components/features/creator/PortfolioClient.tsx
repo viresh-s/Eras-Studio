@@ -393,8 +393,11 @@ export default function PortfolioClient({
           {/* Controls Bar */}
           <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-8">
             {/* Search Input */}
-            <div className="relative w-full md:w-[320px] lg:w-[380px] bg-white rounded-2xl border border-[#E3E3E7] shadow-2xs px-4 py-2.5 flex items-center gap-3">
-              <Search size={18} className="text-[#6E6E69] shrink-0" />
+            <div
+              className="relative w-full md:w-[320px] lg:w-[380px] bg-white border border-[#E3E3E7] px-3.5 py-2.5 flex items-center gap-2.5 shadow-2xs"
+              style={{ borderRadius: 4 }}
+            >
+              <Search size={16} className="text-[#6E6E69] shrink-0" />
               <input
                 type="text"
                 value={searchQuery}
@@ -404,6 +407,7 @@ export default function PortfolioClient({
                 }}
                 placeholder="Search artworks"
                 className="w-full bg-transparent text-xs sm:text-sm text-[#141413] placeholder-[#6E6E69] outline-none font-normal"
+                style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
               />
             </div>
 
@@ -417,7 +421,11 @@ export default function PortfolioClient({
                     setStatusFilter(e.target.value);
                     setCurrentPage(1);
                   }}
-                  className="appearance-none bg-white rounded-xl border border-[#E8E8E3] pl-3.5 pr-8 py-2 text-xs sm:text-sm font-medium text-[#666666] outline-none cursor-pointer shadow-2xs hover:border-gray-400 transition-colors"
+                  className="appearance-none bg-white border border-[#E3E3E7] pl-3.5 pr-8 py-2.5 text-xs sm:text-sm font-normal text-[#141413] outline-none cursor-pointer shadow-2xs hover:border-gray-400 transition-colors"
+                  style={{
+                    borderRadius: 4,
+                    fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
+                  }}
                 >
                   <option value="All">All status</option>
                   <option value="Available">Available</option>
@@ -436,7 +444,11 @@ export default function PortfolioClient({
                 <select
                   value={sortOrder}
                   onChange={(e) => setSortOrder(e.target.value)}
-                  className="appearance-none bg-white rounded-xl border border-[#E8E8E3] pl-3.5 pr-8 py-2 text-xs sm:text-sm font-medium text-[#666666] outline-none cursor-pointer shadow-2xs hover:border-gray-400 transition-colors"
+                  className="appearance-none bg-white border border-[#E3E3E7] pl-3.5 pr-8 py-2.5 text-xs sm:text-sm font-normal text-[#141413] outline-none cursor-pointer shadow-2xs hover:border-gray-400 transition-colors"
+                  style={{
+                    borderRadius: 4,
+                    fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
+                  }}
                 >
                   <option value="recent">Recent first</option>
                   <option value="oldest">Oldest first</option>
@@ -615,13 +627,14 @@ export default function PortfolioClient({
 
           {/* Pagination Controls */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-3 pt-10 pb-4">
+            <div className="flex items-center justify-center gap-2.5 pt-10 pb-4">
               {/* Prev Button */}
               <button
                 type="button"
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
-                className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-white border border-[#E8E8E3] flex items-center justify-center text-[#6E6E69] hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed shadow-2xs transition-colors cursor-pointer"
+                className="w-10 h-10 sm:w-11 sm:h-11 bg-white border border-[#E8E8E3] flex items-center justify-center text-[#6E6E69] hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed shadow-2xs transition-colors cursor-pointer"
+                style={{ borderRadius: 6 }}
                 aria-label="Previous page"
               >
                 <ChevronLeft size={18} />
@@ -635,11 +648,12 @@ export default function PortfolioClient({
                     key={pageNum}
                     type="button"
                     onClick={() => setCurrentPage(pageNum)}
-                    className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl flex items-center justify-center text-xs sm:text-sm font-medium transition-colors cursor-pointer shadow-2xs ${
+                    className={`w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center text-xs sm:text-sm font-medium transition-colors cursor-pointer shadow-2xs ${
                       isActive
                         ? 'bg-black text-white'
                         : 'bg-white border border-[#E8E8E3] text-[#6E6E69] hover:bg-gray-50'
                     }`}
+                    style={{ borderRadius: 6 }}
                   >
                     {pageNum}
                   </button>
@@ -651,7 +665,8 @@ export default function PortfolioClient({
                 type="button"
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
-                className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-white border border-[#E8E8E3] flex items-center justify-center text-[#6E6E69] hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed shadow-2xs transition-colors cursor-pointer"
+                className="w-10 h-10 sm:w-11 sm:h-11 bg-white border border-[#E8E8E3] flex items-center justify-center text-[#6E6E69] hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed shadow-2xs transition-colors cursor-pointer"
+                style={{ borderRadius: 6 }}
                 aria-label="Next page"
               >
                 <ChevronRight size={18} />
