@@ -415,8 +415,8 @@ export default function CollectionManager({
         </div>
       </div>
 
-      {/* Small Button Boxes Section (White background, blue gradient border & text on active/hover, no full gradient fill) */}
-      <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 mb-8">
+      {/* Sleek, Compact Filter Buttons (Capsule pill, white background, ERAS blue gradient border & text on active, smooth hover) */}
+      <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 mb-8">
         {statsTabs.map((tab) => {
           const isActive = activeTab === tab.id;
 
@@ -432,44 +432,45 @@ export default function CollectionManager({
                         'linear-gradient(#ffffff, #ffffff) padding-box, linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%) border-box',
                       border: '1.5px solid transparent',
                       boxShadow:
-                        '0px 4px 14px rgba(35, 77, 255, 0.12), 0px 1px 3px rgba(35, 77, 255, 0.08)',
+                        '0px 3px 12px rgba(35, 77, 255, 0.12), 0px 1px 3px rgba(35, 77, 255, 0.08)',
                     }
                   : {
                       background: '#FFFFFF',
                       border: '1.5px solid #EBEBE6',
                     }
               }
-              className={`relative min-w-[135px] sm:min-w-[155px] flex-1 sm:flex-none px-4 py-2.5 sm:px-5 sm:py-3 rounded-2xl text-left transition-all duration-200 cursor-pointer select-none group box-border ${
+              className={`relative h-9 px-3.5 sm:px-4 inline-flex items-center gap-2 rounded-full text-left transition-all duration-200 cursor-pointer select-none group box-border shrink-0 ${
                 isActive
                   ? 'shadow-xs'
-                  : 'hover:border-[#2356FF] hover:shadow-[0_2px_12px_rgba(35,77,255,0.08)] active:scale-[0.99]'
+                  : 'hover:border-[#2356FF] hover:shadow-[0_2px_10px_rgba(35,77,255,0.08)] active:scale-[0.98]'
               }`}
             >
-              <div className="flex flex-col justify-between">
-                <p
-                  className={`text-[10px] sm:text-[11px] font-normal tracking-[0.14em] uppercase mb-1 truncate transition-colors ${
-                    isActive ? 'text-[#1345EE]' : 'text-gray-500 group-hover:text-[#2356FF]'
-                  }`}
-                >
-                  {tab.label}
-                </p>
-                <span
-                  style={
-                    isActive
-                      ? {
-                          background: 'linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%)',
-                          WebkitBackgroundClip: 'text',
-                          WebkitTextFillColor: 'transparent',
-                        }
-                      : undefined
-                  }
-                  className={`text-xl sm:text-2xl font-normal leading-tight transition-colors ${
-                    isActive ? '' : 'text-gray-900 group-hover:text-[#2356FF]'
-                  }`}
-                >
-                  {tab.count}
-                </span>
-              </div>
+              <span
+                style={
+                  isActive
+                    ? {
+                        background: 'linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                      }
+                    : undefined
+                }
+                className={`text-xs font-normal tracking-wide transition-colors ${
+                  isActive ? 'font-medium' : 'text-gray-700 group-hover:text-[#2356FF]'
+                }`}
+              >
+                {tab.label}
+              </span>
+
+              <span
+                className={`text-[11px] px-2 py-0.5 rounded-full font-medium transition-colors ${
+                  isActive
+                    ? 'bg-[#EEF2FF] text-[#1345EE]'
+                    : 'bg-[#F4F4F0] text-gray-500 group-hover:bg-[#EEF2FF] group-hover:text-[#2356FF]'
+                }`}
+              >
+                {tab.count}
+              </span>
             </button>
           );
         })}
