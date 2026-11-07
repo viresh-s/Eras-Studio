@@ -25,6 +25,21 @@ export async function toggleSaveArtwork(artworkId: string, isSaved: boolean) {
       .eq('user_id', user.id);
 
     if (error) throw new Error(error.message);
+
+    // Sync likes_count on artworks table if column exists
+    try {
+      const { count } = await supabase
+        .from('saved_artworks')
+        .select('*', { count: 'exact', head: true })
+        .eq('artwork_id', artworkId);
+
+      await (supabase as any)
+        .from('artworks')
+        .update({ likes_count: count ?? 0 })
+        .eq('id', artworkId);
+    } catch {
+      // Non-blocking if column not yet added
+    }
   } else {
     // Save
     const { error } = await supabase
@@ -32,8 +47,25 @@ export async function toggleSaveArtwork(artworkId: string, isSaved: boolean) {
       .insert({ artwork_id: artworkId, user_id: user.id });
 
     if (error) throw new Error(error.message);
+
+    // Sync likes_count on artworks table if column exists
+    try {
+      const { count } = await supabase
+        .from('saved_artworks')
+        .select('*', { count: 'exact', head: true })
+        .eq('artwork_id', artworkId);
+
+      await (supabase as any)
+        .from('artworks')
+        .update({ likes_count: count ?? 1 })
+        .eq('id', artworkId);
+    } catch {
+      // Non-blocking if column not yet added
+    }
   }
 
   revalidatePath(`/artwork/${artworkId}`);
   revalidatePath('/purchases');
+  revalidatePath('/portfolio');
+  revalidatePath('/discovery');
 }

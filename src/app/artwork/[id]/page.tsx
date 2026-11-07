@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { notFound, redirect } from 'next/navigation';
 import ArtworkDiscoveryDetail from '@/components/features/artwork/ArtworkDiscoveryDetail';
+import ArtworkViewTracker from '@/components/features/artwork/ArtworkViewTracker';
 
 interface ArtworkPageProps {
   params: Promise<{ id: string }>;
@@ -62,12 +63,19 @@ export default async function ArtworkPage({ params }: ArtworkPageProps) {
   const isSaved = Boolean(savedResult?.data);
 
   return (
-    <ArtworkDiscoveryDetail
-      artwork={artwork}
-      currentUser={user ? { id: user.id } : null}
-      userRole={userRole}
-      existingChat={existingChat}
-      isSaved={isSaved}
-    />
+    <>
+      <ArtworkViewTracker
+        artworkId={artwork.id}
+        viewerId={user?.id}
+        isOwner={isOwner}
+      />
+      <ArtworkDiscoveryDetail
+        artwork={artwork}
+        currentUser={user ? { id: user.id } : null}
+        userRole={userRole}
+        existingChat={existingChat}
+        isSaved={isSaved}
+      />
+    </>
   );
 }

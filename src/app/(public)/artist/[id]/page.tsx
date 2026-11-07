@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import ProfileTabs from '@/components/features/creator/ProfileTabs';
 import ReportUserButton from '@/components/features/user/ReportUserButton';
 import ArtistProfileAvatar from '@/components/features/creator/ArtistProfileAvatar';
+import ProfileViewTracker from '@/components/features/creator/ProfileViewTracker';
 import { getCreatorCollections } from '@/actions/collectionActions';
 
 interface ArtistProfilePageProps {
@@ -73,6 +74,11 @@ export default async function ArtistProfilePage({ params }: ArtistProfilePagePro
 
   return (
     <div className="min-h-screen bg-white pb-20">
+      <ProfileViewTracker
+        profileId={profile.id}
+        viewerId={user?.id}
+        isOwner={isOwner}
+      />
       <div className="max-w-[1400px] mx-auto px-6 pt-10">
         
         {/* Cover Image (Rounded, not full width) */}

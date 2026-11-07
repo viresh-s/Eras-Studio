@@ -30,6 +30,7 @@ interface PortfolioClientProps {
   completeness: number;
   isLimited: boolean;
   userId: string;
+  profileViews?: number;
 }
 
 export default function PortfolioClient({
@@ -41,6 +42,7 @@ export default function PortfolioClient({
   completeness,
   isLimited,
   userId,
+  profileViews = 0,
 }: PortfolioClientProps) {
   const router = useRouter();
   const [artworks, setArtworks] = useState<Artwork[]>(initialArtworks);
@@ -284,12 +286,12 @@ export default function PortfolioClient({
             <div className="flex items-center gap-4 text-xs sm:text-sm font-normal text-[#6E6E69]">
               <div className="flex items-center gap-2">
                 <span>Profile views</span>
-                <span className="font-semibold text-[#141413]">0</span>
+                <span className="font-semibold text-[#141413]">{profileViews}</span>
               </div>
               <div className="w-[1px] h-4 bg-[#E8E8E3]" />
               <div className="flex items-center gap-2">
                 <span>Shortlisted</span>
-                <span className="font-semibold text-[#141413]">{chatCount || 1}</span>
+                <span className="font-semibold text-[#141413]">{chatCount || 0}</span>
               </div>
             </div>
           </div>
@@ -525,13 +527,13 @@ export default function PortfolioClient({
                         className="flex items-center gap-4 text-[11px] sm:text-xs text-[#6E6E69] font-normal pt-0.5"
                         style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
                       >
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1" title={`${artwork.likes_count || 0} likes`}>
                           <Heart size={13} className="text-[#6E6E69]" strokeWidth={1.75} />
-                          <span>0</span>
+                          <span>{artwork.likes_count || 0}</span>
                         </div>
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1" title={`${artwork.views_count || 0} views`}>
                           <Eye size={13} className="text-[#6E6E69]" strokeWidth={1.75} />
-                          <span>{320 + (artwork.title.length * 17) % 500}</span>
+                          <span>{artwork.views_count || 0}</span>
                         </div>
                       </div>
 

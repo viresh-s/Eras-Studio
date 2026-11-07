@@ -31,6 +31,7 @@ export interface Profile {
   is_premium: boolean;
   plan?: 'free' | 'pro' | 'elite' | string;
   status?: 'active' | 'suspended' | string;
+  profile_views_count?: number;
   created_at: string;
 }
 
@@ -66,6 +67,8 @@ export interface Artwork {
   collection: string | null;
   price_visibility: string | null;
   is_published: boolean;
+  views_count?: number;
+  likes_count?: number;
   created_at: string;
 }
 

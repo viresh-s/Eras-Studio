@@ -52,9 +52,48 @@ export default async function CreatorDashboard() {
 
   const isLimited = freemiumStatus.isLocked;
 
+  // Aggregate real-time likes & views across all creator artworks
+  const artworkIds = (artworks || []).map((a) => a.id);
+
+  const [profileViewsRes, savedArtworksRes, artworkViewsRes] = await Promise.all([
+    (supabase as any)
+      .from('profile_views')
+      .select('*', { count: 'exact', head: true })
+      .eq('profile_id', user.id),
+    artworkIds.length > 0
+      ? supabase.from('saved_artworks').select('artwork_id').in('artwork_id', artworkIds)
+      : Promise.resolve({ data: [] }),
+    artworkIds.length > 0
+      ? (supabase as any).from('artwork_views').select('artwork_id').in('artwork_id', artworkIds)
+      : Promise.resolve({ data: [] }),
+  ]);
+
+  const likesMap = new Map<string, number>();
+  ((savedArtworksRes?.data as any[]) || []).forEach((s) => {
+    if (s?.artwork_id) {
+      likesMap.set(s.artwork_id, (likesMap.get(s.artwork_id) || 0) + 1);
+    }
+  });
+
+  const viewsMap = new Map<string, number>();
+  ((artworkViewsRes?.data as any[]) || []).forEach((v) => {
+    if (v?.artwork_id) {
+      viewsMap.set(v.artwork_id, (viewsMap.get(v.artwork_id) || 0) + 1);
+    }
+  });
+
+  const enrichedArtworks = (artworks || []).map((a) => ({
+    ...a,
+    likes_count: a.likes_count ?? likesMap.get(a.id) ?? 0,
+    views_count: a.views_count ?? viewsMap.get(a.id) ?? 0,
+  }));
+
+  const totalProfileViews =
+    profile?.profile_views_count ?? profileViewsRes?.count ?? 0;
+
   return (
     <PortfolioClient
-      initialArtworks={artworks || []}
+      initialArtworks={enrichedArtworks}
       profile={profile}
       collectionsCount={collections?.length || 0}
       chatCount={chatCount || 0}
@@ -62,6 +101,7 @@ export default async function CreatorDashboard() {
       completeness={completeness}
       isLimited={isLimited}
       userId={user.id}
+      profileViews={totalProfileViews}
     />
   );
 }
