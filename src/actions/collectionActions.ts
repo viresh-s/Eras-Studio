@@ -69,7 +69,7 @@ export async function getCreatorCollections(creatorId?: string): Promise<Collect
       // Fetch artworks count per collection
       const { data: artworks } = await dbClient
         .from('artworks')
-        .select('id, collection_id, collection, image_url')
+        .select('id, collection_id, collection, image_url, title, year, price, art_type, status, is_published')
         .eq('creator_id', targetId);
 
       const items: CollectionItem[] = collections.map((col) => {
@@ -81,6 +81,7 @@ export async function getCreatorCollections(creatorId?: string): Promise<Collect
           ...col,
           cover_image_url: autoCover,
           artwork_count: matchingArtworks.length,
+          artworks: matchingArtworks,
         };
       });
 
@@ -327,7 +328,7 @@ export async function deleteCollection(id: string) {
  */
 export async function assignArtworkToCollection(
   artworkId: string,
-  collectionId: string | null,
+  collectionIdOrTitle: string | null,
   collectionTitle?: string | null
 ) {
   const supabase = await createClient();
@@ -341,48 +342,94 @@ export async function assignArtworkToCollection(
   const dbClient = adminClient || supabase;
 
   try {
-    let resolvedTitle = collectionTitle || null;
+    // If removing from collection
+    if (!collectionIdOrTitle || collectionIdOrTitle === 'none' || collectionIdOrTitle === '') {
+      await dbClient
+        .from('artworks')
+        .update({
+          collection_id: null,
+          collection: null,
+        })
+        .eq('id', artworkId)
+        .eq('creator_id', user.id);
 
-    // If collectionId is given and not a synthetic ID, look up its title
-    if (collectionId && collectionId.length > 30) {
-      const { data: col } = await dbClient
+      revalidatePath('/portfolio');
+      revalidatePath('/portfolio/collections');
+      revalidatePath('/portfolio/artworks');
+      revalidatePath(`/artist/${user.id}`);
+      revalidatePath(`/artwork/${artworkId}`);
+      return { success: true };
+    }
+
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(collectionIdOrTitle);
+
+    let resolvedId: string | null = null;
+    let resolvedTitle: string | null = collectionTitle || null;
+
+    if (isUUID) {
+      resolvedId = collectionIdOrTitle;
+      if (!resolvedTitle) {
+        const { data: col } = await dbClient
+          .from('collections')
+          .select('title')
+          .eq('id', resolvedId)
+          .maybeSingle();
+        if (col) resolvedTitle = col.title;
+      }
+    } else {
+      // It's a title
+      const targetTitle = (collectionTitle || collectionIdOrTitle).trim();
+      const { data: existingCol } = await dbClient
         .from('collections')
-        .select('title')
-        .eq('id', collectionId)
+        .select('id, title')
+        .eq('creator_id', user.id)
+        .ilike('title', targetTitle)
         .maybeSingle();
 
-      if (col?.title) {
-        resolvedTitle = col.title;
+      if (existingCol) {
+        resolvedId = existingCol.id;
+        resolvedTitle = existingCol.title;
+      } else {
+        const { data: newCol } = await dbClient
+          .from('collections')
+          .insert({
+            creator_id: user.id,
+            title: targetTitle,
+            is_published: true,
+          })
+          .select('id, title')
+          .single();
+
+        if (newCol) {
+          resolvedId = newCol.id;
+          resolvedTitle = newCol.title;
+        }
       }
     }
 
     const { error } = await dbClient
       .from('artworks')
       .update({
-        collection_id: collectionId && collectionId.length > 30 ? collectionId : null,
+        collection_id: resolvedId,
         collection: resolvedTitle,
       })
       .eq('id', artworkId)
       .eq('creator_id', user.id);
 
     if (error) {
-      // If collection_id column does not exist yet, update collection text
-      await dbClient
-        .from('artworks')
-        .update({
-          collection: resolvedTitle,
-        })
-        .eq('id', artworkId)
-        .eq('creator_id', user.id);
+      console.error('Failed to update artwork collection:', error);
+      return { success: false, error: error.message };
     }
 
     revalidatePath('/portfolio');
     revalidatePath('/portfolio/collections');
     revalidatePath('/portfolio/artworks');
     revalidatePath(`/artist/${user.id}`);
+    revalidatePath(`/artwork/${artworkId}`);
 
-    return { success: true };
+    return { success: true, collectionId: resolvedId, title: resolvedTitle };
   } catch (err: any) {
+    console.error('Failed to assign artwork to collection:', err);
     return { success: false, error: err?.message || 'Failed to assign collection' };
   }
 }

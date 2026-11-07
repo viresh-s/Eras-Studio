@@ -95,7 +95,41 @@ export async function createArtwork(data: CreateArtworkData) {
   const sanitizedStyle = data.style ? sanitizeText(data.style, 100) : null;
   const sanitizedCollection = data.collection ? sanitizeText(data.collection, 100) : null;
 
-  // 5. Database Insertion with Server-Enforced Creator ID
+  // 5. Resolve or auto-create collection in collections table
+  let targetCollectionId: string | null = null;
+  let targetCollectionTitle: string | null = null;
+
+  if (sanitizedCollection && sanitizedCollection.toLowerCase() !== 'none' && sanitizedCollection.toLowerCase() !== 'other') {
+    targetCollectionTitle = sanitizedCollection;
+    const { data: existingCol } = await supabase
+      .from('collections')
+      .select('id, title')
+      .eq('creator_id', user.id)
+      .ilike('title', targetCollectionTitle)
+      .maybeSingle();
+
+    if (existingCol) {
+      targetCollectionId = existingCol.id;
+      targetCollectionTitle = existingCol.title;
+    } else {
+      const { data: newCol } = await supabase
+        .from('collections')
+        .insert({
+          creator_id: user.id,
+          title: targetCollectionTitle,
+          is_published: true,
+        })
+        .select('id, title')
+        .single();
+
+      if (newCol) {
+        targetCollectionId = newCol.id;
+        targetCollectionTitle = newCol.title;
+      }
+    }
+  }
+
+  // 6. Database Insertion with Server-Enforced Creator ID
   const { data: inserted, error } = await supabase
     .from('artworks')
     .insert({
@@ -121,7 +155,8 @@ export async function createArtwork(data: CreateArtworkData) {
       location: sanitizedLocation,
       style: sanitizedStyle,
       tags: data.tags || [],
-      collection: sanitizedCollection,
+      collection: targetCollectionTitle,
+      collection_id: targetCollectionId,
       price_visibility: data.priceVisibility || 'Show Price',
       is_published: data.isPublished !== undefined ? data.isPublished : true,
     })
@@ -135,6 +170,8 @@ export async function createArtwork(data: CreateArtworkData) {
 
   securityLogger.info('ARTWORK_CREATED', { artworkId: inserted?.id, userId: user.id });
 
+  revalidatePath('/portfolio');
+  revalidatePath('/portfolio/collections');
   revalidatePath('/portfolio/artworks');
   revalidatePath('/discovery');
 }
@@ -198,9 +235,50 @@ export async function updateArtwork(artworkId: string, data: Partial<CreateArtwo
   if (data.location !== undefined) updateData.location = data.location ? sanitizeText(data.location, 100) : null;
   if (data.style !== undefined) updateData.style = data.style ? sanitizeText(data.style, 100) : null;
   if (data.tags !== undefined) updateData.tags = data.tags || [];
-  if (data.collection !== undefined) updateData.collection = data.collection ? sanitizeText(data.collection, 100) : null;
   if (data.priceVisibility !== undefined) updateData.price_visibility = data.priceVisibility;
   if (data.isPublished !== undefined) updateData.is_published = data.isPublished;
+
+  // Handle collection updates & sync collection_id foreign key
+  if (data.collection !== undefined) {
+    const rawCol = data.collection ? sanitizeText(data.collection, 100).trim() : null;
+    if (rawCol && rawCol.toLowerCase() !== 'none' && rawCol.toLowerCase() !== 'other') {
+      let targetCollectionId: string | null = null;
+      let targetCollectionTitle: string = rawCol;
+
+      const { data: existingCol } = await supabase
+        .from('collections')
+        .select('id, title')
+        .eq('creator_id', user.id)
+        .ilike('title', targetCollectionTitle)
+        .maybeSingle();
+
+      if (existingCol) {
+        targetCollectionId = existingCol.id;
+        targetCollectionTitle = existingCol.title;
+      } else {
+        const { data: newCol } = await supabase
+          .from('collections')
+          .insert({
+            creator_id: user.id,
+            title: targetCollectionTitle,
+            is_published: true,
+          })
+          .select('id, title')
+          .single();
+
+        if (newCol) {
+          targetCollectionId = newCol.id;
+          targetCollectionTitle = newCol.title;
+        }
+      }
+
+      updateData.collection = targetCollectionTitle;
+      updateData.collection_id = targetCollectionId;
+    } else {
+      updateData.collection = null;
+      updateData.collection_id = null;
+    }
+  }
 
   // Strictly enforce creator ownership
   const { error } = await supabase
@@ -217,6 +295,7 @@ export async function updateArtwork(artworkId: string, data: Partial<CreateArtwo
   securityLogger.info('ARTWORK_UPDATED', { artworkId, userId: user.id });
 
   revalidatePath('/portfolio');
+  revalidatePath('/portfolio/collections');
   revalidatePath('/portfolio/artworks');
   revalidatePath(`/artwork/${artworkId}`);
   revalidatePath('/discovery');

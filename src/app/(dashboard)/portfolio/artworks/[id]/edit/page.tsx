@@ -22,8 +22,13 @@ export default async function EditArtworkPage({ params }: { params: Promise<{ id
   }
 
   return (
-    <div>
-      <h1 className="font-heading text-3xl font-bold mb-6">Manage Artwork</h1>
+    <div style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}>
+      <h1
+        className="text-3xl sm:text-4xl font-serif italic font-semibold text-[#141413] tracking-tight mb-6"
+        style={{ fontFamily: "'Century Schoolbook', Century, 'TeX Gyre Schola', Georgia, serif", fontStyle: 'italic' }}
+      >
+        Manage Artwork
+      </h1>
       <ArtworkEditForm userId={user.id} artwork={artwork} />
     </div>
   );
