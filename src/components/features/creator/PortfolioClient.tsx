@@ -62,9 +62,9 @@ export default function PortfolioClient({
 
     // Tab Filter
     if (activeTab === 'artworks') {
-      list = list.filter((a) => a.is_published !== false && a.status !== 'Not for sale');
+      list = list.filter((a) => a.is_published !== false);
     } else if (activeTab === 'archived') {
-      list = list.filter((a) => a.is_published === false || a.status === 'Not for sale');
+      list = list.filter((a) => a.is_published === false);
     }
 
     // Search Query Filter
@@ -95,10 +95,14 @@ export default function PortfolioClient({
         return a.title.localeCompare(b.title);
       }
       if (sortOrder === 'price_desc') {
-        return (b.price || 0) - (a.price || 0);
+        const priceA = Number(a.price) || 0;
+        const priceB = Number(b.price) || 0;
+        return priceB - priceA;
       }
       if (sortOrder === 'price_asc') {
-        return (a.price || 0) - (b.price || 0);
+        const priceA = Number(a.price) || 0;
+        const priceB = Number(b.price) || 0;
+        return priceA - priceB;
       }
       return 0;
     });
@@ -125,20 +129,18 @@ export default function PortfolioClient({
   const handleToggleArchive = async (artworkId: string, currentStatus: string, currentIsPublished: boolean) => {
     try {
       setIsUpdatingId(artworkId);
-      const isCurrentlyArchived = !currentIsPublished || currentStatus === 'Not for sale';
-      const newStatus = isCurrentlyArchived ? 'Available' : 'Not for sale';
-      const newIsPublished = isCurrentlyArchived;
+      const isCurrentlyArchived = !currentIsPublished;
+      const newIsPublished = !currentIsPublished;
 
       setArtworks((prev) =>
         prev.map((item) =>
           item.id === artworkId
-            ? { ...item, status: newStatus as Artwork['status'], is_published: newIsPublished }
+            ? { ...item, is_published: newIsPublished }
             : item
         )
       );
 
       await updateArtwork(artworkId, {
-        status: newStatus,
         isPublished: newIsPublished,
       });
 
@@ -176,8 +178,8 @@ export default function PortfolioClient({
   const taglineText =
     profile?.primary_medium || profile?.about_me || 'Digital artist · Visual storyteller';
 
-  const publishedCount = artworks.filter((a) => a.is_published !== false && a.status !== 'Not for sale').length;
-  const archivedCount = artworks.filter((a) => a.is_published === false || a.status === 'Not for sale').length;
+  const publishedCount = artworks.filter((a) => a.is_published !== false).length;
+  const archivedCount = artworks.filter((a) => a.is_published === false).length;
 
   return (
     <div
@@ -443,7 +445,10 @@ export default function PortfolioClient({
               <div className="relative">
                 <select
                   value={sortOrder}
-                  onChange={(e) => setSortOrder(e.target.value)}
+                  onChange={(e) => {
+                    setSortOrder(e.target.value);
+                    setCurrentPage(1);
+                  }}
                   className="appearance-none bg-white border border-[#E3E3E7] pl-3.5 pr-8 py-2.5 text-xs sm:text-sm font-normal text-[#141413] outline-none cursor-pointer shadow-2xs hover:border-gray-400 transition-colors"
                   style={{
                     borderRadius: 4,
