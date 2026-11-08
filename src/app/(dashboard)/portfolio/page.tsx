@@ -94,6 +94,7 @@ export default async function CreatorDashboard() {
   return (
     <PortfolioClient
       initialArtworks={enrichedArtworks}
+      initialCollections={collections || []}
       profile={profile}
       collectionsCount={collections?.length || 0}
       chatCount={chatCount || 0}

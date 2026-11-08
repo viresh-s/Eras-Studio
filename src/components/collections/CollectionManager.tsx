@@ -1,21 +1,20 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
   Plus,
   Folder,
   Layers,
-  Edit2,
+  Pencil,
   Trash2,
-  ExternalLink,
-  ChevronRight,
   X,
   Check,
   Loader2,
   Sparkles,
   ArrowLeft,
+  Search,
   Image as ImageIcon,
 } from 'lucide-react';
 import {
@@ -48,6 +47,7 @@ export default function CollectionManager({
 }: CollectionManagerProps) {
   const router = useRouter();
   const [collections, setCollections] = useState<CollectionItem[]>(initialCollections);
+  const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCollection, setEditingCollection] = useState<CollectionItem | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -57,6 +57,17 @@ export default function CollectionManager({
   const [creatorArtworks, setCreatorArtworks] = useState<ArtworkSimple[]>([]);
   const [isLoadingArtworks, setIsLoadingArtworks] = useState(false);
   const [updatingArtworkId, setUpdatingArtworkId] = useState<string | null>(null);
+
+  // Filter collections by search query
+  const filteredCollections = useMemo(() => {
+    if (!searchQuery.trim()) return collections;
+    const q = searchQuery.toLowerCase().trim();
+    return collections.filter(
+      (c) =>
+        c.title.toLowerCase().includes(q) ||
+        (c.description || '').toLowerCase().includes(q)
+    );
+  }, [collections, searchQuery]);
 
   // Load all artworks when drawer opens
   useEffect(() => {
@@ -170,191 +181,264 @@ export default function CollectionManager({
   };
 
   return (
-    <div style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}>
-      {/* Top Navigation & Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-        <div>
-          <div className="flex items-center gap-2 text-xs text-gray-500 font-normal mb-2">
-            <Link href="/portfolio" className="hover:text-gray-900 transition-colors flex items-center gap-1">
+    <div
+      className="-mt-8 -mx-6 -mb-8 flex flex-col flex-1 min-h-screen"
+      style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+    >
+      {/* ======================================================== */}
+      {/* 1. TOP HEADER SECTION: PURE WHITE                        */}
+      {/* ======================================================== */}
+      <div className="bg-white border-b border-[#E3E3E7] w-full pt-8 sm:pt-10 pb-6">
+        <div className="max-w-[1400px] mx-auto px-6">
+          {/* Breadcrumb / Back Link */}
+          <div className="mb-4">
+            <Link
+              href="/portfolio"
+              className="inline-flex items-center gap-1.5 text-xs text-[#6E6E69] hover:text-[#141413] transition-colors font-normal select-none"
+            >
               <ArrowLeft size={14} /> Back to Portfolio
             </Link>
           </div>
-          <h1
-            className="text-4xl font-serif italic font-semibold text-gray-900 tracking-tight"
-            style={{ fontFamily: "'Century Schoolbook', Century, 'TeX Gyre Schola', Georgia, serif", fontStyle: 'italic' }}
-          >
-            My Collections
-          </h1>
-          <p className="text-xs text-gray-500 font-normal mt-1">
-            Organize and curate your artworks into thematic series or exhibition collections.
-          </p>
-        </div>
 
-        {/* Create Collection Button */}
-        <button
-          onClick={() => {
-            setEditingCollection(null);
-            setIsModalOpen(true);
-          }}
-          style={{
-            position: 'relative',
-            background: 'linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%)',
-            boxShadow:
-              '0px 7px 22px rgba(35, 77, 255, 0.13), 0px 3px 3px rgba(255, 255, 255, 0.65) inset, 0px -3px 6px rgba(6, 42, 137, 0.33) inset',
-            overflow: 'hidden',
-            borderRadius: 40,
-            outline: '2px #2356FF solid',
-            outlineOffset: '-2px',
-          }}
-          className="px-8 py-3.5 sm:px-9 sm:py-3.5 inline-flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 hover:brightness-110 active:scale-[0.98] group select-none shadow-md"
-        >
-          <div
-            style={{
-              position: 'absolute',
-              inset: 3,
-              borderRadius: 37,
-              border: '1px rgba(255, 255, 255, 0.15) solid',
-              pointerEvents: 'none',
-            }}
-          />
-          <div
-            style={{
-              color: 'white',
-              fontSize: 15,
-              fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
-              fontWeight: '400',
-              lineHeight: '24px',
-            }}
-            className="flex items-center gap-2 relative z-10"
-          >
-            <Plus size={18} className="text-white" />
-            <span>New Collection</span>
+          {/* Title Row + New Collection Button */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h1
+                className="text-2xl sm:text-[28px] font-semibold text-[#141413] tracking-normal"
+                style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+              >
+                Manage Collections
+              </h1>
+              <p
+                className="text-xs sm:text-[13px] text-[#6E6E69] font-normal mt-1"
+                style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+              >
+                Organize and curate your artworks into thematic series or exhibition drops.
+              </p>
+            </div>
+
+            {/* Create Collection Button (matching ERAS blue gradient button) */}
+            <button
+              onClick={() => {
+                setEditingCollection(null);
+                setIsModalOpen(true);
+              }}
+              style={{
+                position: 'relative',
+                background: 'linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%)',
+                boxShadow:
+                  '0px 7px 22px rgba(35, 77, 255, 0.13), 0px 3px 3px rgba(255, 255, 255, 0.65) inset, 0px -3px 6px rgba(6, 42, 137, 0.33) inset',
+                overflow: 'hidden',
+                borderRadius: 40,
+                outline: '2px #2356FF solid',
+                outlineOffset: '-2px',
+              }}
+              className="px-6 py-2.5 sm:px-8 sm:py-3 inline-flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 hover:brightness-110 active:scale-[0.98] select-none text-white text-xs sm:text-sm font-medium shadow-md shrink-0"
+            >
+              <Plus size={16} className="text-white" />
+              <span>New Collection</span>
+            </button>
           </div>
-        </button>
+        </div>
       </div>
 
-      {/* Collections Grid */}
-      {collections.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {collections.map((col) => {
-            return (
-              <div
-                key={col.id}
-                className="bg-white rounded-3xl border border-gray-200 overflow-hidden shadow-2xs hover:shadow-md transition-all duration-200 flex flex-col group"
-              >
-                {/* Cover Preview */}
-                <div
-                  className="h-44 bg-gray-100 relative overflow-hidden cursor-pointer"
-                  onClick={() => setSelectedCollectionForArtworks(col)}
-                >
-                  {col.cover_image_url ? (
-                    <img
-                      src={col.cover_image_url}
-                      alt={col.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 text-gray-400 gap-2">
-                      <Folder size={32} className="opacity-40" />
-                      <span className="text-[11px] font-normal">Click to assign artworks</span>
-                    </div>
-                  )}
+      {/* ======================================================== */}
+      {/* 2. LOWER SECTION: WARM #F2F0ED BACKGROUND                */}
+      {/* ======================================================== */}
+      <div className="bg-[#F2F0ED] flex-1 w-full py-8 sm:py-10">
+        <div className="max-w-[1400px] mx-auto px-6">
+          {/* Controls Bar: Search */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-8">
+            <div
+              className="relative w-full sm:w-[320px] lg:w-[380px] bg-white border border-[#E3E3E7] px-3.5 py-2.5 flex items-center gap-2.5 shadow-2xs"
+              style={{ borderRadius: 4 }}
+            >
+              <Search size={16} className="text-[#6E6E69] shrink-0" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search collections"
+                className="w-full bg-transparent text-xs sm:text-sm text-[#141413] placeholder-[#6E6E69] outline-none font-normal"
+                style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+              />
+            </div>
 
-                  {/* Artwork Count Badge */}
-                  <div className="absolute bottom-3 left-3 bg-black/70 backdrop-blur-xs text-white text-[11px] font-normal px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-xs">
-                    <Layers size={11} />
-                    <span>{col.artwork_count || 0} {col.artwork_count === 1 ? 'Artwork' : 'Artworks'}</span>
-                  </div>
-                </div>
-
-                {/* Content */}
-                <div className="p-5 flex-1 flex flex-col justify-between">
-                  <div>
-                    <h3
-                      className="text-xl font-serif italic font-normal text-gray-900 tracking-tight mb-1.5 cursor-pointer hover:text-[#2356FF] transition-colors"
-                      style={{ fontFamily: "'Century Schoolbook', Century, 'TeX Gyre Schola', Georgia, serif", fontStyle: 'italic' }}
-                      onClick={() => setSelectedCollectionForArtworks(col)}
-                    >
-                      {col.title}
-                    </h3>
-                    {col.description ? (
-                      <p className="text-xs text-gray-600 line-clamp-2 font-normal leading-relaxed">
-                        {col.description}
-                      </p>
-                    ) : (
-                      <p className="text-xs text-gray-400 font-normal italic">
-                        No curatorial statement provided.
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="mt-5 pt-4 border-t border-gray-100 flex items-center justify-between gap-2">
-                    <button
-                      onClick={() => setSelectedCollectionForArtworks(col)}
-                      className="px-3.5 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-full text-xs font-normal transition-colors cursor-pointer flex items-center gap-1.5"
-                    >
-                      <Layers size={13} />
-                      <span>Manage Artworks</span>
-                    </button>
-
-                    <div className="flex items-center gap-1">
-                      <button
-                        onClick={() => {
-                          setEditingCollection(col);
-                          setIsModalOpen(true);
-                        }}
-                        title="Edit Collection"
-                        className="p-1.5 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors cursor-pointer"
-                      >
-                        <Edit2 size={14} />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(col)}
-                        disabled={deletingId === col.id}
-                        title="Delete Collection"
-                        className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors cursor-pointer disabled:opacity-50"
-                      >
-                        {deletingId === col.id ? (
-                          <Loader2 size={14} className="animate-spin text-red-500" />
-                        ) : (
-                          <Trash2 size={14} />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      ) : (
-        /* Empty State */
-        <div className="bg-white rounded-3xl border border-gray-200 p-16 text-center">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-blue-50 text-[#2356FF] flex items-center justify-center">
-            <Folder size={30} />
+            <div className="text-xs text-[#6E6E69] font-normal">
+              <span>{filteredCollections.length} {filteredCollections.length === 1 ? 'collection' : 'collections'}</span>
+            </div>
           </div>
-          <p
-            className="font-serif italic font-normal text-gray-900 text-2xl mb-2"
-            style={{ fontFamily: "'Century Schoolbook', Century, 'TeX Gyre Schola', Georgia, serif", fontStyle: 'italic' }}
-          >
-            No collections yet
-          </p>
-          <p className="text-xs text-gray-500 font-normal max-w-md mx-auto mb-6 leading-relaxed">
-            Create collections to curate your artworks into series, seasonal drops, or solo exhibition themes.
-          </p>
-          <button
-            onClick={() => {
-              setEditingCollection(null);
-              setIsModalOpen(true);
-            }}
-            className="inline-flex items-center gap-2 px-6 py-2.5 bg-gray-900 text-white rounded-full text-xs font-normal hover:bg-black transition-all cursor-pointer shadow-xs select-none"
-          >
-            <Plus size={15} />
-            <span>Create Your First Collection</span>
-          </button>
+
+          {/* Collections Grid */}
+          {filteredCollections.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+              {filteredCollections.map((col) => {
+                return (
+                  <div
+                    key={col.id}
+                    className="bg-white border border-[#E8E8E3] overflow-hidden flex flex-col justify-between shadow-2xs hover:shadow-md transition-shadow group select-none"
+                    style={{ borderRadius: 14 }}
+                  >
+                    {/* Cover Preview */}
+                    <div
+                      className="relative w-full aspect-[16/10.5] bg-gray-100 overflow-hidden cursor-pointer"
+                      onClick={() => setSelectedCollectionForArtworks(col)}
+                    >
+                      {col.cover_image_url ? (
+                        <img
+                          src={col.cover_image_url}
+                          alt={col.title}
+                          className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500 ease-out select-none pointer-events-none"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-[#FAFAF8] to-[#ECEAE5] text-[#6E6E69] gap-2">
+                          <Folder size={36} className="opacity-40 text-[#6E6E69]" />
+                          <span className="text-[12px] font-normal text-[#6E6E69]">Curated Collection</span>
+                        </div>
+                      )}
+                      <div className="absolute inset-0 z-[1]" />
+                      {col.is_published === false && (
+                        <span className="absolute top-3 left-3 px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-amber-100 text-amber-800 z-[2] shadow-2xs">
+                          Draft
+                        </span>
+                      )}
+
+                      {/* Artwork Count Badge */}
+                      <div className="absolute bottom-3 left-3 bg-black/70 backdrop-blur-xs text-white text-[11px] font-medium px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-2xs z-[2]">
+                        <Layers size={12} />
+                        <span>
+                          {col.artwork_count || 0} {col.artwork_count === 1 ? 'Artwork' : 'Artworks'}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Content Body */}
+                    <div className="p-4 sm:p-5 flex flex-col gap-3">
+                      {/* Row 1: Title & Year */}
+                      <div className="flex items-center justify-between gap-2">
+                        <h3
+                          onClick={() => setSelectedCollectionForArtworks(col)}
+                          className="text-[16px] sm:text-[17px] font-medium text-[#141413] truncate hover:text-[#1345EE] transition-colors cursor-pointer"
+                          style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+                        >
+                          {col.title}
+                        </h3>
+                        <span
+                          className="text-[11px] sm:text-xs text-[#6E6E69] font-normal shrink-0"
+                          style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+                        >
+                          {col.created_at ? new Date(col.created_at).getFullYear() : 2025}
+                        </span>
+                      </div>
+
+                      {/* Row 2: Status */}
+                      <div
+                        className="flex items-center gap-1.5 text-[11px] sm:text-xs text-[#6E6E69] font-normal truncate"
+                        style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+                      >
+                        <span className="truncate">Curated Collection</span>
+                        <span className="text-[#E8E8E3]">·</span>
+                        <span className="truncate">{col.artwork_count || 0} items</span>
+                      </div>
+
+                      {/* Row 3: Description */}
+                      <p
+                        className="text-[11px] sm:text-xs text-[#6E6E69] line-clamp-2 leading-relaxed"
+                        style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+                      >
+                        {col.description || 'No curatorial statement provided.'}
+                      </p>
+
+                      {/* Divider Line */}
+                      <div className="h-[1px] bg-[#E8E8E3] w-full my-0.5" />
+
+                      {/* Row 4: Action Buttons (Edit + Manage on Left, Delete on Right) */}
+                      <div className="flex items-center justify-between pt-0.5">
+                        <div className="flex items-center gap-2">
+                          {/* Edit Button */}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setEditingCollection(col);
+                              setIsModalOpen(true);
+                            }}
+                            className="w-8 h-9 sm:w-[32px] sm:h-[34px] bg-white border border-[#E8E8E3] flex items-center justify-center text-[#6E6E69] hover:text-[#141413] hover:border-gray-400 transition-colors shadow-2xs cursor-pointer"
+                            style={{ borderRadius: 8 }}
+                            title="Edit collection"
+                          >
+                            <Pencil size={14} className="text-[#6E6E69]" />
+                          </button>
+
+                          {/* Manage Artworks Button */}
+                          <button
+                            type="button"
+                            onClick={() => setSelectedCollectionForArtworks(col)}
+                            className="h-9 sm:h-[34px] px-3.5 sm:px-4 rounded-full bg-[#FAF5EC] border border-[#EACEC0] text-[#865E16] text-[11px] sm:text-xs font-medium hover:bg-[#F5EADB] transition-colors cursor-pointer select-none flex items-center justify-center"
+                            style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+                          >
+                            Manage Artworks
+                          </button>
+                        </div>
+
+                        {/* Delete Button */}
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(col)}
+                          disabled={deletingId === col.id}
+                          className="w-8 h-9 sm:w-[32px] sm:h-[34px] bg-white border border-[#E8E8E3] flex items-center justify-center text-[#6E6E69] hover:text-red-600 hover:border-red-200 transition-colors shadow-2xs cursor-pointer ml-auto"
+                          style={{ borderRadius: 8 }}
+                          title="Delete collection"
+                        >
+                          {deletingId === col.id ? (
+                            <Loader2 size={14} className="animate-spin text-red-500" />
+                          ) : (
+                            <Trash2 size={14} />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            /* Empty State */
+            <div className="bg-white rounded-3xl border border-[#E8E8E3] p-12 sm:p-16 text-center max-w-xl mx-auto shadow-xs">
+              <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-4 text-gray-500">
+                <Folder size={26} />
+              </div>
+              <h3 className="text-lg font-semibold text-[#141413] mb-2">
+                {searchQuery ? 'No matching collections' : 'No collections yet'}
+              </h3>
+              <p className="text-xs sm:text-sm text-[#6E6E69] max-w-md mx-auto mb-6">
+                {searchQuery
+                  ? 'Try clearing your search query or check back later.'
+                  : 'Organize and curate your artworks into thematic series or exhibition drops.'}
+              </p>
+              <button
+                onClick={() => {
+                  setEditingCollection(null);
+                  setIsModalOpen(true);
+                }}
+                style={{
+                  position: 'relative',
+                  background: 'linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%)',
+                  boxShadow:
+                    '0px 7px 22px rgba(35, 77, 255, 0.13), 0px 3px 3px rgba(255, 255, 255, 0.65) inset, 0px -3px 6px rgba(6, 42, 137, 0.33) inset',
+                  overflow: 'hidden',
+                  borderRadius: 40,
+                  outline: '2px #2356FF solid',
+                  outlineOffset: '-2px',
+                }}
+                className="px-6 py-2.5 inline-flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 hover:brightness-110 active:scale-[0.98] select-none text-white text-xs font-medium shadow-md"
+              >
+                <Plus size={14} />
+                <span>Create First Collection</span>
+              </button>
+            </div>
+          )}
         </div>
-      )}
+      </div>
 
       {/* Modal for Create/Edit Collection */}
       <CreateCollectionModal
@@ -375,37 +459,38 @@ export default function CollectionManager({
         >
           <div
             className="w-full max-w-xl bg-white h-full shadow-2xl flex flex-col p-6 sm:p-8 overflow-y-auto"
+            style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Drawer Header */}
-            <div className="flex items-start justify-between pb-5 border-b border-gray-100">
+            <div className="flex items-start justify-between pb-5 border-b border-[#E8E8E3]">
               <div>
-                <span className="text-[11px] font-normal tracking-[0.15em] text-[#2356FF] uppercase">
+                <span className="text-[11px] font-medium tracking-[0.1em] text-[#1345EE] uppercase">
                   Curate Collection
                 </span>
                 <h2
-                  className="text-2xl font-serif italic font-semibold text-gray-900 tracking-tight mt-1"
-                  style={{ fontFamily: "'Century Schoolbook', Century, 'TeX Gyre Schola', Georgia, serif", fontStyle: 'italic' }}
+                  className="text-xl sm:text-2xl font-semibold text-[#141413] tracking-normal mt-1"
+                  style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
                 >
                   {selectedCollectionForArtworks.title}
                 </h2>
-                <p className="text-xs text-gray-500 font-normal mt-1">
+                <p className="text-xs text-[#6E6E69] font-normal mt-1">
                   Click on an artwork to add or remove it from this collection.
                 </p>
               </div>
               <button
                 onClick={() => setSelectedCollectionForArtworks(null)}
-                className="p-1 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+                className="p-1.5 rounded-full text-[#6E6E69] hover:text-[#141413] hover:bg-gray-100 transition-colors cursor-pointer"
               >
-                <X size={20} />
+                <X size={18} />
               </button>
             </div>
 
             {/* Artworks List */}
             <div className="flex-1 py-6">
               {isLoadingArtworks ? (
-                <div className="flex flex-col items-center justify-center py-20 text-gray-400 gap-2">
-                  <Loader2 size={24} className="animate-spin text-[#2356FF]" />
+                <div className="flex flex-col items-center justify-center py-20 text-[#6E6E69] gap-2">
+                  <Loader2 size={24} className="animate-spin text-[#1345EE]" />
                   <span className="text-xs font-normal">Loading your artworks...</span>
                 </div>
               ) : creatorArtworks.length > 0 ? (
@@ -422,8 +507,8 @@ export default function CollectionManager({
                         onClick={() => !isUpdating && handleToggleArtworkInCollection(art)}
                         className={`p-3 rounded-2xl border transition-all cursor-pointer flex items-center gap-3 relative select-none ${
                           isInCollection
-                            ? 'border-[#2356FF] bg-blue-50/40 ring-1 ring-[#2356FF]'
-                            : 'border-gray-200 bg-white hover:border-gray-300'
+                            ? 'border-[#1345EE] bg-blue-50/40 ring-1 ring-[#1345EE]'
+                            : 'border-[#E8E8E3] bg-white hover:border-gray-400'
                         }`}
                       >
                         {/* Thumbnail */}
@@ -437,14 +522,14 @@ export default function CollectionManager({
 
                         {/* Info */}
                         <div className="flex-1 min-w-0">
-                          <p className="text-xs font-normal text-gray-900 truncate">
+                          <p className="text-xs font-medium text-[#141413] truncate">
                             {art.title}
                           </p>
-                          <p className="text-[11px] text-gray-500 font-normal">
+                          <p className="text-[11px] text-[#6E6E69] font-normal">
                             {art.year || 'Contemporary'}
                           </p>
                           {art.collection && (
-                            <span className="inline-block text-[10px] text-gray-400 truncate max-w-full font-normal">
+                            <span className="inline-block text-[10px] text-[#6E6E69] truncate max-w-full font-normal">
                               {isInCollection ? 'In this collection' : `In: ${art.collection}`}
                             </span>
                           )}
@@ -453,13 +538,13 @@ export default function CollectionManager({
                         {/* Status Checkbox / Indicator */}
                         <div className="shrink-0 mr-1">
                           {isUpdating ? (
-                            <Loader2 size={16} className="animate-spin text-[#2356FF]" />
+                            <Loader2 size={16} className="animate-spin text-[#1345EE]" />
                           ) : isInCollection ? (
-                            <div className="w-6 h-6 rounded-full bg-[#2356FF] text-white flex items-center justify-center">
+                            <div className="w-6 h-6 rounded-full bg-[#1345EE] text-white flex items-center justify-center">
                               <Check size={14} />
                             </div>
                           ) : (
-                            <div className="w-6 h-6 rounded-full border border-gray-300 flex items-center justify-center hover:border-gray-500" />
+                            <div className="w-6 h-6 rounded-full border border-[#BEBEC7] flex items-center justify-center hover:border-gray-600" />
                           )}
                         </div>
                       </div>
@@ -468,12 +553,12 @@ export default function CollectionManager({
                 </div>
               ) : (
                 <div className="text-center py-16">
-                  <p className="text-xs text-gray-500 font-normal">
+                  <p className="text-xs text-[#6E6E69] font-normal">
                     You haven&apos;t uploaded any artworks yet.
                   </p>
                   <Link
                     href="/portfolio/upload"
-                    className="mt-3 inline-flex items-center gap-1.5 text-xs text-[#2356FF] font-normal hover:underline"
+                    className="mt-3 inline-flex items-center gap-1.5 text-xs text-[#1345EE] font-medium hover:underline"
                   >
                     <Plus size={13} /> Upload Artwork
                   </Link>
@@ -482,13 +567,13 @@ export default function CollectionManager({
             </div>
 
             {/* Drawer Footer */}
-            <div className="pt-4 border-t border-gray-100 flex items-center justify-between">
-              <span className="text-xs text-gray-500 font-normal">
+            <div className="pt-4 border-t border-[#E8E8E3] flex items-center justify-between">
+              <span className="text-xs text-[#6E6E69] font-normal">
                 {selectedCollectionForArtworks.artwork_count || 0} artworks in this collection
               </span>
               <button
                 onClick={() => setSelectedCollectionForArtworks(null)}
-                className="px-6 py-2.5 bg-[#181A1F] text-white rounded-full text-xs font-normal hover:bg-black transition-all cursor-pointer"
+                className="px-6 py-2.5 bg-black text-white rounded-full text-xs font-medium hover:bg-gray-800 transition-all cursor-pointer"
               >
                 Done
               </button>

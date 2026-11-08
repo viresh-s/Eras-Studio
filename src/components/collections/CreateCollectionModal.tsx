@@ -83,7 +83,7 @@ export default function CreateCollectionModal({
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-3xl border border-gray-200 shadow-2xl w-full max-w-lg p-6 sm:p-8 relative"
+        className="bg-white rounded-3xl border border-[#E8E8E3] shadow-2xl w-full max-w-lg p-6 sm:p-8 relative"
         style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -91,7 +91,7 @@ export default function CreateCollectionModal({
         <button
           onClick={onClose}
           disabled={isSubmitting}
-          className="absolute top-5 right-5 text-gray-400 hover:text-gray-700 transition-colors cursor-pointer p-1 rounded-full hover:bg-gray-100"
+          className="absolute top-5 right-5 text-[#6E6E69] hover:text-[#141413] transition-colors cursor-pointer p-1.5 rounded-full hover:bg-gray-100"
         >
           <X size={18} />
         </button>
@@ -99,12 +99,12 @@ export default function CreateCollectionModal({
         {/* Modal Header */}
         <div className="mb-6">
           <h2
-            className="text-2xl font-serif italic font-semibold text-gray-900 tracking-tight"
-            style={{ fontFamily: "'Century Schoolbook', Century, 'TeX Gyre Schola', Georgia, serif", fontStyle: 'italic' }}
+            className="text-xl sm:text-2xl font-semibold text-[#141413] tracking-normal"
+            style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
           >
             {collectionToEdit ? 'Edit Collection' : 'Create New Collection'}
           </h2>
-          <p className="text-xs text-gray-500 font-normal mt-1">
+          <p className="text-xs sm:text-[13px] text-[#6E6E69] font-normal mt-1">
             Curate a series or theme of artworks to present together on your portfolio and public profile.
           </p>
         </div>
@@ -117,7 +117,7 @@ export default function CreateCollectionModal({
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
-            <label className="block text-xs font-normal text-gray-700 mb-1.5">
+            <label className="block text-xs font-medium text-[#141413] mb-1.5">
               Collection Title <span className="text-red-500">*</span>
             </label>
             <input
@@ -127,12 +127,12 @@ export default function CreateCollectionModal({
               placeholder="e.g. Monsoon Studies, Urban Silence, Solitude"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#2356FF] focus:ring-1 focus:ring-[#2356FF] transition-all font-normal"
+              className="w-full text-xs sm:text-sm px-3.5 py-2.5 rounded-xl border border-[#E8E8E3] bg-white text-[#141413] placeholder:text-[#6E6E69] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all font-normal"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-normal text-gray-700 mb-1.5">
+            <label className="block text-xs font-medium text-[#141413] mb-1.5">
               Curatorial Statement / Description (Optional)
             </label>
             <textarea
@@ -140,26 +140,26 @@ export default function CreateCollectionModal({
               placeholder="Describe the conceptual background, inspiration, or narrative connecting the works in this series..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#2356FF] focus:ring-1 focus:ring-[#2356FF] transition-all font-normal resize-none"
+              className="w-full text-xs sm:text-sm px-3.5 py-2.5 rounded-xl border border-[#E8E8E3] bg-white text-[#141413] placeholder:text-[#6E6E69] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all font-normal resize-none"
             />
           </div>
 
-          <div className="flex items-center justify-end gap-3 mt-4 pt-4 border-t border-gray-100">
+          <div className="flex items-center justify-end gap-3 mt-4 pt-4 border-t border-[#E8E8E3]">
             <button
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="px-5 py-2.5 text-xs font-normal text-gray-600 hover:text-gray-900 rounded-full hover:bg-gray-100 transition-colors cursor-pointer"
+              className="px-5 py-2.5 text-xs font-medium text-[#6E6E69] hover:text-[#141413] rounded-full hover:bg-gray-100 transition-colors cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting || !title.trim()}
-              className="px-6 py-2.5 bg-[#181A1F] text-white rounded-full text-xs font-normal hover:bg-black transition-all flex items-center gap-2 disabled:opacity-50 cursor-pointer shadow-xs select-none"
+              className="px-6 py-2.5 bg-black text-white rounded-full text-xs font-medium hover:bg-gray-800 transition-all flex items-center gap-2 disabled:opacity-50 cursor-pointer shadow-xs select-none"
             >
               {isSubmitting ? (
-                <Loader2 size={14} className="animate-spin" />
+                <Loader2 size={14} className="animate-spin text-white" />
               ) : (
                 <Sparkles size={14} />
               )}

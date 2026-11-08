@@ -15,14 +15,18 @@ import {
   Plus,
   Loader2,
   Image as ImageIcon,
+  Folder,
+  Layers,
 } from 'lucide-react';
 import RestrictedUploadAction from '@/app/(dashboard)/portfolio/components/RestrictedUploadAction';
 import { updateArtwork, deleteArtwork } from '@/actions/artworkActions';
+import { CollectionItem, deleteCollection } from '@/actions/collectionActions';
 import { PROTECTED_CONTAINER_CLASS, PROTECTED_IMAGE_CLASS } from '@/lib/media/assetProtection';
 import type { Profile, Artwork } from '@/types/database';
 
 interface PortfolioClientProps {
   initialArtworks: Artwork[];
+  initialCollections?: CollectionItem[];
   profile: Profile | null;
   collectionsCount: number;
   chatCount: number;
@@ -35,6 +39,7 @@ interface PortfolioClientProps {
 
 export default function PortfolioClient({
   initialArtworks,
+  initialCollections = [],
   profile,
   collectionsCount,
   chatCount,
@@ -46,6 +51,7 @@ export default function PortfolioClient({
 }: PortfolioClientProps) {
   const router = useRouter();
   const [artworks, setArtworks] = useState<Artwork[]>(initialArtworks);
+  const [collectionsList, setCollectionsList] = useState<CollectionItem[]>(initialCollections);
   const [activeTab, setActiveTab] = useState<'artworks' | 'collections' | 'archived'>('artworks');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
@@ -110,13 +116,50 @@ export default function PortfolioClient({
     return list;
   }, [artworks, activeTab, searchQuery, statusFilter, sortOrder]);
 
-  const totalPages = Math.max(1, Math.ceil(filteredArtworks.length / PAGE_SIZE));
+  // Filter & Sort Collections
+  const filteredCollections = useMemo(() => {
+    let list = [...collectionsList];
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      list = list.filter(
+        (c) =>
+          c.title.toLowerCase().includes(q) ||
+          (c.description || '').toLowerCase().includes(q)
+      );
+    }
+
+    list.sort((a, b) => {
+      if (sortOrder === 'recent') {
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      }
+      if (sortOrder === 'oldest') {
+        return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+      }
+      if (sortOrder === 'title_asc') {
+        return a.title.localeCompare(b.title);
+      }
+      return 0;
+    });
+
+    return list;
+  }, [collectionsList, searchQuery, sortOrder]);
+
+  const activeTotalItems =
+    activeTab === 'collections' ? filteredCollections.length : filteredArtworks.length;
+  const totalPages = Math.max(1, Math.ceil(activeTotalItems / PAGE_SIZE));
+
   const paginatedArtworks = useMemo(() => {
     const start = (currentPage - 1) * PAGE_SIZE;
     return filteredArtworks.slice(start, start + PAGE_SIZE);
   }, [filteredArtworks, currentPage]);
 
-  // Keep currentPage within bounds when filteredArtworks or totalPages change
+  const paginatedCollections = useMemo(() => {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return filteredCollections.slice(start, start + PAGE_SIZE);
+  }, [filteredCollections, currentPage]);
+
+  // Keep currentPage within bounds when items or totalPages change
   useEffect(() => {
     if (currentPage > totalPages) {
       setCurrentPage(totalPages);
@@ -143,8 +186,29 @@ export default function PortfolioClient({
   const handleTabChange = (tab: 'artworks' | 'collections' | 'archived') => {
     setActiveTab(tab);
     setCurrentPage(1);
-    if (tab === 'collections') {
-      router.push('/portfolio/collections');
+    setSearchQuery('');
+  };
+
+  // Delete Collection
+  const handleDeleteCollection = async (col: CollectionItem) => {
+    if (
+      !window.confirm(
+        `Are you sure you want to delete the collection "${col.title}"? Your artworks will remain intact and will simply be unassigned from this collection.`
+      )
+    ) {
+      return;
+    }
+
+    try {
+      setIsDeletingId(col.id);
+      setCollectionsList((prev) => prev.filter((c) => c.id !== col.id));
+      await deleteCollection(col.id);
+      router.refresh();
+    } catch (err) {
+      console.error('Failed to delete collection:', err);
+      alert('Failed to delete collection.');
+    } finally {
+      setIsDeletingId(null);
     }
   };
 
@@ -367,7 +431,7 @@ export default function PortfolioClient({
                   activeTab === 'collections' ? 'text-[#1345EE]' : 'text-[#62636B]'
                 }`}
               >
-                {collectionsCount}
+                {collectionsList.length}
               </span>
               {activeTab === 'collections' && (
                 <div
@@ -430,7 +494,7 @@ export default function PortfolioClient({
                   setSearchQuery(e.target.value);
                   setCurrentPage(1);
                 }}
-                placeholder="Search artworks"
+                placeholder={activeTab === 'collections' ? 'Search collections' : 'Search artworks'}
                 className="w-full bg-transparent text-xs sm:text-sm text-[#141413] placeholder-[#6E6E69] outline-none font-normal"
                 style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
               />
@@ -438,31 +502,33 @@ export default function PortfolioClient({
 
             {/* Filter Dropdowns & Manage Collections Link */}
             <div className="flex flex-wrap items-center gap-3 sm:gap-4">
-              {/* All Status Dropdown */}
-              <div className="relative">
-                <select
-                  value={statusFilter}
-                  onChange={(e) => {
-                    setStatusFilter(e.target.value);
-                    setCurrentPage(1);
-                  }}
-                  className="appearance-none bg-white border border-[#E3E3E7] pl-3.5 pr-8 py-2.5 text-xs sm:text-sm font-normal text-[#141413] outline-none cursor-pointer shadow-2xs hover:border-gray-400 transition-colors"
-                  style={{
-                    borderRadius: 4,
-                    fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
-                  }}
-                >
-                  <option value="All">All status</option>
-                  <option value="Available">Available</option>
-                  <option value="For Sale">For Sale</option>
-                  <option value="Not for sale">Not for sale</option>
-                  <option value="Sold">Sold</option>
-                </select>
-                <ChevronDown
-                  size={14}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#6E6E69] pointer-events-none"
-                />
-              </div>
+              {/* All Status Dropdown (Artworks only) */}
+              {activeTab !== 'collections' && (
+                <div className="relative">
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => {
+                      setStatusFilter(e.target.value);
+                      setCurrentPage(1);
+                    }}
+                    className="appearance-none bg-white border border-[#E3E3E7] pl-3.5 pr-8 py-2.5 text-xs sm:text-sm font-normal text-[#141413] outline-none cursor-pointer shadow-2xs hover:border-gray-400 transition-colors"
+                    style={{
+                      borderRadius: 4,
+                      fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
+                    }}
+                  >
+                    <option value="All">All status</option>
+                    <option value="Available">Available</option>
+                    <option value="For Sale">For Sale</option>
+                    <option value="Not for sale">Not for sale</option>
+                    <option value="Sold">Sold</option>
+                  </select>
+                  <ChevronDown
+                    size={14}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#6E6E69] pointer-events-none"
+                  />
+                </div>
+              )}
 
               {/* Sort Order Dropdown */}
               <div className="relative">
@@ -481,8 +547,12 @@ export default function PortfolioClient({
                   <option value="recent">Recent first</option>
                   <option value="oldest">Oldest first</option>
                   <option value="title_asc">Title A-Z</option>
-                  <option value="price_desc">Price: High to Low</option>
-                  <option value="price_asc">Price: Low to High</option>
+                  {activeTab !== 'collections' && (
+                    <>
+                      <option value="price_desc">Price: High to Low</option>
+                      <option value="price_asc">Price: Low to High</option>
+                    </>
+                  )}
                 </select>
                 <ChevronDown
                   size={14}
@@ -502,8 +572,173 @@ export default function PortfolioClient({
             </div>
           </div>
 
-          {/* 3-Column Artwork Cards Grid */}
-          {filteredArtworks.length > 0 ? (
+          {/* ======================================================== */}
+          {/* TAB CONTENT: COLLECTIONS VS ARTWORKS                      */}
+          {/* ======================================================== */}
+          {activeTab === 'collections' ? (
+            /* 3-Column Collections Grid */
+            filteredCollections.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                {paginatedCollections.map((col) => {
+                  return (
+                    <div
+                      key={col.id}
+                      className="bg-white border border-[#E8E8E3] overflow-hidden flex flex-col justify-between shadow-2xs hover:shadow-md transition-shadow group select-none"
+                      style={{ borderRadius: 14 }}
+                    >
+                      {/* Collection Cover Image */}
+                      <Link
+                        href="/portfolio/collections"
+                        className="block relative w-full aspect-[16/10.5] bg-gray-100 overflow-hidden cursor-pointer"
+                      >
+                        {col.cover_image_url ? (
+                          <img
+                            src={col.cover_image_url}
+                            alt={col.title}
+                            className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500 ease-out select-none pointer-events-none"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-[#FAFAF8] to-[#ECEAE5] text-[#6E6E69] gap-2">
+                            <Folder size={36} className="opacity-40 text-[#6E6E69]" />
+                            <span className="text-[12px] font-normal text-[#6E6E69]">Curated Collection</span>
+                          </div>
+                        )}
+                        <div className="absolute inset-0 z-[1]" />
+                        {col.is_published === false && (
+                          <span className="absolute top-3 left-3 px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-amber-100 text-amber-800 z-[2] shadow-2xs">
+                            Draft
+                          </span>
+                        )}
+
+                        {/* Artwork Count Badge */}
+                        <div className="absolute bottom-3 left-3 bg-black/70 backdrop-blur-xs text-white text-[11px] font-medium px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-2xs z-[2]">
+                          <Layers size={12} />
+                          <span>
+                            {col.artwork_count || 0} {col.artwork_count === 1 ? 'Artwork' : 'Artworks'}
+                          </span>
+                        </div>
+                      </Link>
+
+                      {/* Collection Details Body */}
+                      <div className="p-4 sm:p-5 flex flex-col gap-3">
+                        {/* Row 1: Title & Year */}
+                        <div className="flex items-center justify-between gap-2">
+                          <Link href="/portfolio/collections" className="min-w-0">
+                            <h3
+                              className="text-[16px] sm:text-[17px] font-medium text-[#141413] truncate hover:text-[#1345EE] transition-colors"
+                              style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+                            >
+                              {col.title}
+                            </h3>
+                          </Link>
+                          <span
+                            className="text-[11px] sm:text-xs text-[#6E6E69] font-normal shrink-0"
+                            style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+                          >
+                            {col.created_at ? new Date(col.created_at).getFullYear() : 2025}
+                          </span>
+                        </div>
+
+                        {/* Row 2: Creator Name · Type */}
+                        <div
+                          className="flex items-center gap-1.5 text-[11px] sm:text-xs text-[#6E6E69] font-normal truncate"
+                          style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+                        >
+                          <span className="truncate">{displayName}</span>
+                          <span className="text-[#E8E8E3]">·</span>
+                          <span className="truncate">Collection</span>
+                        </div>
+
+                        {/* Row 3: Description / Statement */}
+                        <p
+                          className="text-[11px] sm:text-xs text-[#6E6E69] line-clamp-1 truncate"
+                          style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+                        >
+                          {col.description || `${col.artwork_count || 0} curated works in this series`}
+                        </p>
+
+                        {/* Divider Line */}
+                        <div className="h-[1px] bg-[#E8E8E3] w-full my-0.5" />
+
+                        {/* Row 4: Action Footer (Edit + Manage on Left, Delete on Right) */}
+                        <div className="flex items-center justify-between pt-0.5">
+                          {/* Left Group */}
+                          <div className="flex items-center gap-2">
+                            {/* Edit on Collections Page */}
+                            <Link
+                              href="/portfolio/collections"
+                              className="w-8 h-9 sm:w-[32px] sm:h-[34px] bg-white border border-[#E8E8E3] flex items-center justify-center text-[#6E6E69] hover:text-[#141413] hover:border-gray-400 transition-colors shadow-2xs"
+                              style={{ borderRadius: 8 }}
+                              title="Edit collection"
+                            >
+                              <Pencil size={14} className="text-[#6E6E69]" />
+                            </Link>
+
+                            {/* Manage Artworks Pill */}
+                            <Link
+                              href="/portfolio/collections"
+                              className="h-9 sm:h-[34px] px-3.5 sm:px-4 rounded-full bg-[#FAF5EC] border border-[#EACEC0] text-[#865E16] text-[11px] sm:text-xs font-medium hover:bg-[#F5EADB] transition-colors cursor-pointer select-none flex items-center justify-center"
+                              style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+                            >
+                              Manage Artworks
+                            </Link>
+                          </div>
+
+                          {/* Right Group: Delete Button */}
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteCollection(col)}
+                            disabled={isDeletingId === col.id}
+                            className="w-8 h-9 sm:w-[32px] sm:h-[34px] bg-white border border-[#E8E8E3] flex items-center justify-center text-[#6E6E69] hover:text-red-600 hover:border-red-200 transition-colors shadow-2xs cursor-pointer ml-auto"
+                            style={{ borderRadius: 8 }}
+                            title="Delete collection"
+                          >
+                            {isDeletingId === col.id ? (
+                              <Loader2 size={14} className="animate-spin text-red-500" />
+                            ) : (
+                              <Trash2 size={14} />
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              /* Collections Empty State */
+              <div className="bg-white rounded-3xl border border-[#E8E8E3] p-12 sm:p-16 text-center max-w-xl mx-auto shadow-xs">
+                <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-4 text-gray-500">
+                  <Folder size={26} />
+                </div>
+                <h3 className="text-lg font-semibold text-[#141413] mb-2">
+                  {searchQuery ? 'No matching collections' : 'No collections yet'}
+                </h3>
+                <p className="text-xs sm:text-sm text-[#6E6E69] max-w-md mx-auto mb-6">
+                  {searchQuery
+                    ? 'Try clearing your search query or check back later.'
+                    : 'Organize and curate your artworks into thematic series or exhibition drops.'}
+                </p>
+                <Link
+                  href="/portfolio/collections"
+                  style={{
+                    position: 'relative',
+                    background: 'linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%)',
+                    boxShadow:
+                      '0px 7px 22px rgba(35, 77, 255, 0.13), 0px 3px 3px rgba(255, 255, 255, 0.65) inset, 0px -3px 6px rgba(6, 42, 137, 0.33) inset',
+                    overflow: 'hidden',
+                    borderRadius: 40,
+                    outline: '2px #2356FF solid',
+                    outlineOffset: '-2px',
+                  }}
+                  className="px-6 py-2.5 inline-flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 hover:brightness-110 active:scale-[0.98] select-none text-white text-xs font-medium shadow-md"
+                >
+                  <Plus size={14} />
+                  <span>Create Collection</span>
+                </Link>
+              </div>
+            )
+          ) : filteredArtworks.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
               {paginatedArtworks.map((artwork) => {
                   const isArchived = !artwork.is_published || artwork.status === 'Not for sale';
@@ -654,7 +889,7 @@ export default function PortfolioClient({
           )}
 
           {/* Pagination Controls */}
-          {filteredArtworks.length > 0 && (
+          {activeTotalItems > 0 && (
             <div className="flex items-center justify-center gap-3 pt-12 pb-4 select-none">
               {/* Prev Button */}
               <button
