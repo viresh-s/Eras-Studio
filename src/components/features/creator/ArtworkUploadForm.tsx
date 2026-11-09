@@ -80,10 +80,9 @@ const uploadSchema = z.object({
     .refine(
       (val) => {
         if (!val || val.trim() === '') return true;
-        const num = Number(val);
-        return !isNaN(num) && num > 0;
+        return /^[1-9]\d*$/.test(val.trim());
       },
-      { message: 'Width must be a positive number' }
+      { message: 'Width must be a positive integer' }
     ),
   height: z
     .string()
@@ -91,10 +90,9 @@ const uploadSchema = z.object({
     .refine(
       (val) => {
         if (!val || val.trim() === '') return true;
-        const num = Number(val);
-        return !isNaN(num) && num > 0;
+        return /^[1-9]\d*$/.test(val.trim());
       },
-      { message: 'Height must be a positive number' }
+      { message: 'Height must be a positive integer' }
     ),
   location: z.string().optional(),
   style: z.string().optional(),
@@ -111,7 +109,7 @@ const uploadSchema = z.object({
         return num !== null && num > 0 && num <= MAX_PRICE_INR;
       },
       {
-        message: `Price cannot exceed ${MAX_PRICE_INR_FORMATTED}`,
+        message: `Price must be a positive integer up to ${MAX_PRICE_INR_FORMATTED}`,
       }
     ),
   priceVisibility: z.enum(['Show Price', 'Price on Request', 'Hide Price']),
@@ -222,6 +220,7 @@ export default function ArtworkUploadForm({
   const watchedHeight = watch('height');
   const watchedDimensionUnit = watch('dimensionUnit');
   const watchedPriceVisibility = watch('priceVisibility');
+  const watchedPrice = watch('price');
 
   const activeUnitSymbol = getUnitSymbol(watchedDimensionUnit) || 'in';
 
@@ -1461,11 +1460,21 @@ export default function ArtworkUploadForm({
                     </label>
                     <input
                       id="artwork-field-width"
-                      type="number"
-                      step={activeUnitSymbol === 'px' ? '1' : 'any'}
-                      {...register('width')}
-                      onFocus={() => clearErrors('width')}
+                      type="text"
+                      inputMode="numeric"
+                      value={watchedWidth || ''}
                       placeholder="e.g. 24"
+                      onFocus={() => clearErrors('width')}
+                      onKeyDown={(e) => {
+                        if (['-', '+', 'e', 'E', '.', ','].includes(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
+                      onChange={(e) => {
+                        const clean = e.target.value.replace(/\D/g, '').replace(/^0+/, '');
+                        setValue('width', clean);
+                        if (clean) clearErrors('width');
+                      }}
                       className={`w-full px-4 py-3 rounded-2xl text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] font-normal shadow-2xs outline-none focus:outline-none ${
                         errors.width
                           ? 'input-error-border'
@@ -1480,11 +1489,21 @@ export default function ArtworkUploadForm({
                     </label>
                     <input
                       id="artwork-field-height"
-                      type="number"
-                      step={activeUnitSymbol === 'px' ? '1' : 'any'}
-                      {...register('height')}
-                      onFocus={() => clearErrors('height')}
+                      type="text"
+                      inputMode="numeric"
+                      value={watchedHeight || ''}
                       placeholder="e.g. 18"
+                      onFocus={() => clearErrors('height')}
+                      onKeyDown={(e) => {
+                        if (['-', '+', 'e', 'E', '.', ','].includes(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
+                      onChange={(e) => {
+                        const clean = e.target.value.replace(/\D/g, '').replace(/^0+/, '');
+                        setValue('height', clean);
+                        if (clean) clearErrors('height');
+                      }}
                       className={`w-full px-4 py-3 rounded-2xl text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] font-normal shadow-2xs outline-none focus:outline-none ${
                         errors.height
                           ? 'input-error-border'
@@ -1846,9 +1865,25 @@ export default function ArtworkUploadForm({
                   <input
                     id="artwork-field-price"
                     type="text"
-                    {...register('price')}
-                    onFocus={() => clearErrors('price')}
+                    inputMode="numeric"
+                    value={watchedPrice || ''}
                     placeholder="e.g. 45,000"
+                    onFocus={() => clearErrors('price')}
+                    onKeyDown={(e) => {
+                      if (['-', '+', 'e', 'E', '.', ','].includes(e.key)) {
+                        e.preventDefault();
+                      }
+                    }}
+                    onChange={(e) => {
+                      const rawDigits = e.target.value.replace(/\D/g, '').replace(/^0+/, '');
+                      if (!rawDigits) {
+                        setValue('price', '');
+                        return;
+                      }
+                      const formatted = formatIndianCurrency(rawDigits);
+                      setValue('price', formatted);
+                      clearErrors('price');
+                    }}
                     className={`w-full px-4 py-3 rounded-2xl text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] font-normal shadow-2xs outline-none focus:outline-none ${
                       errors.price
                         ? 'input-error-border'
@@ -1856,7 +1891,7 @@ export default function ArtworkUploadForm({
                     }`}
                   />
                   <p className="text-[11px] text-[#6E6E69] mt-1.5">
-                    Max amount: 1,00,00,000
+                    Max amount: {MAX_PRICE_INR_FORMATTED}
                   </p>
                 </div>
               </div>

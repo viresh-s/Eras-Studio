@@ -84,10 +84,9 @@ const editSchema = z.object({
     .refine(
       (val) => {
         if (!val || val.trim() === '') return true;
-        const num = Number(val);
-        return !isNaN(num) && num > 0;
+        return /^[1-9]\d*$/.test(val.trim());
       },
-      { message: 'Width must be a positive number' }
+      { message: 'Width must be a positive integer' }
     ),
   height: z
     .string()
@@ -95,10 +94,9 @@ const editSchema = z.object({
     .refine(
       (val) => {
         if (!val || val.trim() === '') return true;
-        const num = Number(val);
-        return !isNaN(num) && num > 0;
+        return /^[1-9]\d*$/.test(val.trim());
       },
-      { message: 'Height must be a positive number' }
+      { message: 'Height must be a positive integer' }
     ),
   location: z.string().optional(),
   style: z.string().optional(),
@@ -116,7 +114,7 @@ const editSchema = z.object({
         return num !== null && num > 0 && num <= MAX_PRICE_INR;
       },
       {
-        message: `Price must be positive and cannot exceed ${MAX_PRICE_INR_FORMATTED}`,
+        message: `Price must be a positive integer up to ${MAX_PRICE_INR_FORMATTED}`,
       }
     ),
   priceVisibility: z.enum(['Show Price', 'Price on Request', 'Hide Price']),
@@ -685,12 +683,12 @@ export default function ArtworkEditForm({ userId, artwork }: ArtworkEditFormProp
               <div className="flex items-center gap-3">
                 <input
                   type="number"
-                  step={selectedDimensionUnit === 'px' ? '1' : '0.1'}
-                  min={selectedDimensionUnit === 'px' ? '1' : '0.1'}
+                  step="1"
+                  min="1"
                   placeholder={selectedDimensionUnit ? `W (${selectedDimensionUnit})` : 'Select unit first'}
                   disabled={!selectedDimensionUnit}
                   onKeyDown={(e) => {
-                    if (e.key === '-' || e.key === 'e' || e.key === 'E') {
+                    if (['-', '+', 'e', 'E', '.', ','].includes(e.key)) {
                       e.preventDefault();
                     }
                   }}
@@ -706,12 +704,12 @@ export default function ArtworkEditForm({ userId, artwork }: ArtworkEditFormProp
                 <span className={`text-[10px] ${!selectedDimensionUnit ? 'text-gray-300' : 'text-gray-400'}`}>✕</span>
                 <input
                   type="number"
-                  step={selectedDimensionUnit === 'px' ? '1' : '0.1'}
-                  min={selectedDimensionUnit === 'px' ? '1' : '0.1'}
+                  step="1"
+                  min="1"
                   placeholder={selectedDimensionUnit ? `H (${selectedDimensionUnit})` : 'Select unit first'}
                   disabled={!selectedDimensionUnit}
                   onKeyDown={(e) => {
-                    if (e.key === '-' || e.key === 'e' || e.key === 'E') {
+                    if (['-', '+', 'e', 'E', '.', ','].includes(e.key)) {
                       e.preventDefault();
                     }
                   }}
@@ -813,7 +811,7 @@ export default function ArtworkEditForm({ userId, artwork }: ArtworkEditFormProp
                   field.onChange(formatted);
                 }}
                 onKeyDown={(e) => {
-                  if (e.key === '-' || e.key === '+' || e.key === 'e' || e.key === 'E') {
+                  if (['-', '+', 'e', 'E', '.', ','].includes(e.key)) {
                     e.preventDefault();
                   }
                 }}
