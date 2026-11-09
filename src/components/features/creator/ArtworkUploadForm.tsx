@@ -618,6 +618,20 @@ export default function ArtworkUploadForm({
     submitArtwork(data, true);
   };
 
+  const onInvalid = (formErrors: any) => {
+    const fieldOrder = ['title', 'artistName', 'artType', 'width', 'height', 'price'];
+    const firstErrorField = fieldOrder.find((field) => formErrors[field]);
+    if (firstErrorField) {
+      const el = document.getElementById(`artwork-field-${firstErrorField}`);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(() => {
+          el.focus();
+        }, 150);
+      }
+    }
+  };
+
   const handleSaveDraft = () => {
     if (selectedFiles.length === 0) {
       setError('Please upload at least one image before saving a draft.');
@@ -1203,14 +1217,16 @@ export default function ArtworkUploadForm({
                       Title *
                     </label>
                     <input
+                      id="artwork-field-title"
                       type="text"
                       {...register('title')}
                       placeholder="e.g. The Broken Illusion"
-                      className="w-full px-4 py-3 rounded-2xl border border-[#E8E8E3] bg-white text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all font-normal shadow-2xs"
+                      className={`w-full px-4 py-3 rounded-2xl bg-white text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] focus:outline-none transition-all font-normal shadow-2xs ${
+                        errors.title
+                          ? 'border-2 border-red-500 ring-2 ring-red-500/20'
+                          : 'border border-[#E8E8E3] focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE]'
+                      }`}
                     />
-                    {errors.title && (
-                      <p className="text-[11px] text-red-500 mt-1">{errors.title.message}</p>
-                    )}
                   </div>
 
                   <div>
@@ -1218,14 +1234,16 @@ export default function ArtworkUploadForm({
                       Artist Name *
                     </label>
                     <input
+                      id="artwork-field-artistName"
                       type="text"
                       {...register('artistName')}
                       placeholder="e.g. Rishi Mailoorkar"
-                      className="w-full px-4 py-3 rounded-2xl border border-[#E8E8E3] bg-white text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all font-normal shadow-2xs"
+                      className={`w-full px-4 py-3 rounded-2xl bg-white text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] focus:outline-none transition-all font-normal shadow-2xs ${
+                        errors.artistName
+                          ? 'border-2 border-red-500 ring-2 ring-red-500/20'
+                          : 'border border-[#E8E8E3] focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE]'
+                      }`}
                     />
-                    {errors.artistName && (
-                      <p className="text-[11px] text-red-500 mt-1">{errors.artistName.message}</p>
-                    )}
                   </div>
                 </div>
 
@@ -1239,6 +1257,7 @@ export default function ArtworkUploadForm({
                       {!isCustomMedium ? (
                         <>
                           <select
+                            id="artwork-field-artType"
                             {...register('artType')}
                             onChange={(e) => {
                               const val = e.target.value;
@@ -1250,7 +1269,11 @@ export default function ArtworkUploadForm({
                                 register('artType').onChange(e);
                               }
                             }}
-                            className="w-full appearance-none px-4 py-3 rounded-2xl border border-[#E8E8E3] bg-white text-xs sm:text-sm text-[#141413] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all font-normal cursor-pointer shadow-2xs pr-10"
+                            className={`w-full appearance-none px-4 py-3 rounded-2xl bg-white text-xs sm:text-sm text-[#141413] focus:outline-none transition-all font-normal cursor-pointer shadow-2xs pr-10 ${
+                              errors.artType
+                                ? 'border-2 border-red-500 ring-2 ring-red-500/20'
+                                : 'border border-[#E8E8E3] focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE]'
+                            }`}
                           >
                             <option value="">Select medium</option>
                             {mediumOptions.map((opt) => (
@@ -1267,6 +1290,7 @@ export default function ArtworkUploadForm({
                       ) : (
                         <div className="relative flex items-center">
                           <input
+                            id="artwork-field-artType"
                             type="text"
                             autoFocus
                             placeholder="Type custom medium..."
@@ -1285,7 +1309,11 @@ export default function ArtworkUploadForm({
                               }
                             }}
                             onBlur={handleCommitCustomMedium}
-                            className="w-full px-4 py-3 rounded-2xl border border-[#1345EE] bg-white text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all font-normal shadow-2xs pr-16"
+                            className={`w-full px-4 py-3 rounded-2xl bg-white text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] focus:outline-none transition-all font-normal shadow-2xs pr-16 ${
+                              errors.artType
+                                ? 'border-2 border-red-500 ring-2 ring-red-500/20'
+                                : 'border border-[#1345EE] focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE]'
+                            }`}
                           />
                           <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1">
                             {customMediumInput.trim() && (
@@ -1310,9 +1338,6 @@ export default function ArtworkUploadForm({
                         </div>
                       )}
                     </div>
-                    {errors.artType && (
-                      <p className="text-[11px] text-red-500 mt-1">{errors.artType.message}</p>
-                    )}
                   </div>
 
                   <div>
@@ -1357,11 +1382,16 @@ export default function ArtworkUploadForm({
                       Dimensions · Width (in)
                     </label>
                     <input
+                      id="artwork-field-width"
                       type="number"
                       step="any"
                       {...register('width')}
                       placeholder="e.g. 24"
-                      className="w-full px-4 py-3 rounded-2xl border border-[#E8E8E3] bg-white text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all font-normal shadow-2xs"
+                      className={`w-full px-4 py-3 rounded-2xl bg-white text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] focus:outline-none transition-all font-normal shadow-2xs ${
+                        errors.width
+                          ? 'border-2 border-red-500 ring-2 ring-red-500/20'
+                          : 'border border-[#E8E8E3] focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE]'
+                      }`}
                     />
                   </div>
 
@@ -1370,11 +1400,16 @@ export default function ArtworkUploadForm({
                       Dimensions · Height (in)
                     </label>
                     <input
+                      id="artwork-field-height"
                       type="number"
                       step="any"
                       {...register('height')}
                       placeholder="e.g. 18"
-                      className="w-full px-4 py-3 rounded-2xl border border-[#E8E8E3] bg-white text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all font-normal shadow-2xs"
+                      className={`w-full px-4 py-3 rounded-2xl bg-white text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] focus:outline-none transition-all font-normal shadow-2xs ${
+                        errors.height
+                          ? 'border-2 border-red-500 ring-2 ring-red-500/20'
+                          : 'border border-[#E8E8E3] focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE]'
+                      }`}
                     />
                   </div>
                 </div>
@@ -1698,14 +1733,16 @@ export default function ArtworkUploadForm({
                     Price
                   </label>
                   <input
+                    id="artwork-field-price"
                     type="text"
                     {...register('price')}
                     placeholder="e.g. 45,000"
-                    className="w-full px-4 py-3 rounded-2xl border border-[#E8E8E3] bg-white text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all font-normal shadow-2xs"
+                    className={`w-full px-4 py-3 rounded-2xl bg-white text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] focus:outline-none transition-all font-normal shadow-2xs ${
+                      errors.price
+                        ? 'border-2 border-red-500 ring-2 ring-red-500/20'
+                        : 'border border-[#E8E8E3] focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE]'
+                    }`}
                   />
-                  {errors.price && (
-                    <p className="text-[11px] text-red-500 mt-1">{errors.price.message}</p>
-                  )}
                   <p className="text-[11px] text-[#6E6E69] mt-1.5">
                     Max amount: 1,00,00,000
                   </p>
@@ -1790,7 +1827,7 @@ export default function ArtworkUploadForm({
 
                 <button
                   type="button"
-                  onClick={handleSubmit(onPublishSubmit)}
+                  onClick={handleSubmit(onPublishSubmit, onInvalid)}
                   disabled={isLoading}
                   className="px-6 sm:px-8 py-2.5 sm:py-3 rounded-full bg-[#1345EE] text-white text-xs sm:text-sm font-medium hover:bg-blue-700 transition-colors flex items-center gap-2 disabled:opacity-50 shadow-sm cursor-pointer select-none"
                 >
