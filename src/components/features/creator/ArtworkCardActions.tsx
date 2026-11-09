@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { updateArtwork, deleteArtwork } from '@/actions/artworkActions';
 import { getCreatorCollections, assignArtworkToCollection } from '@/actions/collectionActions';
+import { DeleteConfirmModal } from '@/components/ui/DeleteConfirmModal';
 import { ChevronDown, Loader2, Check } from 'lucide-react';
 
 interface ArtworkCardActionsProps {
@@ -28,6 +29,7 @@ export default function ArtworkCardActions({ artwork, userId }: ArtworkCardActio
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   // Optimistic local state for immediate responsiveness (0ms perceptual lag)
   const [selectedStatus, setSelectedStatus] = useState(artwork.status || 'Available');
@@ -71,27 +73,26 @@ export default function ArtworkCardActions({ artwork, userId }: ArtworkCardActio
       router.refresh();
     } catch (error) {
       console.error('Failed to update publish state', error);
-      alert('Failed to update artwork');
     } finally {
       setIsPublishing(false);
     }
   };
 
-  const handleDelete = async (e: React.MouseEvent) => {
+  const handleDeleteClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
-    if (!window.confirm('Are you sure you want to delete this artwork? This will also delete any chats associated with it.')) {
-      return;
-    }
+    setIsDeleteModalOpen(true);
+  };
 
+  const handleConfirmDelete = async () => {
     try {
       setIsDeleting(true);
       await deleteArtwork(artwork.id, userId);
       router.refresh();
+      setIsDeleteModalOpen(false);
     } catch (error) {
       console.error('Failed to delete artwork', error);
-      alert('Failed to delete artwork');
+    } finally {
       setIsDeleting(false);
     }
   };
@@ -161,7 +162,7 @@ export default function ArtworkCardActions({ artwork, userId }: ArtworkCardActio
           {isPublishing ? <Loader2 size={12} className="animate-spin inline" /> : (artwork.is_published === false ? 'Publish' : 'Archive')}
         </button>
         <button
-          onClick={handleDelete}
+          onClick={handleDeleteClick}
           disabled={isDeleting || isPublishing}
           className="flex-1 py-1.5 px-3 bg-white border border-gray-200 text-gray-700 rounded-full text-xs font-semibold hover:bg-red-50 hover:text-red-600 hover:border-red-100 transition-colors flex justify-center items-center"
         >
@@ -216,6 +217,16 @@ export default function ArtworkCardActions({ artwork, userId }: ArtworkCardActio
         </div>
       </div>
 
+      {/* Custom Delete Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => !isDeleting && setIsDeleteModalOpen(false)}
+        onConfirm={handleConfirmDelete}
+        isLoading={isDeleting}
+        title="Delete artwork?"
+        description="Are you sure you want to delete this artwork? This will also remove any conversations associated with it."
+        confirmLabel="Delete artwork"
+      />
     </div>
   );
 }

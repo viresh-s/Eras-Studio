@@ -24,6 +24,7 @@ import {
   getCreatorCollections,
 } from '@/actions/collectionActions';
 import CreateCollectionModal from './CreateCollectionModal';
+import { DeleteConfirmModal } from '@/components/ui/DeleteConfirmModal';
 import { createClient } from '@/lib/supabase/client';
 
 interface ArtworkSimple {
@@ -57,6 +58,10 @@ export default function CollectionManager({
   const [creatorArtworks, setCreatorArtworks] = useState<ArtworkSimple[]>([]);
   const [isLoadingArtworks, setIsLoadingArtworks] = useState(false);
   const [updatingArtworkId, setUpdatingArtworkId] = useState<string | null>(null);
+
+  // Custom Delete Modal State
+  const [deleteTargetCol, setDeleteTargetCol] = useState<CollectionItem | null>(null);
+  const [isDeletingCol, setIsDeletingCol] = useState(false);
 
   // Filter collections by search query
   const filteredCollections = useMemo(() => {
@@ -112,31 +117,27 @@ export default function CollectionManager({
     router.refresh();
   };
 
-  const handleDelete = async (col: CollectionItem) => {
-    if (
-      !window.confirm(
-        `Are you sure you want to delete the collection "${col.title}"? Your artworks will remain intact and will simply be moved out of this collection.`
-      )
-    ) {
-      return;
-    }
+  const handleConfirmDelete = async () => {
+    if (!deleteTargetCol) return;
 
-    setDeletingId(col.id);
+    setIsDeletingCol(true);
+    const colToDelete = deleteTargetCol;
     try {
-      const res = await deleteCollection(col.id);
+      const res = await deleteCollection(colToDelete.id);
       if (res.success) {
-        setCollections((prev) => prev.filter((c) => c.id !== col.id));
-        if (selectedCollectionForArtworks?.id === col.id) {
+        setCollections((prev) => prev.filter((c) => c.id !== colToDelete.id));
+        if (selectedCollectionForArtworks?.id === colToDelete.id) {
           setSelectedCollectionForArtworks(null);
         }
         router.refresh();
+        setDeleteTargetCol(null);
       } else {
-        alert(res.error || 'Failed to delete collection.');
+        console.error('Failed to delete collection:', res.error);
       }
-    } catch {
-      alert('An error occurred while deleting.');
+    } catch (err) {
+      console.error('An error occurred while deleting collection:', err);
     } finally {
-      setDeletingId(null);
+      setIsDeletingCol(false);
     }
   };
 
@@ -383,13 +384,13 @@ export default function CollectionManager({
                         {/* Delete Button */}
                         <button
                           type="button"
-                          onClick={() => handleDelete(col)}
-                          disabled={deletingId === col.id}
+                          onClick={() => setDeleteTargetCol(col)}
+                          disabled={isDeletingCol && deleteTargetCol?.id === col.id}
                           className="w-8 h-9 sm:w-[32px] sm:h-[34px] bg-white border border-[#E8E8E3] flex items-center justify-center text-[#6E6E69] hover:text-red-600 hover:border-red-200 transition-colors shadow-2xs cursor-pointer ml-auto"
                           style={{ borderRadius: 8 }}
                           title="Delete collection"
                         >
-                          {deletingId === col.id ? (
+                          {isDeletingCol && deleteTargetCol?.id === col.id ? (
                             <Loader2 size={14} className="animate-spin text-red-500" />
                           ) : (
                             <Trash2 size={14} />
@@ -581,6 +582,18 @@ export default function CollectionManager({
           </div>
         </div>
       )}
+
+      {/* Custom Delete Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={!!deleteTargetCol}
+        onClose={() => !isDeletingCol && setDeleteTargetCol(null)}
+        onConfirm={handleConfirmDelete}
+        isLoading={isDeletingCol}
+        title="Delete collection?"
+        description="Are you sure you want to delete this collection? Your artworks will remain intact and will simply be moved out of this collection."
+        itemName={deleteTargetCol?.title}
+        confirmLabel="Delete collection"
+      />
     </div>
   );
 }

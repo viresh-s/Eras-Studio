@@ -21,6 +21,7 @@ import {
 import RestrictedUploadAction from '@/app/(dashboard)/portfolio/components/RestrictedUploadAction';
 import { updateArtwork, deleteArtwork } from '@/actions/artworkActions';
 import { CollectionItem, deleteCollection } from '@/actions/collectionActions';
+import { DeleteConfirmModal } from '@/components/ui/DeleteConfirmModal';
 import { PROTECTED_CONTAINER_CLASS, PROTECTED_IMAGE_CLASS } from '@/lib/media/assetProtection';
 import type { Profile, Artwork } from '@/types/database';
 
@@ -189,26 +190,34 @@ export default function PortfolioClient({
     setSearchQuery('');
   };
 
-  // Delete Collection
-  const handleDeleteCollection = async (col: CollectionItem) => {
-    if (
-      !window.confirm(
-        `Are you sure you want to delete the collection "${col.title}"? Your artworks will remain intact and will simply be unassigned from this collection.`
-      )
-    ) {
-      return;
-    }
+  // Delete Confirmation Modal State
+  const [deleteTarget, setDeleteTarget] = useState<{
+    type: 'artwork' | 'collection';
+    id: string;
+    title: string;
+  } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
+  // Confirm Delete Action
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+
+    setIsDeleting(true);
+    const target = deleteTarget;
     try {
-      setIsDeletingId(col.id);
-      setCollectionsList((prev) => prev.filter((c) => c.id !== col.id));
-      await deleteCollection(col.id);
+      if (target.type === 'collection') {
+        setCollectionsList((prev) => prev.filter((c) => c.id !== target.id));
+        await deleteCollection(target.id);
+      } else {
+        setArtworks((prev) => prev.filter((a) => a.id !== target.id));
+        await deleteArtwork(target.id, userId);
+      }
       router.refresh();
+      setDeleteTarget(null);
     } catch (err) {
-      console.error('Failed to delete collection:', err);
-      alert('Failed to delete collection.');
+      console.error(`Failed to delete ${target.type}:`, err);
     } finally {
-      setIsDeletingId(null);
+      setIsDeleting(false);
     }
   };
 
@@ -234,28 +243,8 @@ export default function PortfolioClient({
       router.refresh();
     } catch (err) {
       console.error('Failed to update artwork archive status:', err);
-      alert('Failed to update archive status.');
     } finally {
       setIsUpdatingId(null);
-    }
-  };
-
-  // Delete Artwork
-  const handleDelete = async (artworkId: string) => {
-    if (!window.confirm('Are you sure you want to delete this artwork? This action cannot be undone.')) {
-      return;
-    }
-
-    try {
-      setIsDeletingId(artworkId);
-      setArtworks((prev) => prev.filter((a) => a.id !== artworkId));
-      await deleteArtwork(artworkId, userId);
-      router.refresh();
-    } catch (err) {
-      console.error('Failed to delete artwork:', err);
-      alert('Failed to delete artwork.');
-    } finally {
-      setIsDeletingId(null);
     }
   };
 
@@ -684,13 +673,19 @@ export default function PortfolioClient({
                           {/* Right Group: Delete Button */}
                           <button
                             type="button"
-                            onClick={() => handleDeleteCollection(col)}
-                            disabled={isDeletingId === col.id}
+                            onClick={() =>
+                              setDeleteTarget({
+                                type: 'collection',
+                                id: col.id,
+                                title: col.title,
+                              })
+                            }
+                            disabled={isDeleting && deleteTarget?.id === col.id}
                             className="w-8 h-9 sm:w-[32px] sm:h-[34px] bg-white border border-[#E8E8E3] flex items-center justify-center text-[#6E6E69] hover:text-red-600 hover:border-red-200 transition-colors shadow-2xs cursor-pointer ml-auto"
                             style={{ borderRadius: 8 }}
                             title="Delete collection"
                           >
-                            {isDeletingId === col.id ? (
+                            {isDeleting && deleteTarget?.id === col.id ? (
                               <Loader2 size={14} className="animate-spin text-red-500" />
                             ) : (
                               <Trash2 size={14} />
@@ -845,13 +840,19 @@ export default function PortfolioClient({
                           {/* Right Group: Delete Button */}
                           <button
                             type="button"
-                            onClick={() => handleDelete(artwork.id)}
-                            disabled={isDeletingId === artwork.id}
+                            onClick={() =>
+                              setDeleteTarget({
+                                type: 'artwork',
+                                id: artwork.id,
+                                title: artwork.title || 'Untitled artwork',
+                              })
+                            }
+                            disabled={isDeleting && deleteTarget?.id === artwork.id}
                             className="w-8 h-9 sm:w-[32px] sm:h-[34px] bg-white border border-[#E8E8E3] flex items-center justify-center text-[#6E6E69] hover:text-red-600 hover:border-red-200 transition-colors shadow-2xs cursor-pointer ml-auto"
                             style={{ borderRadius: 8 }}
                             title="Delete artwork"
                           >
-                            {isDeletingId === artwork.id ? (
+                            {isDeleting && deleteTarget?.id === artwork.id ? (
                               <Loader2 size={14} className="animate-spin text-red-500" />
                             ) : (
                               <Trash2 size={14} />
@@ -949,6 +950,22 @@ export default function PortfolioClient({
           )}
         </div>
       </div>
+
+      {/* Custom Delete Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={!!deleteTarget}
+        onClose={() => !isDeleting && setDeleteTarget(null)}
+        onConfirm={handleConfirmDelete}
+        isLoading={isDeleting}
+        title={deleteTarget?.type === 'collection' ? 'Delete collection?' : 'Delete artwork?'}
+        description={
+          deleteTarget?.type === 'collection'
+            ? 'Are you sure you want to delete this collection? Your artworks will remain intact and will simply be unassigned from this collection.'
+            : 'Are you sure you want to delete this artwork? This action cannot be undone.'
+        }
+        itemName={deleteTarget?.title}
+        confirmLabel={deleteTarget?.type === 'collection' ? 'Delete collection' : 'Delete artwork'}
+      />
     </div>
   );
 }
