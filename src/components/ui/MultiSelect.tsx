@@ -68,11 +68,11 @@ export default function MultiSelect({
         <div
           id={selectId}
           onClick={() => setIsOpen(!isOpen)}
-          className={`w-full min-h-[44px] px-3.5 py-2 text-sm bg-white border rounded-[12px] outline-none cursor-pointer transition-colors duration-150 flex flex-wrap gap-2 items-center justify-between ${
+          className={`w-full min-h-[44px] px-3.5 py-2 text-sm flex flex-wrap gap-2 items-center justify-between cursor-pointer outline-none ${
             error
-              ? 'border-red-400 focus:border-red-500 focus:ring-1 focus:ring-red-500'
-              : 'border-[#E2E2DC] focus:border-[#181A1F] focus:ring-1 focus:ring-[#181A1F]'
-          } ${isOpen ? 'ring-1 ring-[#181A1F] border-[#181A1F]' : ''} ${className}`}
+              ? 'input-error-border-12'
+              : `input-gradient-border-12 ${isOpen ? 'is-open' : ''}`
+          } ${className}`}
         >
           <div className="flex flex-wrap gap-1.5 flex-1 items-center">
             {value.length === 0 && (

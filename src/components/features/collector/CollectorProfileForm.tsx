@@ -388,7 +388,7 @@ export default function CollectorProfileForm({ profile, email }: CollectorProfil
                               fontFamily: "'Poppins', sans-serif",
                               color: '#181A1F',
                             }}
-                            className="w-full px-3.5 py-2.5 bg-white border border-[#E2E2DC] focus:border-[#181A1F] focus:ring-1 focus:ring-[#181A1F] rounded-[12px] text-sm placeholder:text-[#A1A1A1] transition-colors outline-none"
+                            className="w-full px-3.5 py-2.5 input-gradient-border-12 text-sm placeholder:text-[#A1A1A1] outline-none"
                           />
                         </div>
 
@@ -435,7 +435,7 @@ export default function CollectorProfileForm({ profile, email }: CollectorProfil
                               fontFamily: "'Poppins', sans-serif",
                               color: '#181A1F',
                             }}
-                            className="w-full px-3.5 py-2.5 bg-white border border-[#E2E2DC] focus:border-[#181A1F] focus:ring-1 focus:ring-[#181A1F] rounded-[12px] text-sm placeholder:text-[#A1A1A1] transition-colors outline-none"
+                            className="w-full px-3.5 py-2.5 input-gradient-border-12 text-sm placeholder:text-[#A1A1A1] outline-none"
                           />
                         </div>
 
@@ -459,7 +459,7 @@ export default function CollectorProfileForm({ profile, email }: CollectorProfil
                               fontFamily: "'Poppins', sans-serif",
                               color: '#181A1F',
                             }}
-                            className="w-full px-3.5 py-2.5 bg-white border border-[#E2E2DC] focus:border-[#181A1F] focus:ring-1 focus:ring-[#181A1F] rounded-[12px] text-sm placeholder:text-[#A1A1A1] transition-colors outline-none"
+                            className="w-full px-3.5 py-2.5 input-gradient-border-12 text-sm placeholder:text-[#A1A1A1] outline-none"
                           />
                         </div>
 

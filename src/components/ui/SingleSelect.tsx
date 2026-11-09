@@ -116,15 +116,15 @@ export default function SingleSelect({
               setIsOpen(false);
             }
           }}
-          className={`w-full min-h-[44px] px-3.5 py-2.5 text-sm bg-white border rounded-[12px] outline-none transition-colors duration-150 flex items-center justify-between gap-2 ${
+          className={`w-full min-h-[44px] px-3.5 py-2.5 text-sm flex items-center justify-between gap-2 outline-none ${
             disabled
-              ? 'bg-[#F8F8F8] border-[#E8E8E3] text-[#8E8E88] cursor-not-allowed'
+              ? 'bg-[#F8F8F8] border border-[#E8E8E3] rounded-[12px] text-[#8E8E88] cursor-not-allowed'
               : 'cursor-pointer'
           } ${
             error
-              ? 'border-red-400 focus:border-red-500 focus:ring-1 focus:ring-red-500'
-              : 'border-[#E2E2DC] hover:border-[#181A1F]'
-          } ${isOpen ? 'ring-1 ring-[#181A1F] border-[#181A1F]' : ''} ${className}`}
+              ? 'input-error-border-12'
+              : `input-gradient-border-12 ${isOpen ? 'is-open' : ''}`
+          } ${className}`}
         >
           <span className={`truncate flex-1 ${selectedOption ? 'text-[#181A1F]' : 'text-[#A1A1A1]'}`}>
             {selectedOption ? selectedOption.label : placeholder}

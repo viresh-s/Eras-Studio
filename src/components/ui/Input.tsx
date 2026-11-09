@@ -40,11 +40,15 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               fontFamily: "'Poppins', sans-serif",
               color: disabled ? '#8E8E88' : '#181A1F',
             }}
-            className={`w-full bg-white text-sm placeholder:text-[#A1A1A1] border ${
-              error ? 'border-red-400 focus:border-red-500 focus:ring-1 focus:ring-red-500' : 'border-[#E2E2DC] focus:border-[#181A1F] focus:ring-1 focus:ring-[#181A1F]'
-            } rounded-[12px] py-2.5 ${leftIcon ? 'pl-10' : 'pl-3.5'} ${
+            className={`w-full text-sm placeholder:text-[#A1A1A1] ${
+              disabled
+                ? 'bg-[#F8F8F8] border border-[#E8E8E3] rounded-[12px] cursor-not-allowed'
+                : error
+                ? 'input-error-border-12'
+                : 'input-gradient-border-12'
+            } py-2.5 ${leftIcon ? 'pl-10' : 'pl-3.5'} ${
               rightIcon ? 'pr-10' : 'pr-3.5'
-            } transition-colors duration-150 outline-none disabled:bg-[#F8F8F8] disabled:hover:bg-[#F8F8F8] disabled:border-[#E8E8E3] disabled:cursor-not-allowed ${className}`}
+            } outline-none disabled:bg-[#F8F8F8] disabled:border-[#E8E8E3] disabled:cursor-not-allowed ${className}`}
             {...props}
           />
           {rightIcon && (

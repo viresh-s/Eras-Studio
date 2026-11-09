@@ -380,6 +380,64 @@ input:-webkit-autofill:active {
 }
 
 
+/* --- 12px Radius Form Input Gradient Border (Profile & UI Components) --- */
+.input-gradient-border-12 {
+  border-radius: 12px;
+  background-color: #ffffff;
+  border: 1.5px solid #E2E2DC;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none !important;
+}
+
+.input-gradient-border-12:hover:not(:focus):not(:disabled):not(.is-open) {
+  border-color: transparent !important;
+  background: linear-gradient(#ffffff, #ffffff) padding-box,
+              linear-gradient(90deg, rgba(8, 39, 121, 0.45) 0%, rgba(19, 69, 238, 0.55) 62%, rgba(69, 140, 255, 0.65) 100%) border-box !important;
+}
+
+.input-gradient-border-12:focus,
+.input-gradient-border-12:focus-visible,
+.input-gradient-border-12:focus-within,
+.input-gradient-border-12.is-open {
+  border-color: transparent !important;
+  background: linear-gradient(#ffffff, #ffffff) padding-box,
+              linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%) border-box !important;
+  box-shadow: 0 0 0 1px rgba(19, 69, 238, 0.15), 0 4px 14px rgba(19, 69, 238, 0.10) !important;
+  outline: none !important;
+}
+
+.input-gradient-border-12:disabled {
+  border: 1.5px solid #E8E8E3 !important;
+  background: #F8F8F8 !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+}
+
+/* --- 12px Radius Form Input Error State with Gradient on Active Focus --- */
+.input-error-border-12 {
+  border-radius: 12px;
+  background-color: #ffffff;
+  border: 1.5px solid #EF4444 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15) !important;
+  outline: none !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.input-error-border-12:hover:not(:focus):not(:disabled) {
+  border-color: #DC2626 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.22) !important;
+}
+
+.input-error-border-12:focus,
+.input-error-border-12:focus-visible,
+.input-error-border-12:focus-within {
+  border-color: transparent !important;
+  background: linear-gradient(#ffffff, #ffffff) padding-box,
+              linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%) border-box !important;
+  box-shadow: 0 0 0 1px rgba(19, 69, 238, 0.15), 0 4px 14px rgba(19, 69, 238, 0.10) !important;
+  outline: none !important;
+}
+
 /* Small radius variant for 4px / 8px controls */
 .input-gradient-border-sm {
   border-radius: 4px;

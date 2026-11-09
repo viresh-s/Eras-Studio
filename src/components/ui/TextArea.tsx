@@ -31,9 +31,9 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
             fontFamily: "'Poppins', sans-serif",
             color: '#181A1F',
           }}
-          className={`w-full px-3.5 py-2.5 text-sm bg-white border ${
-            error ? 'border-red-400 focus:border-red-500 focus:ring-1 focus:ring-red-500' : 'border-[#E2E2DC] focus:border-[#181A1F] focus:ring-1 focus:ring-[#181A1F]'
-          } rounded-[12px] outline-none resize-y transition-colors duration-150 placeholder:text-[#A1A1A1] ${className}`}
+          className={`w-full px-3.5 py-2.5 text-sm ${
+            error ? 'input-error-border-12' : 'input-gradient-border-12'
+          } outline-none resize-y placeholder:text-[#A1A1A1] ${className}`}
           {...props}
         />
         {error && (
