@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ArrowRight, Sparkles, Briefcase, Compass, FileCheck, Calendar, ShieldCheck, Check } from 'lucide-react';
+import { ArrowRight, Briefcase, Compass, FileCheck, Calendar, ShieldCheck, Target, Check } from 'lucide-react';
 
 interface CorLockedStateProps {
   isPaused?: boolean;
@@ -15,7 +15,7 @@ const benefits = [
     desc: 'Comprehensive portfolio review and positioning strategy by curatorial advisors.',
   },
   {
-    icon: Sparkles,
+    icon: Target,
     title: 'Opportunity Discovery',
     desc: 'Access curated open calls, prestigious residencies, grants, and high-value commissions.',
   },
@@ -55,26 +55,31 @@ export default function CorLockedState({ isPaused = false }: CorLockedStateProps
               background:
                 'linear-gradient(#ffffff, #ffffff) padding-box, linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%) border-box',
               border: '1.5px solid transparent',
+              fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
             }}
             className="h-8 px-4 rounded-full inline-flex items-center gap-1.5 text-xs font-medium text-[#1345EE] shadow-2xs"
           >
-            <Sparkles size={13} className="text-[#1345EE]" />
+            <ShieldCheck size={13} className="text-[#1345EE]" />
             <span className="uppercase tracking-wider">COR Pro Membership</span>
           </span>
         </div>
 
         {/* Title */}
         <h1
-          className="text-3xl sm:text-5xl font-serif italic font-semibold text-[#141413] tracking-tight leading-tight max-w-2xl mx-auto"
+          className="century-heading text-3xl sm:text-5xl text-[#141413] tracking-tight leading-tight max-w-2xl mx-auto"
           style={{
-            fontFamily: "'Century Schoolbook', Century, 'TeX Gyre Schola', Georgia, serif",
+            fontFamily: '"Century", \'Century Schoolbook\', Georgia, serif',
             fontStyle: 'italic',
+            fontWeight: 500,
           }}
         >
           {isPaused ? 'COR Hub is temporarily paused' : 'Turn your portfolio into institutional opportunities'}
         </h1>
 
-        <p className="text-xs sm:text-sm text-gray-600 font-normal mt-3 max-w-xl mx-auto leading-relaxed">
+        <p
+          className="text-xs sm:text-sm text-gray-600 font-normal mt-3 max-w-xl mx-auto leading-relaxed"
+          style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+        >
           Human guidance. Thoughtful curatorial opportunities. A clearer, elevated way forward for dedicated artists, creators, and collectors.
         </p>
 
@@ -90,10 +95,16 @@ export default function CorLockedState({ isPaused = false }: CorLockedStateProps
                 <div className="w-8 h-8 rounded-xl bg-white border border-[#EBEBE6] flex items-center justify-center text-[#1345EE] mb-3 group-hover:scale-105 transition-transform">
                   <Icon size={16} />
                 </div>
-                <h3 className="text-sm font-medium text-[#141413] mb-1">
+                <h3
+                  className="text-sm font-medium text-[#141413] mb-1"
+                  style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+                >
                   {b.title}
                 </h3>
-                <p className="text-xs text-gray-500 font-normal leading-relaxed">
+                <p
+                  className="text-xs text-gray-500 font-normal leading-relaxed"
+                  style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+                >
                   {b.desc}
                 </p>
               </div>
@@ -102,7 +113,10 @@ export default function CorLockedState({ isPaused = false }: CorLockedStateProps
         </div>
 
         {/* Plan summary chip */}
-        <div className="inline-flex items-center gap-2 p-1.5 pr-4 rounded-full bg-[#F4F4F0] border border-[#E5E7EB] mb-8 text-xs text-gray-700">
+        <div
+          className="inline-flex items-center gap-2 p-1.5 pr-4 rounded-full bg-[#F4F4F0] border border-[#E5E7EB] mb-8 text-xs text-gray-700"
+          style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+        >
           <span className="px-2.5 py-0.5 rounded-full bg-white text-[#1345EE] font-semibold text-[11px] shadow-2xs">
             PRO TIER
           </span>

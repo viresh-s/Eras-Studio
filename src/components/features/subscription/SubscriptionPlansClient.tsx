@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Check, X, CreditCard, Loader2, ArrowRight, Sparkles, AlertCircle, ShieldCheck } from 'lucide-react';
+import { Check, X, CreditCard, Loader2, ArrowRight, AlertCircle, ShieldCheck, ChevronRight } from 'lucide-react';
 import { upgradeUserPlanAction, createRazorpayOrderAction, PlanTier, type RazorpayPaymentProof } from '@/actions/subscriptionActions';
 
 interface SubscriptionPlansClientProps {
@@ -207,20 +208,33 @@ export function SubscriptionPlansClient({
         </div>
       )}
 
-      {/* Header Section */}
-      <div className="max-w-2xl mb-10 sm:mb-12">
-        <h1
-          className="text-4xl sm:text-5xl lg:text-6xl font-serif italic font-semibold text-[#141413] tracking-tight leading-tight"
-          style={{
-            fontFamily: "'Century Schoolbook', Century, 'TeX Gyre Schola', Georgia, serif",
-            fontStyle: 'italic',
-          }}
-        >
-          A plan for your practice
-        </h1>
-        <p className="text-xs sm:text-sm text-gray-600 font-normal mt-3 leading-relaxed">
-          Start with your art. Add curatorial guidance, portfolio collections, and institutional opportunities when you are ready.
-        </p>
+      {/* Editorial Page Header */}
+      <div className="border-b border-[#E8E8E3] pb-6 mb-8">
+        <div className="flex items-center gap-2 text-xs font-medium text-[#8A8A85] mb-2 font-sans">
+          <Link href="/portfolio" className="hover:text-[#141413] transition-colors flex items-center gap-1.5">
+            <span>Portfolio</span>
+          </Link>
+          <ChevronRight size={13} className="text-[#8A8A85]" />
+          <span className="text-[#141413]">Subscription Plans</span>
+        </div>
+        <div>
+          <h1
+            className="century-heading text-3xl sm:text-4xl text-[#141413] tracking-tight leading-tight"
+            style={{
+              fontFamily: '"Century", \'Century Schoolbook\', Georgia, serif',
+              fontStyle: 'italic',
+              fontWeight: 500,
+            }}
+          >
+            A plan for your practice
+          </h1>
+          <p
+            className="text-xs sm:text-sm text-[#6E6E69] font-normal mt-2 max-w-2xl leading-relaxed"
+            style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+          >
+            Start with your art. Add curatorial guidance, portfolio collections, and institutional opportunities when you are ready.
+          </p>
+        </div>
       </div>
 
       {/* Active Subscription Status Banner (Capsule style) */}
@@ -249,10 +263,11 @@ export function SubscriptionPlansClient({
           <div>
             <div className="flex items-center justify-between mb-3">
               <h2
-                className="text-2xl font-serif italic font-semibold text-[#141413]"
+                className="century-heading text-2xl text-[#141413]"
                 style={{
-                  fontFamily: "'Century Schoolbook', Century, 'TeX Gyre Schola', Georgia, serif",
+                  fontFamily: '"Century", \'Century Schoolbook\', Georgia, serif',
                   fontStyle: 'italic',
+                  fontWeight: 500,
                 }}
               >
                 Free
@@ -311,10 +326,11 @@ export function SubscriptionPlansClient({
           <div>
             <div className="flex items-center justify-between mb-3">
               <h2
-                className="text-2xl font-serif italic font-semibold text-[#141413]"
+                className="century-heading text-2xl text-[#141413]"
                 style={{
-                  fontFamily: "'Century Schoolbook', Century, 'TeX Gyre Schola', Georgia, serif",
+                  fontFamily: '"Century", \'Century Schoolbook\', Georgia, serif',
                   fontStyle: 'italic',
+                  fontWeight: 500,
                 }}
               >
                 Lite
@@ -390,16 +406,17 @@ export function SubscriptionPlansClient({
             {/* Top Pill: Recommended */}
             <div className="flex items-center justify-between mb-3">
               <h2
-                className="text-2xl font-serif italic font-semibold text-[#141413]"
+                className="century-heading text-2xl text-[#141413]"
                 style={{
-                  fontFamily: "'Century Schoolbook', Century, 'TeX Gyre Schola', Georgia, serif",
+                  fontFamily: '"Century", \'Century Schoolbook\', Georgia, serif',
                   fontStyle: 'italic',
+                  fontWeight: 500,
                 }}
               >
                 Pro
               </h2>
-              <span className="inline-flex items-center gap-1 text-[10px] tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-blue-50 text-[#1345EE] font-semibold border border-blue-200/60 shadow-2xs">
-                <Sparkles size={11} className="text-[#1345EE]" />
+              <span className="inline-flex items-center gap-1.5 text-[10px] tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-blue-50 text-[#1345EE] font-semibold border border-blue-200/60 shadow-2xs">
+                <ShieldCheck size={12} className="text-[#1345EE]" />
                 <span>Recommended</span>
               </span>
             </div>
@@ -494,10 +511,11 @@ export function SubscriptionPlansClient({
                   Confirm Subscription
                 </p>
                 <h3
-                  className="text-2xl font-serif italic font-semibold text-[#141413] mt-1"
+                  className="century-heading text-2xl text-[#141413] mt-1"
                   style={{
-                    fontFamily: "'Century Schoolbook', Century, 'TeX Gyre Schola', Georgia, serif",
+                    fontFamily: '"Century", \'Century Schoolbook\', Georgia, serif',
                     fontStyle: 'italic',
+                    fontWeight: 500,
                   }}
                 >
                   Upgrade to {selectedPlanForModal === 'pro' ? 'Pro' : selectedPlanForModal === 'lite' ? 'Lite' : 'Free'}
