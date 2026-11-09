@@ -1,28 +1,32 @@
 import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, getAuthenticatedProfile } from '@/lib/supabase/server';
 import { checkFreemiumStatus } from '@/lib/freemium/check';
+import { getCreatorCollections } from '@/actions/collectionActions';
 import ArtworkUploadForm from '@/components/features/creator/ArtworkUploadForm';
+
+export const dynamic = 'force-dynamic';
 
 export default async function UploadPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const freemiumStatus = await checkFreemiumStatus(user.id);
+  const [freemiumStatus, profile, collections] = await Promise.all([
+    checkFreemiumStatus(user.id),
+    getAuthenticatedProfile(user.id),
+    getCreatorCollections(user.id),
+  ]);
+
   if (freemiumStatus.isLocked) {
     redirect('/subscription');
   }
 
   return (
-    <div>
-      <h1
-        className="text-3xl sm:text-4xl font-serif italic font-semibold text-[#141413] tracking-tight mb-6"
-        style={{ fontFamily: "'Century Schoolbook', Century, serif", fontStyle: 'italic' }}
-      >
-        Upload your artwork
-      </h1>
-
-      <ArtworkUploadForm userId={user.id} freemiumStatus={freemiumStatus} />
-    </div>
+    <ArtworkUploadForm
+      userId={user.id}
+      profile={profile}
+      collections={collections || []}
+      freemiumStatus={freemiumStatus}
+    />
   );
 }

@@ -1,32 +1,42 @@
 'use client';
 
-import { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Upload, Image as ImageIcon, Link as LinkIcon, Trash2, Save, Loader2 } from 'lucide-react';
+import {
+  Upload,
+  Image as ImageIcon,
+  Trash2,
+  Loader2,
+  ChevronLeft,
+  ChevronDown,
+  ArrowRight,
+  Check,
+  Pencil,
+  Eye,
+  GripVertical,
+  Plus,
+  X,
+  Sparkles,
+} from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { createArtwork } from '@/actions/artworkActions';
-import Input from '@/components/ui/Input';
-import Select from '@/components/ui/Select';
-import MultiSelect from '@/components/ui/MultiSelect';
-import TextArea from '@/components/ui/TextArea';
 import type { FreemiumStatus } from '@/lib/freemium/check';
-import { buildMediumOptions, getCustomMediums, saveCustomMedium } from '@/lib/constants/mediums';
-import { buildCollectionOptions, getCustomCollections, saveCustomCollection } from '@/lib/constants/collections';
+import type { CollectionItem } from '@/actions/collectionActions';
+import type { Profile } from '@/types/database';
 import {
   MAX_PRICE_INR,
   MAX_PRICE_INR_FORMATTED,
   formatIndianCurrency,
   parseIndianCurrency,
 } from '@/lib/constants/currency';
-import { DIMENSION_UNIT_OPTIONS } from '@/lib/constants/dimensions';
 import {
   compressImages,
   uploadCompressedPair,
   validateImageFile,
-  MAX_INPUT_SIZE_MB,
   type PipelineProgress,
   type CompressionResult,
 } from '@/lib/media/imagePipeline';
@@ -54,28 +64,37 @@ const styleOptions = [
   { value: 'Surrealism', label: 'Surrealism' },
   { value: 'Realism', label: 'Realism' },
   { value: 'Expressionism', label: 'Expressionism' },
-  { value: 'Cubism', label: 'Cubism' },
+  { value: 'Figurative', label: 'Figurative' },
+  { value: 'Portraiture', label: 'Portraiture' },
+  { value: 'Landscape', label: 'Landscape' },
   { value: 'Other', label: 'Other' },
 ];
 
+const mediumOptions = [
+  { value: 'Painting', label: 'Painting' },
+  { value: 'Oil on Canvas', label: 'Oil on Canvas' },
+  { value: 'Acrylic on Canvas', label: 'Acrylic on Canvas' },
+  { value: 'Watercolor', label: 'Watercolor' },
+  { value: 'Sculpture', label: 'Sculpture' },
+  { value: 'Photography', label: 'Photography' },
+  { value: 'Digital Art', label: 'Digital Art' },
+  { value: 'Mixed Media', label: 'Mixed Media' },
+  { value: 'Printmaking', label: 'Printmaking' },
+  { value: 'Drawing & Illustration', label: 'Drawing & Illustration' },
+  { value: 'Ceramic & Pottery', label: 'Ceramic & Pottery' },
+  { value: 'Other', label: 'Other' },
+];
 
-
-const tagsOptions = [
-  { value: 'oil, canvas', label: 'Oil on Canvas' },
-  { value: 'acrylic, canvas', label: 'Acrylic on Canvas' },
-  { value: 'watercolor, paper', label: 'Watercolor on Paper' },
-  { value: 'digital', label: 'Digital' },
-  { value: 'mixed media', label: 'Mixed Media' },
-  { value: 'photography', label: 'Photography' },
-  { value: 'sculpture', label: 'Sculpture' },
+const dimensionUnitOptions = [
+  { value: 'Inches (in)', label: 'Inches (in)' },
+  { value: 'Centimeters (cm)', label: 'Centimeters (cm)' },
 ];
 
 const uploadSchema = z.object({
-  title: z.string().min(2, 'Title is required'),
-  artType: z.string().min(1, 'Please select a medium'), // We map this to Medium
-  artistName: z.string().min(2, 'Artist name is required'),
+  title: z.string().min(1, 'Title is required'),
+  artistName: z.string().min(1, 'Artist name is required'),
+  artType: z.string().min(1, 'Please select a medium'),
   year: z.string().optional(),
-  dimensions: z.string().optional(),
   dimensionUnit: z.string().optional(),
   width: z
     .string()
@@ -102,7 +121,6 @@ const uploadSchema = z.object({
   location: z.string().optional(),
   style: z.string().optional(),
   collection: z.string().optional(),
-  tags: z.array(z.string()).optional(),
   description: z.string().optional(),
   externalLink: z.string().url('Please enter a valid URL').optional().or(z.literal('')),
   price: z
@@ -115,68 +133,113 @@ const uploadSchema = z.object({
         return num !== null && num > 0 && num <= MAX_PRICE_INR;
       },
       {
-        message: `Price must be positive and cannot exceed ${MAX_PRICE_INR_FORMATTED}`,
+        message: `Price cannot exceed ${MAX_PRICE_INR_FORMATTED}`,
       }
     ),
   priceVisibility: z.enum(['Show Price', 'Price on Request', 'Hide Price']),
   status: z.enum(['Available', 'For Sale', 'Not for sale', 'Sold']),
-}).refine(
-  (data) => {
-    if ((data.width || data.height) && !data.dimensionUnit) {
-      return false;
-    }
-    return true;
-  },
-  {
-    message: 'Please select a dimension unit first',
-    path: ['dimensionUnit'],
-  }
-).refine(
-  (data) => {
-    if (data.dimensionUnit && ((data.width && !data.height) || (!data.width && data.height))) {
-      return false;
-    }
-    return true;
-  },
-  {
-    message: 'Please enter both width and height',
-    path: ['height'],
-  }
-);
+});
 
 type UploadForm = z.infer<typeof uploadSchema>;
 
-interface UploadFormProps {
+interface ImageFileMeta {
+  name: string;
+  sizeFormatted: string;
+  width?: number;
+  height?: number;
+}
+
+interface ArtworkUploadFormProps {
   userId: string;
+  profile: Profile | null;
+  collections?: CollectionItem[];
   freemiumStatus: FreemiumStatus;
 }
 
-export default function ArtworkUploadForm({ userId, freemiumStatus }: UploadFormProps) {
+export default function ArtworkUploadForm({
+  userId,
+  profile,
+  collections = [],
+  freemiumStatus,
+}: ArtworkUploadFormProps) {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
-  const [submitAction, setSubmitAction] = useState<'publish' | 'draft'>('publish');
-  const [error, setError] = useState<string | null>(null);
+
+  // Multi-step state: 1 = Upload images, 2 = Artwork details
+  const [step, setStep] = useState<1 | 2>(1);
+
+  // Images state
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
-  const [customMediums, setCustomMediums] = useState<string[]>([]);
-  const [customMediumInput, setCustomMediumInput] = useState('');
-  const [customCollections, setCustomCollections] = useState<string[]>([]);
-  const [customStyle, setCustomStyle] = useState('');
-  const [customCollection, setCustomCollection] = useState('');
+  const [filesMeta, setFilesMeta] = useState<ImageFileMeta[]>([]);
+  const [selectedPreviewIndex, setSelectedPreviewIndex] = useState<number>(0);
 
-  // Load custom mediums and collections from localStorage on mount
-  useEffect(() => {
-    setCustomMediums(getCustomMediums());
-    setCustomCollections(getCustomCollections());
-  }, []);
-
-  const mediumOptions = useMemo(() => buildMediumOptions(customMediums), [customMediums]);
-  const collectionOptions = useMemo(() => buildCollectionOptions(customCollections), [customCollections]);
-
-  // Drag and drop state
-  const dragCounter = useRef(0);
+  // Drag & drop state for dropzone
   const [isDragging, setIsDragging] = useState(false);
+  const dragCounter = useRef(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const editImageInputRef = useRef<HTMLInputElement>(null);
+
+  // Tags state
+  const [tags, setTags] = useState<string[]>(['Portrait', 'Geometric', 'Contemporary']);
+  const [tagInput, setTagInput] = useState('');
+  const [isAddingTag, setIsAddingTag] = useState(false);
+
+  // Form submission state
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [compressionProgress, setCompressionProgress] = useState<PipelineProgress | null>(null);
+  const [uploadStage, setUploadStage] = useState<string | null>(null);
+
+  // Default values based on creator profile
+  const defaultArtistName = profile?.full_name || 'Rishi Mailoorkar';
+  const defaultLocation =
+    [profile?.location_city, profile?.location_country].filter(Boolean).join(', ') || 'Mumbai, India';
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm<UploadForm>({
+    resolver: zodResolver(uploadSchema),
+    defaultValues: {
+      title: 'The Broken Illusion',
+      artistName: defaultArtistName,
+      artType: 'Painting',
+      year: new Date().getFullYear().toString(),
+      dimensionUnit: 'Inches (in)',
+      width: '24',
+      height: '18',
+      location: defaultLocation,
+      style: 'Abstract',
+      collection: collections[0]?.title || 'Summer Series',
+      description:
+        'A portrait caught between the real and the imagined. Fractured planes of colour explore the many ways we see ourselves, bringing moments of clarity and distortion into the same frame.',
+      externalLink: 'https://rishimailoorkar.com/the-broken-illusion',
+      price: '45,000',
+      priceVisibility: 'Show Price',
+      status: 'Available',
+    },
+  });
+
+  const watchedTitle = watch('title');
+  const watchedArtistName = watch('artistName');
+  const watchedArtType = watch('artType');
+  const watchedYear = watch('year');
+  const watchedWidth = watch('width');
+  const watchedHeight = watch('height');
+  const watchedDimensionUnit = watch('dimensionUnit');
+  const watchedPriceVisibility = watch('priceVisibility');
+
+  // Format bytes to human readable string
+  const formatFileSize = (bytes: number): string => {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+  };
 
   // Clean up object URLs on unmount
   useEffect(() => {
@@ -189,37 +252,25 @@ export default function ArtworkUploadForm({ userId, freemiumStatus }: UploadForm
     };
   }, [previewUrls]);
 
-  // Compression pipeline state
-  const [compressionProgress, setCompressionProgress] = useState<PipelineProgress | null>(null);
-  const [uploadStage, setUploadStage] = useState<string | null>(null);
+  // Read dimensions from an image file
+  const readImageDimensions = (file: File): Promise<{ width: number; height: number }> => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        resolve({ width: img.naturalWidth, height: img.naturalHeight });
+        URL.revokeObjectURL(url);
+      };
+      img.onerror = () => {
+        resolve({ width: 0, height: 0 });
+        URL.revokeObjectURL(url);
+      };
+      img.src = url;
+    });
+  };
 
-  useEffect(() => {
-    if (freemiumStatus.isLocked) {
-      router.replace('/subscription');
-    }
-  }, [freemiumStatus.isLocked, router]);
-
-  const {
-    register,
-    handleSubmit,
-    watch,
-    control,
-    formState: { errors },
-  } = useForm<UploadForm>({
-    resolver: zodResolver(uploadSchema),
-    defaultValues: {
-      priceVisibility: 'Show Price',
-      status: 'Available',
-    }
-  });
-
-  const selectedMedium = watch('artType');
-  const selectedDimensionUnit = watch('dimensionUnit');
-  const selectedStyle = watch('style');
-  const selectedCollection = watch('collection');
-  const selectedPriceVisibility = watch('priceVisibility');
-
-  const processFiles = (incomingFiles: File[]) => {
+  // Process incoming files
+  const processFiles = async (incomingFiles: File[]) => {
     setError(null);
     if (!incomingFiles || incomingFiles.length === 0) return;
 
@@ -247,8 +298,26 @@ export default function ArtworkUploadForm({ userId, freemiumStatus }: UploadForm
       const newFiles = [...selectedFiles, ...filesToAdd];
       setSelectedFiles(newFiles);
 
-      const newUrls = newFiles.map(file => URL.createObjectURL(file));
+      const newUrls = newFiles.map((file) => URL.createObjectURL(file));
       setPreviewUrls(newUrls);
+
+      // Extract metadata for each file
+      const metas: ImageFileMeta[] = await Promise.all(
+        newFiles.map(async (f) => {
+          const dims = await readImageDimensions(f);
+          return {
+            name: f.name,
+            sizeFormatted: formatFileSize(f.size),
+            width: dims.width,
+            height: dims.height,
+          };
+        })
+      );
+      setFilesMeta(metas);
+
+      if (selectedFiles.length === 0) {
+        setSelectedPreviewIndex(0);
+      }
     }
   };
 
@@ -258,6 +327,92 @@ export default function ArtworkUploadForm({ userId, freemiumStatus }: UploadForm
     e.target.value = '';
   };
 
+  // Edit / Replace image at current preview index
+  const handleReplaceImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      validateImageFile(file);
+      const newFiles = [...selectedFiles];
+      newFiles[selectedPreviewIndex] = file;
+      setSelectedFiles(newFiles);
+
+      const newUrl = URL.createObjectURL(file);
+      const newUrls = [...previewUrls];
+      if (newUrls[selectedPreviewIndex]?.startsWith('blob:')) {
+        URL.revokeObjectURL(newUrls[selectedPreviewIndex]);
+      }
+      newUrls[selectedPreviewIndex] = newUrl;
+      setPreviewUrls(newUrls);
+
+      readImageDimensions(file).then((dims) => {
+        const newMetas = [...filesMeta];
+        newMetas[selectedPreviewIndex] = {
+          name: file.name,
+          sizeFormatted: formatFileSize(file.size),
+          width: dims.width,
+          height: dims.height,
+        };
+        setFilesMeta(newMetas);
+      });
+    } catch (valErr) {
+      setError(valErr instanceof Error ? valErr.message : 'Invalid image file');
+    }
+    e.target.value = '';
+  };
+
+  // Remove a file
+  const removeFile = (index: number) => {
+    if (previewUrls[index]?.startsWith('blob:')) {
+      URL.revokeObjectURL(previewUrls[index]);
+    }
+    const newFiles = [...selectedFiles];
+    newFiles.splice(index, 1);
+    setSelectedFiles(newFiles);
+
+    const newUrls = [...previewUrls];
+    newUrls.splice(index, 1);
+    setPreviewUrls(newUrls);
+
+    const newMetas = [...filesMeta];
+    newMetas.splice(index, 1);
+    setFilesMeta(newMetas);
+
+    if (selectedPreviewIndex >= newFiles.length) {
+      setSelectedPreviewIndex(Math.max(0, newFiles.length - 1));
+    }
+  };
+
+  // Drag reordering for thumbnails
+  const handleDragStartThumb = (e: React.DragEvent, index: number) => {
+    e.dataTransfer.setData('text/plain', index.toString());
+  };
+
+  const handleDropThumb = (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault();
+    const sourceIndex = parseInt(e.dataTransfer.getData('text/plain'), 10);
+    if (isNaN(sourceIndex) || sourceIndex === dropIndex) return;
+
+    const newFiles = [...selectedFiles];
+    const [movedFile] = newFiles.splice(sourceIndex, 1);
+    newFiles.splice(dropIndex, 0, movedFile);
+    setSelectedFiles(newFiles);
+
+    const newUrls = [...previewUrls];
+    const [movedUrl] = newUrls.splice(sourceIndex, 1);
+    newUrls.splice(dropIndex, 0, movedUrl);
+    setPreviewUrls(newUrls);
+
+    const newMetas = [...filesMeta];
+    const [movedMeta] = newMetas.splice(sourceIndex, 1);
+    newMetas.splice(dropIndex, 0, movedMeta);
+    setFilesMeta(newMetas);
+
+    setSelectedPreviewIndex(dropIndex);
+  };
+
+  // Drag and drop for dropzone
   const handleDragEnter = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -280,9 +435,7 @@ export default function ArtworkUploadForm({ userId, freemiumStatus }: UploadForm
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!isDragging) {
-      setIsDragging(true);
-    }
+    if (!isDragging) setIsDragging(true);
   };
 
   const handleDrop = (e: React.DragEvent) => {
@@ -290,29 +443,30 @@ export default function ArtworkUploadForm({ userId, freemiumStatus }: UploadForm
     e.stopPropagation();
     setIsDragging(false);
     dragCounter.current = 0;
-
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      const droppedFiles = Array.from(e.dataTransfer.files);
-      processFiles(droppedFiles);
+      processFiles(Array.from(e.dataTransfer.files));
     }
   };
 
-  const removeFile = (index: number) => {
-    if (previewUrls[index]?.startsWith('blob:')) {
-      URL.revokeObjectURL(previewUrls[index]);
+  // Tag helper
+  const handleAddTag = () => {
+    const trimmed = tagInput.trim();
+    if (trimmed && !tags.includes(trimmed)) {
+      setTags([...tags, trimmed]);
+      setTagInput('');
+      setIsAddingTag(false);
     }
-    const newFiles = [...selectedFiles];
-    newFiles.splice(index, 1);
-    setSelectedFiles(newFiles);
-
-    const newUrls = [...previewUrls];
-    newUrls.splice(index, 1);
-    setPreviewUrls(newUrls);
   };
 
-  const onSubmit = async (data: UploadForm) => {
+  const handleRemoveTag = (tagToRemove: string) => {
+    setTags(tags.filter((t) => t !== tagToRemove));
+  };
+
+  // Core submission handler (both for draft and publish)
+  const submitArtwork = async (data: UploadForm, isPublished: boolean) => {
     if (selectedFiles.length === 0) {
-      setError('Please select at least one image file');
+      setError('Please upload at least one image of your artwork.');
+      setStep(1);
       return;
     }
 
@@ -325,7 +479,7 @@ export default function ArtworkUploadForm({ userId, freemiumStatus }: UploadForm
       const supabase = createClient();
 
       // ── Stage 1: Client-Side WebP Compression ──
-      setUploadStage('Compressing images...');
+      setUploadStage('Compressing images for maximum clarity & performance...');
       let compressionResults: CompressionResult[];
       try {
         compressionResults = await compressImages(selectedFiles, (progress) => {
@@ -338,7 +492,7 @@ export default function ArtworkUploadForm({ userId, freemiumStatus }: UploadForm
       }
 
       // ── Stage 2: Upload Compressed WebP Pairs to Supabase ──
-      setUploadStage('Uploading optimized images...');
+      setUploadStage('Uploading optimized artwork images...');
       const uploadedPairs: { cardUrl: string; fullUrl: string }[] = [];
 
       for (let i = 0; i < compressionResults.length; i++) {
@@ -347,526 +501,1126 @@ export default function ArtworkUploadForm({ userId, freemiumStatus }: UploadForm
         uploadedPairs.push(urls);
       }
 
-      // Cover image = first image's card URL (for feeds/grids)
+      // Cover image = first uploaded image pair
       const coverImage = uploadedPairs[0].cardUrl;
-      // Full-res cover for detail views
       const coverImageFull = uploadedPairs[0].fullUrl;
-      // Additional images = remaining card URLs
       const additionalImages = uploadedPairs.slice(1).map((p) => p.cardUrl);
-      // Additional full-res URLs
       const additionalImagesFull = uploadedPairs.slice(1).map((p) => p.fullUrl);
-
-      // Image metadata from the cover (first) image
       const coverMeta = compressionResults[0];
 
-      let finalMedium = data.artType;
-      if (data.artType === 'Other') {
-        const trimmed = customMediumInput.trim();
-        if (!trimmed) {
-          setError('Please specify your custom medium');
-          setIsLoading(false);
-          return;
-        }
-        finalMedium = trimmed;
-        saveCustomMedium(trimmed);
-        setCustomMediums((prev) => {
-          if (prev.some((m) => m.toLowerCase() === trimmed.toLowerCase())) return prev;
-          return [...prev, trimmed];
-        });
+      // Format dimensions string
+      let formattedDimensions = '';
+      if (data.width && data.height) {
+        const unit = data.dimensionUnit === 'Centimeters (cm)' ? 'cm' : 'in';
+        formattedDimensions = `${data.width} × ${data.height} ${unit}`;
       }
 
-      const finalStyle = data.style === 'Other' ? customStyle : data.style;
-      const finalCollection = data.collection === 'Other' ? customCollection.trim() : data.collection;
-      if (data.collection === 'Other' && finalCollection) {
-        saveCustomCollection(finalCollection);
-        setCustomCollections((prev) => {
-          if (prev.some((c) => c.toLowerCase() === finalCollection.toLowerCase())) return prev;
-          return [...prev, finalCollection];
-        });
-      }
-      const tagsArray = data.tags || [];
+      const numericPrice = data.price ? parseIndianCurrency(data.price) : null;
 
-      const finalPrice = parseIndianCurrency(data.price);
-      const calculatedDimensions =
-        data.width && data.height && data.dimensionUnit
-          ? `${data.width} × ${data.height} ${data.dimensionUnit}`
-          : data.dimensions || undefined;
-
-      // ── Stage 3: Save to Database ──
-      setUploadStage('Saving artwork details...');
+      // ── Stage 3: Create Artwork in Database ──
+      setUploadStage('Finalizing artwork portfolio entry...');
       await createArtwork({
         userId,
-        title: data.title,
-        artType: finalMedium,
-        artistName: data.artistName,
-        year: data.year,
-        dimensions: calculatedDimensions,
-        width: data.width,
-        height: data.height,
-        location: data.location,
-        style: finalStyle,
-        collection: finalCollection,
-        tags: tagsArray,
-        description: data.description,
-        externalLink: data.externalLink,
+        title: data.title.trim(),
+        artType: data.artType,
+        artistName: data.artistName.trim(),
+        description: data.description?.trim() || undefined,
+        externalLink: data.externalLink?.trim() || undefined,
         imageUrl: coverImage,
         imageUrlFull: coverImageFull,
-        additionalImages: additionalImages,
-        additionalImagesFull: additionalImagesFull,
+        additionalImages,
+        additionalImagesFull,
         imageWidth: coverMeta.originalWidth,
         imageHeight: coverMeta.originalHeight,
         aspectRatio: coverMeta.aspectRatio,
-        price: finalPrice,
+        price: numericPrice,
+        year: data.year?.trim() || undefined,
+        dimensions: formattedDimensions || undefined,
+        width: data.width?.trim() || undefined,
+        height: data.height?.trim() || undefined,
+        location: data.location?.trim() || undefined,
+        style: data.style?.trim() || undefined,
+        tags,
+        collection: data.collection?.trim() || undefined,
         priceVisibility: data.priceVisibility,
-        status: data.status,
-        isPublished: submitAction === 'publish',
+        isPublished,
+        status: isPublished ? data.status : 'Not for sale',
       });
 
+      // Redirect back to portfolio on success
       router.push('/portfolio');
       router.refresh();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong');
+    } catch (err: any) {
+      console.error('Artwork creation failed:', err);
+      setError(err?.message || 'Failed to upload artwork. Please try again.');
     } finally {
       setIsLoading(false);
-      setCompressionProgress(null);
       setUploadStage(null);
+      setCompressionProgress(null);
     }
   };
 
+  const onPublishSubmit = (data: UploadForm) => {
+    submitArtwork(data, true);
+  };
+
+  const handleSaveDraft = () => {
+    const currentValues = watch();
+    const draftTitle = currentValues.title?.trim() || 'Untitled Artwork';
+    submitArtwork({ ...currentValues, title: draftTitle }, false);
+  };
+
+  const activeMeta = filesMeta[selectedPreviewIndex] || {
+    name: selectedFiles[selectedPreviewIndex]?.name || 'broken-illusion.jpg',
+    sizeFormatted: '8.4 MB',
+    width: 2400,
+    height: 1800,
+  };
+
+  const currentCoverUrl = previewUrls[0] || null;
 
   return (
-    <div className="bg-white rounded-2xl shadow-[0_2px_20px_rgb(0,0,0,0.04)] p-8">
-      {!freemiumStatus.isLocked && freemiumStatus.artworksLimit > 0 && (
-        <div className="mb-4 p-4 bg-amber-50 rounded-xl border border-amber-200">
-          <p className="text-sm font-medium text-amber-800">
-            Free Plan: {freemiumStatus.artworksUsed}/{freemiumStatus.artworksLimit} uploads used
-            {freemiumStatus.daysRemaining > 0 && ` · ${freemiumStatus.daysRemaining} days remaining`}
-          </p>
-        </div>
-      )}
+    <div
+      className="w-full min-h-screen bg-white text-[#141413] pb-16"
+      style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+    >
+      {/* Hidden file inputs */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        multiple
+        accept="image/jpeg,image/png,image/webp,image/avif"
+        onChange={handleFileChange}
+        className="hidden"
+      />
+      <input
+        ref={editImageInputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp,image/avif"
+        onChange={handleReplaceImage}
+        className="hidden"
+      />
 
-      {error && (
-        <div className="mb-4 bg-red-50 border border-red-200 rounded-xl p-3 text-red-600 text-sm">
-          {error}
-        </div>
-      )}
-
-      {/* Compression & Upload Progress Bar */}
-      {isLoading && uploadStage && (
-        <div className="mb-6 bg-gray-50 rounded-xl border border-gray-200 p-4">
-          <div className="flex items-center gap-3 mb-2">
-            <Loader2 size={16} className="animate-spin text-gray-600" />
-            <span className="text-sm font-medium text-gray-700">{uploadStage}</span>
-          </div>
-          {compressionProgress && (
-            <div className="space-y-1">
-              <div className="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
-                <div
-                  className="h-full bg-gray-900 rounded-full transition-all duration-300 ease-out"
-                  style={{
-                    width: `${Math.round(
-                      ((compressionProgress.fileIndex * 100 + compressionProgress.percent) /
-                        (compressionProgress.totalFiles * 100)) *
-                        100
-                    )}%`,
-                  }}
-                />
-              </div>
-              <p className="text-[10px] text-gray-500">
-                File {compressionProgress.fileIndex + 1} of {compressionProgress.totalFiles}
-                {compressionProgress.stage !== 'complete' && ` — ${compressionProgress.stage.replace(/-/g, ' ')}`}
-              </p>
-            </div>
-          )}
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        {/* Image Upload */}
-        <div>
-          <label className="text-sm font-medium text-gray-700 block mb-2">
-            Artwork Images * (First image is the cover)
-          </label>
-          <div
-            onDragEnter={handleDragEnter}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-            className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4"
+      {/* ======================================================== */}
+      {/* 1. TOP SUBHEADER WITH BREADCRUMB, TITLE & STEPPER        */}
+      {/* ======================================================== */}
+      <div className="border-b border-[#E8E8E3] pb-8 pt-2 mb-8 sm:mb-10">
+        {/* Breadcrumb: Back to portfolio */}
+        <div className="mb-6">
+          <Link
+            href="/portfolio"
+            className="inline-flex items-center gap-2.5 text-xs sm:text-sm text-[#6E6E69] hover:text-[#141413] transition-colors font-normal select-none"
           >
-            {previewUrls.map((url, idx) => (
-              <div key={idx} className="relative group aspect-square rounded-xl overflow-hidden bg-gray-100 border border-gray-200">
-                <img src={url} alt={`Preview ${idx + 1}`} className="w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="w-8 h-8 rounded-lg bg-white border border-[#E8E8E3] flex items-center justify-center text-[#6E6E69] hover:border-black shadow-2xs">
+              <ChevronLeft size={16} />
+            </div>
+            <span>Back to portfolio</span>
+          </Link>
+        </div>
+
+        {/* Title + Stepper Row */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+          <div>
+            <h1
+              className="text-3xl sm:text-4xl lg:text-[42px] font-bold text-[#141413] tracking-tight leading-tight"
+              style={{
+                fontFamily: "'Century Schoolbook', Century, 'TeX Gyre Schola', Georgia, serif",
+                fontStyle: 'italic',
+              }}
+            >
+              {step === 1 ? 'Upload your artwork' : 'Artwork details'}
+            </h1>
+            <p className="text-xs sm:text-sm text-[#6E6E69] font-normal mt-2">
+              {step === 1
+                ? 'Give your work the space it deserves. Start with your images.'
+                : 'Tell the story of your work, then make it part of ERAS.'}
+            </p>
+          </div>
+
+          {/* Stepper Component */}
+          <div className="flex items-center gap-3 sm:gap-4 shrink-0 select-none">
+            {/* Step 1 Indicator */}
+            <div
+              className={`flex items-center gap-2.5 cursor-pointer ${
+                step === 1 ? 'opacity-100' : 'opacity-85 hover:opacity-100'
+              }`}
+              onClick={() => setStep(1)}
+            >
+              <div
+                className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-medium transition-all ${
+                  step === 1
+                    ? 'bg-[#1345EE] text-white shadow-2xs'
+                    : 'bg-[#EEF2FE] text-[#1345EE]'
+                }`}
+              >
+                {step > 1 ? <Check size={14} strokeWidth={2.5} /> : '1'}
+              </div>
+              <span
+                className={`text-xs sm:text-sm font-medium transition-colors ${
+                  step === 1 ? 'text-[#141413]' : 'text-[#6E6E69]'
+                }`}
+              >
+                Upload artwork
+              </span>
+            </div>
+
+            {/* Connecting Line */}
+            <div className="w-6 sm:w-10 h-[1.5px] bg-[#E8E8E3]" />
+
+            {/* Step 2 Indicator */}
+            <div
+              className={`flex items-center gap-2.5 ${
+                selectedFiles.length > 0 ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'
+              }`}
+              onClick={() => selectedFiles.length > 0 && setStep(2)}
+            >
+              <div
+                className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-medium transition-all ${
+                  step === 2
+                    ? 'bg-[#1345EE] text-white shadow-2xs'
+                    : 'bg-[#F7F7F5] text-[#6E6E69] border border-[#E8E8E3]'
+                }`}
+              >
+                2
+              </div>
+              <span
+                className={`text-xs sm:text-sm font-medium transition-colors ${
+                  step === 2 ? 'text-[#141413]' : 'text-[#6E6E69]'
+                }`}
+              >
+                Artwork details
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Global Error Banner */}
+      {error && (
+        <div className="mb-6 p-4 rounded-2xl bg-red-50 border border-red-200 text-xs sm:text-sm text-red-700 flex items-center justify-between">
+          <span>{error}</span>
+          <button onClick={() => setError(null)} className="p-1 hover:bg-red-100 rounded-md">
+            <X size={16} />
+          </button>
+        </div>
+      )}
+
+      {/* Upload/Compression Status Notification */}
+      {isLoading && uploadStage && (
+        <div className="mb-6 p-4 rounded-2xl bg-[#EEF2FE] border border-[#CED8FC] text-xs sm:text-sm text-[#1345EE] flex items-center gap-3">
+          <Loader2 size={18} className="animate-spin text-[#1345EE] shrink-0" />
+          <div className="flex-1">
+            <p className="font-medium">{uploadStage}</p>
+            {compressionProgress && (
+              <p className="text-[11px] text-[#458CFF] mt-0.5 capitalize">
+                {compressionProgress.stage.replace('-', ' ')} ({compressionProgress.fileIndex + 1}/
+                {compressionProgress.totalFiles}) — {compressionProgress.percent}%
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit(onPublishSubmit)}>
+        {/* ======================================================== */}
+        {/* STEP 1: UPLOAD ARTWORK IMAGES VIEW                       */}
+        {/* ======================================================== */}
+        {step === 1 && (
+          <div className="flex flex-col lg:flex-row items-start gap-8 lg:gap-12">
+            {/* Left Column: Big Image Display, Thumbnails & Dropzone */}
+            <div className="flex-1 w-full flex flex-col gap-6">
+              {/* Image Counter Header */}
+              <div className="flex items-center justify-between">
+                <span className="text-sm sm:text-base font-medium text-[#141413]">
+                  Artwork images <span className="text-red-500">*</span>
+                </span>
+                <span className="text-xs sm:text-sm text-[#6E6E69]">
+                  {selectedFiles.length} of 5 images uploaded
+                </span>
+              </div>
+
+              {/* Main Card with Preview Image & Details */}
+              {selectedFiles.length > 0 ? (
+                <div className="w-full border border-[#E8E8E3] rounded-3xl overflow-hidden bg-white shadow-2xs">
+                  {/* Large Image Box */}
+                  <div className="w-full h-[320px] sm:h-[440px] md:h-[500px] bg-[#F7F7F5] flex items-center justify-center p-4 relative overflow-hidden select-none">
+                    <img
+                      src={previewUrls[selectedPreviewIndex]}
+                      alt="Artwork Preview"
+                      className="max-w-full max-h-full object-contain rounded-lg shadow-xs pointer-events-none"
+                    />
+                  </div>
+
+                  {/* Bottom Bar: Cover badge, Filename, Resolution, Edit & Delete */}
+                  <div className="p-4 sm:p-5 flex flex-wrap items-center justify-between gap-4 border-t border-[#E8E8E3] bg-white">
+                    <div className="flex items-center gap-3 min-w-0">
+                      {selectedPreviewIndex === 0 ? (
+                        <div className="px-2.5 py-1 rounded-md bg-[#EEF2FE] border border-[#CED8FC] text-[#1345EE] text-[11px] font-medium shrink-0">
+                          Cover
+                        </div>
+                      ) : (
+                        <div className="px-2.5 py-1 rounded-md bg-[#F7F7F5] border border-[#E8E8E3] text-[#6E6E69] text-[11px] font-medium shrink-0">
+                          Detail view
+                        </div>
+                      )}
+                      <div className="min-w-0">
+                        <p className="text-xs sm:text-sm font-medium text-[#141413] truncate">
+                          {activeMeta.name}
+                        </p>
+                        <p className="text-[11px] sm:text-xs text-[#6E6E69] truncate">
+                          {activeMeta.width && activeMeta.height
+                            ? `${activeMeta.width} × ${activeMeta.height} px · ${activeMeta.sizeFormatted}`
+                            : activeMeta.sizeFormatted}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 shrink-0">
+                      {/* Edit Image Button */}
+                      <button
+                        type="button"
+                        onClick={() => editImageInputRef.current?.click()}
+                        className="px-3.5 py-2 rounded-xl border border-[#E8E8E3] bg-white text-xs font-medium text-[#6E6E69] hover:text-[#141413] hover:border-black transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer"
+                      >
+                        <Pencil size={13} className="text-[#6E6E69]" />
+                        <span>Edit image</span>
+                      </button>
+
+                      <div className="w-[1px] h-6 bg-[#E8E8E3]" />
+
+                      {/* Delete Image Button */}
+                      <button
+                        type="button"
+                        onClick={() => removeFile(selectedPreviewIndex)}
+                        className="w-9 h-9 rounded-xl border border-[#E8E8E3] bg-white flex items-center justify-center text-[#6E6E69] hover:text-red-600 hover:border-red-200 transition-colors shadow-2xs cursor-pointer"
+                        title="Remove image"
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                /* Big Initial Dropzone Area when no images uploaded yet */
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  onDragEnter={handleDragEnter}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                  className={`w-full h-[360px] sm:h-[420px] rounded-3xl border-2 border-dashed flex flex-col items-center justify-center p-8 cursor-pointer transition-all ${
+                    isDragging
+                      ? 'border-[#1345EE] bg-blue-50/40 scale-[0.99]'
+                      : 'border-[#E8E8E3] bg-[#F7F7F5] hover:bg-gray-100 hover:border-gray-400'
+                  }`}
+                >
+                  <div className="w-16 h-16 rounded-2xl bg-white border border-[#E8E8E3] flex items-center justify-center text-[#1345EE] mb-4 shadow-xs">
+                    <Upload size={26} />
+                  </div>
+                  <h3 className="text-base sm:text-lg font-medium text-[#141413] text-center">
+                    Drop images here or browse files
+                  </h3>
+                  <p className="text-xs sm:text-sm text-[#6E6E69] text-center mt-1.5 max-w-sm">
+                    Up to 5 images · maximum 50 MB each (JPEG, PNG, WebP)
+                  </p>
                   <button
                     type="button"
-                    onClick={() => removeFile(idx)}
-                    className="bg-red-500 text-white w-10 h-10 flex items-center justify-center rounded-full hover:bg-red-600 shadow-lg transform hover:scale-105 transition-all"
+                    className="mt-6 px-6 py-2.5 rounded-full bg-white border border-[#E8E8E3] text-xs font-medium text-[#141413] hover:border-black transition-colors shadow-2xs"
                   >
-                    <Trash2 size={18} />
+                    Choose files
                   </button>
                 </div>
-                {idx === 0 && (
-                  <div className="absolute bottom-2 left-2 bg-gray-900/90 text-white text-[10px] font-bold px-2 py-1 rounded">
-                    COVER
-                  </div>
-                )}
-              </div>
-            ))}
+              )}
 
-            {previewUrls.length < 5 && (
-              <div
-                className={`aspect-square border-2 border-dashed rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all ${
-                  isDragging
-                    ? 'border-blue-500 bg-blue-50/60'
-                    : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                }`}
-                onClick={() => fileInputRef.current?.click()}
-              >
-                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center mb-2">
-                  <Upload size={18} className={isDragging ? 'text-blue-600' : 'text-gray-400'} />
+              {/* Thumbnails Strip & Dropzone Tile Row */}
+              {selectedFiles.length > 0 && (
+                <div className="flex flex-wrap items-center gap-3.5 pt-1">
+                  {selectedFiles.map((file, idx) => {
+                    const isCover = idx === 0;
+                    const isSelected = idx === selectedPreviewIndex;
+
+                    return (
+                      <div
+                        key={idx}
+                        draggable
+                        onDragStart={(e) => handleDragStartThumb(e, idx)}
+                        onDragOver={(e) => e.preventDefault()}
+                        onDrop={(e) => handleDropThumb(e, idx)}
+                        onClick={() => setSelectedPreviewIndex(idx)}
+                        className="flex flex-col gap-1.5 cursor-pointer group"
+                      >
+                        {/* Thumbnail Box */}
+                        <div
+                          className={`w-28 h-20 sm:w-36 sm:h-24 rounded-2xl overflow-hidden p-1.5 transition-all select-none ${
+                            isSelected
+                              ? 'border-2 border-[#1345EE] shadow-sm'
+                              : isCover
+                              ? 'border-2 border-[#1345EE]'
+                              : 'border border-[#E8E8E3] hover:border-gray-400'
+                          }`}
+                        >
+                          <div className="w-full h-full rounded-xl overflow-hidden bg-gray-100 relative">
+                            <img
+                              src={previewUrls[idx]}
+                              alt={`Thumb ${idx + 1}`}
+                              className="w-full h-full object-cover"
+                            />
+                            {isCover && (
+                              <span className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded text-[10px] font-semibold bg-[#1345EE] text-white shadow-2xs">
+                                1
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Label & Actions */}
+                        <div className="flex items-center justify-between px-1">
+                          <span
+                            className={`text-[11px] font-normal truncate ${
+                              isCover ? 'text-[#1345EE] font-medium' : 'text-[#6E6E69]'
+                            }`}
+                          >
+                            {isCover ? 'Cover image' : 'Detail view'}
+                          </span>
+                          <span title="Drag to reorder">
+                            <GripVertical
+                              size={12}
+                              className="text-[#6E6E69] opacity-40 group-hover:opacity-100 transition-opacity"
+                            />
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+
+                  {/* Add more images tile (if fewer than 5) */}
+                  {selectedFiles.length < 5 && (
+                    <div
+                      onClick={() => fileInputRef.current?.click()}
+                      onDragEnter={handleDragEnter}
+                      onDragOver={handleDragOver}
+                      onDragLeave={handleDragLeave}
+                      onDrop={handleDrop}
+                      className="w-44 sm:w-56 h-20 sm:h-24 rounded-2xl border border-dashed border-[#E8E8E3] bg-[#F7F7F5] hover:bg-gray-100 hover:border-gray-400 flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors p-2 text-center"
+                    >
+                      <Upload size={16} className="text-[#6E6E69]" />
+                      <span className="text-[11px] sm:text-xs font-medium text-[#141413]">
+                        Drop images or browse
+                      </span>
+                      <span className="text-[10px] text-[#6E6E69]">
+                        Up to 5 · max 50 MB
+                      </span>
+                    </div>
+                  )}
                 </div>
-                <p className="font-semibold text-gray-900 text-xs">
-                  {isDragging ? 'Drop Image Here' : 'Add Image'}
+              )}
+
+              {/* Help Reorder Note */}
+              {selectedFiles.length > 0 && (
+                <p className="text-xs text-[#6E6E69] flex items-center gap-1.5 pt-1">
+                  <GripVertical size={13} className="text-[#6E6E69]" />
+                  <span>Drag to reorder. The first image is always your cover.</span>
                 </p>
-                <p className="text-[10px] text-gray-400 mt-1">Up to 5 images (max {MAX_INPUT_SIZE_MB} MB each)</p>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
 
-          <input
-            ref={fileInputRef}
-            id="file-upload"
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={handleFileChange}
-            className="hidden"
-          />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <Input label="Title *" placeholder="Name of the artwork" error={errors.title?.message} {...register('title')} />
-          <Input label="Artist Name *" placeholder="Who created this?" error={errors.artistName?.message} {...register('artistName')} />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <div className="flex flex-col gap-2">
-            <Select
-              label="Medium *"
-              options={mediumOptions}
-              placeholder="Select Medium"
-              error={errors.artType?.message}
-              {...register('artType')}
-            />
-            {selectedMedium === 'Other' && (
-              <Input
-                autoFocus
-                label="Custom Medium"
-                placeholder="Specify your medium..."
-                value={customMediumInput}
-                onChange={(e) => setCustomMediumInput(e.target.value)}
-                onBlur={() => {
-                  const trimmed = customMediumInput.trim();
-                  if (trimmed && trimmed.toLowerCase() !== 'other') {
-                    saveCustomMedium(trimmed);
-                    setCustomMediums((prev) => {
-                      if (prev.some((m) => m.toLowerCase() === trimmed.toLowerCase())) return prev;
-                      return [...prev, trimmed];
-                    });
-                  }
-                }}
-              />
-            )}
-          </div>
-          <Input label="Year" placeholder="e.g. 2024" error={errors.year?.message} {...register('year')} />
-
-          <div className="flex flex-col gap-2">
-            <Select
-              label="Dimension Unit"
-              options={DIMENSION_UNIT_OPTIONS}
-              placeholder="Select Unit (e.g. in, cm, px)"
-              error={errors.dimensionUnit?.message}
-              {...register('dimensionUnit')}
-            />
-
-            <div className="flex flex-col gap-1.5">
-              <div className="flex items-center justify-between">
-                <label
-                  style={{ color: '#929292', fontWeight: 500 }}
-                  className="block text-xs mb-1"
-                >
-                  Dimensions
-                </label>
-                {!selectedDimensionUnit && (
-                  <span className="text-[10px] text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded font-normal mb-1">
-                    Select unit first
+            {/* Right Column: Cover Preview Card & Guidelines */}
+            <div className="w-full lg:w-[380px] xl:w-[410px] flex flex-col gap-6 shrink-0">
+              {/* Cover Preview Card */}
+              <div className="w-full bg-white border border-[#E8E8E3] rounded-3xl p-5 sm:p-6 flex flex-col gap-4 shadow-2xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs sm:text-sm font-medium text-[#141413]">
+                    Cover preview
                   </span>
-                )}
-              </div>
-              <div className="flex items-center gap-3">
-                <input
-                  type="number"
-                  step={selectedDimensionUnit === 'px' ? '1' : '0.1'}
-                  min={selectedDimensionUnit === 'px' ? '1' : '0.1'}
-                  placeholder={selectedDimensionUnit ? `W (${selectedDimensionUnit})` : 'Select unit first'}
-                  disabled={!selectedDimensionUnit}
-                  onKeyDown={(e) => {
-                    if (e.key === '-' || e.key === 'e' || e.key === 'E') {
-                      e.preventDefault();
-                    }
-                  }}
-                  className={`w-full px-2 py-3 text-sm bg-transparent border-b-2 outline-none transition-all placeholder:text-gray-400 text-center ${
-                    !selectedDimensionUnit
-                      ? 'opacity-40 cursor-not-allowed border-gray-200 bg-gray-50/50'
-                      : errors.width
-                      ? 'border-red-300 focus:border-red-500'
-                      : 'border-gray-300 focus:border-gray-900'
-                  }`}
-                  {...register('width')}
-                />
-                <span className={`text-[10px] ${!selectedDimensionUnit ? 'text-gray-300' : 'text-gray-400'}`}>✕</span>
-                <input
-                  type="number"
-                  step={selectedDimensionUnit === 'px' ? '1' : '0.1'}
-                  min={selectedDimensionUnit === 'px' ? '1' : '0.1'}
-                  placeholder={selectedDimensionUnit ? `H (${selectedDimensionUnit})` : 'Select unit first'}
-                  disabled={!selectedDimensionUnit}
-                  onKeyDown={(e) => {
-                    if (e.key === '-' || e.key === 'e' || e.key === 'E') {
-                      e.preventDefault();
-                    }
-                  }}
-                  className={`w-full px-2 py-3 text-sm bg-transparent border-b-2 outline-none transition-all placeholder:text-gray-400 text-center ${
-                    !selectedDimensionUnit
-                      ? 'opacity-40 cursor-not-allowed border-gray-200 bg-gray-50/50'
-                      : errors.height
-                      ? 'border-red-300 focus:border-red-500'
-                      : 'border-gray-300 focus:border-gray-900'
-                  }`}
-                  {...register('height')}
-                />
-              </div>
-              {(errors.width || errors.height) && (
-                <p className="text-[11px] text-red-500 font-normal mt-1">
-                  {errors.width?.message || errors.height?.message}
+                  <Eye size={16} className="text-[#6E6E69]" />
+                </div>
+
+                {/* Preview Image */}
+                <div className="w-full aspect-[4/3] rounded-xl overflow-hidden bg-[#F7F7F5] border border-[#E8E8E3] flex items-center justify-center">
+                  {currentCoverUrl ? (
+                    <img
+                      src={currentCoverUrl}
+                      alt="Cover Preview"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex flex-col items-center gap-2 text-[#6E6E69]">
+                      <ImageIcon size={32} className="opacity-40" />
+                      <span className="text-xs font-normal">Cover image appears here</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Artwork Title & Artist Info */}
+                <div className="flex flex-col gap-1">
+                  <h4 className="text-sm sm:text-base font-medium text-[#141413] truncate">
+                    {watchedTitle || 'The Broken Illusion'}
+                  </h4>
+                  <p className="text-xs text-[#6E6E69] truncate">
+                    {watchedArtistName || defaultArtistName}
+                  </p>
+                </div>
+
+                <p className="text-[11px] sm:text-xs text-[#6E6E69] leading-relaxed pt-1 border-t border-[#E8E8E3]">
+                  Your first image introduces this work in your portfolio and across ERAS.
                 </p>
-              )}
+              </div>
+
+              {/* "Let the artwork lead" Guidelines Card */}
+              <div className="w-full bg-white border border-[#E8E8E3] rounded-3xl p-5 sm:p-6 flex flex-col gap-3.5 shadow-2xs">
+                <h4 className="text-xs sm:text-sm font-medium text-[#141413]">
+                  Let the artwork lead
+                </h4>
+                <div className="flex flex-col gap-2.5 text-xs text-[#6E6E69] leading-relaxed">
+                  <div className="flex items-start gap-2">
+                    <span className="text-[#94948E] select-none">—</span>
+                    <span>Use a clear, well-lit image of the full artwork for your cover.</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-[#94948E] select-none">—</span>
+                    <span>Add close-ups to show texture, colour and the finer details.</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-[#94948E] select-none">—</span>
+                    <span>Keep colours true to the original. Avoid glare and distractions.</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <Input label="Location" placeholder="e.g. New York, NY" error={errors.location?.message} {...register('location')} />
+        {/* ======================================================== */}
+        {/* STEP 2: ARTWORK DETAILS FORM VIEW                        */}
+        {/* ======================================================== */}
+        {step === 2 && (
+          <div className="flex flex-col lg:flex-row items-start gap-8 lg:gap-14">
+            {/* Left Column: Your Artwork Summary Card & Portfolio Info */}
+            <div className="w-full lg:w-[380px] xl:w-[410px] flex flex-col gap-6 shrink-0 order-2 lg:order-1">
+              {/* Summary Card */}
+              <div className="w-full bg-white border border-[#E8E8E3] rounded-3xl p-5 sm:p-6 flex flex-col gap-4 shadow-2xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs sm:text-sm font-medium text-[#141413]">
+                    Your artwork
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-md bg-[#F3F3EF] border border-[#E5E5DF] text-[11px] font-medium text-[#6E6E69]">
+                    Draft
+                  </span>
+                </div>
 
-          <div className="flex flex-col gap-2">
-            <Select label="Style" options={styleOptions} placeholder="Select Style" error={errors.style?.message} {...register('style')} />
-            {selectedStyle === 'Other' && (
-              <Input autoFocus label="Custom Style" placeholder="Specify your style..." value={customStyle} onChange={(e) => setCustomStyle(e.target.value)} />
-            )}
-          </div>
+                {/* Cover Image */}
+                <div className="w-full aspect-[4/3] rounded-xl overflow-hidden bg-[#F7F7F5] border border-[#E8E8E3]">
+                  {currentCoverUrl ? (
+                    <img
+                      src={currentCoverUrl}
+                      alt="Cover"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-[#6E6E69]">
+                      <ImageIcon size={32} />
+                    </div>
+                  )}
+                </div>
 
-          <div className="flex flex-col gap-2">
-            <Select label="Collection" options={collectionOptions} placeholder="Select Collection" error={errors.collection?.message} {...register('collection')} />
-            {selectedCollection === 'Other' && (
-              <Input
-                autoFocus
-                label="Custom Collection"
-                placeholder="Specify collection name..."
-                value={customCollection}
-                onChange={(e) => setCustomCollection(e.target.value)}
-                onBlur={() => {
-                  const trimmed = customCollection.trim();
-                  if (trimmed && trimmed.toLowerCase() !== 'other') {
-                    saveCustomCollection(trimmed);
-                    setCustomCollections((prev) => {
-                      if (prev.some((c) => c.toLowerCase() === trimmed.toLowerCase())) return prev;
-                      return [...prev, trimmed];
-                    });
-                  }
-                }}
-              />
-            )}
-          </div>
-        </div>
+                {/* Live Info */}
+                <div className="flex flex-col gap-1.5">
+                  <h3
+                    className="text-lg sm:text-xl font-bold text-[#141413] tracking-tight leading-snug"
+                    style={{
+                      fontFamily: "'Century Schoolbook', Century, 'TeX Gyre Schola', Georgia, serif",
+                      fontStyle: 'italic',
+                    }}
+                  >
+                    {watchedTitle || 'The Broken Illusion'}
+                  </h3>
+                  <p className="text-xs sm:text-[13px] text-[#6E6E69]">
+                    {watchedArtistName || defaultArtistName}
+                  </p>
+                  <p className="text-xs text-[#6E6E69]">
+                    {watchedArtType || 'Painting'} · {watchedYear || 2026}
+                    {watchedWidth && watchedHeight && (
+                      <>
+                        <br />
+                        {watchedWidth} × {watchedHeight}{' '}
+                        {watchedDimensionUnit === 'Centimeters (cm)' ? 'cm' : 'in'}
+                      </>
+                    )}
+                  </p>
+                </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <div className="flex flex-col gap-2">
-            <Controller
-              name="tags"
-              control={control}
-              render={({ field }) => (
-                <MultiSelect
-                  label="Tags"
-                  options={tagsOptions}
-                  placeholder="Select Tags"
-                  value={field.value || []}
-                  onChange={field.onChange}
-                  error={errors.tags?.message}
-                />
-              )}
-            />
-          </div>
-          <Select label="Availability" options={availabilityOptions} error={errors.status?.message} {...register('status')} />
-          <Select label="Price Visibility" options={visibilityOptions} error={errors.priceVisibility?.message} {...register('priceVisibility')} />
-        </div>
+                <div className="h-[1px] bg-[#E8E8E3] w-full" />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <Controller
-            name="price"
-            control={control}
-            render={({ field }) => (
-              <Input
-                label={
-                  selectedPriceVisibility === 'Hide Price'
-                    ? 'Price · Hidden from public view'
-                    : selectedPriceVisibility === 'Price on Request'
-                    ? 'Price · Will display as "On Request"'
-                    : 'Price'
-                }
-                type="text"
-                inputMode="numeric"
-                placeholder="0"
-                helperText={`Max amount: ${MAX_PRICE_INR_FORMATTED}`}
-                error={errors.price?.message}
-                value={field.value || ''}
-                onChange={(e) => {
-                  const formatted = formatIndianCurrency(e.target.value);
-                  field.onChange(formatted);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === '-' || e.key === '+' || e.key === 'e' || e.key === 'E') {
-                    e.preventDefault();
-                  }
-                }}
-              />
-            )}
-          />
-          <div className="relative">
-            <Input label="Related Link" placeholder="https://..." error={errors.externalLink?.message} {...register('externalLink')} />
-            <LinkIcon className="absolute right-3 top-9 text-gray-400" size={16} />
-          </div>
-        </div>
+                {/* Thumbnail Preview Strip */}
+                <div className="flex items-center gap-2.5 overflow-hidden">
+                  {previewUrls.slice(0, 3).map((url, i) => (
+                    <div
+                      key={i}
+                      className={`w-14 h-11 rounded-lg overflow-hidden border ${
+                        i === 0 ? 'border-[#1345EE] ring-1 ring-[#1345EE]' : 'border-[#E8E8E3]'
+                      }`}
+                    >
+                      <img src={url} alt={`Thumb ${i}`} className="w-full h-full object-cover" />
+                    </div>
+                  ))}
+                  <span className="text-xs text-[#6E6E69] ml-1">
+                    {selectedFiles.length} {selectedFiles.length === 1 ? 'image' : 'images'}
+                  </span>
+                </div>
 
-        <TextArea label="Description" placeholder="Tell collectors about this piece..." error={errors.description?.message} {...register('description')} />
+                {/* Edit Images Button */}
+                <button
+                  type="button"
+                  onClick={() => setStep(1)}
+                  className="mt-1 px-4 py-2 rounded-xl border border-[#E8E8E3] bg-white text-xs font-medium text-[#141413] hover:border-black transition-colors flex items-center gap-2 w-fit shadow-2xs cursor-pointer"
+                >
+                  <Pencil size={13} className="text-[#6E6E69]" />
+                  <span>Edit images</span>
+                </button>
+              </div>
 
-        <div className="flex flex-col sm:flex-row items-center gap-3.5 pt-6 border-t border-gray-100">
-          {/* Blue Gradient Publish Button */}
-          <button
-            type="submit"
-            disabled={isLoading || freemiumStatus.isLocked}
-            onClick={() => setSubmitAction('publish')}
-            style={{
-              position: 'relative',
-              background: 'linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%)',
-              boxShadow:
-                '0px 7px 22px rgba(35, 77, 255, 0.13), 0px 3px 3px rgba(255, 255, 255, 0.65) inset, 0px -3px 6px rgba(6, 42, 137, 0.33) inset',
-              overflow: 'hidden',
-              borderRadius: 40,
-              outline: '2px #2356FF solid',
-              outlineOffset: '-2px',
-            }}
-            className="w-full sm:w-auto px-8 py-3.5 sm:px-10 sm:py-4 inline-flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 hover:brightness-110 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed group select-none shadow-md"
-          >
-            <div
-              style={{
-                position: 'absolute',
-                inset: 3,
-                borderRadius: 37,
-                border: '1px rgba(255, 255, 255, 0.15) solid',
-                pointerEvents: 'none',
-              }}
-            />
-            <div
-              style={{
-                color: 'white',
-                fontSize: 16,
-                fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
-                fontWeight: '600',
-                lineHeight: '24px',
-              }}
-              className="flex items-center gap-2 relative z-10"
-            >
-              {isLoading && submitAction === 'publish' ? (
-                <>
-                  <Loader2 size={18} className="animate-spin text-white" />
-                  <span>Publishing...</span>
-                </>
-              ) : (
-                <>
-                  <ImageIcon size={18} className="text-white" />
-                  <span>Publish</span>
-                </>
-              )}
+              {/* "A place in your portfolio" Card */}
+              <div className="w-full bg-[#F7F7F5] border border-[#E8E8E3] rounded-2xl p-5 flex flex-col gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-white border border-[#E8E8E3] flex items-center justify-center text-[#6E6E69]">
+                  <Eye size={16} />
+                </div>
+                <h4 className="text-xs sm:text-sm font-medium text-[#141413]">
+                  A place in your portfolio
+                </h4>
+                <p className="text-xs text-[#6E6E69] leading-relaxed">
+                  Publishing makes this artwork visible on ERAS and in your portfolio. You can edit its details at any time.
+                </p>
+              </div>
+
+              <p className="text-xs text-[#6E6E69] px-1">
+                Not quite ready? Save a draft and return whenever inspiration strikes.
+              </p>
             </div>
-          </button>
 
-          {/* Black Save Draft Button */}
-          <button
-            type="submit"
-            disabled={isLoading || freemiumStatus.isLocked}
-            onClick={() => setSubmitAction('draft')}
-            style={{
-              position: 'relative',
-              background: '#181A1F',
-              overflow: 'hidden',
-              borderRadius: 40,
-            }}
-            className="w-full sm:w-auto px-8 py-3.5 sm:px-10 sm:py-4 inline-flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 hover:bg-black active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed shadow-md select-none"
-          >
-            <span
-              style={{
-                color: 'white',
-                fontSize: 15,
-                fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
-                fontWeight: '600',
-                lineHeight: '24px',
-              }}
-              className="flex items-center gap-2 relative z-10"
-            >
-              {isLoading && submitAction === 'draft' ? (
-                <>
-                  <Loader2 size={17} className="animate-spin text-white" />
-                  <span>Saving Draft...</span>
-                </>
-              ) : (
-                <>
-                  <Save size={17} className="text-white" />
-                  <span>Save Draft</span>
-                </>
-              )}
-            </span>
-          </button>
+            {/* Right Column: Form Sections 01, 02, 03 */}
+            <div className="flex-1 w-full flex flex-col gap-8 order-1 lg:order-2">
+              {/* ====================================================== */}
+              {/* SECTION 01: THE ESSENTIALS                             */}
+              {/* ====================================================== */}
+              <div className="flex flex-col gap-6">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-start gap-4">
+                    <span
+                      className="text-2xl sm:text-3xl font-normal text-[#94948E]"
+                      style={{
+                        fontFamily: "'Century Schoolbook', Century, 'TeX Gyre Schola', Georgia, serif",
+                        fontStyle: 'italic',
+                      }}
+                    >
+                      01
+                    </span>
+                    <div>
+                      <h3 className="text-base sm:text-lg font-medium text-[#141413]">
+                        The essentials
+                      </h3>
+                      <p className="text-xs sm:text-[13px] text-[#6E6E69] mt-0.5">
+                        The name, material and scale of your work.
+                      </p>
+                    </div>
+                  </div>
+                  <span className="text-xs text-[#6E6E69] shrink-0">* Required fields</span>
+                </div>
 
-          {/* Cancel Button */}
-          <button
-            type="button"
-            onClick={() => router.push('/portfolio')}
-            style={{
-              position: 'relative',
-              background: '#F3F3F3',
-              overflow: 'hidden',
-              borderRadius: 40,
-            }}
-            className="w-full sm:w-auto px-8 py-3.5 sm:px-10 sm:py-4 inline-flex items-center justify-center cursor-pointer transition-all duration-200 hover:bg-[#E5E5E5] active:scale-[0.98] select-none"
-          >
-            <span
-              style={{
-                color: '#343434',
-                fontSize: 15,
-                fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
-                fontWeight: '600',
-                lineHeight: '24px',
-                textAlign: 'center',
-              }}
-              className="relative z-10"
-            >
-              Cancel
-            </span>
-          </button>
+                {/* Form Fields: Row 1 (Title, Artist Name) */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                  <div>
+                    <label className="block text-xs font-normal text-[#6E6E69] mb-1.5">
+                      Title *
+                    </label>
+                    <input
+                      type="text"
+                      {...register('title')}
+                      placeholder="e.g. The Broken Illusion"
+                      className="w-full px-4 py-3 rounded-2xl border border-[#E8E8E3] bg-white text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all font-normal shadow-2xs"
+                    />
+                    {errors.title && (
+                      <p className="text-[11px] text-red-500 mt-1">{errors.title.message}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-normal text-[#6E6E69] mb-1.5">
+                      Artist Name *
+                    </label>
+                    <input
+                      type="text"
+                      {...register('artistName')}
+                      placeholder="e.g. Rishi Mailoorkar"
+                      className="w-full px-4 py-3 rounded-2xl border border-[#E8E8E3] bg-white text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all font-normal shadow-2xs"
+                    />
+                    {errors.artistName && (
+                      <p className="text-[11px] text-red-500 mt-1">{errors.artistName.message}</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Form Fields: Row 2 (Medium, Year) */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                  <div>
+                    <label className="block text-xs font-normal text-[#6E6E69] mb-1.5">
+                      Medium *
+                    </label>
+                    <div className="relative">
+                      <select
+                        {...register('artType')}
+                        className="w-full appearance-none px-4 py-3 rounded-2xl border border-[#E8E8E3] bg-white text-xs sm:text-sm text-[#141413] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all font-normal cursor-pointer shadow-2xs pr-10"
+                      >
+                        {mediumOptions.map((opt) => (
+                          <option key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown
+                        size={16}
+                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#6E6E69] pointer-events-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-normal text-[#6E6E69] mb-1.5">
+                      Year
+                    </label>
+                    <input
+                      type="text"
+                      {...register('year')}
+                      placeholder="e.g. 2026"
+                      className="w-full px-4 py-3 rounded-2xl border border-[#E8E8E3] bg-white text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all font-normal shadow-2xs"
+                    />
+                  </div>
+                </div>
+
+                {/* Form Fields: Row 3 (Dimension Unit, Width, Height) */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+                  <div>
+                    <label className="block text-xs font-normal text-[#6E6E69] mb-1.5">
+                      Dimension Unit
+                    </label>
+                    <div className="relative">
+                      <select
+                        {...register('dimensionUnit')}
+                        className="w-full appearance-none px-4 py-3 rounded-2xl border border-[#E8E8E3] bg-white text-xs sm:text-sm text-[#141413] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all font-normal cursor-pointer shadow-2xs pr-10"
+                      >
+                        {dimensionUnitOptions.map((opt) => (
+                          <option key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown
+                        size={16}
+                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#6E6E69] pointer-events-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-normal text-[#6E6E69] mb-1.5">
+                      Dimensions · Width (in)
+                    </label>
+                    <input
+                      type="number"
+                      step="any"
+                      {...register('width')}
+                      placeholder="e.g. 24"
+                      className="w-full px-4 py-3 rounded-2xl border border-[#E8E8E3] bg-white text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all font-normal shadow-2xs"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-normal text-[#6E6E69] mb-1.5">
+                      Dimensions · Height (in)
+                    </label>
+                    <input
+                      type="number"
+                      step="any"
+                      {...register('height')}
+                      placeholder="e.g. 18"
+                      className="w-full px-4 py-3 rounded-2xl border border-[#E8E8E3] bg-white text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all font-normal shadow-2xs"
+                    />
+                  </div>
+                </div>
+
+                {/* Form Fields: Row 4 (Location) */}
+                <div>
+                  <label className="block text-xs font-normal text-[#6E6E69] mb-1.5">
+                    Location
+                  </label>
+                  <input
+                    type="text"
+                    {...register('location')}
+                    placeholder="e.g. Mumbai, India"
+                    className="w-full px-4 py-3 rounded-2xl border border-[#E8E8E3] bg-white text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all font-normal shadow-2xs"
+                  />
+                </div>
+              </div>
+
+              <div className="h-[1px] bg-[#E8E8E3] w-full" />
+
+              {/* ====================================================== */}
+              {/* SECTION 02: STORY & DISCOVERY                          */}
+              {/* ====================================================== */}
+              <div className="flex flex-col gap-6">
+                <div className="flex items-start gap-4">
+                  <span
+                    className="text-2xl sm:text-3xl font-normal text-[#94948E]"
+                    style={{
+                      fontFamily: "'Century Schoolbook', Century, 'TeX Gyre Schola', Georgia, serif",
+                      fontStyle: 'italic',
+                    }}
+                  >
+                    02
+                  </span>
+                  <div>
+                    <h3 className="text-base sm:text-lg font-medium text-[#141413]">
+                      Story & discovery
+                    </h3>
+                    <p className="text-xs sm:text-[13px] text-[#6E6E69] mt-0.5">
+                      Help collectors understand and find your artwork.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Form Fields: Row 1 (Style, Collection) */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                  <div>
+                    <label className="block text-xs font-normal text-[#6E6E69] mb-1.5">
+                      Style
+                    </label>
+                    <div className="relative">
+                      <select
+                        {...register('style')}
+                        className="w-full appearance-none px-4 py-3 rounded-2xl border border-[#E8E8E3] bg-white text-xs sm:text-sm text-[#141413] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all font-normal cursor-pointer shadow-2xs pr-10"
+                      >
+                        {styleOptions.map((opt) => (
+                          <option key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown
+                        size={16}
+                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#6E6E69] pointer-events-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-normal text-[#6E6E69] mb-1.5">
+                      Collection
+                    </label>
+                    <div className="relative">
+                      <select
+                        {...register('collection')}
+                        className="w-full appearance-none px-4 py-3 rounded-2xl border border-[#E8E8E3] bg-white text-xs sm:text-sm text-[#141413] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all font-normal cursor-pointer shadow-2xs pr-10"
+                      >
+                        <option value="">None (Individual artwork)</option>
+                        {collections.map((col) => (
+                          <option key={col.id} value={col.title}>
+                            {col.title}
+                          </option>
+                        ))}
+                        <option value="Summer Series">Summer Series</option>
+                        <option value="Monsoon Studies">Monsoon Studies</option>
+                      </select>
+                      <ChevronDown
+                        size={16}
+                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#6E6E69] pointer-events-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Form Fields: Row 2 (Tags) */}
+                <div>
+                  <label className="block text-xs font-normal text-[#6E6E69] mb-1.5">
+                    Tags
+                  </label>
+                  <div className="w-full min-h-[52px] p-2.5 rounded-2xl border border-[#E8E8E3] bg-white flex flex-wrap items-center gap-2 shadow-2xs">
+                    {tags.map((t) => (
+                      <span
+                        key={t}
+                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#F3F3EF] border border-[#E5E5DF] text-xs font-medium text-[#6E6E69]"
+                      >
+                        <span>{t}</span>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveTag(t)}
+                          className="hover:text-black cursor-pointer"
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+
+                    {isAddingTag ? (
+                      <div className="inline-flex items-center gap-1">
+                        <input
+                          type="text"
+                          value={tagInput}
+                          onChange={(e) => setTagInput(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              handleAddTag();
+                            } else if (e.key === 'Escape') {
+                              setIsAddingTag(false);
+                            }
+                          }}
+                          placeholder="Type tag & Enter"
+                          className="text-xs px-2 py-1 rounded border border-[#1345EE] outline-none text-[#141413]"
+                          autoFocus
+                        />
+                        <button
+                          type="button"
+                          onClick={handleAddTag}
+                          className="text-xs text-[#1345EE] font-medium"
+                        >
+                          Add
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setIsAddingTag(true)}
+                        className="text-xs text-[#6E6E69] hover:text-black transition-colors px-2 py-1 cursor-pointer"
+                      >
+                        + Add tag
+                      </button>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-[#6E6E69] mt-1.5">
+                    Choose keywords that describe the subject, mood or technique.
+                  </p>
+                </div>
+
+                {/* Form Fields: Row 3 (Related Link) */}
+                <div>
+                  <label className="block text-xs font-normal text-[#6E6E69] mb-1.5">
+                    Related Link
+                  </label>
+                  <input
+                    type="url"
+                    {...register('externalLink')}
+                    placeholder="https://..."
+                    className="w-full px-4 py-3 rounded-2xl border border-[#E8E8E3] bg-white text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all font-normal shadow-2xs"
+                  />
+                </div>
+
+                {/* Form Fields: Row 4 (Description) */}
+                <div>
+                  <label className="block text-xs font-normal text-[#6E6E69] mb-1.5">
+                    Description
+                  </label>
+                  <textarea
+                    rows={4}
+                    {...register('description')}
+                    placeholder="Share the inspiration, process or story behind this piece."
+                    className="w-full px-4 py-3 rounded-2xl border border-[#E8E8E3] bg-white text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all font-normal shadow-2xs resize-none"
+                  />
+                  <p className="text-[11px] text-[#6E6E69] mt-1">
+                    Share the inspiration, process or story behind this piece.
+                  </p>
+                </div>
+              </div>
+
+              <div className="h-[1px] bg-[#E8E8E3] w-full" />
+
+              {/* ====================================================== */}
+              {/* SECTION 03: AVAILABILITY & PRICING                     */}
+              {/* ====================================================== */}
+              <div className="flex flex-col gap-6">
+                <div className="flex items-start gap-4">
+                  <span
+                    className="text-2xl sm:text-3xl font-normal text-[#94948E]"
+                    style={{
+                      fontFamily: "'Century Schoolbook', Century, 'TeX Gyre Schola', Georgia, serif",
+                      fontStyle: 'italic',
+                    }}
+                  >
+                    03
+                  </span>
+                  <div>
+                    <h3 className="text-base sm:text-lg font-medium text-[#141413]">
+                      Availability & pricing
+                    </h3>
+                    <p className="text-xs sm:text-[13px] text-[#6E6E69] mt-0.5">
+                      Choose how your work is presented to collectors.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Form Fields: Row 1 (Availability, Price Visibility) */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                  <div>
+                    <label className="block text-xs font-normal text-[#6E6E69] mb-1.5">
+                      Availability
+                    </label>
+                    <div className="relative">
+                      <select
+                        {...register('status')}
+                        className="w-full appearance-none px-4 py-3 rounded-2xl border border-[#E8E8E3] bg-white text-xs sm:text-sm text-[#141413] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all font-normal cursor-pointer shadow-2xs pr-10"
+                      >
+                        {availabilityOptions.map((opt) => (
+                          <option key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown
+                        size={16}
+                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#6E6E69] pointer-events-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-normal text-[#6E6E69] mb-1.5">
+                      Price Visibility
+                    </label>
+                    <div className="relative">
+                      <select
+                        {...register('priceVisibility')}
+                        className="w-full appearance-none px-4 py-3 rounded-2xl border border-[#E8E8E3] bg-white text-xs sm:text-sm text-[#141413] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all font-normal cursor-pointer shadow-2xs pr-10"
+                      >
+                        {visibilityOptions.map((opt) => (
+                          <option key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown
+                        size={16}
+                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#6E6E69] pointer-events-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Form Fields: Row 2 (Price) */}
+                <div>
+                  <label className="block text-xs font-normal text-[#6E6E69] mb-1.5">
+                    Price
+                  </label>
+                  <input
+                    type="text"
+                    {...register('price')}
+                    placeholder="e.g. 45,000"
+                    className="w-full px-4 py-3 rounded-2xl border border-[#E8E8E3] bg-white text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all font-normal shadow-2xs"
+                  />
+                  {errors.price && (
+                    <p className="text-[11px] text-red-500 mt-1">{errors.price.message}</p>
+                  )}
+                  <p className="text-[11px] text-[#6E6E69] mt-1.5">
+                    Max amount: 1,00,00,000
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ======================================================== */}
+        {/* BOTTOM ACTION BAR                                        */}
+        {/* ======================================================== */}
+        <div className="mt-12 pt-6 border-t border-[#E8E8E3] flex flex-col sm:flex-row items-center justify-between gap-4">
+          {step === 1 ? (
+            <>
+              {/* Cancel Button */}
+              <Link
+                href="/portfolio"
+                className="px-6 py-2.5 rounded-full text-xs sm:text-sm font-medium text-[#141413] hover:bg-gray-100 transition-colors cursor-pointer select-none"
+              >
+                Cancel
+              </Link>
+
+              {/* Step 1 Actions */}
+              <div className="flex items-center gap-3 sm:gap-4">
+                <span className="text-xs sm:text-sm text-[#6E6E69] hidden md:inline">
+                  {selectedFiles.length === 5 ? 'All images uploaded' : `${selectedFiles.length} of 5 images uploaded`}
+                </span>
+
+                <button
+                  type="button"
+                  onClick={handleSaveDraft}
+                  disabled={isLoading || selectedFiles.length === 0}
+                  className="px-6 py-2.5 rounded-full border border-[#E8E8E3] bg-white text-xs sm:text-sm font-medium text-[#141413] hover:border-black transition-colors disabled:opacity-40 disabled:cursor-not-allowed shadow-2xs cursor-pointer select-none"
+                >
+                  Save draft
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (selectedFiles.length === 0) {
+                      setError('Please select at least one image before continuing.');
+                      return;
+                    }
+                    setStep(2);
+                  }}
+                  disabled={selectedFiles.length === 0}
+                  className="px-6 sm:px-8 py-2.5 sm:py-3 rounded-full bg-[#1345EE] text-white text-xs sm:text-sm font-medium hover:bg-blue-700 transition-colors flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm cursor-pointer select-none"
+                >
+                  <span>Continue to details</span>
+                  <ArrowRight size={16} />
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Back to Images Button */}
+              <button
+                type="button"
+                onClick={() => setStep(1)}
+                className="px-6 py-2.5 rounded-full text-xs sm:text-sm font-medium text-[#141413] hover:bg-gray-100 transition-colors cursor-pointer select-none flex items-center gap-1.5"
+              >
+                <ChevronLeft size={16} />
+                <span>Back to images</span>
+              </button>
+
+              {/* Step 2 Actions */}
+              <div className="flex items-center gap-3 sm:gap-4">
+                <span className="text-xs sm:text-sm text-[#6E6E69] hidden md:inline">
+                  Ready to share your perspective?
+                </span>
+
+                <button
+                  type="button"
+                  onClick={handleSaveDraft}
+                  disabled={isLoading}
+                  className="px-6 py-2.5 rounded-full border border-[#E8E8E3] bg-white text-xs sm:text-sm font-medium text-[#141413] hover:border-black transition-colors disabled:opacity-40 shadow-2xs cursor-pointer select-none"
+                >
+                  Save draft
+                </button>
+
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="px-6 sm:px-8 py-2.5 sm:py-3 rounded-full bg-[#1345EE] text-white text-xs sm:text-sm font-medium hover:bg-blue-700 transition-colors flex items-center gap-2 disabled:opacity-50 shadow-sm cursor-pointer select-none"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin text-white" />
+                      <span>Publishing...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Publish artwork</span>
+                      <ArrowRight size={16} />
+                    </>
+                  )}
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </form>
-
     </div>
   );
 }
