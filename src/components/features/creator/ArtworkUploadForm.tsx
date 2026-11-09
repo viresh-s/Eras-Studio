@@ -180,7 +180,7 @@ export default function ArtworkUploadForm({
   const editImageInputRef = useRef<HTMLInputElement>(null);
 
   // Tags state
-  const [tags, setTags] = useState<string[]>(['Portrait', 'Geometric', 'Contemporary']);
+  const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
   const [isAddingTag, setIsAddingTag] = useState(false);
 
@@ -190,10 +190,8 @@ export default function ArtworkUploadForm({
   const [compressionProgress, setCompressionProgress] = useState<PipelineProgress | null>(null);
   const [uploadStage, setUploadStage] = useState<string | null>(null);
 
-  // Default values based on creator profile
-  const defaultArtistName = profile?.full_name || 'Rishi Mailoorkar';
-  const defaultLocation =
-    [profile?.location_city, profile?.location_country].filter(Boolean).join(', ') || 'Mumbai, India';
+  // Default values based on creator profile - only artist name is pre-filled
+  const defaultArtistName = profile?.full_name || '';
 
   const {
     register,
@@ -204,20 +202,19 @@ export default function ArtworkUploadForm({
   } = useForm<UploadForm>({
     resolver: zodResolver(uploadSchema),
     defaultValues: {
-      title: 'The Broken Illusion',
+      title: '',
       artistName: defaultArtistName,
-      artType: 'Painting',
-      year: new Date().getFullYear().toString(),
+      artType: '',
+      year: '',
       dimensionUnit: 'Inches (in)',
-      width: '24',
-      height: '18',
-      location: defaultLocation,
-      style: 'Abstract',
-      collection: collections[0]?.title || 'Summer Series',
-      description:
-        'A portrait caught between the real and the imagined. Fractured planes of colour explore the many ways we see ourselves, bringing moments of clarity and distortion into the same frame.',
-      externalLink: 'https://rishimailoorkar.com/the-broken-illusion',
-      price: '45,000',
+      width: '',
+      height: '',
+      location: '',
+      style: '',
+      collection: '',
+      description: '',
+      externalLink: '',
+      price: '',
       priceVisibility: 'Show Price',
       status: 'Available',
     },
@@ -565,16 +562,21 @@ export default function ArtworkUploadForm({
   };
 
   const handleSaveDraft = () => {
+    if (selectedFiles.length === 0) {
+      setError('Please upload at least one image before saving a draft.');
+      return;
+    }
     const currentValues = watch();
-    const draftTitle = currentValues.title?.trim() || 'Untitled Artwork';
+    const draftTitle = currentValues.title?.trim() || selectedFiles[0]?.name || 'Untitled Draft';
     submitArtwork({ ...currentValues, title: draftTitle }, false);
   };
 
+  const currentPreviewFile = selectedFiles[selectedPreviewIndex];
   const activeMeta = filesMeta[selectedPreviewIndex] || {
-    name: selectedFiles[selectedPreviewIndex]?.name || 'broken-illusion.jpg',
-    sizeFormatted: '8.4 MB',
-    width: 2400,
-    height: 1800,
+    name: currentPreviewFile?.name || '',
+    sizeFormatted: currentPreviewFile ? formatFileSize(currentPreviewFile.size) : '',
+    width: undefined,
+    height: undefined,
   };
 
   const currentCoverUrl = previewUrls[0] || null;
@@ -721,7 +723,14 @@ export default function ArtworkUploadForm({
         </div>
       )}
 
-      <form onSubmit={handleSubmit(onPublishSubmit)}>
+      <form
+        onSubmit={(e) => e.preventDefault()}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' && (e.target as HTMLElement).tagName === 'INPUT') {
+            e.preventDefault();
+          }
+        }}
+      >
         {/* ======================================================== */}
         {/* STEP 1: UPLOAD ARTWORK IMAGES VIEW                       */}
         {/* ======================================================== */}
@@ -954,10 +963,10 @@ export default function ArtworkUploadForm({
                 {/* Artwork Title & Artist Info */}
                 <div className="flex flex-col gap-1">
                   <h4 className="text-sm sm:text-base font-medium text-[#141413] truncate">
-                    {watchedTitle || 'The Broken Illusion'}
+                    {selectedFiles[0]?.name || 'Cover image'}
                   </h4>
                   <p className="text-xs text-[#6E6E69] truncate">
-                    {watchedArtistName || defaultArtistName}
+                    {defaultArtistName || 'Artist'}
                   </p>
                 </div>
 
@@ -1032,13 +1041,14 @@ export default function ArtworkUploadForm({
                       fontStyle: 'italic',
                     }}
                   >
-                    {watchedTitle || 'The Broken Illusion'}
+                    {watchedTitle?.trim() || selectedFiles[0]?.name || 'Untitled'}
                   </h3>
                   <p className="text-xs sm:text-[13px] text-[#6E6E69]">
-                    {watchedArtistName || defaultArtistName}
+                    {watchedArtistName?.trim() || defaultArtistName || 'Artist'}
                   </p>
                   <p className="text-xs text-[#6E6E69]">
-                    {watchedArtType || 'Painting'} · {watchedYear || 2026}
+                    {watchedArtType ? watchedArtType : 'Medium not selected'}
+                    {watchedYear?.trim() ? ` · ${watchedYear.trim()}` : ''}
                     {watchedWidth && watchedHeight && (
                       <>
                         <br />
@@ -1170,6 +1180,7 @@ export default function ArtworkUploadForm({
                         {...register('artType')}
                         className="w-full appearance-none px-4 py-3 rounded-2xl border border-[#E8E8E3] bg-white text-xs sm:text-sm text-[#141413] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all font-normal cursor-pointer shadow-2xs pr-10"
                       >
+                        <option value="">Select medium</option>
                         {mediumOptions.map((opt) => (
                           <option key={opt.value} value={opt.value}>
                             {opt.label}
@@ -1181,6 +1192,9 @@ export default function ArtworkUploadForm({
                         className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#6E6E69] pointer-events-none"
                       />
                     </div>
+                    {errors.artType && (
+                      <p className="text-[11px] text-red-500 mt-1">{errors.artType.message}</p>
+                    )}
                   </div>
 
                   <div>
@@ -1298,6 +1312,7 @@ export default function ArtworkUploadForm({
                         {...register('style')}
                         className="w-full appearance-none px-4 py-3 rounded-2xl border border-[#E8E8E3] bg-white text-xs sm:text-sm text-[#141413] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all font-normal cursor-pointer shadow-2xs pr-10"
                       >
+                        <option value="">Select style</option>
                         {styleOptions.map((opt) => (
                           <option key={opt.value} value={opt.value}>
                             {opt.label}
@@ -1326,8 +1341,6 @@ export default function ArtworkUploadForm({
                             {col.title}
                           </option>
                         ))}
-                        <option value="Summer Series">Summer Series</option>
-                        <option value="Monsoon Studies">Monsoon Studies</option>
                       </select>
                       <ChevronDown
                         size={16}
@@ -1600,7 +1613,8 @@ export default function ArtworkUploadForm({
                 </button>
 
                 <button
-                  type="submit"
+                  type="button"
+                  onClick={handleSubmit(onPublishSubmit)}
                   disabled={isLoading}
                   className="px-6 sm:px-8 py-2.5 sm:py-3 rounded-full bg-[#1345EE] text-white text-xs sm:text-sm font-medium hover:bg-blue-700 transition-colors flex items-center gap-2 disabled:opacity-50 shadow-sm cursor-pointer select-none"
                 >
