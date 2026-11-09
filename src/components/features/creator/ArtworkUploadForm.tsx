@@ -192,6 +192,7 @@ export default function ArtworkUploadForm({
     handleSubmit,
     watch,
     setValue,
+    clearErrors,
     formState: { errors },
   } = useForm<UploadForm>({
     resolver: zodResolver(uploadSchema),
@@ -246,13 +247,16 @@ export default function ArtworkUploadForm({
       if (prev.some((m) => m.toLowerCase() === trimmed.toLowerCase())) return prev;
       return [...prev, trimmed];
     });
-    setValue('artType', trimmed, { shouldValidate: true });
+    setValue('artType', trimmed);
+    clearErrors('artType');
+    setIsCustomMedium(false);
   };
 
   const handleCancelCustomMedium = () => {
     setIsCustomMedium(false);
     setCustomMediumInput('');
-    setValue('artType', '', { shouldValidate: true });
+    setValue('artType', '');
+    clearErrors('artType');
   };
 
   const handleCommitCustomStyle = () => {
@@ -264,13 +268,16 @@ export default function ArtworkUploadForm({
       if (prev.some((s) => s.toLowerCase() === trimmed.toLowerCase())) return prev;
       return [...prev, trimmed];
     });
-    setValue('style', trimmed, { shouldValidate: true });
+    setValue('style', trimmed);
+    clearErrors('style');
+    setIsCustomStyle(false);
   };
 
   const handleCancelCustomStyle = () => {
     setIsCustomStyle(false);
     setCustomStyleInput('');
-    setValue('style', '', { shouldValidate: true });
+    setValue('style', '');
+    clearErrors('style');
   };
 
   // Format bytes to human readable string
@@ -1260,10 +1267,11 @@ export default function ArtworkUploadForm({
                       id="artwork-field-title"
                       type="text"
                       {...register('title')}
+                      onFocus={() => clearErrors('title')}
                       placeholder="e.g. The Broken Illusion"
-                      className={`w-full px-4 py-3 rounded-2xl text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] font-normal shadow-2xs ${
+                      className={`w-full px-4 py-3 rounded-2xl text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] font-normal shadow-2xs outline-none focus:outline-none ${
                         errors.title
-                          ? 'bg-white border-2 border-red-500 ring-2 ring-red-500/20'
+                          ? 'input-error-border'
                           : 'input-gradient-border'
                       }`}
                     />
@@ -1277,10 +1285,11 @@ export default function ArtworkUploadForm({
                       id="artwork-field-artistName"
                       type="text"
                       {...register('artistName')}
+                      onFocus={() => clearErrors('artistName')}
                       placeholder="e.g. Rishi Mailoorkar"
-                      className={`w-full px-4 py-3 rounded-2xl text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] font-normal shadow-2xs ${
+                      className={`w-full px-4 py-3 rounded-2xl text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] font-normal shadow-2xs outline-none focus:outline-none ${
                         errors.artistName
-                          ? 'bg-white border-2 border-red-500 ring-2 ring-red-500/20'
+                          ? 'input-error-border'
                           : 'input-gradient-border'
                       }`}
                     />
@@ -1298,20 +1307,29 @@ export default function ArtworkUploadForm({
                         <>
                           <select
                             id="artwork-field-artType"
-                            {...register('artType')}
+                            value={isCustomMedium ? 'Other' : (watchedArtType || '')}
                             onChange={(e) => {
                               const val = e.target.value;
                               if (val === 'Other') {
                                 setIsCustomMedium(true);
                                 setCustomMediumInput('');
-                                setValue('artType', '', { shouldValidate: true });
+                                setValue('artType', '');
+                                clearErrors('artType');
                               } else {
-                                register('artType').onChange(e);
+                                setValue('artType', val);
+                                if (val) {
+                                  clearErrors('artType');
+                                }
                               }
                             }}
-                            className={`w-full appearance-none px-4 py-3 rounded-2xl text-xs sm:text-sm text-[#141413] font-normal cursor-pointer shadow-2xs pr-10 ${
+                            onFocus={() => {
+                              if (watchedArtType) {
+                                clearErrors('artType');
+                              }
+                            }}
+                            className={`w-full appearance-none px-4 py-3 rounded-2xl text-xs sm:text-sm text-[#141413] font-normal cursor-pointer shadow-2xs pr-10 outline-none focus:outline-none ${
                               errors.artType
-                                ? 'bg-white border-2 border-red-500 ring-2 ring-red-500/20'
+                                ? 'input-error-border'
                                 : 'input-gradient-border'
                             }`}
                           >
@@ -1338,7 +1356,13 @@ export default function ArtworkUploadForm({
                             onChange={(e) => {
                               const val = e.target.value;
                               setCustomMediumInput(val);
-                              setValue('artType', val, { shouldValidate: true });
+                              setValue('artType', val);
+                              if (val.trim()) {
+                                clearErrors('artType');
+                              }
+                            }}
+                            onFocus={() => {
+                              clearErrors('artType');
                             }}
                             onKeyDown={(e) => {
                               if (e.key === 'Enter') {
@@ -1348,10 +1372,14 @@ export default function ArtworkUploadForm({
                                 handleCancelCustomMedium();
                               }
                             }}
-                            onBlur={handleCommitCustomMedium}
-                            className={`w-full px-4 py-3 rounded-2xl text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] font-normal shadow-2xs pr-16 ${
+                            onBlur={() => {
+                              if (customMediumInput.trim()) {
+                                handleCommitCustomMedium();
+                              }
+                            }}
+                            className={`w-full px-4 py-3 rounded-2xl text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] font-normal shadow-2xs pr-16 outline-none focus:outline-none ${
                               errors.artType
-                                ? 'bg-white border-2 border-red-500 ring-2 ring-red-500/20'
+                                ? 'input-error-border'
                                 : 'input-gradient-border'
                             }`}
                           />
@@ -1359,6 +1387,7 @@ export default function ArtworkUploadForm({
                             {customMediumInput.trim() && (
                               <button
                                 type="button"
+                                onMouseDown={(e) => e.preventDefault()}
                                 onClick={handleCommitCustomMedium}
                                 className="px-2.5 py-1 rounded-md text-white text-[10px] font-medium hover:opacity-90 transition-opacity cursor-pointer select-none shadow-2xs"
                                 style={{
@@ -1372,6 +1401,7 @@ export default function ArtworkUploadForm({
                             )}
                             <button
                               type="button"
+                              onMouseDown={(e) => e.preventDefault()}
                               onClick={handleCancelCustomMedium}
                               className="p-1 rounded-md text-[#6E6E69] hover:text-[#141413] hover:bg-gray-100 transition-colors cursor-pointer select-none"
                               title="Back to dropdown"
@@ -1392,7 +1422,7 @@ export default function ArtworkUploadForm({
                       type="text"
                       {...register('year')}
                       placeholder="e.g. 2026"
-                      className="w-full px-4 py-3 rounded-2xl input-gradient-border text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] font-normal shadow-2xs"
+                      className="w-full px-4 py-3 rounded-2xl input-gradient-border text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] font-normal shadow-2xs outline-none focus:outline-none"
                     />
                   </div>
                 </div>
@@ -1406,7 +1436,7 @@ export default function ArtworkUploadForm({
                     <div className="relative">
                       <select
                         {...register('dimensionUnit')}
-                        className="w-full appearance-none px-4 py-3 rounded-2xl input-gradient-border text-xs sm:text-sm text-[#141413] font-normal cursor-pointer shadow-2xs pr-10"
+                        className="w-full appearance-none px-4 py-3 rounded-2xl input-gradient-border text-xs sm:text-sm text-[#141413] font-normal cursor-pointer shadow-2xs pr-10 outline-none focus:outline-none"
                       >
                         {dimensionUnitOptions.map((opt) => (
                           <option key={opt.value} value={opt.value}>
@@ -1430,10 +1460,11 @@ export default function ArtworkUploadForm({
                       type="number"
                       step="any"
                       {...register('width')}
+                      onFocus={() => clearErrors('width')}
                       placeholder="e.g. 24"
-                      className={`w-full px-4 py-3 rounded-2xl text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] font-normal shadow-2xs ${
+                      className={`w-full px-4 py-3 rounded-2xl text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] font-normal shadow-2xs outline-none focus:outline-none ${
                         errors.width
-                          ? 'bg-white border-2 border-red-500 ring-2 ring-red-500/20'
+                          ? 'input-error-border'
                           : 'input-gradient-border'
                       }`}
                     />
@@ -1448,10 +1479,11 @@ export default function ArtworkUploadForm({
                       type="number"
                       step="any"
                       {...register('height')}
+                      onFocus={() => clearErrors('height')}
                       placeholder="e.g. 18"
-                      className={`w-full px-4 py-3 rounded-2xl text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] font-normal shadow-2xs ${
+                      className={`w-full px-4 py-3 rounded-2xl text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] font-normal shadow-2xs outline-none focus:outline-none ${
                         errors.height
-                          ? 'bg-white border-2 border-red-500 ring-2 ring-red-500/20'
+                          ? 'input-error-border'
                           : 'input-gradient-border'
                       }`}
                     />
@@ -1508,18 +1540,26 @@ export default function ArtworkUploadForm({
                       {!isCustomStyle ? (
                         <>
                           <select
-                            {...register('style')}
+                            id="artwork-field-style"
+                            value={isCustomStyle ? 'Other' : (watch('style') || '')}
                             onChange={(e) => {
                               const val = e.target.value;
                               if (val === 'Other') {
                                 setIsCustomStyle(true);
                                 setCustomStyleInput('');
-                                setValue('style', '', { shouldValidate: true });
+                                setValue('style', '');
+                                clearErrors('style');
                               } else {
-                                register('style').onChange(e);
+                                setValue('style', val);
+                                clearErrors('style');
                               }
                             }}
-                            className="w-full appearance-none px-4 py-3 rounded-2xl input-gradient-border text-xs sm:text-sm text-[#141413] font-normal cursor-pointer shadow-2xs pr-10"
+                            onFocus={() => clearErrors('style')}
+                            className={`w-full appearance-none px-4 py-3 rounded-2xl text-xs sm:text-sm text-[#141413] font-normal cursor-pointer shadow-2xs pr-10 outline-none focus:outline-none ${
+                              errors.style
+                                ? 'input-error-border'
+                                : 'input-gradient-border'
+                            }`}
                           >
                             <option value="">Select style</option>
                             {styleOptions.map((opt) => (
@@ -1536,6 +1576,7 @@ export default function ArtworkUploadForm({
                       ) : (
                         <div className="relative flex items-center">
                           <input
+                            id="artwork-field-style"
                             type="text"
                             autoFocus
                             placeholder="Type custom style..."
@@ -1543,8 +1584,12 @@ export default function ArtworkUploadForm({
                             onChange={(e) => {
                               const val = e.target.value;
                               setCustomStyleInput(val);
-                              setValue('style', val, { shouldValidate: true });
+                              setValue('style', val);
+                              if (val.trim()) {
+                                clearErrors('style');
+                              }
                             }}
+                            onFocus={() => clearErrors('style')}
                             onKeyDown={(e) => {
                               if (e.key === 'Enter') {
                                 e.preventDefault();
@@ -1553,13 +1598,22 @@ export default function ArtworkUploadForm({
                                 handleCancelCustomStyle();
                               }
                             }}
-                            onBlur={handleCommitCustomStyle}
-                            className="w-full px-4 py-3 rounded-2xl input-gradient-border text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] font-normal shadow-2xs pr-16"
+                            onBlur={() => {
+                              if (customStyleInput.trim()) {
+                                handleCommitCustomStyle();
+                              }
+                            }}
+                            className={`w-full px-4 py-3 rounded-2xl text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] font-normal shadow-2xs pr-16 outline-none focus:outline-none ${
+                              errors.style
+                                ? 'input-error-border'
+                                : 'input-gradient-border'
+                            }`}
                           />
                           <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1">
                             {customStyleInput.trim() && (
                               <button
                                 type="button"
+                                onMouseDown={(e) => e.preventDefault()}
                                 onClick={handleCommitCustomStyle}
                                 className="px-2.5 py-1 rounded-md text-white text-[10px] font-medium hover:opacity-90 transition-opacity cursor-pointer select-none shadow-2xs"
                                 style={{
@@ -1573,6 +1627,7 @@ export default function ArtworkUploadForm({
                             )}
                             <button
                               type="button"
+                              onMouseDown={(e) => e.preventDefault()}
                               onClick={handleCancelCustomStyle}
                               className="p-1 rounded-md text-[#6E6E69] hover:text-[#141413] hover:bg-gray-100 transition-colors cursor-pointer select-none"
                               title="Back to dropdown"
@@ -1788,10 +1843,11 @@ export default function ArtworkUploadForm({
                     id="artwork-field-price"
                     type="text"
                     {...register('price')}
+                    onFocus={() => clearErrors('price')}
                     placeholder="e.g. 45,000"
-                    className={`w-full px-4 py-3 rounded-2xl text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] font-normal shadow-2xs ${
+                    className={`w-full px-4 py-3 rounded-2xl text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] font-normal shadow-2xs outline-none focus:outline-none ${
                       errors.price
-                        ? 'bg-white border-2 border-red-500 ring-2 ring-red-500/20'
+                        ? 'input-error-border'
                         : 'input-gradient-border'
                     }`}
                   />

@@ -353,6 +353,33 @@ input:-webkit-autofill:active {
   outline: none !important;
 }
 
+/* --- Form Input Error State with Gradient on Active Focus --- */
+.input-error-border {
+  border-radius: 1rem; /* rounded-2xl */
+  background-color: #ffffff;
+  border: 1.5px solid #EF4444 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15) !important;
+  outline: none !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.input-error-border:hover:not(:focus):not(:disabled) {
+  border-color: #DC2626 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.22) !important;
+}
+
+/* When the user focuses or clicks on the input (active), smoothly switch to the ERAS blue gradient! */
+.input-error-border:focus,
+.input-error-border:focus-visible,
+.input-error-border:focus-within {
+  border-color: transparent !important;
+  background: linear-gradient(#ffffff, #ffffff) padding-box,
+              linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%) border-box !important;
+  box-shadow: 0 0 0 1px rgba(19, 69, 238, 0.15), 0 4px 14px rgba(19, 69, 238, 0.10) !important;
+  outline: none !important;
+}
+
+
 /* Small radius variant for 4px / 8px controls */
 .input-gradient-border-sm {
   border-radius: 4px;
