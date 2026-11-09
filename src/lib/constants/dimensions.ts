@@ -7,22 +7,36 @@ export interface DimensionUnitOption {
 export const DIMENSION_UNIT_OPTIONS: DimensionUnitOption[] = [
   { value: 'in', label: 'Inches (in)', symbol: 'in' },
   { value: 'cm', label: 'Centimeters (cm)', symbol: 'cm' },
-  { value: 'm', label: 'Meters (m)', symbol: 'm' },
   { value: 'mm', label: 'Millimeters (mm)', symbol: 'mm' },
+  { value: 'm', label: 'Meters (m)', symbol: 'm' },
   { value: 'ft', label: 'Feet (ft)', symbol: 'ft' },
+  { value: 'yd', label: 'Yards (yd)', symbol: 'yd' },
   { value: 'px', label: 'Pixels (px)', symbol: 'px' },
 ];
 
 export function normalizeUnit(rawUnit?: string): string {
   if (!rawUnit) return '';
   const clean = rawUnit.trim().toLowerCase();
-  if (clean === 'in' || clean === 'inch' || clean === 'inches' || clean === 'inc') return 'in';
-  if (clean === 'cm' || clean === 'centimeter' || clean === 'centimeters') return 'cm';
-  if (clean === 'm' || clean === 'meter' || clean === 'meters' || clean === 'meeter') return 'm';
-  if (clean === 'mm' || clean === 'millimeter' || clean === 'millimeters') return 'mm';
-  if (clean === 'ft' || clean === 'foot' || clean === 'feet') return 'ft';
-  if (clean === 'px' || clean === 'pixel' || clean === 'pixels') return 'px';
+  if (clean === 'in' || clean === 'inch' || clean === 'inches' || clean === 'inc' || clean.includes('inch')) return 'in';
+  if (clean === 'cm' || clean === 'centimeter' || clean === 'centimeters' || clean.includes('centimeter')) return 'cm';
+  if (clean === 'mm' || clean === 'millimeter' || clean === 'millimeters' || clean.includes('millimeter')) return 'mm';
+  if (clean === 'm' || clean === 'meter' || clean === 'meters' || clean === 'meeter' || clean.includes('meter')) return 'm';
+  if (clean === 'ft' || clean === 'foot' || clean === 'feet' || clean.includes('feet')) return 'ft';
+  if (clean === 'yd' || clean === 'yard' || clean === 'yards' || clean.includes('yard')) return 'yd';
+  if (clean === 'px' || clean === 'pixel' || clean === 'pixels' || clean.includes('pixel')) return 'px';
   return clean;
+}
+
+export function getUnitSymbol(rawUnit?: string): string {
+  if (!rawUnit) return 'in';
+  const clean = normalizeUnit(rawUnit);
+  const found = DIMENSION_UNIT_OPTIONS.find(
+    (opt) =>
+      opt.value === clean ||
+      opt.symbol === clean ||
+      opt.label.toLowerCase() === rawUnit.trim().toLowerCase()
+  );
+  return found?.symbol || clean || 'in';
 }
 
 export function parseDimensionsString(dimStr?: string | null): {

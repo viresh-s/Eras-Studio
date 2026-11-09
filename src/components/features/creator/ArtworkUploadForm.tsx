@@ -44,6 +44,10 @@ import {
   saveCustomStyle,
 } from '@/lib/constants/styles';
 import {
+  DIMENSION_UNIT_OPTIONS,
+  getUnitSymbol,
+} from '@/lib/constants/dimensions';
+import {
   compressImages,
   uploadCompressedPair,
   validateImageFile,
@@ -62,11 +66,6 @@ const availabilityOptions = [
   { value: 'For Sale', label: 'For Sale' },
   { value: 'Not for sale', label: 'Not for sale' },
   { value: 'Sold', label: 'Sold' },
-];
-
-const dimensionUnitOptions = [
-  { value: 'Inches (in)', label: 'Inches (in)' },
-  { value: 'Centimeters (cm)', label: 'Centimeters (cm)' },
 ];
 
 const uploadSchema = z.object({
@@ -201,7 +200,7 @@ export default function ArtworkUploadForm({
       artistName: defaultArtistName,
       artType: '',
       year: '',
-      dimensionUnit: 'Inches (in)',
+      dimensionUnit: 'in',
       width: '',
       height: '',
       location: '',
@@ -223,6 +222,8 @@ export default function ArtworkUploadForm({
   const watchedHeight = watch('height');
   const watchedDimensionUnit = watch('dimensionUnit');
   const watchedPriceVisibility = watch('priceVisibility');
+
+  const activeUnitSymbol = getUnitSymbol(watchedDimensionUnit) || 'in';
 
   // Strip file extension helper (e.g. "artwork.png" -> "artwork")
   const stripFileExtension = (filename?: string | null): string => {
@@ -559,7 +560,7 @@ export default function ArtworkUploadForm({
       // Format dimensions string
       let formattedDimensions = '';
       if (data.width && data.height) {
-        const unit = data.dimensionUnit === 'Centimeters (cm)' ? 'cm' : 'in';
+        const unit = getUnitSymbol(data.dimensionUnit);
         formattedDimensions = `${data.width} × ${data.height} ${unit}`;
       }
 
@@ -1164,8 +1165,7 @@ export default function ArtworkUploadForm({
                     {watchedWidth && watchedHeight && (
                       <>
                         <br />
-                        {watchedWidth} × {watchedHeight}{' '}
-                        {watchedDimensionUnit === 'Centimeters (cm)' ? 'cm' : 'in'}
+                        {watchedWidth} × {watchedHeight} {activeUnitSymbol}
                       </>
                     )}
                   </p>
@@ -1436,9 +1436,13 @@ export default function ArtworkUploadForm({
                     <div className="relative">
                       <select
                         {...register('dimensionUnit')}
+                        value={activeUnitSymbol}
+                        onChange={(e) => {
+                          setValue('dimensionUnit', e.target.value);
+                        }}
                         className="w-full appearance-none px-4 py-3 rounded-2xl input-gradient-border text-xs sm:text-sm text-[#141413] font-normal cursor-pointer shadow-2xs pr-10 outline-none focus:outline-none"
                       >
-                        {dimensionUnitOptions.map((opt) => (
+                        {DIMENSION_UNIT_OPTIONS.map((opt) => (
                           <option key={opt.value} value={opt.value}>
                             {opt.label}
                           </option>
@@ -1453,12 +1457,12 @@ export default function ArtworkUploadForm({
 
                   <div>
                     <label className="block text-xs font-normal text-[#6E6E69] mb-1.5">
-                      Dimensions · Width (in)
+                      Dimensions · Width ({activeUnitSymbol})
                     </label>
                     <input
                       id="artwork-field-width"
                       type="number"
-                      step="any"
+                      step={activeUnitSymbol === 'px' ? '1' : 'any'}
                       {...register('width')}
                       onFocus={() => clearErrors('width')}
                       placeholder="e.g. 24"
@@ -1472,12 +1476,12 @@ export default function ArtworkUploadForm({
 
                   <div>
                     <label className="block text-xs font-normal text-[#6E6E69] mb-1.5">
-                      Dimensions · Height (in)
+                      Dimensions · Height ({activeUnitSymbol})
                     </label>
                     <input
                       id="artwork-field-height"
                       type="number"
-                      step="any"
+                      step={activeUnitSymbol === 'px' ? '1' : 'any'}
                       {...register('height')}
                       onFocus={() => clearErrors('height')}
                       placeholder="e.g. 18"
