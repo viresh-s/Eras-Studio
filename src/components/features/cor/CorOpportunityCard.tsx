@@ -82,10 +82,18 @@ export default function CorOpportunityCard({ opportunity, isApplied = false }: C
         ) : (
           <Link
             href={`/cor/opportunities/${opportunity.id}`}
-            className="px-4 py-2 rounded-full bg-[#141413] text-white text-xs font-medium hover:bg-black transition-colors inline-flex items-center gap-1.5 shadow-xs font-sans"
+            style={{
+              position: 'relative',
+              background: 'linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%)',
+              boxShadow: '0px 4px 14px rgba(35, 77, 255, 0.2), 0px 2px 2px rgba(255, 255, 255, 0.65) inset, 0px -2px 4px rgba(6, 42, 137, 0.33) inset',
+              borderRadius: 9999,
+              outline: '2px #2356FF solid',
+              outlineOffset: '-2px',
+            }}
+            className="btn-premium-gradient-pill px-4 py-2 text-white text-xs font-medium hover:brightness-110 active:scale-[0.98] transition-all inline-flex items-center gap-1.5 shadow-xs font-sans select-none"
           >
             <span>Apply Now</span>
-            <ArrowRight size={12} />
+            <ArrowRight size={12} className="text-white" />
           </Link>
         )}
       </div>

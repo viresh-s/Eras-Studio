@@ -255,6 +255,54 @@ input:-webkit-autofill:active {
   pointer-events: none;
 }
 
+/* --- Pill Style Premium Blue Gradient Buttons --- */
+.btn-premium-gradient-pill {
+  border-radius: 9999px !important;
+  border: 2px solid #2356FF !important;
+  background: linear-gradient(
+    90deg,
+    #082779 0%,
+    #1345EE 62%,
+    #458CFF 100%
+  ) !important;
+  box-shadow:
+    0 -3px 6px 0 rgba(6, 42, 137, 0.33) inset,
+    0 3px 3px 0 rgba(255, 255, 255, 0.65) inset,
+    0 7px 22px 0 rgba(35, 77, 255, 0.18) !important;
+  color: #FFFFFF !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-premium-gradient-pill:hover:not(:disabled) {
+  opacity: 0.96;
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+  box-shadow:
+    0 -3px 6px 0 rgba(6, 42, 137, 0.33) inset,
+    0 3px 3px 0 rgba(255, 255, 255, 0.75) inset,
+    0 10px 24px 0 rgba(35, 77, 255, 0.25) !important;
+}
+
+.btn-premium-gradient-pill:active:not(:disabled) {
+  transform: translateY(0);
+  filter: brightness(0.98);
+}
+
+.btn-premium-gradient-pill:focus-visible {
+  outline: 2px solid #458CFF !important;
+  outline-offset: 3px !important;
+}
+
+.btn-premium-gradient-pill:disabled,
+.btn-premium-gradient-pill[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 
 /* Card with Blue Gradient Border on Hover */
 .card-gradient-border-hover {

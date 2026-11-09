@@ -13,7 +13,7 @@ export default function CorPipelineGrid({ counts }: CorPipelineGridProps) {
     <div className="bg-white border border-[#E8E8E3] rounded-3xl p-6 sm:p-7 my-8 shadow-xs">
       <div className="flex items-center justify-between pb-5 border-b border-[#F0F0EB] mb-6">
         <div>
-          <h2 className="century-heading text-xl sm:text-2xl text-[#141413]">
+          <h2 className="font-sans font-semibold text-xl sm:text-2xl text-[#141413] tracking-tight">
             Your application pipeline
           </h2>
           <p className="text-xs text-[#6E6E69] font-sans mt-0.5">

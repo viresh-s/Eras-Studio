@@ -25,7 +25,7 @@ export default function CorHeroSection({ profile, completeness }: CorHeroSection
               </span>
             </div>
 
-            <h2 className="century-heading text-2xl sm:text-3xl text-[#141413]">
+            <h2 className="font-sans font-semibold text-2xl sm:text-3xl text-[#141413] tracking-tight">
               {profile?.status === 'under_review'
                 ? 'Your career profile is with our team.'
                 : 'Your career profile is active.'}
@@ -38,10 +38,18 @@ export default function CorHeroSection({ profile, completeness }: CorHeroSection
 
           <Link
             href="/cor/profile"
-            className="px-5 py-2.5 rounded-full border border-[#141413] text-xs font-medium text-[#141413] hover:bg-neutral-50 transition-colors inline-flex items-center justify-center gap-2 self-start md:self-auto cursor-pointer font-sans"
+            style={{
+              position: 'relative',
+              background: 'linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%)',
+              boxShadow: '0px 7px 22px rgba(35, 77, 255, 0.18), 0px 3px 3px rgba(255, 255, 255, 0.65) inset, 0px -3px 6px rgba(6, 42, 137, 0.33) inset',
+              borderRadius: 9999,
+              outline: '2px #2356FF solid',
+              outlineOffset: '-2px',
+            }}
+            className="btn-premium-gradient-pill px-6 py-2.5 text-xs font-semibold text-white hover:brightness-110 active:scale-[0.98] transition-all inline-flex items-center justify-center gap-2 self-start md:self-auto cursor-pointer font-sans shadow-xs select-none"
           >
             <span>Review Career Profile</span>
-            <ArrowRight size={13} />
+            <ArrowRight size={13} className="text-white" />
           </Link>
         </div>
 
@@ -63,14 +71,22 @@ export default function CorHeroSection({ profile, completeness }: CorHeroSection
           <span>{completeness > 0 ? `Profile ${completeness}% Complete` : 'Profile Not Started'}</span>
         </div>
 
-        <h2 className="century-heading text-3xl sm:text-4xl lg:text-5xl text-[#141413] tracking-tight leading-tight">
+        <h2 className="font-sans font-semibold text-3xl sm:text-4xl lg:text-5xl text-[#141413] tracking-tight leading-tight">
           Your Next Possibility
         </h2>
 
         <div>
           <Link
             href="/cor/profile"
-            className="px-7 py-3.5 rounded-full bg-[#141413] text-white text-xs sm:text-sm font-medium hover:bg-black transition-all inline-flex items-center gap-2 cursor-pointer shadow-xs font-sans"
+            style={{
+              position: 'relative',
+              background: 'linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%)',
+              boxShadow: '0px 7px 22px rgba(35, 77, 255, 0.22), 0px 3px 3px rgba(255, 255, 255, 0.65) inset, 0px -3px 6px rgba(6, 42, 137, 0.33) inset',
+              borderRadius: 9999,
+              outline: '2px #2356FF solid',
+              outlineOffset: '-2px',
+            }}
+            className="btn-premium-gradient-pill px-7 py-3.5 text-white text-xs sm:text-sm font-semibold hover:brightness-110 active:scale-[0.98] transition-all inline-flex items-center gap-2 cursor-pointer shadow-xs font-sans select-none"
           >
             <span>{completeness > 0 ? 'Resume Career Questionnaire' : 'Start Career Questionnaire'}</span>
             <ArrowRight size={15} className="text-white" />

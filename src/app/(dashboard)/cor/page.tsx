@@ -118,7 +118,7 @@ export default async function CorDashboardPage() {
       <div className="space-y-5">
         <div className="flex items-center justify-between pb-3 border-b border-[#F0F0EB]">
           <div>
-            <h2 className="century-heading text-xl sm:text-2xl text-[#141413]">
+            <h2 className="font-sans font-semibold text-xl sm:text-2xl text-[#141413] tracking-tight">
               Recommended opportunities
             </h2>
           </div>

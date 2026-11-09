@@ -12,7 +12,7 @@ export default function CorConsultationCard({ consultation }: CorConsultationCar
   return (
     <div className="bg-white border border-[#E8E8E3] rounded-3xl p-6 sm:p-7 shadow-xs flex flex-col justify-between">
       <div>
-        <h2 className="century-heading text-xl sm:text-2xl text-[#141413]">
+        <h2 className="font-sans font-semibold text-xl sm:text-2xl text-[#141413] tracking-tight">
           Upcoming consultation
         </h2>
 
