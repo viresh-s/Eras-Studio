@@ -34,6 +34,16 @@ import {
   parseIndianCurrency,
 } from '@/lib/constants/currency';
 import {
+  buildMediumOptions,
+  getCustomMediums,
+  saveCustomMedium,
+} from '@/lib/constants/mediums';
+import {
+  buildStyleOptions,
+  getCustomStyles,
+  saveCustomStyle,
+} from '@/lib/constants/styles';
+import {
   compressImages,
   uploadCompressedPair,
   validateImageFile,
@@ -52,37 +62,6 @@ const availabilityOptions = [
   { value: 'For Sale', label: 'For Sale' },
   { value: 'Not for sale', label: 'Not for sale' },
   { value: 'Sold', label: 'Sold' },
-];
-
-const styleOptions = [
-  { value: 'Abstract', label: 'Abstract' },
-  { value: 'Minimalist', label: 'Minimalist' },
-  { value: 'Contemporary', label: 'Contemporary' },
-  { value: 'Modern', label: 'Modern' },
-  { value: 'Impressionism', label: 'Impressionism' },
-  { value: 'Pop Art', label: 'Pop Art' },
-  { value: 'Surrealism', label: 'Surrealism' },
-  { value: 'Realism', label: 'Realism' },
-  { value: 'Expressionism', label: 'Expressionism' },
-  { value: 'Figurative', label: 'Figurative' },
-  { value: 'Portraiture', label: 'Portraiture' },
-  { value: 'Landscape', label: 'Landscape' },
-  { value: 'Other', label: 'Other' },
-];
-
-const mediumOptions = [
-  { value: 'Painting', label: 'Painting' },
-  { value: 'Oil on Canvas', label: 'Oil on Canvas' },
-  { value: 'Acrylic on Canvas', label: 'Acrylic on Canvas' },
-  { value: 'Watercolor', label: 'Watercolor' },
-  { value: 'Sculpture', label: 'Sculpture' },
-  { value: 'Photography', label: 'Photography' },
-  { value: 'Digital Art', label: 'Digital Art' },
-  { value: 'Mixed Media', label: 'Mixed Media' },
-  { value: 'Printmaking', label: 'Printmaking' },
-  { value: 'Drawing & Illustration', label: 'Drawing & Illustration' },
-  { value: 'Ceramic & Pottery', label: 'Ceramic & Pottery' },
-  { value: 'Other', label: 'Other' },
 ];
 
 const dimensionUnitOptions = [
@@ -184,6 +163,21 @@ export default function ArtworkUploadForm({
   const [tagInput, setTagInput] = useState('');
   const [isAddingTag, setIsAddingTag] = useState(false);
 
+  // Custom Medium & Style state (allowing inline "Other" creation)
+  const [customMediums, setCustomMediums] = useState<string[]>([]);
+  const [isCustomMedium, setIsCustomMedium] = useState(false);
+  const [customMediumInput, setCustomMediumInput] = useState('');
+
+  const [customStyles, setCustomStyles] = useState<string[]>([]);
+  const [isCustomStyle, setIsCustomStyle] = useState(false);
+  const [customStyleInput, setCustomStyleInput] = useState('');
+
+  // Load custom mediums and styles from local storage on client mount
+  useEffect(() => {
+    setCustomMediums(getCustomMediums());
+    setCustomStyles(getCustomStyles());
+  }, []);
+
   // Form submission state
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -228,6 +222,56 @@ export default function ArtworkUploadForm({
   const watchedHeight = watch('height');
   const watchedDimensionUnit = watch('dimensionUnit');
   const watchedPriceVisibility = watch('priceVisibility');
+
+  // Strip file extension helper (e.g. "artwork.png" -> "artwork")
+  const stripFileExtension = (filename?: string | null): string => {
+    if (!filename) return '';
+    return filename.replace(/\.[^/.]+$/, '');
+  };
+
+  const mediumOptions = useMemo(() => {
+    return buildMediumOptions(customMediums, watchedArtType);
+  }, [customMediums, watchedArtType]);
+
+  const styleOptions = useMemo(() => {
+    return buildStyleOptions(customStyles);
+  }, [customStyles]);
+
+  const handleCommitCustomMedium = () => {
+    const trimmed = customMediumInput.trim();
+    if (!trimmed || trimmed.toLowerCase() === 'other') return;
+
+    saveCustomMedium(trimmed);
+    setCustomMediums((prev) => {
+      if (prev.some((m) => m.toLowerCase() === trimmed.toLowerCase())) return prev;
+      return [...prev, trimmed];
+    });
+    setValue('artType', trimmed, { shouldValidate: true });
+  };
+
+  const handleCancelCustomMedium = () => {
+    setIsCustomMedium(false);
+    setCustomMediumInput('');
+    setValue('artType', '', { shouldValidate: true });
+  };
+
+  const handleCommitCustomStyle = () => {
+    const trimmed = customStyleInput.trim();
+    if (!trimmed || trimmed.toLowerCase() === 'other') return;
+
+    saveCustomStyle(trimmed);
+    setCustomStyles((prev) => {
+      if (prev.some((s) => s.toLowerCase() === trimmed.toLowerCase())) return prev;
+      return [...prev, trimmed];
+    });
+    setValue('style', trimmed, { shouldValidate: true });
+  };
+
+  const handleCancelCustomStyle = () => {
+    setIsCustomStyle(false);
+    setCustomStyleInput('');
+    setValue('style', '', { shouldValidate: true });
+  };
 
   // Format bytes to human readable string
   const formatFileSize = (bytes: number): string => {
@@ -514,12 +558,25 @@ export default function ArtworkUploadForm({
 
       const numericPrice = data.price ? parseIndianCurrency(data.price) : null;
 
+      // Handle custom medium / style persistence
+      let finalMedium = data.artType;
+      if (isCustomMedium && customMediumInput.trim()) {
+        finalMedium = customMediumInput.trim();
+        saveCustomMedium(finalMedium);
+      }
+
+      let finalStyle = data.style;
+      if (isCustomStyle && customStyleInput.trim()) {
+        finalStyle = customStyleInput.trim();
+        saveCustomStyle(finalStyle);
+      }
+
       // ── Stage 3: Create Artwork in Database ──
       setUploadStage('Finalizing artwork portfolio entry...');
       await createArtwork({
         userId,
         title: data.title.trim(),
-        artType: data.artType,
+        artType: finalMedium,
         artistName: data.artistName.trim(),
         description: data.description?.trim() || undefined,
         externalLink: data.externalLink?.trim() || undefined,
@@ -536,7 +593,7 @@ export default function ArtworkUploadForm({
         width: data.width?.trim() || undefined,
         height: data.height?.trim() || undefined,
         location: data.location?.trim() || undefined,
-        style: data.style?.trim() || undefined,
+        style: finalStyle?.trim() || undefined,
         tags,
         collection: data.collection?.trim() || undefined,
         priceVisibility: data.priceVisibility,
@@ -567,7 +624,10 @@ export default function ArtworkUploadForm({
       return;
     }
     const currentValues = watch();
-    const draftTitle = currentValues.title?.trim() || selectedFiles[0]?.name || 'Untitled Draft';
+    const draftTitle =
+      currentValues.title?.trim() ||
+      stripFileExtension(selectedFiles[0]?.name) ||
+      'Untitled Draft';
     submitArtwork({ ...currentValues, title: draftTitle }, false);
   };
 
@@ -963,7 +1023,7 @@ export default function ArtworkUploadForm({
                 {/* Artwork Title & Artist Info */}
                 <div className="flex flex-col gap-1">
                   <h4 className="text-sm sm:text-base font-medium text-[#141413] truncate">
-                    {selectedFiles[0]?.name || 'Cover image'}
+                    {stripFileExtension(selectedFiles[0]?.name) || 'Cover image'}
                   </h4>
                   <p className="text-xs text-[#6E6E69] truncate">
                     {defaultArtistName || 'Artist'}
@@ -1041,7 +1101,7 @@ export default function ArtworkUploadForm({
                       fontStyle: 'italic',
                     }}
                   >
-                    {watchedTitle?.trim() || selectedFiles[0]?.name || 'Untitled'}
+                    {watchedTitle?.trim() || stripFileExtension(selectedFiles[0]?.name) || 'Untitled'}
                   </h3>
                   <p className="text-xs sm:text-[13px] text-[#6E6E69]">
                     {watchedArtistName?.trim() || defaultArtistName || 'Artist'}
@@ -1176,21 +1236,79 @@ export default function ArtworkUploadForm({
                       Medium *
                     </label>
                     <div className="relative">
-                      <select
-                        {...register('artType')}
-                        className="w-full appearance-none px-4 py-3 rounded-2xl border border-[#E8E8E3] bg-white text-xs sm:text-sm text-[#141413] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all font-normal cursor-pointer shadow-2xs pr-10"
-                      >
-                        <option value="">Select medium</option>
-                        {mediumOptions.map((opt) => (
-                          <option key={opt.value} value={opt.value}>
-                            {opt.label}
-                          </option>
-                        ))}
-                      </select>
-                      <ChevronDown
-                        size={16}
-                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#6E6E69] pointer-events-none"
-                      />
+                      {!isCustomMedium ? (
+                        <>
+                          <select
+                            {...register('artType')}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              if (val === 'Other') {
+                                setIsCustomMedium(true);
+                                setCustomMediumInput('');
+                                setValue('artType', '', { shouldValidate: true });
+                              } else {
+                                register('artType').onChange(e);
+                              }
+                            }}
+                            className="w-full appearance-none px-4 py-3 rounded-2xl border border-[#E8E8E3] bg-white text-xs sm:text-sm text-[#141413] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all font-normal cursor-pointer shadow-2xs pr-10"
+                          >
+                            <option value="">Select medium</option>
+                            {mediumOptions.map((opt) => (
+                              <option key={opt.value} value={opt.value}>
+                                {opt.label}
+                              </option>
+                            ))}
+                          </select>
+                          <ChevronDown
+                            size={16}
+                            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#6E6E69] pointer-events-none"
+                          />
+                        </>
+                      ) : (
+                        <div className="relative flex items-center">
+                          <input
+                            type="text"
+                            autoFocus
+                            placeholder="Type custom medium..."
+                            value={customMediumInput}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setCustomMediumInput(val);
+                              setValue('artType', val, { shouldValidate: true });
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                handleCommitCustomMedium();
+                              } else if (e.key === 'Escape') {
+                                handleCancelCustomMedium();
+                              }
+                            }}
+                            onBlur={handleCommitCustomMedium}
+                            className="w-full px-4 py-3 rounded-2xl border border-[#1345EE] bg-white text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all font-normal shadow-2xs pr-16"
+                          />
+                          <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                            {customMediumInput.trim() && (
+                              <button
+                                type="button"
+                                onClick={handleCommitCustomMedium}
+                                className="px-2 py-0.5 rounded-md bg-[#1345EE] text-white text-[10px] font-medium hover:bg-blue-700 transition-colors cursor-pointer select-none"
+                                title="Save to list"
+                              >
+                                Save
+                              </button>
+                            )}
+                            <button
+                              type="button"
+                              onClick={handleCancelCustomMedium}
+                              className="p-1 rounded-md text-[#6E6E69] hover:text-[#141413] hover:bg-gray-100 transition-colors cursor-pointer select-none"
+                              title="Back to dropdown"
+                            >
+                              <X size={14} />
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                     {errors.artType && (
                       <p className="text-[11px] text-red-500 mt-1">{errors.artType.message}</p>
@@ -1308,21 +1426,79 @@ export default function ArtworkUploadForm({
                       Style
                     </label>
                     <div className="relative">
-                      <select
-                        {...register('style')}
-                        className="w-full appearance-none px-4 py-3 rounded-2xl border border-[#E8E8E3] bg-white text-xs sm:text-sm text-[#141413] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all font-normal cursor-pointer shadow-2xs pr-10"
-                      >
-                        <option value="">Select style</option>
-                        {styleOptions.map((opt) => (
-                          <option key={opt.value} value={opt.value}>
-                            {opt.label}
-                          </option>
-                        ))}
-                      </select>
-                      <ChevronDown
-                        size={16}
-                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#6E6E69] pointer-events-none"
-                      />
+                      {!isCustomStyle ? (
+                        <>
+                          <select
+                            {...register('style')}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              if (val === 'Other') {
+                                setIsCustomStyle(true);
+                                setCustomStyleInput('');
+                                setValue('style', '', { shouldValidate: true });
+                              } else {
+                                register('style').onChange(e);
+                              }
+                            }}
+                            className="w-full appearance-none px-4 py-3 rounded-2xl border border-[#E8E8E3] bg-white text-xs sm:text-sm text-[#141413] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all font-normal cursor-pointer shadow-2xs pr-10"
+                          >
+                            <option value="">Select style</option>
+                            {styleOptions.map((opt) => (
+                              <option key={opt.value} value={opt.value}>
+                                {opt.label}
+                              </option>
+                            ))}
+                          </select>
+                          <ChevronDown
+                            size={16}
+                            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#6E6E69] pointer-events-none"
+                          />
+                        </>
+                      ) : (
+                        <div className="relative flex items-center">
+                          <input
+                            type="text"
+                            autoFocus
+                            placeholder="Type custom style..."
+                            value={customStyleInput}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setCustomStyleInput(val);
+                              setValue('style', val, { shouldValidate: true });
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                handleCommitCustomStyle();
+                              } else if (e.key === 'Escape') {
+                                handleCancelCustomStyle();
+                              }
+                            }}
+                            onBlur={handleCommitCustomStyle}
+                            className="w-full px-4 py-3 rounded-2xl border border-[#1345EE] bg-white text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all font-normal shadow-2xs pr-16"
+                          />
+                          <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                            {customStyleInput.trim() && (
+                              <button
+                                type="button"
+                                onClick={handleCommitCustomStyle}
+                                className="px-2 py-0.5 rounded-md bg-[#1345EE] text-white text-[10px] font-medium hover:bg-blue-700 transition-colors cursor-pointer select-none"
+                                title="Save to list"
+                              >
+                                Save
+                              </button>
+                            )}
+                            <button
+                              type="button"
+                              onClick={handleCancelCustomStyle}
+                              className="p-1 rounded-md text-[#6E6E69] hover:text-[#141413] hover:bg-gray-100 transition-colors cursor-pointer select-none"
+                              title="Back to dropdown"
+                            >
+                              <X size={14} />
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
 

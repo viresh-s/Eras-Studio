@@ -5,11 +5,16 @@ export interface MediumOption {
 
 export const DEFAULT_MEDIUM_OPTIONS: MediumOption[] = [
   { value: 'Painting', label: 'Painting' },
+  { value: 'Oil on Canvas', label: 'Oil on Canvas' },
+  { value: 'Acrylic on Canvas', label: 'Acrylic on Canvas' },
+  { value: 'Watercolor', label: 'Watercolor' },
   { value: 'Sculpture', label: 'Sculpture' },
   { value: 'Photography', label: 'Photography' },
   { value: 'Digital Art', label: 'Digital Art' },
-  { value: 'Illustration', label: 'Illustration' },
   { value: 'Mixed Media', label: 'Mixed Media' },
+  { value: 'Printmaking', label: 'Printmaking' },
+  { value: 'Drawing & Illustration', label: 'Drawing & Illustration' },
+  { value: 'Ceramic & Pottery', label: 'Ceramic & Pottery' },
 ];
 
 export const OTHER_OPTION: MediumOption = { value: 'Other', label: 'Other' };
