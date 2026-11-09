@@ -327,3 +327,87 @@ input:-webkit-autofill:active {
               linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%) border-box;
   outline: none;
 }
+
+/* --- Form Input Gradient Outline on Focus & Hover --- */
+.input-gradient-border {
+  border-radius: 1rem; /* rounded-2xl */
+  background-color: #ffffff;
+  border: 1.5px solid #E8E8E3;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none !important;
+}
+
+.input-gradient-border:hover:not(:focus):not(:disabled) {
+  border-color: transparent !important;
+  background: linear-gradient(#ffffff, #ffffff) padding-box,
+              linear-gradient(90deg, rgba(8, 39, 121, 0.45) 0%, rgba(19, 69, 238, 0.55) 62%, rgba(69, 140, 255, 0.65) 100%) border-box !important;
+}
+
+.input-gradient-border:focus,
+.input-gradient-border:focus-visible,
+.input-gradient-border:focus-within {
+  border-color: transparent !important;
+  background: linear-gradient(#ffffff, #ffffff) padding-box,
+              linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%) border-box !important;
+  box-shadow: 0 0 0 1px rgba(19, 69, 238, 0.15), 0 4px 14px rgba(19, 69, 238, 0.10) !important;
+  outline: none !important;
+}
+
+/* Small radius variant for 4px / 8px controls */
+.input-gradient-border-sm {
+  border-radius: 4px;
+  background-color: #ffffff;
+  border: 1.5px solid #E3E3E7;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none !important;
+}
+
+.input-gradient-border-sm:hover:not(:focus):not(:disabled) {
+  border-color: transparent !important;
+  background: linear-gradient(#ffffff, #ffffff) padding-box,
+              linear-gradient(90deg, rgba(8, 39, 121, 0.45) 0%, rgba(19, 69, 238, 0.55) 62%, rgba(69, 140, 255, 0.65) 100%) border-box !important;
+}
+
+.input-gradient-border-sm:focus,
+.input-gradient-border-sm:focus-visible,
+.input-gradient-border-sm:focus-within {
+  border-color: transparent !important;
+  background: linear-gradient(#ffffff, #ffffff) padding-box,
+              linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%) border-box !important;
+  box-shadow: 0 0 0 1px rgba(19, 69, 238, 0.15), 0 4px 14px rgba(19, 69, 238, 0.10) !important;
+  outline: none !important;
+}
+
+/* --- Dropzone Gradient Hover & Drag Active --- */
+.dropzone-gradient-hover {
+  border: 2px dashed #E8E8E3;
+  background-color: #F7F7F5;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dropzone-gradient-hover:hover,
+.dropzone-gradient-hover.is-dragging {
+  border-color: transparent !important;
+  background: linear-gradient(#F7F7F5, #F7F7F5) padding-box,
+              linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%) border-box !important;
+  box-shadow: 0 6px 24px rgba(19, 69, 238, 0.08);
+}
+
+/* --- ERAS Blue Gradient Button --- */
+.btn-eras-gradient {
+  background: linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%);
+  color: #ffffff;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-eras-gradient:hover:not(:disabled) {
+  background: linear-gradient(90deg, #061e5e 0%, #0f39c7 62%, #3878e6 100%);
+  box-shadow: 0 6px 20px rgba(19, 69, 238, 0.28);
+  transform: translateY(-0.5px);
+}
+
+.btn-eras-gradient:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+

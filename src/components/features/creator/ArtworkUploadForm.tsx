@@ -723,11 +723,10 @@ export default function ArtworkUploadForm({
               onClick={() => setStep(1)}
             >
               <div
-                className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-medium transition-all ${
-                  step === 1
-                    ? 'bg-[#1345EE] text-white shadow-2xs'
-                    : 'bg-[#EEF2FE] text-[#1345EE]'
-                }`}
+                className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-medium text-white shadow-2xs transition-all"
+                style={{
+                  background: 'linear-gradient(135deg, #082779 0%, #1345EE 62%, #458CFF 100%)',
+                }}
               >
                 {step > 1 ? <Check size={14} strokeWidth={2.5} /> : '1'}
               </div>
@@ -753,9 +752,16 @@ export default function ArtworkUploadForm({
               <div
                 className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-medium transition-all ${
                   step === 2
-                    ? 'bg-[#1345EE] text-white shadow-2xs'
+                    ? 'text-white shadow-2xs'
                     : 'bg-[#F7F7F5] text-[#6E6E69] border border-[#E8E8E3]'
                 }`}
+                style={
+                  step === 2
+                    ? {
+                        background: 'linear-gradient(135deg, #082779 0%, #1345EE 62%, #458CFF 100%)',
+                      }
+                    : undefined
+                }
               >
                 2
               </div>
@@ -783,7 +789,7 @@ export default function ArtworkUploadForm({
 
       {/* Upload/Compression Status Notification */}
       {isLoading && uploadStage && (
-        <div className="mb-6 p-4 rounded-2xl bg-[#EEF2FE] border border-[#CED8FC] text-xs sm:text-sm text-[#1345EE] flex items-center gap-3">
+        <div className="mb-6 p-4 rounded-2xl bg-gradient-to-r from-blue-50/70 via-indigo-50/40 to-blue-50/70 border border-[#CED8FC] text-xs sm:text-sm text-[#082779] flex items-center gap-3">
           <Loader2 size={18} className="animate-spin text-[#1345EE] shrink-0" />
           <div className="flex-1">
             <p className="font-medium">{uploadStage}</p>
@@ -838,7 +844,13 @@ export default function ArtworkUploadForm({
                   <div className="p-4 sm:p-5 flex flex-wrap items-center justify-between gap-4 border-t border-[#E8E8E3] bg-white">
                     <div className="flex items-center gap-3 min-w-0">
                       {selectedPreviewIndex === 0 ? (
-                        <div className="px-2.5 py-1 rounded-md bg-[#EEF2FE] border border-[#CED8FC] text-[#1345EE] text-[11px] font-medium shrink-0">
+                        <div
+                          className="px-2.5 py-1 rounded-md text-white text-[11px] font-medium shrink-0 shadow-2xs"
+                          style={{
+                            background:
+                              'linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%)',
+                          }}
+                        >
                           Cover
                         </div>
                       ) : (
@@ -891,13 +903,17 @@ export default function ArtworkUploadForm({
                   onDragOver={handleDragOver}
                   onDragLeave={handleDragLeave}
                   onDrop={handleDrop}
-                  className={`w-full h-[360px] sm:h-[420px] rounded-3xl border-2 border-dashed flex flex-col items-center justify-center p-8 cursor-pointer transition-all ${
-                    isDragging
-                      ? 'border-[#1345EE] bg-blue-50/40 scale-[0.99]'
-                      : 'border-[#E8E8E3] bg-[#F7F7F5] hover:bg-gray-100 hover:border-gray-400'
+                  className={`w-full h-[360px] sm:h-[420px] rounded-3xl flex flex-col items-center justify-center p-8 cursor-pointer dropzone-gradient-hover ${
+                    isDragging ? 'is-dragging scale-[0.99]' : ''
                   }`}
                 >
-                  <div className="w-16 h-16 rounded-2xl bg-white border border-[#E8E8E3] flex items-center justify-center text-[#1345EE] mb-4 shadow-xs">
+                  <div
+                    className="w-16 h-16 rounded-2xl flex items-center justify-center text-white mb-4 shadow-sm"
+                    style={{
+                      background:
+                        'linear-gradient(135deg, #082779 0%, #1345EE 62%, #458CFF 100%)',
+                    }}
+                  >
                     <Upload size={26} />
                   </div>
                   <h3 className="text-base sm:text-lg font-medium text-[#141413] text-center">
@@ -935,12 +951,19 @@ export default function ArtworkUploadForm({
                         {/* Thumbnail Box */}
                         <div
                           className={`w-28 h-20 sm:w-36 sm:h-24 rounded-2xl overflow-hidden p-1.5 transition-all select-none ${
-                            isSelected
-                              ? 'border-2 border-[#1345EE] shadow-sm'
-                              : isCover
-                              ? 'border-2 border-[#1345EE]'
+                            isSelected || isCover
+                              ? 'shadow-sm'
                               : 'border border-[#E8E8E3] hover:border-gray-400'
                           }`}
+                          style={
+                            isSelected || isCover
+                              ? {
+                                  background:
+                                    'linear-gradient(white, white) padding-box, linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%) border-box',
+                                  border: '2px solid transparent',
+                                }
+                              : undefined
+                          }
                         >
                           <div className="w-full h-full rounded-xl overflow-hidden bg-gray-100 relative">
                             <img
@@ -949,7 +972,13 @@ export default function ArtworkUploadForm({
                               className="w-full h-full object-cover"
                             />
                             {isCover && (
-                              <span className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded text-[10px] font-semibold bg-[#1345EE] text-white shadow-2xs">
+                              <span
+                                className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded text-[10px] font-semibold text-white shadow-2xs"
+                                style={{
+                                  background:
+                                    'linear-gradient(135deg, #082779 0%, #1345EE 62%, #458CFF 100%)',
+                                }}
+                              >
                                 1
                               </span>
                             )}
@@ -959,8 +988,8 @@ export default function ArtworkUploadForm({
                         {/* Label & Actions */}
                         <div className="flex items-center justify-between px-1">
                           <span
-                            className={`text-[11px] font-normal truncate ${
-                              isCover ? 'text-[#1345EE] font-medium' : 'text-[#6E6E69]'
+                            className={`text-[11px] truncate ${
+                              isCover ? 'text-[#082779] font-medium' : 'text-[#6E6E69] font-normal'
                             }`}
                           >
                             {isCover ? 'Cover image' : 'Detail view'}
@@ -984,7 +1013,9 @@ export default function ArtworkUploadForm({
                       onDragOver={handleDragOver}
                       onDragLeave={handleDragLeave}
                       onDrop={handleDrop}
-                      className="w-44 sm:w-56 h-20 sm:h-24 rounded-2xl border border-dashed border-[#E8E8E3] bg-[#F7F7F5] hover:bg-gray-100 hover:border-gray-400 flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors p-2 text-center"
+                      className={`w-44 sm:w-56 h-20 sm:h-24 rounded-2xl flex flex-col items-center justify-center gap-1 cursor-pointer p-2 text-center dropzone-gradient-hover ${
+                        isDragging ? 'is-dragging' : ''
+                      }`}
                     >
                       <Upload size={16} className="text-[#6E6E69]" />
                       <span className="text-[11px] sm:text-xs font-medium text-[#141413]">
@@ -1140,9 +1171,18 @@ export default function ArtworkUploadForm({
                   {previewUrls.slice(0, 3).map((url, i) => (
                     <div
                       key={i}
-                      className={`w-14 h-11 rounded-lg overflow-hidden border ${
-                        i === 0 ? 'border-[#1345EE] ring-1 ring-[#1345EE]' : 'border-[#E8E8E3]'
+                      className={`w-14 h-11 rounded-lg overflow-hidden ${
+                        i === 0 ? '' : 'border border-[#E8E8E3]'
                       }`}
+                      style={
+                        i === 0
+                          ? {
+                              background:
+                                'linear-gradient(white, white) padding-box, linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%) border-box',
+                              border: '2px solid transparent',
+                            }
+                          : undefined
+                      }
                     >
                       <img src={url} alt={`Thumb ${i}`} className="w-full h-full object-cover" />
                     </div>
@@ -1221,10 +1261,10 @@ export default function ArtworkUploadForm({
                       type="text"
                       {...register('title')}
                       placeholder="e.g. The Broken Illusion"
-                      className={`w-full px-4 py-3 rounded-2xl bg-white text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] focus:outline-none transition-all font-normal shadow-2xs ${
+                      className={`w-full px-4 py-3 rounded-2xl text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] font-normal shadow-2xs ${
                         errors.title
-                          ? 'border-2 border-red-500 ring-2 ring-red-500/20'
-                          : 'border border-[#E8E8E3] focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE]'
+                          ? 'bg-white border-2 border-red-500 ring-2 ring-red-500/20'
+                          : 'input-gradient-border'
                       }`}
                     />
                   </div>
@@ -1238,10 +1278,10 @@ export default function ArtworkUploadForm({
                       type="text"
                       {...register('artistName')}
                       placeholder="e.g. Rishi Mailoorkar"
-                      className={`w-full px-4 py-3 rounded-2xl bg-white text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] focus:outline-none transition-all font-normal shadow-2xs ${
+                      className={`w-full px-4 py-3 rounded-2xl text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] font-normal shadow-2xs ${
                         errors.artistName
-                          ? 'border-2 border-red-500 ring-2 ring-red-500/20'
-                          : 'border border-[#E8E8E3] focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE]'
+                          ? 'bg-white border-2 border-red-500 ring-2 ring-red-500/20'
+                          : 'input-gradient-border'
                       }`}
                     />
                   </div>
@@ -1269,10 +1309,10 @@ export default function ArtworkUploadForm({
                                 register('artType').onChange(e);
                               }
                             }}
-                            className={`w-full appearance-none px-4 py-3 rounded-2xl bg-white text-xs sm:text-sm text-[#141413] focus:outline-none transition-all font-normal cursor-pointer shadow-2xs pr-10 ${
+                            className={`w-full appearance-none px-4 py-3 rounded-2xl text-xs sm:text-sm text-[#141413] font-normal cursor-pointer shadow-2xs pr-10 ${
                               errors.artType
-                                ? 'border-2 border-red-500 ring-2 ring-red-500/20'
-                                : 'border border-[#E8E8E3] focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE]'
+                                ? 'bg-white border-2 border-red-500 ring-2 ring-red-500/20'
+                                : 'input-gradient-border'
                             }`}
                           >
                             <option value="">Select medium</option>
@@ -1309,10 +1349,10 @@ export default function ArtworkUploadForm({
                               }
                             }}
                             onBlur={handleCommitCustomMedium}
-                            className={`w-full px-4 py-3 rounded-2xl bg-white text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] focus:outline-none transition-all font-normal shadow-2xs pr-16 ${
+                            className={`w-full px-4 py-3 rounded-2xl text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] font-normal shadow-2xs pr-16 ${
                               errors.artType
-                                ? 'border-2 border-red-500 ring-2 ring-red-500/20'
-                                : 'border border-[#1345EE] focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE]'
+                                ? 'bg-white border-2 border-red-500 ring-2 ring-red-500/20'
+                                : 'input-gradient-border'
                             }`}
                           />
                           <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1">
@@ -1320,7 +1360,11 @@ export default function ArtworkUploadForm({
                               <button
                                 type="button"
                                 onClick={handleCommitCustomMedium}
-                                className="px-2 py-0.5 rounded-md bg-[#1345EE] text-white text-[10px] font-medium hover:bg-blue-700 transition-colors cursor-pointer select-none"
+                                className="px-2.5 py-1 rounded-md text-white text-[10px] font-medium hover:opacity-90 transition-opacity cursor-pointer select-none shadow-2xs"
+                                style={{
+                                  background:
+                                    'linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%)',
+                                }}
                                 title="Save to list"
                               >
                                 Save
@@ -1348,7 +1392,7 @@ export default function ArtworkUploadForm({
                       type="text"
                       {...register('year')}
                       placeholder="e.g. 2026"
-                      className="w-full px-4 py-3 rounded-2xl border border-[#E8E8E3] bg-white text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all font-normal shadow-2xs"
+                      className="w-full px-4 py-3 rounded-2xl input-gradient-border text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] font-normal shadow-2xs"
                     />
                   </div>
                 </div>
@@ -1362,7 +1406,7 @@ export default function ArtworkUploadForm({
                     <div className="relative">
                       <select
                         {...register('dimensionUnit')}
-                        className="w-full appearance-none px-4 py-3 rounded-2xl border border-[#E8E8E3] bg-white text-xs sm:text-sm text-[#141413] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all font-normal cursor-pointer shadow-2xs pr-10"
+                        className="w-full appearance-none px-4 py-3 rounded-2xl input-gradient-border text-xs sm:text-sm text-[#141413] font-normal cursor-pointer shadow-2xs pr-10"
                       >
                         {dimensionUnitOptions.map((opt) => (
                           <option key={opt.value} value={opt.value}>
@@ -1387,10 +1431,10 @@ export default function ArtworkUploadForm({
                       step="any"
                       {...register('width')}
                       placeholder="e.g. 24"
-                      className={`w-full px-4 py-3 rounded-2xl bg-white text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] focus:outline-none transition-all font-normal shadow-2xs ${
+                      className={`w-full px-4 py-3 rounded-2xl text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] font-normal shadow-2xs ${
                         errors.width
-                          ? 'border-2 border-red-500 ring-2 ring-red-500/20'
-                          : 'border border-[#E8E8E3] focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE]'
+                          ? 'bg-white border-2 border-red-500 ring-2 ring-red-500/20'
+                          : 'input-gradient-border'
                       }`}
                     />
                   </div>
@@ -1405,10 +1449,10 @@ export default function ArtworkUploadForm({
                       step="any"
                       {...register('height')}
                       placeholder="e.g. 18"
-                      className={`w-full px-4 py-3 rounded-2xl bg-white text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] focus:outline-none transition-all font-normal shadow-2xs ${
+                      className={`w-full px-4 py-3 rounded-2xl text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] font-normal shadow-2xs ${
                         errors.height
-                          ? 'border-2 border-red-500 ring-2 ring-red-500/20'
-                          : 'border border-[#E8E8E3] focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE]'
+                          ? 'bg-white border-2 border-red-500 ring-2 ring-red-500/20'
+                          : 'input-gradient-border'
                       }`}
                     />
                   </div>
@@ -1423,7 +1467,7 @@ export default function ArtworkUploadForm({
                     type="text"
                     {...register('location')}
                     placeholder="e.g. Mumbai, India"
-                    className="w-full px-4 py-3 rounded-2xl border border-[#E8E8E3] bg-white text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all font-normal shadow-2xs"
+                    className="w-full px-4 py-3 rounded-2xl input-gradient-border text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] font-normal shadow-2xs"
                   />
                 </div>
               </div>
@@ -1475,7 +1519,7 @@ export default function ArtworkUploadForm({
                                 register('style').onChange(e);
                               }
                             }}
-                            className="w-full appearance-none px-4 py-3 rounded-2xl border border-[#E8E8E3] bg-white text-xs sm:text-sm text-[#141413] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all font-normal cursor-pointer shadow-2xs pr-10"
+                            className="w-full appearance-none px-4 py-3 rounded-2xl input-gradient-border text-xs sm:text-sm text-[#141413] font-normal cursor-pointer shadow-2xs pr-10"
                           >
                             <option value="">Select style</option>
                             {styleOptions.map((opt) => (
@@ -1510,14 +1554,18 @@ export default function ArtworkUploadForm({
                               }
                             }}
                             onBlur={handleCommitCustomStyle}
-                            className="w-full px-4 py-3 rounded-2xl border border-[#1345EE] bg-white text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all font-normal shadow-2xs pr-16"
+                            className="w-full px-4 py-3 rounded-2xl input-gradient-border text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] font-normal shadow-2xs pr-16"
                           />
                           <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1">
                             {customStyleInput.trim() && (
                               <button
                                 type="button"
                                 onClick={handleCommitCustomStyle}
-                                className="px-2 py-0.5 rounded-md bg-[#1345EE] text-white text-[10px] font-medium hover:bg-blue-700 transition-colors cursor-pointer select-none"
+                                className="px-2.5 py-1 rounded-md text-white text-[10px] font-medium hover:opacity-90 transition-opacity cursor-pointer select-none shadow-2xs"
+                                style={{
+                                  background:
+                                    'linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%)',
+                                }}
                                 title="Save to list"
                               >
                                 Save
@@ -1544,7 +1592,7 @@ export default function ArtworkUploadForm({
                     <div className="relative">
                       <select
                         {...register('collection')}
-                        className="w-full appearance-none px-4 py-3 rounded-2xl border border-[#E8E8E3] bg-white text-xs sm:text-sm text-[#141413] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all font-normal cursor-pointer shadow-2xs pr-10"
+                        className="w-full appearance-none px-4 py-3 rounded-2xl input-gradient-border text-xs sm:text-sm text-[#141413] font-normal cursor-pointer shadow-2xs pr-10"
                       >
                         <option value="">None (Individual artwork)</option>
                         {collections.map((col) => (
@@ -1566,7 +1614,7 @@ export default function ArtworkUploadForm({
                   <label className="block text-xs font-normal text-[#6E6E69] mb-1.5">
                     Tags
                   </label>
-                  <div className="w-full min-h-[52px] p-2.5 rounded-2xl border border-[#E8E8E3] bg-white flex flex-wrap items-center gap-2 shadow-2xs">
+                  <div className="w-full min-h-[52px] p-2.5 rounded-2xl input-gradient-border flex flex-wrap items-center gap-2 shadow-2xs">
                     {tags.map((t) => (
                       <span
                         key={t}
@@ -1584,7 +1632,7 @@ export default function ArtworkUploadForm({
                     ))}
 
                     {isAddingTag ? (
-                      <div className="inline-flex items-center gap-1">
+                      <div className="inline-flex items-center gap-1.5">
                         <input
                           type="text"
                           value={tagInput}
@@ -1598,13 +1646,17 @@ export default function ArtworkUploadForm({
                             }
                           }}
                           placeholder="Type tag & Enter"
-                          className="text-xs px-2 py-1 rounded border border-[#1345EE] outline-none text-[#141413]"
+                          className="text-xs px-2.5 py-1 rounded-lg input-gradient-border text-[#141413]"
                           autoFocus
                         />
                         <button
                           type="button"
                           onClick={handleAddTag}
-                          className="text-xs text-[#1345EE] font-medium"
+                          className="text-xs px-2.5 py-1 rounded-md text-white font-medium hover:opacity-90 transition-opacity cursor-pointer select-none shadow-2xs"
+                          style={{
+                            background:
+                              'linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%)',
+                          }}
                         >
                           Add
                         </button>
@@ -1633,7 +1685,7 @@ export default function ArtworkUploadForm({
                     type="url"
                     {...register('externalLink')}
                     placeholder="https://..."
-                    className="w-full px-4 py-3 rounded-2xl border border-[#E8E8E3] bg-white text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all font-normal shadow-2xs"
+                    className="w-full px-4 py-3 rounded-2xl input-gradient-border text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] font-normal shadow-2xs"
                   />
                 </div>
 
@@ -1646,7 +1698,7 @@ export default function ArtworkUploadForm({
                     rows={4}
                     {...register('description')}
                     placeholder="Share the inspiration, process or story behind this piece."
-                    className="w-full px-4 py-3 rounded-2xl border border-[#E8E8E3] bg-white text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all font-normal shadow-2xs resize-none"
+                    className="w-full px-4 py-3 rounded-2xl input-gradient-border text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] font-normal shadow-2xs resize-none"
                   />
                   <p className="text-[11px] text-[#6E6E69] mt-1">
                     Share the inspiration, process or story behind this piece.
@@ -1689,7 +1741,7 @@ export default function ArtworkUploadForm({
                     <div className="relative">
                       <select
                         {...register('status')}
-                        className="w-full appearance-none px-4 py-3 rounded-2xl border border-[#E8E8E3] bg-white text-xs sm:text-sm text-[#141413] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all font-normal cursor-pointer shadow-2xs pr-10"
+                        className="w-full appearance-none px-4 py-3 rounded-2xl input-gradient-border text-xs sm:text-sm text-[#141413] font-normal cursor-pointer shadow-2xs pr-10"
                       >
                         {availabilityOptions.map((opt) => (
                           <option key={opt.value} value={opt.value}>
@@ -1711,7 +1763,7 @@ export default function ArtworkUploadForm({
                     <div className="relative">
                       <select
                         {...register('priceVisibility')}
-                        className="w-full appearance-none px-4 py-3 rounded-2xl border border-[#E8E8E3] bg-white text-xs sm:text-sm text-[#141413] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all font-normal cursor-pointer shadow-2xs pr-10"
+                        className="w-full appearance-none px-4 py-3 rounded-2xl input-gradient-border text-xs sm:text-sm text-[#141413] font-normal cursor-pointer shadow-2xs pr-10"
                       >
                         {visibilityOptions.map((opt) => (
                           <option key={opt.value} value={opt.value}>
@@ -1737,10 +1789,10 @@ export default function ArtworkUploadForm({
                     type="text"
                     {...register('price')}
                     placeholder="e.g. 45,000"
-                    className={`w-full px-4 py-3 rounded-2xl bg-white text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] focus:outline-none transition-all font-normal shadow-2xs ${
+                    className={`w-full px-4 py-3 rounded-2xl text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] font-normal shadow-2xs ${
                       errors.price
-                        ? 'border-2 border-red-500 ring-2 ring-red-500/20'
-                        : 'border border-[#E8E8E3] focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE]'
+                        ? 'bg-white border-2 border-red-500 ring-2 ring-red-500/20'
+                        : 'input-gradient-border'
                     }`}
                   />
                   <p className="text-[11px] text-[#6E6E69] mt-1.5">
@@ -1791,7 +1843,7 @@ export default function ArtworkUploadForm({
                     setStep(2);
                   }}
                   disabled={selectedFiles.length === 0}
-                  className="px-6 sm:px-8 py-2.5 sm:py-3 rounded-full bg-[#1345EE] text-white text-xs sm:text-sm font-medium hover:bg-blue-700 transition-colors flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm cursor-pointer select-none"
+                  className="px-6 sm:px-8 py-2.5 sm:py-3 rounded-full btn-eras-gradient text-xs sm:text-sm font-medium flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm cursor-pointer select-none"
                 >
                   <span>Continue to details</span>
                   <ArrowRight size={16} />
@@ -1829,7 +1881,7 @@ export default function ArtworkUploadForm({
                   type="button"
                   onClick={handleSubmit(onPublishSubmit, onInvalid)}
                   disabled={isLoading}
-                  className="px-6 sm:px-8 py-2.5 sm:py-3 rounded-full bg-[#1345EE] text-white text-xs sm:text-sm font-medium hover:bg-blue-700 transition-colors flex items-center gap-2 disabled:opacity-50 shadow-sm cursor-pointer select-none"
+                  className="px-6 sm:px-8 py-2.5 sm:py-3 rounded-full btn-eras-gradient text-xs sm:text-sm font-medium flex items-center gap-2 disabled:opacity-50 shadow-sm cursor-pointer select-none"
                 >
                   {isLoading ? (
                     <>

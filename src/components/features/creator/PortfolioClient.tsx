@@ -483,8 +483,7 @@ export default function PortfolioClient({
           <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-8">
             {/* Search Input */}
             <div
-              className="relative w-full md:w-[320px] lg:w-[380px] bg-white border border-[#E3E3E7] px-3.5 py-2.5 flex items-center gap-2.5 shadow-2xs"
-              style={{ borderRadius: 4 }}
+              className="relative w-full md:w-[320px] lg:w-[380px] px-3.5 py-2.5 flex items-center gap-2.5 shadow-2xs input-gradient-border-sm"
             >
               <Search size={16} className="text-[#6E6E69] shrink-0" />
               <input
@@ -511,9 +510,8 @@ export default function PortfolioClient({
                       setStatusFilter(e.target.value);
                       setCurrentPage(1);
                     }}
-                    className="appearance-none bg-white border border-[#E3E3E7] pl-3.5 pr-8 py-2.5 text-xs sm:text-sm font-normal text-[#141413] outline-none cursor-pointer shadow-2xs hover:border-gray-400 transition-colors"
+                    className="appearance-none pl-3.5 pr-8 py-2.5 text-xs sm:text-sm font-normal text-[#141413] outline-none cursor-pointer shadow-2xs input-gradient-border-sm"
                     style={{
-                      borderRadius: 4,
                       fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
                     }}
                   >
@@ -538,9 +536,8 @@ export default function PortfolioClient({
                     setSortOrder(e.target.value);
                     setCurrentPage(1);
                   }}
-                  className="appearance-none bg-white border border-[#E3E3E7] pl-3.5 pr-8 py-2.5 text-xs sm:text-sm font-normal text-[#141413] outline-none cursor-pointer shadow-2xs hover:border-gray-400 transition-colors"
+                  className="appearance-none pl-3.5 pr-8 py-2.5 text-xs sm:text-sm font-normal text-[#141413] outline-none cursor-pointer shadow-2xs input-gradient-border-sm"
                   style={{
-                    borderRadius: 4,
                     fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
                   }}
                 >
