@@ -10,11 +10,12 @@
 --  4. Eliminates the need for a separate admin_sessions table.
 -- =========================================================================
 
--- Optional cleanup of deprecated standalone admin_sessions table
+-- Clean up any previous partial/separate tables so the unified schema is cleanly applied
 DROP TABLE IF EXISTS public.admin_sessions CASCADE;
+DROP TABLE IF EXISTS public.admin_accounts CASCADE;
 
 -- Create Unified Admin Accounts Table
-CREATE TABLE IF NOT EXISTS public.admin_accounts (
+CREATE TABLE public.admin_accounts (
   id uuid PRIMARY KEY,
   username text NOT NULL UNIQUE,
   email text NOT NULL UNIQUE,
