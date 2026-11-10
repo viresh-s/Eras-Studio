@@ -4,6 +4,9 @@ import { createClient, getSupabaseAdmin } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
 import { z } from 'zod';
+import { getClientIp } from '@/lib/security/authGuard';
+import { checkRateLimit } from '@/lib/security/rateLimiter';
+import { securityLogger } from '@/lib/security/logger';
 
 async function getRequestOrigin(): Promise<string> {
   try {
@@ -38,6 +41,15 @@ export interface AuthResult {
 }
 
 export async function login(formData: FormData): Promise<AuthResult> {
+  const ip = await getClientIp();
+
+  // Rate Limiting by IP: 20 login attempts per minute
+  const ipRate = checkRateLimit(`login:ip:${ip}`, { maxRequests: 20, windowSeconds: 60 });
+  if (!ipRate.allowed) {
+    securityLogger.alert('RATE_LIMIT_LOGIN_IP', { ip });
+    return { error: 'Too many login attempts from this network. Please wait a minute.' };
+  }
+
   const parsed = loginSchema.safeParse({
     email: formData.get('email'),
     password: formData.get('password')
@@ -48,6 +60,13 @@ export async function login(formData: FormData): Promise<AuthResult> {
   }
   const { email, password } = parsed.data;
 
+  // Rate Limiting by Account: 5 failed attempts per 5 minutes to prevent brute-force attacks
+  const emailRate = checkRateLimit(`login:account:${email.toLowerCase()}`, { maxRequests: 5, windowSeconds: 300 });
+  if (!emailRate.allowed) {
+    securityLogger.alert('RATE_LIMIT_LOGIN_ACCOUNT', { email, ip });
+    return { error: 'Too many attempts for this account. Please wait 5 minutes before trying again.' };
+  }
+
   const supabase = await createClient();
 
   const { error } = await supabase.auth.signInWithPassword({
@@ -56,18 +75,26 @@ export async function login(formData: FormData): Promise<AuthResult> {
   });
 
   if (error) {
+    securityLogger.audit('LOGIN_FAILED', { email, ip, reason: error.message });
     return { error: error.message };
   }
 
-  // Get user profile for role-based redirect
+  // Get user profile for role-based redirect & account suspension verification
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: 'Authentication failed' };
 
   let { data: profile } = await supabase
     .from('profiles')
-    .select('role')
+    .select('role, status')
     .eq('id', user.id)
     .single();
+
+  // Account suspension check: reject suspended users immediately and sign them out
+  if (profile?.status === 'suspended') {
+    securityLogger.alert('SUSPENDED_USER_LOGIN_BLOCKED', { userId: user.id, email, ip });
+    await supabase.auth.signOut();
+    return { error: 'Your account is suspended. Please contact studio support for assistance.' };
+  }
 
   // If the database trigger failed and they have no profile, create it now!
   // Since they are logging in, they have a valid session so RLS will allow this.
@@ -79,9 +106,10 @@ export async function login(formData: FormData): Promise<AuthResult> {
         full_name: user.user_metadata?.full_name || 'New User',
         email: user.email!,
         phone_number: user.user_metadata?.phone_number || '',
-        role: user.user_metadata?.role || 'User'
+        role: user.user_metadata?.role || 'User',
+        status: 'active'
       })
-      .select('role')
+      .select('role, status')
       .single();
 
     if (newProfile) {
@@ -91,10 +119,19 @@ export async function login(formData: FormData): Promise<AuthResult> {
     }
   }
 
+  securityLogger.info('USER_LOGIN_SUCCESS', { userId: user.id, email, role: profile?.role });
   return { role: profile?.role || 'User' };
 }
 
 export async function signup(formData: FormData): Promise<AuthResult> {
+  const ip = await getClientIp();
+
+  // Rate Limiting by IP: 5 registration attempts per 10 minutes
+  const ipRate = checkRateLimit(`signup:ip:${ip}`, { maxRequests: 5, windowSeconds: 600 });
+  if (!ipRate.allowed) {
+    securityLogger.alert('RATE_LIMIT_SIGNUP_IP', { ip });
+    return { error: 'Too many registration requests. Please wait a few minutes before trying again.' };
+  }
   const parsed = signupSchema.safeParse({
     email: formData.get('email'),
     password: formData.get('password'),
@@ -181,6 +218,12 @@ export async function logout(): Promise<void> {
 }
 
 export async function resendVerificationEmail(emailRaw: string): Promise<{ error?: string, success?: boolean }> {
+  const ip = await getClientIp();
+  const rateLimit = checkRateLimit(`resend_verification:${ip}`, { maxRequests: 3, windowSeconds: 900 });
+  if (!rateLimit.allowed) {
+    return { error: 'Too many verification email requests. Please wait a few minutes before trying again.' };
+  }
+
   const parsed = emailSchema.safeParse(emailRaw);
   if (!parsed.success) return { error: parsed.error.errors[0].message };
   const email = parsed.data;
@@ -201,6 +244,12 @@ export async function resendVerificationEmail(emailRaw: string): Promise<{ error
 }
 
 export async function sendPasswordResetOtp(emailRaw: string): Promise<{ error?: string, success?: boolean }> {
+  const ip = await getClientIp();
+  const rateLimit = checkRateLimit(`password_reset:${ip}`, { maxRequests: 3, windowSeconds: 900 });
+  if (!rateLimit.allowed) {
+    return { error: 'Too many password reset requests. Please wait a few minutes before trying again.' };
+  }
+
   const parsed = emailSchema.safeParse(emailRaw);
   if (!parsed.success) return { error: parsed.error.errors[0].message };
   const email = parsed.data;
@@ -216,6 +265,12 @@ export async function sendPasswordResetOtp(emailRaw: string): Promise<{ error?: 
 }
 
 export async function updateUserPassword(newPassword: string): Promise<{ error?: string, success?: boolean }> {
+  const ip = await getClientIp();
+  const rateLimit = checkRateLimit(`password_update:${ip}`, { maxRequests: 5, windowSeconds: 600 });
+  if (!rateLimit.allowed) {
+    return { error: 'Too many password update attempts. Please wait.' };
+  }
+
   if (!newPassword || newPassword.length < 6) {
     return { error: 'Password must be at least 6 characters' };
   }
@@ -232,6 +287,7 @@ export async function updateUserPassword(newPassword: string): Promise<{ error?:
   });
 
   if (error) return { error: error.message };
+  securityLogger.info('PASSWORD_UPDATED', { userId: user.id });
   return { success: true };
 }
 

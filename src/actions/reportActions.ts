@@ -42,9 +42,20 @@ export async function submitArtworkReport(
   const validArtworkId = SafeIdSchema.parse(input.artworkId);
   const validReason = ReportReasonSchema.parse(input.reason);
   const sanitizedDetails = input.details ? sanitizeText(input.details, 2000) : null;
-  const validOwnerId = input.artworkOwnerId
-    ? SafeIdSchema.safeParse(input.artworkOwnerId).data || null
-    : null;
+
+  // Verify artwork and retrieve authoritative owner
+  const { data: artwork } = await supabase
+    .from('artworks')
+    .select('id, creator_id')
+    .eq('id', validArtworkId)
+    .maybeSingle();
+
+  if (!artwork) {
+    return {
+      success: false,
+      message: 'The reported artwork could not be found.',
+    };
+  }
 
   // 4. Insert report with server-enforced reporter identity
   const { data, error } = await supabase
@@ -52,7 +63,7 @@ export async function submitArtworkReport(
     .insert({
       artwork_id: validArtworkId,
       reporter_user_id: user.id, // Strictly server derived
-      artwork_owner_id: validOwnerId,
+      artwork_owner_id: artwork.creator_id || null, // Authoritative creator ID
       reason: validReason,
       details: sanitizedDetails,
       status: 'pending', // Client cannot set approved or resolved

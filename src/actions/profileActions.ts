@@ -71,10 +71,18 @@ export async function updateProfile(data: UpdateProfileData) {
     throw new Error('Unauthorized: Authentication required.');
   }
 
-  const { userId, ...updateData } = data;
+  // Prevent mass-assignment: strictly destructure from parsed.data (never from raw input data)
+  const { userId, ...updateData } = parsed.data;
 
   if (user.id !== userId) {
     throw new Error('Unauthorized: You can only edit your own profile.');
+  }
+
+  // Rate limiting to prevent database abuse
+  const { checkRateLimit } = await import('@/lib/security/rateLimiter');
+  const rateLimit = checkRateLimit(`profile:update:${user.id}`, { maxRequests: 30, windowSeconds: 60 });
+  if (!rateLimit.allowed) {
+    throw new Error('Rate limit reached: Please wait before updating your profile again.');
   }
 
   // Remove undefined values so we don't overwrite with null accidentally

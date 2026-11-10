@@ -31,7 +31,21 @@ export async function POST(request: Request) {
       );
     }
 
-    const { artworkId, artworkOwnerId, reason, details } = validation.data;
+    const { artworkId, reason, details } = validation.data;
+
+    // Verify artwork existence and retrieve authoritative owner
+    const { data: artwork, error: artworkError } = await supabase
+      .from('artworks')
+      .select('id, creator_id')
+      .eq('id', artworkId)
+      .maybeSingle();
+
+    if (artworkError || !artwork) {
+      return NextResponse.json(
+        { success: false, message: 'The reported artwork could not be found.' },
+        { status: 404 }
+      );
+    }
 
     // Rate limiting: 5 reports per 15 minutes
     const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000).toISOString();
@@ -54,9 +68,9 @@ export async function POST(request: Request) {
     const { data, error } = await supabase
       .from('reports')
       .insert({
-        artwork_id: artworkId,
+        artwork_id: artwork.id,
         reporter_user_id: user.id,
-        artwork_owner_id: artworkOwnerId || null,
+        artwork_owner_id: artwork.creator_id || null,
         reason,
         details: details?.trim() || null,
         status: 'pending',

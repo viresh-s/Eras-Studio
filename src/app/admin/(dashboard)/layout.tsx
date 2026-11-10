@@ -11,6 +11,7 @@ import {
   Palette,
   Award,
   ShieldAlert,
+  ShieldCheck,
   CreditCard,
   Sliders,
   Briefcase,
@@ -42,6 +43,7 @@ const navItems: NavItem[] = [
   { name: "Reports", href: "/admin/reports", icon: ShieldAlert },
   { name: "COR", href: "/admin/cor", icon: Award },
   { name: "Careers", href: "/admin/careers", icon: Briefcase },
+  { name: "Security Centre", href: "/admin/security", icon: ShieldCheck },
   { name: "Studio Settings", href: "/admin/settings", icon: Sliders },
 ];
 
@@ -66,6 +68,7 @@ function getPageTitle(pathname: string): string {
   if (pathname.includes("/admin/cor/opportunities")) return "Institutional Opportunities";
   if (pathname.includes("/admin/cor")) return "COR";
   if (pathname.includes("/admin/careers")) return "Careers Management";
+  if (pathname.includes("/admin/security")) return "Security Centre";
   if (pathname.includes("/admin/settings")) return "Studio Settings";
   return "Overview";
 }

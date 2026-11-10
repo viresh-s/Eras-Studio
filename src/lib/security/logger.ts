@@ -1,12 +1,30 @@
-type SecurityLogLevel = 'INFO' | 'WARN' | 'ERROR' | 'SECURITY_AUDIT' | 'SECURITY_ALERT';
+export type SecurityLogLevel = 'INFO' | 'WARN' | 'ERROR' | 'SECURITY_AUDIT' | 'SECURITY_ALERT';
 
-interface SecurityLogPayload {
+export interface SecurityLogPayload {
   action: string;
   userId?: string | null;
   ip?: string | null;
   details?: Record<string, unknown>;
   [key: string]: unknown;
 }
+
+export interface SecurityLogEntry {
+  id: string;
+  timestamp: string;
+  level: SecurityLogLevel;
+  action: string;
+  userId: string;
+  ip: string;
+  details?: Record<string, unknown>;
+}
+
+// Memory Ring Buffer for Verified Real-Time Administrative Security Centre Visibility
+const MAX_EVENT_BUFFER = 200;
+const eventBuffer: SecurityLogEntry[] = [];
+let totalEventsCount = 0;
+let failedAuthCount = 0;
+let unauthorizedApiCount = 0;
+let securityAlertsCount = 0;
 
 // Sensitive keys that must NEVER appear in logs
 const SENSITIVE_KEYS = new Set([
@@ -50,9 +68,10 @@ function redactSensitiveData(obj: unknown, depth = 0): unknown {
 export const securityLogger = {
   log(level: SecurityLogLevel, payload: SecurityLogPayload) {
     const timestamp = new Date().toISOString();
-    const sanitizedDetails = payload.details ? redactSensitiveData(payload.details) : undefined;
+    const sanitizedDetails = payload.details ? (redactSensitiveData(payload.details) as Record<string, unknown>) : undefined;
 
-    const logEntry = {
+    const logEntry: SecurityLogEntry = {
+      id: `sec_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
       timestamp,
       level,
       action: payload.action,
@@ -60,6 +79,25 @@ export const securityLogger = {
       ip: payload.ip || 'unknown',
       details: sanitizedDetails,
     };
+
+    // Update real system security counters
+    totalEventsCount++;
+    const act = payload.action.toUpperCase();
+    if (act.includes('LOGIN_FAILED') || act.includes('RATE_LIMIT_LOGIN') || act.includes('AUTH_FAILED')) {
+      failedAuthCount++;
+    }
+    if (act.includes('UNAUTHORIZED') || act.includes('FORBIDDEN') || act.includes('ACCESS_DENIED') || act.includes('TAMPER')) {
+      unauthorizedApiCount++;
+    }
+    if (level === 'SECURITY_ALERT') {
+      securityAlertsCount++;
+    }
+
+    // Keep ring buffer
+    eventBuffer.unshift(logEntry);
+    if (eventBuffer.length > MAX_EVENT_BUFFER) {
+      eventBuffer.pop();
+    }
 
     if (level === 'SECURITY_ALERT' || level === 'ERROR') {
       console.error(`[SECURITY ${level}] ${JSON.stringify(logEntry)}`);
@@ -90,3 +128,17 @@ export const securityLogger = {
     this.log('ERROR', { action, ...(payload || {}) });
   },
 };
+
+export function getSecurityAuditStats() {
+  return {
+    totalEventsCount,
+    failedAuthCount,
+    unauthorizedApiCount,
+    securityAlertsCount,
+    bufferLength: eventBuffer.length,
+  };
+}
+
+export function getRecentSecurityEvents(limit = 50): SecurityLogEntry[] {
+  return eventBuffer.slice(0, limit);
+}
