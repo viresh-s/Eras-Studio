@@ -463,7 +463,7 @@ export default function DashboardLayout({
                   </div>
                   <div className="text-left">
                     <p className="text-xs font-medium text-[#141413]">Admin Console</p>
-                    <p className="text-[11px] text-[#6E6E69]">admin123@erasstudio.com</p>
+                    <p className="text-[11px] text-[#6E6E69]">Authorized Admin</p>
                   </div>
                 </div>
                 <button

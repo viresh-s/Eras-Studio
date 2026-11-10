@@ -3,8 +3,10 @@ import { cookies } from "next/headers";
 import {
   verifyCredentials,
   createSessionToken,
+  verifySessionToken,
   COOKIE_OPTIONS,
 } from "@/lib/auth";
+import { establishAdminSession } from "@/lib/security/adminSessionManager";
 import { globalRateLimiter, RATE_LIMIT_CONFIGS } from "@/lib/security/rateLimit";
 import { reportsRepo } from "@/lib/data";
 
@@ -77,15 +79,41 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Check single active admin session and 30-minute inactivity
+    const cookieStore = await cookies();
+    const existingToken = cookieStore.get(COOKIE_OPTIONS.name)?.value;
+    let existingSessionId: string | undefined;
+    if (existingToken) {
+      try {
+        const verified = await verifySessionToken(existingToken);
+        existingSessionId = verified?.sessionId;
+      } catch {}
+    }
+
+    const sessionResult = await establishAdminSession(
+      verification.user.id || "adm_01",
+      verification.user.email,
+      clientIp,
+      request.headers.get("user-agent") || undefined,
+      existingSessionId
+    );
+
+    if (!sessionResult.allowed) {
+      return NextResponse.json(
+        { error: sessionResult.error || "Admin access is currently unavailable. An active administrator session already exists." },
+        { status: 409 }
+      );
+    }
+
     const token = await createSessionToken({
       id: verification.user.id || "adm_01",
       username: username.trim(),
       role: (verification.user.role as any) || "super_admin",
       name: verification.user.name,
       email: verification.user.email,
+      sessionId: sessionResult.sessionId,
     });
 
-    const cookieStore = await cookies();
     cookieStore.set({
       name: COOKIE_OPTIONS.name,
       value: token,

@@ -13,7 +13,7 @@ import { createClient } from '@/lib/supabase/client';
 import { GoogleIcon } from '@/components/features/auth/SocialAuthButtons';
 
 const loginSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
+  email: z.string().min(1, 'Please enter your username or email'),
   password: z.string().min(1, 'Password is required'),
 });
 
@@ -89,9 +89,18 @@ function LoginFormContent() {
     if (result?.error) {
       setError(result.error);
       setIsLoading(false);
-    } else if (result?.role) {
-      if (result.role === 'Admin') router.push('/admin');
-      else router.push('/discovery');
+    } else if (result?.redirectUrl) {
+      router.push(result.redirectUrl);
+      router.refresh();
+    } else if (result?.role === 'Admin') {
+      router.push('/admin/overview');
+      router.refresh();
+    } else if (result?.role === 'Creator') {
+      router.push('/portfolio');
+      router.refresh();
+    } else {
+      router.push('/discovery');
+      router.refresh();
     }
   };
 
@@ -205,13 +214,13 @@ function LoginFormContent() {
           {/* Error Message */}
           {(error || urlError) && (
             <div className="mb-5 bg-red-50 border border-red-200 rounded-xl p-3 text-red-600 text-xs">
-              {error || urlError}
+              {error || (urlError === 'inactivity' ? 'Your session expired due to inactivity. Please log in again.' : urlError)}
             </div>
           )}
 
           {/* Credentials Form */}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            {/* Email Field */}
+            {/* Email or Username Field */}
             <div>
               <label
                 htmlFor="email"
@@ -222,13 +231,15 @@ function LoginFormContent() {
                 }}
                 className="block text-xs mb-1"
               >
-                Email
+                Email or Username
               </label>
               <input
                 id="email"
-                type="email"
-                autoComplete="email"
-                placeholder=""
+                type="text"
+                autoCapitalize="none"
+                autoCorrect="off"
+                autoComplete="username"
+                placeholder="e.g. name@example.com or admin123"
                 {...register('email')}
                 style={{
                   fontFamily: "'Poppins', sans-serif",

@@ -1,6 +1,7 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 import { verifySessionToken } from '@/lib/auth';
+import { isAuthorizedAdminEmail } from '@/lib/security/adminWhitelist';
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -15,10 +16,10 @@ export async function updateSession(request: NextRequest) {
   const verifiedAdmin = await verifySessionToken(adminCookieVal);
   const hasValidAdminSession = Boolean(verifiedAdmin);
 
-  // If already logged into admin and accessing admin login page, redirect to overview
-  if (isAdminLoginRoute && hasValidAdminSession && !isServerAction) {
+  // If accessing legacy admin login route, redirect to unified login page
+  if (isAdminLoginRoute && !isServerAction) {
     const url = request.nextUrl.clone();
-    url.pathname = '/admin/overview';
+    url.pathname = hasValidAdminSession ? '/admin/overview' : '/login';
     return NextResponse.redirect(url);
   }
 
@@ -83,10 +84,16 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   // Handle protected admin routes
-  if (isAdminRoute && !isAdminLoginRoute) {
+  if (isAdminRoute) {
+    if (isAdminLoginRoute) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/login';
+      return NextResponse.redirect(url);
+    }
+
     if (!hasValidAdminSession) {
       let isSupabaseAdmin = false;
-      if (user) {
+      if (user && isAuthorizedAdminEmail(user.email)) {
         const { data: profile } = await supabase
           .from('profiles')
           .select('role')
@@ -99,7 +106,10 @@ export async function updateSession(request: NextRequest) {
 
       if (!isSupabaseAdmin) {
         const url = request.nextUrl.clone();
-        url.pathname = '/admin/login';
+        url.pathname = '/login';
+        if (adminCookieVal) {
+          url.searchParams.set('error', 'inactivity');
+        }
         const response = NextResponse.redirect(url);
         supabaseResponse.cookies.getAll().forEach((cookie) => {
           response.cookies.set(cookie.name, cookie.value);
@@ -137,7 +147,7 @@ export async function updateSession(request: NextRequest) {
     }
 
     const url = request.nextUrl.clone();
-    if (profile.role === 'Admin') {
+    if (profile.role === 'Admin' && isAuthorizedAdminEmail(user.email)) {
       url.pathname = '/admin/overview';
     } else {
       url.pathname = '/discovery';

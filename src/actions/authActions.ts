@@ -2,11 +2,27 @@
 
 import { createClient, getSupabaseAdmin } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import { headers } from 'next/headers';
+import { headers, cookies } from 'next/headers';
 import { z } from 'zod';
 import { getClientIp } from '@/lib/security/authGuard';
 import { checkRateLimit } from '@/lib/security/rateLimiter';
 import { securityLogger } from '@/lib/security/logger';
+import {
+  verifyCredentials,
+  createSessionToken,
+  verifySessionToken,
+  AUTH_COOKIE_NAME,
+  COOKIE_OPTIONS,
+} from '@/lib/auth';
+import {
+  establishAdminSession,
+  terminateAdminSession,
+} from '@/lib/security/adminSessionManager';
+import {
+  resolveLoginIdentifier,
+  isAuthorizedAdminEmail,
+  isAuthorizedAdminUserId,
+} from '@/lib/security/adminWhitelist';
 
 async function getRequestOrigin(): Promise<string> {
   try {
@@ -20,7 +36,7 @@ async function getRequestOrigin(): Promise<string> {
 }
 
 const loginSchema = z.object({
-  email: z.string().email('Invalid email address').max(255),
+  email: z.string().min(1, 'Please enter your email or username').max(255),
   password: z.string().min(1, 'Password is required').max(100)
 });
 
@@ -37,6 +53,7 @@ const emailSchema = z.string().email('Invalid email address').max(255);
 export interface AuthResult {
   error?: string;
   role?: string;
+  redirectUrl?: string;
   requireEmailVerification?: boolean;
 }
 
@@ -58,46 +75,46 @@ export async function login(formData: FormData): Promise<AuthResult> {
   if (!parsed.success) {
     return { error: `Validation Error: ${parsed.error.errors[0].message}` };
   }
-  const { email, password } = parsed.data;
+  const { email: rawIdentifier, password } = parsed.data;
+  const resolvedAuthEmail = resolveLoginIdentifier(rawIdentifier);
 
   // Rate Limiting by Account: 5 failed attempts per 5 minutes to prevent brute-force attacks
-  const emailRate = checkRateLimit(`login:account:${email.toLowerCase()}`, { maxRequests: 5, windowSeconds: 300 });
+  const emailRate = checkRateLimit(`login:account:${resolvedAuthEmail.toLowerCase()}`, { maxRequests: 5, windowSeconds: 300 });
   if (!emailRate.allowed) {
-    securityLogger.alert('RATE_LIMIT_LOGIN_ACCOUNT', { email, ip });
+    securityLogger.alert('RATE_LIMIT_LOGIN_ACCOUNT', { email: resolvedAuthEmail, ip });
     return { error: 'Too many attempts for this account. Please wait 5 minutes before trying again.' };
   }
 
+  // Unified Supabase Authentication
   const supabase = await createClient();
 
-  const { error } = await supabase.auth.signInWithPassword({
-    email,
+  const { data: authData, error } = await supabase.auth.signInWithPassword({
+    email: resolvedAuthEmail,
     password,
   });
 
-  if (error) {
-    securityLogger.audit('LOGIN_FAILED', { email, ip, reason: error.message });
-    return { error: error.message };
+  if (error || !authData.user) {
+    securityLogger.audit('LOGIN_FAILED', { email: resolvedAuthEmail, ip, reason: error?.message });
+    return { error: error?.message || 'Invalid username or password.' };
   }
 
-  // Get user profile for role-based redirect & account suspension verification
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { error: 'Authentication failed' };
+  const user = authData.user;
 
+  // Get user profile for role-based redirect & account suspension verification
   let { data: profile } = await supabase
     .from('profiles')
-    .select('role, status')
+    .select('role, status, full_name')
     .eq('id', user.id)
     .single();
 
   // Account suspension check: reject suspended users immediately and sign them out
   if (profile?.status === 'suspended') {
-    securityLogger.alert('SUSPENDED_USER_LOGIN_BLOCKED', { userId: user.id, email, ip });
+    securityLogger.alert('SUSPENDED_USER_LOGIN_BLOCKED', { userId: user.id, email: user.email || resolvedAuthEmail, ip });
     await supabase.auth.signOut();
     return { error: 'Your account is suspended. Please contact studio support for assistance.' };
   }
 
   // If the database trigger failed and they have no profile, create it now!
-  // Since they are logging in, they have a valid session so RLS will allow this.
   if (!profile) {
     const { data: newProfile, error: insertError } = await supabase
       .from('profiles')
@@ -109,7 +126,7 @@ export async function login(formData: FormData): Promise<AuthResult> {
         role: user.user_metadata?.role || 'User',
         status: 'active'
       })
-      .select('role, status')
+      .select('role, status, full_name')
       .single();
 
     if (newProfile) {
@@ -119,8 +136,67 @@ export async function login(formData: FormData): Promise<AuthResult> {
     }
   }
 
-  securityLogger.info('USER_LOGIN_SUCCESS', { userId: user.id, email, role: profile?.role });
-  return { role: profile?.role || 'User' };
+  securityLogger.info('USER_LOGIN_SUCCESS', { userId: user.id, email: user.email || resolvedAuthEmail, role: profile?.role });
+
+  // 3. Authoritative Role-Based Routing & Single Session Enforcement
+  if (profile?.role === 'Admin') {
+    // Phase 25: Strict Whitelist - Only the two predefined admin accounts are permitted
+    if (!isAuthorizedAdminEmail(user.email) || !isAuthorizedAdminUserId(user.id)) {
+      securityLogger.alert('UNAUTHORIZED_ADMIN_ROLE_LOGIN_BLOCKED', {
+        userId: user.id,
+        email: user.email,
+        ip,
+      });
+      await supabase.auth.signOut();
+      return {
+        error: "Access denied. Unauthorized administrative identity.",
+      };
+    }
+
+    const cookieStore = await cookies();
+    const existingToken = cookieStore.get(AUTH_COOKIE_NAME)?.value;
+    let existingSessionId: string | undefined;
+    if (existingToken) {
+      try {
+        const verified = await verifySessionToken(existingToken);
+        existingSessionId = verified?.sessionId;
+      } catch {}
+    }
+
+    const sessionResult = await establishAdminSession(
+      user.id,
+      user.email || resolvedAuthEmail,
+      ip,
+      undefined,
+      existingSessionId
+    );
+
+    if (!sessionResult.allowed) {
+      await supabase.auth.signOut();
+      return {
+        error: sessionResult.error || "Admin access is currently unavailable. An active administrator session already exists.",
+      };
+    }
+
+    const token = await createSessionToken({
+      id: user.id,
+      username: user.user_metadata?.username || (user.email || resolvedAuthEmail).split('@')[0],
+      role: 'super_admin',
+      name: profile.full_name || 'Administrator',
+      email: user.email || resolvedAuthEmail,
+      sessionId: sessionResult.sessionId,
+    });
+
+    cookieStore.set(AUTH_COOKIE_NAME, token, COOKIE_OPTIONS);
+    securityLogger.info('ADMIN_LOGIN_SUCCESS', { adminId: user.id, ip });
+    return { role: 'Admin', redirectUrl: '/admin/overview' };
+  }
+
+  if (profile?.role === 'Creator') {
+    return { role: 'Creator', redirectUrl: '/portfolio' };
+  }
+
+  return { role: profile?.role || 'User', redirectUrl: '/discovery' };
 }
 
 export async function signup(formData: FormData): Promise<AuthResult> {
@@ -212,6 +288,18 @@ export async function signup(formData: FormData): Promise<AuthResult> {
 }
 
 export async function logout(): Promise<void> {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get(AUTH_COOKIE_NAME)?.value;
+    if (token) {
+      const verified = await verifySessionToken(token);
+      if (verified) {
+        await terminateAdminSession(verified.sessionId, verified.id);
+      }
+      cookieStore.delete(AUTH_COOKIE_NAME);
+    }
+  } catch {}
+
   const supabase = await createClient();
   await supabase.auth.signOut();
   redirect('/login');

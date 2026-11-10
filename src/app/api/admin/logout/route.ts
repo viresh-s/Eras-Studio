@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { COOKIE_OPTIONS, verifySessionToken } from "@/lib/auth";
+import { terminateAdminSession } from "@/lib/security/adminSessionManager";
 import { reportsRepo } from "@/lib/data";
 
 export async function POST() {
@@ -10,6 +11,7 @@ export async function POST() {
     const session = await verifySessionToken(token);
 
     if (session) {
+      await terminateAdminSession(session.sessionId, session.id);
       await reportsRepo.logAudit({
         adminId: session.id || "adm_01",
         action: "admin_logout" as any,
