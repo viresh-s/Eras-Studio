@@ -113,13 +113,13 @@ export default function AdminLoginPage() {
         {/* Right Column: Sign In Form & Brand */}
         <div className="w-full max-w-[390px] mx-auto flex flex-col justify-center">
           
-          {/* Brand Header: ERAS */}
+          {/* Brand Header: ERAS Studio */}
           <div className="text-center mb-6 flex justify-center">
             <Image
               src="/images/eras-logo.png"
-              alt="ERAS"
-              width={140}
-              height={35}
+              alt="ERAS Studio"
+              width={160}
+              height={26}
               className="h-7 w-auto object-contain select-none"
               priority
             />

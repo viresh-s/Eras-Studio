@@ -13,10 +13,10 @@ export default function Footer() {
               <Link href="/" className="hover:opacity-90 transition-opacity inline-flex items-center mb-1">
                 <Image
                   src="/images/eras-logo.png"
-                  alt="ERAS"
-                  width={110}
-                  height={35}
-                  className="h-8 w-auto object-contain select-none"
+                  alt="ERAS Studio"
+                  width={140}
+                  height={23}
+                  className="h-7 sm:h-8 w-auto object-contain select-none"
                 />
               </Link>
               <p className="mt-3 text-[#9E9E98] text-sm leading-relaxed max-w-xs">

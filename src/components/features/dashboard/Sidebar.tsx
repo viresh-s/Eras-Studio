@@ -82,10 +82,10 @@ export default function Sidebar({ role, isCollapsed, onToggle }: SidebarProps) {
           <Link href="/" className="hover:opacity-90 transition-opacity flex items-center">
             <NextImage
               src="/images/eras-logo.png"
-              alt="ERAS"
-              width={90}
-              height={29}
-              className="h-7 w-auto object-contain select-none"
+              alt="ERAS Studio"
+              width={130}
+              height={21}
+              className="h-6 w-auto object-contain select-none"
               priority
             />
           </Link>

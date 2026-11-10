@@ -590,14 +590,14 @@ function ForgotPasswordContent() {
         {/* Right Column: Form & Brand */}
         <div className="w-full max-w-[390px] mx-auto flex flex-col justify-center">
           
-          {/* Brand Header: ERAS */}
+          {/* Brand Header: ERAS Studio */}
           <div className="text-center mb-2 flex justify-center">
             <Link href="/" className="hover:opacity-90 transition-opacity inline-flex items-center">
               <Image
                 src="/images/eras-logo.png"
-                alt="ERAS"
-                width={120}
-                height={38}
+                alt="ERAS Studio"
+                width={160}
+                height={26}
                 className="h-8 w-auto object-contain select-none"
                 priority
               />

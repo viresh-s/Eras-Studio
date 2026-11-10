@@ -108,10 +108,10 @@ export default function Navbar({ profile }: NavbarProps) {
           <Link href="/discovery" className="flex items-center flex-shrink-0 hover:opacity-90 transition-opacity">
             <Image
               src="/images/eras-logo.png"
-              alt="ERAS"
-              width={100}
-              height={32}
-              className="h-8 w-auto object-contain select-none"
+              alt="ERAS Studio"
+              width={140}
+              height={23}
+              className="h-7 w-auto object-contain select-none"
               priority
             />
           </Link>

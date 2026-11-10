@@ -200,20 +200,16 @@ export default function DashboardLayout({
           <Link
             href="/admin/overview"
             onClick={closeMobileDrawer}
-            className="flex items-center gap-1.5 select-none"
+            className="flex items-center select-none"
           >
             <Image
               src="/images/eras-logo.png"
-              alt="ERAS"
-              width={80}
-              height={20}
+              alt="ERAS Studio"
+              width={130}
+              height={21}
               className="h-5 w-auto object-contain"
               priority
             />
-            <span className="font-medium text-xl tracking-tight text-[#141413]">
-              Studio
-            </span>
-            <span className="w-1.5 h-1.5 rounded-full bg-[#1345EE] mb-1 ml-0.5 inline-block" />
           </Link>
 
           <div className="flex items-center gap-2">
@@ -492,19 +488,15 @@ export default function DashboardLayout({
         <aside className="hidden lg:flex flex-col w-64 shrink-0 border-r border-[#E8E8E3] bg-white min-h-screen sticky top-0 h-screen select-none shadow-soft-sm">
           {/* Top Brand Header */}
           <div className="p-6 border-b border-[#E8E8E3] flex items-center justify-between">
-            <Link href="/admin/overview" className="flex items-center gap-1.5 group">
+            <Link href="/admin/overview" className="flex items-center group">
               <Image
                 src="/images/eras-logo.png"
-                alt="ERAS"
-                width={80}
-                height={20}
-                className="h-5 w-auto object-contain group-hover:opacity-85 transition-opacity"
+                alt="ERAS Studio"
+                width={150}
+                height={24}
+                className="h-6 w-auto object-contain group-hover:opacity-85 transition-opacity"
                 priority
               />
-              <span className="font-medium text-xl tracking-tight text-[#141413]">
-                Studio
-              </span>
-              <span className="w-1.5 h-1.5 rounded-full bg-[#1345EE] mb-1 ml-0.5 inline-block" />
             </Link>
           </div>
 

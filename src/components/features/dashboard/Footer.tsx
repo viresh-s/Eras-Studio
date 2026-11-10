@@ -9,9 +9,9 @@ export default function Footer() {
           <Link href="/discovery" className="hover:opacity-90 transition-opacity inline-flex items-center">
             <Image
               src="/images/eras-logo.png"
-              alt="ERAS"
-              width={65}
-              height={21}
+              alt="ERAS Studio"
+              width={110}
+              height={18}
               className="h-5 w-auto object-contain select-none"
             />
           </Link>

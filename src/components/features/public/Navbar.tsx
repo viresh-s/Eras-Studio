@@ -26,10 +26,10 @@ export default function Navbar() {
         <Link href="/" className="hover:opacity-90 transition-opacity flex items-center">
           <Image
             src="/images/eras-logo.png"
-            alt="ERAS"
-            width={105}
-            height={34}
-            className="h-8 w-auto object-contain select-none"
+            alt="ERAS Studio"
+            width={140}
+            height={23}
+            className="h-7 sm:h-8 w-auto object-contain select-none"
             priority
           />
         </Link>
