@@ -14,14 +14,14 @@ export interface AdminSessionRecord {
   isActive: boolean;
 }
 
-// Global server-side synchronized in-memory registry (prevents race conditions and provides microsecond lookup)
+// Global server-side synchronized in-memory registry (provides microsecond lookup and prevents race conditions)
 // Key: adminId -> AdminSessionRecord
 const activeAdminSessions = new Map<string, AdminSessionRecord>();
 // Key: sessionId -> adminId
 const sessionToAdminMap = new Map<string, string>();
 
 /**
- * Checks for and creates an exclusive single active Admin session.
+ * Checks for and creates an exclusive single active Admin session stored in unified public.admin_accounts table.
  * Rejects concurrent logins from a secondary browser while a valid session is active.
  */
 export async function establishAdminSession(
@@ -70,44 +70,47 @@ export async function establishAdminSession(
     }
   }
 
-  // 2. Database verification check (authoritative persistence)
+  // 2. Authoritative Database Check in unified public.admin_accounts table
   try {
     const adminSupabase = getSupabaseAdmin();
     if (adminSupabase) {
-      const { data: dbSession } = await (adminSupabase.from("admin_sessions" as any) as any)
+      const { data: adminRecord } = await (adminSupabase.from("admin_accounts" as any) as any)
         .select("*")
-        .eq("admin_id", adminId)
-        .eq("is_active", true)
-        .order("created_at", { ascending: false })
-        .limit(1)
+        .eq("id", adminId)
         .maybeSingle();
 
-      if (dbSession) {
-        const lastAct = new Date(dbSession.last_activity_at).getTime();
+      if (adminRecord && adminRecord.session_is_active && adminRecord.active_session_token_id) {
+        const lastAct = adminRecord.session_last_activity_at
+          ? new Date(adminRecord.session_last_activity_at).getTime()
+          : 0;
         const isDbExpired = now - lastAct > ADMIN_INACTIVITY_TIMEOUT_MS;
 
         if (isDbExpired) {
-          await (adminSupabase.from("admin_sessions" as any) as any)
+          // Auto-revoke expired database session
+          await (adminSupabase.from("admin_accounts" as any) as any)
             .update({
-              is_active: false,
-              revoked_at: new Date().toISOString(),
-              revocation_reason: "inactivity_timeout",
+              session_is_active: false,
+              session_revoked_at: new Date().toISOString(),
+              session_revocation_reason: "inactivity_timeout",
+              updated_at: new Date().toISOString(),
             })
-            .eq("id", dbSession.id);
-        } else if (existingSessionId && existingSessionId === dbSession.session_token_id) {
+            .eq("id", adminId);
+        } else if (existingSessionId && existingSessionId === adminRecord.active_session_token_id) {
           // Same browser session
           activeAdminSessions.set(adminId, {
-            sessionId: dbSession.session_token_id,
+            sessionId: adminRecord.active_session_token_id,
             adminId,
             adminEmail,
             ip,
             userAgent,
-            createdAt: new Date(dbSession.created_at).getTime(),
+            createdAt: adminRecord.session_created_at
+              ? new Date(adminRecord.session_created_at).getTime()
+              : now,
             lastActivityAt: now,
             isActive: true,
           });
-          sessionToAdminMap.set(dbSession.session_token_id, adminId);
-          return { allowed: true, sessionId: dbSession.session_token_id };
+          sessionToAdminMap.set(adminRecord.active_session_token_id, adminId);
+          return { allowed: true, sessionId: adminRecord.active_session_token_id };
         } else {
           securityLogger.alert("CONCURRENT_ADMIN_LOGIN_DB_BLOCKED", {
             adminId,
@@ -122,7 +125,7 @@ export async function establishAdminSession(
       }
     }
   } catch (dbErr) {
-    console.warn("Notice: admin_sessions database lookup fallback to in-memory store:", dbErr);
+    console.warn("Notice: admin_accounts database lookup fallback to in-memory store:", dbErr);
   }
 
   // 3. Atomically establish the new exclusive session
@@ -141,20 +144,24 @@ export async function establishAdminSession(
   activeAdminSessions.set(adminId, sessionRecord);
   sessionToAdminMap.set(newSessionId, adminId);
 
-  // Asynchronously record in database table
+  // Synchronously/Asynchronously update unified admin_accounts record in database
   try {
     const adminSupabase = getSupabaseAdmin();
     if (adminSupabase) {
-      await (adminSupabase.from("admin_sessions" as any) as any).insert({
-        admin_id: adminId,
-        session_token_id: newSessionId,
-        ip_address: ip,
-        user_agent_hash: userAgent ? userAgent.slice(0, 100) : null,
-        created_at: new Date(now).toISOString(),
-        last_activity_at: new Date(now).toISOString(),
-        expires_at: new Date(now + ADMIN_INACTIVITY_TIMEOUT_MS).toISOString(),
-        is_active: true,
-      });
+      await (adminSupabase.from("admin_accounts" as any) as any)
+        .update({
+          active_session_token_id: newSessionId,
+          session_ip_address: ip,
+          session_user_agent_hash: userAgent ? userAgent.slice(0, 100) : null,
+          session_created_at: new Date(now).toISOString(),
+          session_last_activity_at: new Date(now).toISOString(),
+          session_expires_at: new Date(now + ADMIN_INACTIVITY_TIMEOUT_MS).toISOString(),
+          session_is_active: true,
+          session_revoked_at: null,
+          session_revocation_reason: null,
+          updated_at: new Date(now).toISOString(),
+        })
+        .eq("id", adminId);
     }
   } catch {}
 
@@ -185,27 +192,31 @@ export async function validateAdminSession(
   const now = Date.now();
   let session = activeAdminSessions.get(adminId);
 
-  // If in-memory map has no record (e.g. cold server restart), check database
+  // If in-memory map has no record (e.g. cold server restart), check unified admin_accounts table
   if (!session) {
     try {
       const adminSupabase = getSupabaseAdmin();
       if (adminSupabase) {
-        const { data: dbSession } = await (adminSupabase.from("admin_sessions" as any) as any)
+        const { data: adminRecord } = await (adminSupabase.from("admin_accounts" as any) as any)
           .select("*")
-          .eq("admin_id", adminId)
-          .eq("session_token_id", sessionId)
-          .eq("is_active", true)
+          .eq("id", adminId)
+          .eq("active_session_token_id", sessionId)
+          .eq("session_is_active", true)
           .maybeSingle();
 
-        if (dbSession) {
+        if (adminRecord) {
           session = {
-            sessionId: dbSession.session_token_id,
+            sessionId: adminRecord.active_session_token_id,
             adminId,
-            adminEmail: dbSession.admin_email || "admin@erasstudio.com",
-            ip: dbSession.ip_address || "127.0.0.1",
-            createdAt: new Date(dbSession.created_at).getTime(),
-            lastActivityAt: new Date(dbSession.last_activity_at).getTime(),
-            isActive: dbSession.is_active,
+            adminEmail: adminRecord.email || "admin@eras.com",
+            ip: adminRecord.session_ip_address || "127.0.0.1",
+            createdAt: adminRecord.session_created_at
+              ? new Date(adminRecord.session_created_at).getTime()
+              : now,
+            lastActivityAt: adminRecord.session_last_activity_at
+              ? new Date(adminRecord.session_last_activity_at).getTime()
+              : now,
+            isActive: adminRecord.session_is_active,
           };
           activeAdminSessions.set(adminId, session);
           sessionToAdminMap.set(sessionId, adminId);
@@ -231,17 +242,18 @@ export async function validateAdminSession(
     activeAdminSessions.delete(adminId);
     sessionToAdminMap.delete(sessionId);
 
-    // Sync database revocation
+    // Sync database revocation to unified admin_accounts table
     try {
       const adminSupabase = getSupabaseAdmin();
       if (adminSupabase) {
-        await (adminSupabase.from("admin_sessions" as any) as any)
+        await (adminSupabase.from("admin_accounts" as any) as any)
           .update({
-            is_active: false,
-            revoked_at: new Date().toISOString(),
-            revocation_reason: "inactivity_timeout",
+            session_is_active: false,
+            session_revoked_at: new Date().toISOString(),
+            session_revocation_reason: "inactivity_timeout",
+            updated_at: new Date().toISOString(),
           })
-          .eq("session_token_id", sessionId);
+          .eq("id", adminId);
       }
     } catch {}
 
@@ -261,7 +273,7 @@ export async function validateAdminSession(
 }
 
 /**
- * Revokes an Admin session upon logout.
+ * Revokes an Admin session upon logout in unified public.admin_accounts table.
  */
 export async function terminateAdminSession(sessionId?: string, adminId?: string): Promise<void> {
   let targetAdminId = adminId;
@@ -280,19 +292,32 @@ export async function terminateAdminSession(sessionId?: string, adminId?: string
 
   if (sessionId) {
     sessionToAdminMap.delete(sessionId);
-    try {
-      const adminSupabase = getSupabaseAdmin();
-      if (adminSupabase) {
-        await (adminSupabase.from("admin_sessions" as any) as any)
-          .update({
-            is_active: false,
-            revoked_at: new Date().toISOString(),
-            revocation_reason: "admin_logout",
-          })
-          .eq("session_token_id", sessionId);
-      }
-    } catch {}
   }
+
+  try {
+    const adminSupabase = getSupabaseAdmin();
+    if (adminSupabase) {
+      if (targetAdminId) {
+        await (adminSupabase.from("admin_accounts" as any) as any)
+          .update({
+            session_is_active: false,
+            session_revoked_at: new Date().toISOString(),
+            session_revocation_reason: "admin_logout",
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", targetAdminId);
+      } else if (sessionId) {
+        await (adminSupabase.from("admin_accounts" as any) as any)
+          .update({
+            session_is_active: false,
+            session_revoked_at: new Date().toISOString(),
+            session_revocation_reason: "admin_logout",
+            updated_at: new Date().toISOString(),
+          })
+          .eq("active_session_token_id", sessionId);
+      }
+    }
+  } catch {}
 
   securityLogger.info("ADMIN_SESSION_TERMINATED", { sessionId, adminId: targetAdminId });
 }
