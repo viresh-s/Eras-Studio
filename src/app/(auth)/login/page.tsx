@@ -220,7 +220,7 @@ function LoginFormContent() {
 
           {/* Credentials Form */}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            {/* Email or Username Field */}
+            {/* Email Field */}
             <div>
               <label
                 htmlFor="email"
@@ -231,7 +231,7 @@ function LoginFormContent() {
                 }}
                 className="block text-xs mb-1"
               >
-                Email or Username
+                Email
               </label>
               <input
                 id="email"
@@ -239,7 +239,7 @@ function LoginFormContent() {
                 autoCapitalize="none"
                 autoCorrect="off"
                 autoComplete="username"
-                placeholder="e.g. name@example.com or admin123"
+                placeholder=""
                 {...register('email')}
                 style={{
                   fontFamily: "'Poppins', sans-serif",
