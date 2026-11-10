@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import { verifySessionToken } from '@/lib/auth';
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -10,10 +11,12 @@ export async function updateSession(request: NextRequest) {
   const isServerAction = Boolean(request.headers.get('next-action'));
   const isAdminLoginRoute = pathname === '/admin/login';
   const isAdminRoute = pathname.startsWith('/admin');
-  const hasAdminCookie = Boolean(request.cookies.get('erasstudio_admin_session')?.value);
+  const adminCookieVal = request.cookies.get('erasstudio_admin_session')?.value;
+  const verifiedAdmin = await verifySessionToken(adminCookieVal);
+  const hasValidAdminSession = Boolean(verifiedAdmin);
 
   // If already logged into admin and accessing admin login page, redirect to overview
-  if (isAdminLoginRoute && hasAdminCookie && !isServerAction) {
+  if (isAdminLoginRoute && hasValidAdminSession && !isServerAction) {
     const url = request.nextUrl.clone();
     url.pathname = '/admin/overview';
     return NextResponse.redirect(url);
@@ -81,7 +84,7 @@ export async function updateSession(request: NextRequest) {
 
   // Handle protected admin routes
   if (isAdminRoute && !isAdminLoginRoute) {
-    if (!hasAdminCookie) {
+    if (!hasValidAdminSession) {
       let isSupabaseAdmin = false;
       if (user) {
         const { data: profile } = await supabase

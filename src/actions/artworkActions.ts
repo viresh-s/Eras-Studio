@@ -4,6 +4,7 @@ import { requireAuth } from '@/lib/security/authGuard';
 import { checkRateLimit } from '@/lib/security/rateLimiter';
 import { sanitizeText } from '@/lib/security/validators';
 import { securityLogger } from '@/lib/security/logger';
+import { checkFreemiumStatus } from '@/lib/freemium/check';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
@@ -69,9 +70,26 @@ export interface CreateArtworkData {
 
 export async function createArtwork(data: CreateArtworkData) {
   // 1. Strict Server Authentication (Prevents IDOR)
-  const { user, supabase } = await requireAuth({ requireActive: true });
+  const { user, profile, supabase } = await requireAuth({ requireActive: true });
+  const isAdmin = profile.role === 'Admin';
 
-  // 2. Rate Limiting (Prevents spam/DDoS)
+  // 2. Authoritative Ownership Validation
+  // Only Administrators can attribute artwork to another creator ID; ordinary creators are strictly bound to their session user.id
+  let targetCreatorId = user.id;
+  if (isAdmin && data.userId && uuidSchema.safeParse(data.userId).success) {
+    targetCreatorId = data.userId;
+  }
+
+  // 3. Server-Enforced Plan Upload Limits (Phase 3.3: Prevent Bypassing Upload Restrictions)
+  if (!isAdmin) {
+    const freemiumStatus = await checkFreemiumStatus(user.id);
+    if (freemiumStatus.isLocked) {
+      securityLogger.alert('FREEMIUM_LIMIT_BLOCKED', { userId: user.id, artworksUsed: freemiumStatus.artworksUsed });
+      throw new Error(freemiumStatus.reason || 'Artwork upload limit reached for your current plan. Upgrade to publish more.');
+    }
+  }
+
+  // 4. Rate Limiting (Prevents spam/DDoS)
   const rateLimit = checkRateLimit(`artwork:create:${user.id}`, {
     maxRequests: 30,
     windowSeconds: 3600,
@@ -81,13 +99,13 @@ export async function createArtwork(data: CreateArtworkData) {
     throw new Error('Upload limit reached. Please wait before publishing more pieces.');
   }
 
-  // 3. Schema Validation
+  // 5. Schema Validation
   const parsed = createArtworkSchema.safeParse(data);
   if (!parsed.success) {
     throw new Error(`Validation Error: ${parsed.error.errors.map(e => e.message).join(', ')}`);
   }
 
-  // 4. Input Sanitization (Prevents Stored XSS)
+  // 6. Input Sanitization (Prevents Stored XSS)
   const sanitizedTitle = sanitizeText(data.title, 255);
   const sanitizedArtistName = sanitizeText(data.artistName, 255);
   const sanitizedDescription = data.description ? sanitizeText(data.description, 5000) : null;
@@ -95,11 +113,11 @@ export async function createArtwork(data: CreateArtworkData) {
   const sanitizedStyle = data.style ? sanitizeText(data.style, 100) : null;
   const sanitizedCollection = data.collection ? sanitizeText(data.collection, 100) : null;
 
-  // 5. Database Insertion with Server-Enforced Creator ID
+  // 7. Database Insertion with Server-Enforced Creator ID
   const { data: inserted, error } = await supabase
     .from('artworks')
     .insert({
-      creator_id: user.id, // Strictly server-derived from auth token
+      creator_id: targetCreatorId,
       title: sanitizedTitle,
       art_type: data.artType,
       artist_name: sanitizedArtistName,
@@ -125,7 +143,7 @@ export async function createArtwork(data: CreateArtworkData) {
       price_visibility: data.priceVisibility || 'Show Price',
       is_published: data.isPublished !== undefined ? data.isPublished : true,
     })
-    .select('id')
+    .select('*')
     .single();
 
   if (error) {
@@ -133,39 +151,46 @@ export async function createArtwork(data: CreateArtworkData) {
     throw new Error('Failed to create artwork. Please try again.');
   }
 
-  securityLogger.info('ARTWORK_CREATED', { artworkId: inserted?.id, userId: user.id });
+  securityLogger.info('ARTWORK_CREATED', { artworkId: inserted?.id, creatorId: targetCreatorId, createdBy: user.id });
 
   revalidatePath('/portfolio');
   revalidatePath('/discovery');
+  revalidatePath('/admin/artworks');
+
+  return inserted;
 }
 
 export async function deleteArtwork(artworkId: string, _optionalUserId?: string) {
-  const { user, supabase } = await requireAuth({ requireActive: true });
+  const { user, profile, supabase } = await requireAuth({ requireActive: true });
+  const isAdmin = profile.role === 'Admin';
 
   if (!uuidSchema.safeParse(artworkId).success) {
     throw new Error("Validation Error: Invalid artwork ID");
   }
 
-  // Strictly enforce creator_id = user.id from session
-  const { error } = await supabase
-    .from('artworks')
-    .delete()
-    .eq('id', artworkId)
-    .eq('creator_id', user.id);
+  // Strictly enforce creator_id = user.id from session for non-admins (prevents IDOR)
+  let query = supabase.from('artworks').delete().eq('id', artworkId);
+  if (!isAdmin) {
+    query = query.eq('creator_id', user.id);
+  }
+
+  const { error } = await query;
 
   if (error) {
     securityLogger.alert('ARTWORK_DELETE_ERROR', { artworkId, userId: user.id, error: error.message });
     throw new Error('Failed to delete artwork.');
   }
 
-  securityLogger.info('ARTWORK_DELETED', { artworkId, userId: user.id });
+  securityLogger.info('ARTWORK_DELETED', { artworkId, deletedBy: user.id });
 
   revalidatePath('/portfolio');
   revalidatePath('/discovery');
+  revalidatePath('/admin/artworks');
 }
 
 export async function updateArtwork(artworkId: string, data: Partial<CreateArtworkData> & { status?: string }) {
-  const { user, supabase } = await requireAuth({ requireActive: true });
+  const { user, profile, supabase } = await requireAuth({ requireActive: true });
+  const isAdmin = profile.role === 'Admin';
 
   if (!uuidSchema.safeParse(artworkId).success) {
     throw new Error("Validation Error: Invalid artwork ID");
@@ -202,21 +227,23 @@ export async function updateArtwork(artworkId: string, data: Partial<CreateArtwo
   if (data.priceVisibility !== undefined) updateData.price_visibility = data.priceVisibility;
   if (data.isPublished !== undefined) updateData.is_published = data.isPublished;
 
-  // Strictly enforce creator ownership
-  const { error } = await supabase
-    .from('artworks')
-    .update(updateData)
-    .eq('id', artworkId)
-    .eq('creator_id', user.id);
+  // Strictly enforce creator ownership for non-admins (prevents IDOR and ownership spoofing)
+  let query = supabase.from('artworks').update(updateData).eq('id', artworkId);
+  if (!isAdmin) {
+    query = query.eq('creator_id', user.id);
+  }
+
+  const { error } = await query;
 
   if (error) {
     securityLogger.alert('ARTWORK_UPDATE_ERROR', { artworkId, userId: user.id, error: error.message });
     throw new Error('Failed to update artwork.');
   }
 
-  securityLogger.info('ARTWORK_UPDATED', { artworkId, userId: user.id });
+  securityLogger.info('ARTWORK_UPDATED', { artworkId, updatedBy: user.id });
 
   revalidatePath('/portfolio');
   revalidatePath(`/artwork/${artworkId}`);
   revalidatePath('/discovery');
+  revalidatePath('/admin/artworks');
 }

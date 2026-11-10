@@ -48,7 +48,7 @@ import {
 } from "@/app/admin/actions";
 import { AdminUserLink } from "@/components/admin/AdminUserLink";
 import { ExportDropdown } from "@/components/admin/ExportDropdown";
-import { ArtworkUploadForm } from "@/components/artworks/ArtworkUploadForm";
+import ArtworkUploadForm from "@/components/features/creator/ArtworkUploadForm";
 import {
   Table,
   TableHeader,
@@ -128,6 +128,15 @@ export function ArtworksClient({
   // Sorting & Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 12;
+
+  const creatorOptions = useMemo(() => {
+    return (creators || []).map((c) => ({
+      id: c.userId || c.id,
+      name: c.name,
+      email: c.email,
+      discipline: c.discipline,
+    }));
+  }, [creators]);
 
   // Bulk Selection
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -1551,17 +1560,19 @@ export function ArtworksClient({
         onClose={() => setIsAddModalOpen(false)}
         title="Add Artwork to Catalog"
         description="Register a new curated piece with media specifications and publication status."
-        maxWidth="2xl"
+        maxWidth="5xl"
       >
-        <ArtworkUploadForm
-          mode="admin"
-          creators={creators}
-          onSuccess={(newArtwork: any) => {
-            setArtworks((prev) => [newArtwork, ...prev]);
-            setIsAddModalOpen(false);
-          }}
-          onCancel={() => setIsAddModalOpen(false)}
-        />
+        <div className="py-2">
+          <ArtworkUploadForm
+            mode="admin"
+            creators={creatorOptions}
+            onSuccess={(newArtwork: any) => {
+              setArtworks((prev) => [newArtwork, ...prev]);
+              setIsAddModalOpen(false);
+            }}
+            onCancel={() => setIsAddModalOpen(false)}
+          />
+        </div>
       </Modal>
 
       {/* ========================================================================= */}

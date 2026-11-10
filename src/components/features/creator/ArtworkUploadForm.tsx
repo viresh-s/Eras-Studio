@@ -126,19 +126,36 @@ interface ImageFileMeta {
 }
 
 interface ArtworkUploadFormProps {
-  userId: string;
-  profile: Profile | null;
+  userId?: string;
+  profile?: Profile | null;
   collections?: CollectionItem[];
-  freemiumStatus: FreemiumStatus;
+  freemiumStatus?: FreemiumStatus;
+  mode?: 'creator' | 'admin';
+  creators?: Array<{ id: string; name: string; email?: string; discipline?: string }>;
+  defaultCreatorId?: string;
+  defaultCreatorName?: string;
+  onSuccess?: (artwork: any) => void;
+  onCancel?: () => void;
 }
 
 export default function ArtworkUploadForm({
-  userId,
-  profile,
+  userId = '',
+  profile = null,
   collections = [],
-  freemiumStatus,
+  freemiumStatus = { isLocked: false, reason: '', daysRemaining: -1, artworksUsed: 0, artworksLimit: -1 },
+  mode = 'creator',
+  creators = [],
+  defaultCreatorId = '',
+  defaultCreatorName = '',
+  onSuccess,
+  onCancel,
 }: ArtworkUploadFormProps) {
   const router = useRouter();
+
+  // Selected Creator for Admin mode
+  const [selectedCreatorId, setSelectedCreatorId] = useState<string>(
+    defaultCreatorId || (creators && creators[0]?.id) || userId || ''
+  );
 
   // Multi-step state: 1 = Upload images, 2 = Artwork details
   const [step, setStep] = useState<1 | 2>(1);
@@ -181,8 +198,11 @@ export default function ArtworkUploadForm({
   const [compressionProgress, setCompressionProgress] = useState<PipelineProgress | null>(null);
   const [uploadStage, setUploadStage] = useState<string | null>(null);
 
-  // Default values based on creator profile - only artist name is pre-filled
-  const defaultArtistName = profile?.full_name || '';
+  // Default values based on creator profile or selected creator in admin mode
+  const defaultArtistName =
+    (mode === 'admin' && (defaultCreatorName || creators[0]?.name)) ||
+    profile?.full_name ||
+    '';
 
   const {
     register,
@@ -579,9 +599,10 @@ export default function ArtworkUploadForm({
       }
 
       // ── Stage 3: Create Artwork in Database ──
-      setUploadStage('Finalizing artwork portfolio entry...');
-      await createArtwork({
-        userId,
+      setUploadStage('Finalizing artwork catalog entry...');
+      const targetUserId = mode === 'admin' ? selectedCreatorId : userId;
+      const created = await createArtwork({
+        userId: targetUserId || undefined,
         title: data.title.trim(),
         artType: finalMedium,
         artistName: data.artistName.trim(),
@@ -608,9 +629,32 @@ export default function ArtworkUploadForm({
         status: isPublished ? data.status : 'Not for sale',
       });
 
-      // Redirect back to portfolio on success
-      router.push('/portfolio');
-      router.refresh();
+      if (onSuccess) {
+        // Map database record to UI Artwork format
+        const normalizedArtwork = {
+          id: created?.id,
+          title: created?.title || data.title.trim(),
+          creatorId: created?.creator_id || targetUserId,
+          creatorName: created?.artist_name || data.artistName.trim(),
+          medium: created?.art_type || finalMedium,
+          dimensions: created?.dimensions || formattedDimensions || '',
+          price: typeof created?.price === 'number' ? created.price : (numericPrice || 0),
+          imageUrl: created?.image_url || coverImage,
+          status: isPublished ? 'published' : 'draft',
+          createdAt: created?.created_at || new Date().toISOString(),
+          year: created?.year || data.year?.trim(),
+          location: created?.location || data.location?.trim(),
+          collection: created?.collection || data.collection?.trim(),
+          description: created?.description || data.description?.trim(),
+          availability: data.status,
+          priceVisibility: data.priceVisibility,
+        };
+        onSuccess(normalizedArtwork);
+      } else {
+        // Redirect back to portfolio on success
+        router.push('/portfolio');
+        router.refresh();
+      }
     } catch (err: any) {
       console.error('Artwork creation failed:', err);
       setError(err?.message || 'Failed to upload artwork. Please try again.');
@@ -688,17 +732,40 @@ export default function ArtworkUploadForm({
       {/* 1. TOP SUBHEADER WITH BREADCRUMB, TITLE & STEPPER        */}
       {/* ======================================================== */}
       <div className="border-b border-[#E8E8E3] pb-8 pt-2 mb-8 sm:mb-10">
-        {/* Breadcrumb: Back to portfolio */}
-        <div className="mb-6">
-          <Link
-            href="/portfolio"
-            className="inline-flex items-center gap-2.5 text-xs sm:text-sm text-[#6E6E69] hover:text-[#141413] transition-colors font-normal select-none"
-          >
-            <div className="w-8 h-8 rounded-lg bg-white border border-[#E8E8E3] flex items-center justify-center text-[#6E6E69] hover:border-black shadow-2xs">
-              <ChevronLeft size={16} />
-            </div>
-            <span>Back to portfolio</span>
-          </Link>
+        {/* Breadcrumb: Back to portfolio or Cancel */}
+        <div className="mb-6 flex items-center justify-between">
+          {mode === 'admin' ? (
+            <button
+              type="button"
+              onClick={() => onCancel?.()}
+              className="inline-flex items-center gap-2.5 text-xs sm:text-sm text-[#6E6E69] hover:text-[#141413] transition-colors font-normal select-none"
+            >
+              <div className="w-8 h-8 rounded-lg bg-white border border-[#E8E8E3] flex items-center justify-center text-[#6E6E69] hover:border-black shadow-2xs">
+                <ChevronLeft size={16} />
+              </div>
+              <span>Back to artworks</span>
+            </button>
+          ) : (
+            <Link
+              href="/portfolio"
+              className="inline-flex items-center gap-2.5 text-xs sm:text-sm text-[#6E6E69] hover:text-[#141413] transition-colors font-normal select-none"
+            >
+              <div className="w-8 h-8 rounded-lg bg-white border border-[#E8E8E3] flex items-center justify-center text-[#6E6E69] hover:border-black shadow-2xs">
+                <ChevronLeft size={16} />
+              </div>
+              <span>Back to portfolio</span>
+            </Link>
+          )}
+
+          {onCancel && (
+            <button
+              type="button"
+              onClick={onCancel}
+              className="text-xs text-[#6E6E69] hover:text-[#141413] font-medium px-3 py-1.5 rounded-lg border border-[#E8E8E3] hover:border-gray-400 bg-white"
+            >
+              Close
+            </button>
+          )}
         </div>
 
         {/* Title + Stepper Row */}
@@ -1255,6 +1322,36 @@ export default function ArtworkUploadForm({
                   </div>
                   <span className="text-xs text-[#6E6E69] shrink-0">* Required fields</span>
                 </div>
+
+                {/* Admin Mode: Attributed Creator Selector */}
+                {mode === 'admin' && creators && creators.length > 0 && (
+                  <div className="p-4 rounded-2xl bg-[#F7F7F5] border border-[#E8E8E3] flex flex-col gap-2">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-medium text-[#141413]">
+                        Attributed Creator *
+                      </label>
+                      <span className="text-[11px] text-[#6E6E69]">Select creator for this artwork</span>
+                    </div>
+                    <select
+                      value={selectedCreatorId}
+                      onChange={(e) => {
+                        const cId = e.target.value;
+                        setSelectedCreatorId(cId);
+                        const match = creators.find((c) => c.id === cId);
+                        if (match?.name) {
+                          setValue('artistName', match.name);
+                        }
+                      }}
+                      className="w-full px-4 py-2.5 rounded-xl text-xs sm:text-sm text-[#141413] bg-white border border-[#E8E8E3] outline-none focus:border-[#141413]"
+                    >
+                      {creators.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.name} {c.email ? `(${c.email})` : ''}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
 
                 {/* Form Fields: Row 1 (Title, Artist Name) */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">

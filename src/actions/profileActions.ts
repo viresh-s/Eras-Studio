@@ -119,35 +119,6 @@ export async function updateProfileAvatar(userId: string, avatarUrl: string) {
   }
 }
 
-export async function upgradeToPremiumServer(userId: string) {
-  const parsedUserId = uuidSchema.safeParse(userId);
-  if (!parsedUserId.success) throw new Error('Validation Error: Invalid user ID');
-
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user || user.id !== userId) {
-    throw new Error('Unauthorized: You can only upgrade your own account.');
-  }
-
-  const { error } = await supabase
-    .from('profiles')
-    .update({ is_premium: true })
-    .eq('id', user.id);
-
-  if (error) {
-    throw new Error(error.message);
-  }
-  
-  await createNotification(
-    user.id,
-    'Welcome to Premium!',
-    'You have successfully upgraded your account. You can now upload unlimited artworks.',
-    'UPGRADE'
-  );
-  
-  revalidatePath('/portfolio/upload');
-}
-
 export async function getFreemiumStatusAction(userId: string) {
   const parsedUserId = uuidSchema.safeParse(userId);
   if (!parsedUserId.success) throw new Error('Validation Error: Invalid user ID');
@@ -156,5 +127,6 @@ export async function getFreemiumStatusAction(userId: string) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Unauthorized');
 
-  return await checkFreemiumStatus(userId);
+  // Enforce caller identity to prevent IDOR
+  return await checkFreemiumStatus(user.id);
 }

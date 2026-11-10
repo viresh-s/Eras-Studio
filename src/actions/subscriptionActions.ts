@@ -119,12 +119,15 @@ export async function upgradeUserPlanAction(
 
     // ── Cryptographic Signature Verification for Paid Plans ──
     if (targetPlan !== 'free') {
-      if (keySecret && paymentProof?.razorpay_order_id && paymentProof?.razorpay_payment_id) {
-        if (!paymentProof.razorpay_signature) {
-          securityLogger.alert('PAYMENT_SIGNATURE_MISSING', { userId: user.id, targetPlan });
-          return { success: false, error: 'Payment signature missing. Verification failed.' };
-        }
+      if (!paymentProof?.razorpay_order_id || !paymentProof?.razorpay_payment_id || !paymentProof?.razorpay_signature) {
+        securityLogger.alert('PAYMENT_PROOF_MISSING', { userId: user.id, targetPlan });
+        return {
+          success: false,
+          error: 'Paid tier activation requires verified payment confirmation from gateway.',
+        };
+      }
 
+      if (keySecret) {
         const expectedSignature = crypto
           .createHmac('sha256', keySecret)
           .update(`${paymentProof.razorpay_order_id}|${paymentProof.razorpay_payment_id}`)
@@ -141,18 +144,6 @@ export async function upgradeUserPlanAction(
             error: 'Untrusted payment payload: Cryptographic signature mismatch.',
           };
         }
-      } else if (isProduction) {
-        // In production, paid upgrades MUST have a verified payment gateway secret and signature
-        securityLogger.alert('UNVERIFIED_PROD_PAYMENT_ATTEMPT', { userId: user.id, targetPlan });
-        return {
-          success: false,
-          error: 'Paid tier activation requires verified payment confirmation from gateway.',
-        };
-      } else {
-        // Development / local test mode only
-        console.warn(
-          `[DEV WARNING] User ${user.id} activated ${targetPlan} in test activation mode without gateway signature.`
-        );
       }
     }
 

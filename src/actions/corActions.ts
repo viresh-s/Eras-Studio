@@ -29,33 +29,6 @@ export async function saveArtistIntakeAction(intake: Partial<ArtistIntakeQuestio
 }
 
 /**
- * Activates Pro subscription tier for the authenticated user
- */
-export async function activateProSubscriptionAction() {
-  const { user } = await requireAuth({ requireActive: true });
-
-  const adminClient = createSupabaseClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-
-  const { error } = await adminClient
-    .from('profiles')
-    .update({ plan: 'pro', is_premium: true })
-    .eq('id', user.id);
-
-  if (error) {
-    throw new Error('Failed to activate Pro subscription: ' + error.message);
-  }
-
-  securityLogger.info('User activated Pro tier', { userId: user.id });
-  revalidatePath('/cor');
-  revalidatePath('/portfolio');
-  revalidatePath('/profile');
-  return { success: true };
-}
-
-/**
  * Retrieves main COR Dashboard data
  */
 export async function getCorDashboardAction() {

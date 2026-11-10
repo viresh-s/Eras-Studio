@@ -30,6 +30,8 @@ export interface Profile {
   latest_proposal_file_url?: string | null;
   is_premium: boolean;
   plan?: 'free' | 'pro' | 'elite' | string;
+  subscription_status?: 'active' | 'cancelled' | 'expired' | 'past_due' | string | null;
+  subscription_period_end?: string | null;
   status?: 'active' | 'suspended' | string;
   profile_views_count?: number;
   created_at: string;

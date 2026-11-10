@@ -84,18 +84,3 @@ export async function checkFreemiumStatus(userId: string): Promise<FreemiumStatu
 
   return evaluateFreemiumStatus(profile, count || 0);
 }
-
-export async function upgradeToPremium(userId: string): Promise<{ success: boolean; error?: string }> {
-  const supabase = await createClient();
-
-  const { error } = await supabase
-    .from('profiles')
-    .update({ is_premium: true })
-    .eq('id', userId);
-
-  if (error) {
-    return { success: false, error: error.message };
-  }
-
-  return { success: true };
-}

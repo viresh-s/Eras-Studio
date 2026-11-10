@@ -144,6 +144,20 @@ export async function requireAdmin(
 export function isProUser(profile: Partial<Profile> | null | undefined): boolean {
   if (!profile) return false;
   if (profile.role === 'Admin') return true;
+
+  // Revoke access if subscription is cancelled or expired
+  if (profile.subscription_status === 'cancelled' || profile.subscription_status === 'expired') {
+    return false;
+  }
+
+  // Revoke access if subscription period has ended
+  if (profile.subscription_period_end) {
+    const expiry = new Date(profile.subscription_period_end).getTime();
+    if (!isNaN(expiry) && expiry < Date.now()) {
+      return false;
+    }
+  }
+
   return profile.plan === 'pro' || profile.plan === 'elite' || profile.is_premium === true;
 }
 
