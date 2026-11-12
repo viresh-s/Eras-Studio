@@ -186,10 +186,15 @@ export default function DashboardLayout({
       await fetch("/api/admin/logout", {
         method: "POST",
       });
-      window.location.href = "/admin/login";
+      try {
+        const { createClient } = await import("@/lib/supabase/client");
+        const supabase = createClient();
+        await supabase.auth.signOut();
+      } catch {}
+      window.location.href = "/login";
     } catch (err) {
       console.error("Logout error:", err);
-      window.location.href = "/admin/login";
+      window.location.href = "/login";
     } finally {
       setIsLoggingOut(false);
     }

@@ -4,7 +4,7 @@ import { createClient, getAuthenticatedUser, getAuthenticatedProfile } from '@/l
 import { redirect } from 'next/navigation';
 import { isProUser } from '@/lib/security/authGuard';
 import { CorService } from '@/lib/services/corService';
-import CorLockedState from '@/components/features/cor/CorLockedState';
+import CorLandingPage from '@/components/features/cor/CorLandingPage';
 import CorIntroSection from '@/components/features/cor/CorIntroSection';
 import CorRequestPending from '@/components/features/cor/CorRequestPending';
 import CorRequestDeclined from '@/components/features/cor/CorRequestDeclined';
@@ -15,24 +15,33 @@ import CorPipelineGrid from '@/components/features/cor/CorPipelineGrid';
 import CorConsultationCard from '@/components/features/cor/CorConsultationCard';
 import CorRecentActivity from '@/components/features/cor/CorRecentActivity';
 import CorOpportunityCard from '@/components/features/cor/CorOpportunityCard';
-import { Calendar, ArrowRight } from 'lucide-react';
+import { Calendar, ArrowRight, ArrowUpRight } from 'lucide-react';
 
 export const metadata = {
-  title: 'COR PRO Dashboard | ErasStudio®',
-  description: 'Human guidance. Thoughtful opportunities. A clearer way forward for artists and creators.',
+  title: 'COR — Curatorial Opportunity & Representation | ErasStudio®',
+  description: 'Human guidance. Curated institutional opportunities. Professional representation for artists.',
 };
 
-export default async function CorDashboardPage() {
+interface CorDashboardPageProps {
+  searchParams?: Promise<{ view?: string }>;
+}
+
+export default async function CorDashboardPage({ searchParams }: CorDashboardPageProps) {
+  const params = searchParams ? await searchParams : {};
   const user = await getAuthenticatedUser();
   if (!user) redirect('/login');
 
   const profile = await getAuthenticatedProfile(user.id);
   const isPro = isProUser(profile);
 
-  if (!isPro) {
+  // If user is Free OR specifically requests the landing page overview
+  if (!isPro || params?.view === 'landing' || params?.view === 'overview') {
     return (
-      <div className="max-w-6xl mx-auto py-6">
-        <CorLockedState />
+      <div className="max-w-6xl mx-auto py-2 sm:py-6 animate-in fade-in duration-300">
+        <CorLandingPage
+          isPro={isPro}
+          profile={profile}
+        />
       </div>
     );
   }
@@ -42,16 +51,19 @@ export default async function CorDashboardPage() {
   const dashboardData = await service.getDashboardData(user.id);
   const { requestStatus, submittedAt, declinedReason, fullProfile } = dashboardData;
 
-  // Phase 3: Creator has not submitted a COR request
+  // Creator has not submitted a COR questionnaire: show modern editorial overview
   if (requestStatus === 'NotSubmitted') {
     return (
-      <div className="max-w-6xl mx-auto py-4 sm:py-6 animate-in fade-in duration-200">
-        <CorIntroSection />
+      <div className="max-w-6xl mx-auto py-2 sm:py-6 animate-in fade-in duration-300">
+        <CorLandingPage
+          isPro={true}
+          profile={profile}
+        />
       </div>
     );
   }
 
-  // Phase 10: Request is Pending review by admin
+  // Request is Pending review by admin
   if (requestStatus === 'Pending') {
     return (
       <div className="max-w-6xl mx-auto py-4 sm:py-6 animate-in fade-in duration-200">
@@ -60,7 +72,7 @@ export default async function CorDashboardPage() {
     );
   }
 
-  // Phase 10: Request was Declined
+  // Request was Declined
   if (requestStatus === 'Declined') {
     return (
       <div className="max-w-6xl mx-auto py-4 sm:py-6 animate-in fade-in duration-200">
@@ -69,25 +81,34 @@ export default async function CorDashboardPage() {
     );
   }
 
-  // Phase 11: Approved Member Experience
+  // Approved Member Hub Experience
   const existingAppliedOppIds = dashboardData.recentApplications.map((a) => a.opportunity_id);
-  const userFirstName = profile?.full_name?.trim() ? profile.full_name.trim().split(' ')[0] : 'Chinmay';
+  const userFirstName = profile?.full_name?.trim() ? profile.full_name.trim().split(' ')[0] : 'Artist';
 
   return (
     <div className="max-w-6xl mx-auto py-4 sm:py-6 space-y-8 animate-in fade-in duration-200">
-      {/* Page Header */}
+      {/* Page Header with Action to toggle Editorial Program Overview */}
       <CorPageHeader
         title={`Welcome back, ${userFirstName}.`}
         description="Your creative career, opportunities and representation in one place."
         hasBorder={false}
         actions={
-          <Link
-            href="/cor/consultations"
-            className="px-6 py-2.5 rounded-full bg-[#141413] text-white text-xs font-medium hover:bg-black transition-colors inline-flex items-center gap-2 shadow-xs cursor-pointer font-sans"
-          >
-            <span>Schedule Consultation</span>
-            <ArrowRight size={13} />
-          </Link>
+          <div className="flex flex-wrap items-center gap-3">
+            <Link
+              href="/cor?view=overview"
+              className="px-4 py-2.5 rounded-full border border-[#E8E8E3] bg-white text-[#141413] text-xs font-medium hover:bg-[#F2F0ED] transition-colors inline-flex items-center gap-1.5 shadow-2xs font-sans"
+            >
+              <span>Program Overview</span>
+              <ArrowUpRight size={13} />
+            </Link>
+            <Link
+              href="/cor/consultations"
+              className="px-6 py-2.5 rounded-full bg-[#141413] text-white text-xs font-medium hover:bg-black transition-colors inline-flex items-center gap-2 shadow-xs cursor-pointer font-sans"
+            >
+              <span>Schedule Consultation</span>
+              <ArrowRight size={13} />
+            </Link>
+          </div>
         }
       />
 

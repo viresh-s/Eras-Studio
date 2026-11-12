@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { COOKIE_OPTIONS, verifySessionToken } from "@/lib/auth";
 import { terminateAdminSession } from "@/lib/security/adminSessionManager";
 import { reportsRepo } from "@/lib/data";
+import { createClient } from "@/lib/supabase/server";
 
 export async function POST() {
   try {
@@ -19,6 +20,7 @@ export async function POST() {
       }).catch(() => {});
     }
 
+    // Delete dedicated admin session cookie
     cookieStore.delete(COOKIE_OPTIONS.name);
     cookieStore.set({
       name: COOKIE_OPTIONS.name,
@@ -30,9 +32,22 @@ export async function POST() {
       maxAge: 0,
     });
 
+    // Terminate Supabase Auth session
+    try {
+      const supabase = await createClient();
+      await supabase.auth.signOut();
+    } catch {}
+
+    // Clear all Supabase auth token cookies
+    cookieStore.getAll().forEach((cookie) => {
+      if (cookie.name.startsWith("sb-")) {
+        cookieStore.delete(cookie.name);
+      }
+    });
+
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Logout error:", error);
+    console.error("Admin logout error:", error);
     return NextResponse.json(
       { error: "Failed to clear session." },
       { status: 500 }
