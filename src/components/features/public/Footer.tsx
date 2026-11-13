@@ -19,8 +19,8 @@ export default function Footer() {
                   className="h-7 sm:h-8 w-auto object-contain select-none"
                 />
               </Link>
-              <p className="mt-3 text-[#9E9E98] text-sm leading-relaxed max-w-xs">
-                Where art meets its collector. An editorial marketplace connecting independent creators with passionate art patrons worldwide.
+              <p className="mt-3 text-[#9E9E98] text-xs sm:text-sm leading-relaxed max-w-xs">
+                A curated marketplace connecting independent creators with art patrons.
               </p>
             </div>
 
@@ -31,10 +31,28 @@ export default function Footer() {
               </h4>
               <ul className="space-y-2.5">
                 {[
-                  { label: 'Browse Art', href: '/discovery' },
+                  { label: 'Gallery', href: '/discovery' },
+                  { label: 'Artists', href: '/discovery' },
+                  { label: 'Artworks', href: '/discovery' },
+                ].map((link) => (
+                  <li key={link.label}>
+                    <Link href={link.href} className="text-gray-400 hover:text-white transition-colors text-sm">
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Company */}
+            <div>
+              <h4 className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">
+                Company
+              </h4>
+              <ul className="space-y-2.5">
+                {[
                   { label: 'About', href: '/about' },
                   { label: 'Services', href: '/services' },
-                  { label: 'Careers', href: '/careers' },
                   { label: 'FAQ', href: '/faq' },
                 ].map((link) => (
                   <li key={link.label}>
@@ -46,38 +64,23 @@ export default function Footer() {
               </ul>
             </div>
 
-            {/* For Creators */}
+            {/* Support */}
             <div>
               <h4 className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">
-                For Creators
+                Support
               </h4>
               <ul className="space-y-2.5">
-                {['Sign Up', 'Upload Artworks', 'Premium Plans', 'Creator FAQ'].map((label) => (
-                  <li key={label}>
-                    <Link href="/signup" className="text-gray-400 hover:text-white transition-colors text-sm">
-                      {label}
+                {[
+                  { label: 'Contact', href: '/contact' },
+                  { label: 'Privacy Policy', href: '/faq' },
+                  { label: 'Terms of Service', href: '/faq' },
+                ].map((link) => (
+                  <li key={link.label}>
+                    <Link href={link.href} className="text-gray-400 hover:text-white transition-colors text-sm">
+                      {link.label}
                     </Link>
                   </li>
                 ))}
-              </ul>
-            </div>
-
-            {/* Connect */}
-            <div>
-              <h4 className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">
-                Connect
-              </h4>
-              <ul className="space-y-2.5">
-                <li>
-                  <Link href="/contact" className="text-gray-400 hover:text-white transition-colors text-sm">
-                    Contact Us
-                  </Link>
-                </li>
-                <li>
-                  <a href="mailto:hello@eras.art" className="text-gray-400 hover:text-white transition-colors text-sm">
-                    hello@eras.art
-                  </a>
-                </li>
               </ul>
             </div>
           </div>
@@ -85,7 +88,7 @@ export default function Footer() {
       </div>
 
       {/* Bottom bar */}
-      <div className="border-t border-gray-800">
+      <div className="border-t border-[#262624]">
         <div className="max-w-7xl mx-auto px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-gray-500 text-xs">
             © {new Date().getFullYear()} Eras Studio. All rights reserved.
