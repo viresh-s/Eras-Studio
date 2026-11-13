@@ -205,8 +205,7 @@ ERAS strictly protects creators' intellectual property. While true web DRM is im
 
 - `src/lib/media/imagePipeline.ts`: Client-side Canvas WebP compression engine & Supabase uploader.
 - `src/lib/media/assetProtection.ts`: Anti-download React hook, props helper, and CSS classes.
-- `src/components/features/creator/ArtworkUploadForm.tsx`: Upload workflow with stage progress indicators.
-- `src/components/features/creator/ArtworkEditForm.tsx`: Edit workflow with WebP compression for newly added images.
+- `src/components/features/creator/ArtworkUploadForm.tsx`: Unified multi-step upload & edit workflow with WebP compression for new and modified images.
 - `src/components/features/creator/ArtworkGridCard.tsx`: Protected card with transparent overlay shield.
 - `src/components/features/artwork/ArtworkImageGallery.tsx`: Anti-download gallery using full-resolution WebP.
 - `src/components/features/artwork/ArtworkDiscoveryDetail.tsx`: Wires full-res URLs to the gallery.

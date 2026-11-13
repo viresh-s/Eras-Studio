@@ -23,7 +23,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
-import { createArtwork } from '@/actions/artworkActions';
+import { createArtwork, updateArtwork } from '@/actions/artworkActions';
 import type { FreemiumStatus } from '@/lib/freemium/check';
 import type { CollectionItem } from '@/actions/collectionActions';
 import type { Profile } from '@/types/database';
@@ -46,6 +46,7 @@ import {
 import {
   DIMENSION_UNIT_OPTIONS,
   getUnitSymbol,
+  parseDimensionsString,
 } from '@/lib/constants/dimensions';
 import {
   compressImages,
@@ -118,7 +119,12 @@ const uploadSchema = z.object({
 
 type UploadForm = z.infer<typeof uploadSchema>;
 
-interface ImageFileMeta {
+interface FormImage {
+  id: string;
+  file?: File;
+  cardUrl: string;
+  fullUrl?: string;
+  isExisting: boolean;
   name: string;
   sizeFormatted: string;
   width?: number;
@@ -136,6 +142,8 @@ interface ArtworkUploadFormProps {
   defaultCreatorName?: string;
   onSuccess?: (artwork: any) => void;
   onCancel?: () => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  initialArtwork?: any;
 }
 
 export default function ArtworkUploadForm({
@@ -149,8 +157,10 @@ export default function ArtworkUploadForm({
   defaultCreatorName = '',
   onSuccess,
   onCancel,
+  initialArtwork,
 }: ArtworkUploadFormProps) {
   const router = useRouter();
+  const isEditMode = Boolean(initialArtwork);
 
   // Selected Creator for Admin mode
   const [selectedCreatorId, setSelectedCreatorId] = useState<string>(
@@ -160,10 +170,47 @@ export default function ArtworkUploadForm({
   // Multi-step state: 1 = Upload images, 2 = Artwork details
   const [step, setStep] = useState<1 | 2>(1);
 
-  // Images state
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
-  const [filesMeta, setFilesMeta] = useState<ImageFileMeta[]>([]);
+  // Helper to strip file extension (e.g. "artwork.png" -> "artwork")
+  const stripFileExtension = (filename?: string | null): string => {
+    if (!filename) return '';
+    return filename.replace(/\.[^/.]+$/, '');
+  };
+
+  // Images state (unified for both new local files and existing database images)
+  const [formImages, setFormImages] = useState<FormImage[]>(() => {
+    if (!initialArtwork) return [];
+    const list: FormImage[] = [];
+    if (initialArtwork.image_url) {
+      list.push({
+        id: `existing-cover-${initialArtwork.id}`,
+        cardUrl: initialArtwork.image_url,
+        fullUrl: initialArtwork.image_url_full || initialArtwork.image_url,
+        isExisting: true,
+        name: stripFileExtension(initialArtwork.title) || 'Cover Image',
+        sizeFormatted: 'Current Cover',
+        width: initialArtwork.image_width,
+        height: initialArtwork.image_height,
+      });
+    }
+    if (Array.isArray(initialArtwork.additional_images)) {
+      initialArtwork.additional_images.forEach((url: string, idx: number) => {
+        if (!url) return;
+        list.push({
+          id: `existing-add-${idx}-${url}`,
+          cardUrl: url,
+          fullUrl:
+            (initialArtwork.additional_images_full &&
+              initialArtwork.additional_images_full[idx]) ||
+            url,
+          isExisting: true,
+          name: `Detail View ${idx + 1}`,
+          sizeFormatted: 'Detail View',
+        });
+      });
+    }
+    return list;
+  });
+
   const [selectedPreviewIndex, setSelectedPreviewIndex] = useState<number>(0);
 
   // Drag & drop state for dropzone
@@ -173,7 +220,7 @@ export default function ArtworkUploadForm({
   const editImageInputRef = useRef<HTMLInputElement>(null);
 
   // Tags state
-  const [tags, setTags] = useState<string[]>([]);
+  const [tags, setTags] = useState<string[]>(initialArtwork?.tags || []);
   const [tagInput, setTagInput] = useState('');
   const [isAddingTag, setIsAddingTag] = useState(false);
 
@@ -198,8 +245,17 @@ export default function ArtworkUploadForm({
   const [compressionProgress, setCompressionProgress] = useState<PipelineProgress | null>(null);
   const [uploadStage, setUploadStage] = useState<string | null>(null);
 
-  // Default values based on creator profile or selected creator in admin mode
+  // Parse existing dimensions if editing
+  const parsedDim = initialArtwork?.dimensions
+    ? parseDimensionsString(initialArtwork.dimensions)
+    : null;
+  const initialWidth = initialArtwork?.width || parsedDim?.width || '';
+  const initialHeight = initialArtwork?.height || parsedDim?.height || '';
+  const initialUnit = parsedDim?.unit || 'in';
+
+  // Default values based on creator profile or selected creator in admin mode or existing artwork
   const defaultArtistName =
+    initialArtwork?.artist_name ||
     (mode === 'admin' && (defaultCreatorName || creators[0]?.name)) ||
     profile?.full_name ||
     '';
@@ -214,21 +270,25 @@ export default function ArtworkUploadForm({
   } = useForm<UploadForm>({
     resolver: zodResolver(uploadSchema),
     defaultValues: {
-      title: '',
+      title: initialArtwork?.title || '',
       artistName: defaultArtistName,
-      artType: '',
-      year: '',
-      dimensionUnit: 'in',
-      width: '',
-      height: '',
-      location: '',
-      style: '',
-      collection: '',
-      description: '',
-      externalLink: '',
-      price: '',
-      priceVisibility: 'Show Price',
-      status: 'Available',
+      artType: initialArtwork?.art_type || '',
+      year: initialArtwork?.year || '',
+      dimensionUnit: initialUnit,
+      width: initialWidth,
+      height: initialHeight,
+      location: initialArtwork?.location || '',
+      style: initialArtwork?.style || '',
+      collection: initialArtwork?.collection || '',
+      description: initialArtwork?.description || '',
+      externalLink: initialArtwork?.external_link || '',
+      price: initialArtwork?.price
+        ? formatIndianCurrency(initialArtwork.price)
+        : '',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      priceVisibility: (initialArtwork?.price_visibility as any) || 'Show Price',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      status: (initialArtwork?.status as any) || 'Available',
     },
   });
 
@@ -243,12 +303,6 @@ export default function ArtworkUploadForm({
   const watchedPrice = watch('price');
 
   const activeUnitSymbol = getUnitSymbol(watchedDimensionUnit) || 'in';
-
-  // Strip file extension helper (e.g. "artwork.png" -> "artwork")
-  const stripFileExtension = (filename?: string | null): string => {
-    if (!filename) return '';
-    return filename.replace(/\.[^/.]+$/, '');
-  };
 
   const mediumOptions = useMemo(() => {
     return buildMediumOptions(customMediums, watchedArtType);
@@ -312,13 +366,13 @@ export default function ArtworkUploadForm({
   // Clean up object URLs on unmount
   useEffect(() => {
     return () => {
-      previewUrls.forEach((url) => {
-        if (url?.startsWith('blob:')) {
-          URL.revokeObjectURL(url);
+      formImages.forEach((img) => {
+        if (img.cardUrl?.startsWith('blob:')) {
+          URL.revokeObjectURL(img.cardUrl);
         }
       });
     };
-  }, [previewUrls]);
+  }, [formImages]);
 
   // Read dimensions from an image file
   const readImageDimensions = (file: File): Promise<{ width: number; height: number }> => {
@@ -342,7 +396,7 @@ export default function ArtworkUploadForm({
     setError(null);
     if (!incomingFiles || incomingFiles.length === 0) return;
 
-    if (selectedFiles.length >= 5) {
+    if (formImages.length >= 5) {
       setError('Maximum 5 images allowed per artwork.');
       return;
     }
@@ -358,32 +412,32 @@ export default function ArtworkUploadForm({
     }
 
     if (validFiles.length > 0) {
-      const remainingSlots = 5 - selectedFiles.length;
+      const remainingSlots = 5 - formImages.length;
       if (validFiles.length > remainingSlots) {
-        setError(`Only ${remainingSlots} more image${remainingSlots > 1 ? 's' : ''} can be added (max 5 images allowed).`);
+        setError(
+          `Only ${remainingSlots} more image${remainingSlots > 1 ? 's' : ''} can be added (max 5 images allowed).`
+        );
       }
       const filesToAdd = validFiles.slice(0, remainingSlots);
-      const newFiles = [...selectedFiles, ...filesToAdd];
-      setSelectedFiles(newFiles);
 
-      const newUrls = newFiles.map((file) => URL.createObjectURL(file));
-      setPreviewUrls(newUrls);
-
-      // Extract metadata for each file
-      const metas: ImageFileMeta[] = await Promise.all(
-        newFiles.map(async (f) => {
+      const newItems: FormImage[] = await Promise.all(
+        filesToAdd.map(async (f, idx) => {
           const dims = await readImageDimensions(f);
           return {
-            name: f.name,
+            id: `new-${Date.now()}-${idx}-${f.name}`,
+            file: f,
+            cardUrl: URL.createObjectURL(f),
+            isExisting: false,
+            name: stripFileExtension(f.name),
             sizeFormatted: formatFileSize(f.size),
             width: dims.width,
             height: dims.height,
           };
         })
       );
-      setFilesMeta(metas);
 
-      if (selectedFiles.length === 0) {
+      setFormImages((prev) => [...prev, ...newItems]);
+      if (formImages.length === 0) {
         setSelectedPreviewIndex(0);
       }
     }
@@ -396,34 +450,32 @@ export default function ArtworkUploadForm({
   };
 
   // Edit / Replace image at current preview index
-  const handleReplaceImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleReplaceImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     try {
       validateImageFile(file);
-      const newFiles = [...selectedFiles];
-      newFiles[selectedPreviewIndex] = file;
-      setSelectedFiles(newFiles);
-
-      const newUrl = URL.createObjectURL(file);
-      const newUrls = [...previewUrls];
-      if (newUrls[selectedPreviewIndex]?.startsWith('blob:')) {
-        URL.revokeObjectURL(newUrls[selectedPreviewIndex]);
+      const dims = await readImageDimensions(file);
+      const currentItem = formImages[selectedPreviewIndex];
+      if (currentItem && currentItem.cardUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(currentItem.cardUrl);
       }
-      newUrls[selectedPreviewIndex] = newUrl;
-      setPreviewUrls(newUrls);
 
-      readImageDimensions(file).then((dims) => {
-        const newMetas = [...filesMeta];
-        newMetas[selectedPreviewIndex] = {
-          name: file.name,
-          sizeFormatted: formatFileSize(file.size),
-          width: dims.width,
-          height: dims.height,
-        };
-        setFilesMeta(newMetas);
-      });
+      const replacedItem: FormImage = {
+        id: `replaced-${Date.now()}-${file.name}`,
+        file,
+        cardUrl: URL.createObjectURL(file),
+        isExisting: false,
+        name: stripFileExtension(file.name),
+        sizeFormatted: formatFileSize(file.size),
+        width: dims.width,
+        height: dims.height,
+      };
+
+      const updated = [...formImages];
+      updated[selectedPreviewIndex] = replacedItem;
+      setFormImages(updated);
     } catch (valErr) {
       setError(valErr instanceof Error ? valErr.message : 'Invalid image file');
     }
@@ -432,23 +484,16 @@ export default function ArtworkUploadForm({
 
   // Remove a file
   const removeFile = (index: number) => {
-    if (previewUrls[index]?.startsWith('blob:')) {
-      URL.revokeObjectURL(previewUrls[index]);
+    const itemToRemove = formImages[index];
+    if (itemToRemove && itemToRemove.cardUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(itemToRemove.cardUrl);
     }
-    const newFiles = [...selectedFiles];
-    newFiles.splice(index, 1);
-    setSelectedFiles(newFiles);
+    const updated = [...formImages];
+    updated.splice(index, 1);
+    setFormImages(updated);
 
-    const newUrls = [...previewUrls];
-    newUrls.splice(index, 1);
-    setPreviewUrls(newUrls);
-
-    const newMetas = [...filesMeta];
-    newMetas.splice(index, 1);
-    setFilesMeta(newMetas);
-
-    if (selectedPreviewIndex >= newFiles.length) {
-      setSelectedPreviewIndex(Math.max(0, newFiles.length - 1));
+    if (selectedPreviewIndex >= updated.length) {
+      setSelectedPreviewIndex(Math.max(0, updated.length - 1));
     }
   };
 
@@ -462,20 +507,10 @@ export default function ArtworkUploadForm({
     const sourceIndex = parseInt(e.dataTransfer.getData('text/plain'), 10);
     if (isNaN(sourceIndex) || sourceIndex === dropIndex) return;
 
-    const newFiles = [...selectedFiles];
-    const [movedFile] = newFiles.splice(sourceIndex, 1);
-    newFiles.splice(dropIndex, 0, movedFile);
-    setSelectedFiles(newFiles);
-
-    const newUrls = [...previewUrls];
-    const [movedUrl] = newUrls.splice(sourceIndex, 1);
-    newUrls.splice(dropIndex, 0, movedUrl);
-    setPreviewUrls(newUrls);
-
-    const newMetas = [...filesMeta];
-    const [movedMeta] = newMetas.splice(sourceIndex, 1);
-    newMetas.splice(dropIndex, 0, movedMeta);
-    setFilesMeta(newMetas);
+    const updated = [...formImages];
+    const [moved] = updated.splice(sourceIndex, 1);
+    updated.splice(dropIndex, 0, moved);
+    setFormImages(updated);
 
     setSelectedPreviewIndex(dropIndex);
   };
@@ -530,9 +565,9 @@ export default function ArtworkUploadForm({
     setTags(tags.filter((t) => t !== tagToRemove));
   };
 
-  // Core submission handler (both for draft and publish)
+  // Core submission handler (both for draft and publish, create and edit)
   const submitArtwork = async (data: UploadForm, isPublished: boolean) => {
-    if (selectedFiles.length === 0) {
+    if (formImages.length === 0) {
       setError('Please upload at least one image of your artwork.');
       setStep(1);
       return;
@@ -546,35 +581,77 @@ export default function ArtworkUploadForm({
     try {
       const supabase = createClient();
 
-      // ── Stage 1: Client-Side WebP Compression ──
-      setUploadStage('Compressing images for maximum clarity & performance...');
-      let compressionResults: CompressionResult[];
-      try {
-        compressionResults = await compressImages(selectedFiles, (progress) => {
-          setCompressionProgress(progress);
-        });
-      } catch (compErr) {
-        throw new Error(
-          `Image compression failed: ${compErr instanceof Error ? compErr.message : 'Unknown error'}`
-        );
+      // ── Stage 1: Client-Side WebP Compression for new/replaced files ──
+      const newItemsToCompress = formImages
+        .map((img, idx) => ({ img, idx }))
+        .filter((entry) => Boolean(entry.img.file));
+
+      let compressionResults: CompressionResult[] = [];
+      if (newItemsToCompress.length > 0) {
+        setUploadStage('Compressing images for maximum clarity & performance...');
+        try {
+          compressionResults = await compressImages(
+            newItemsToCompress.map((e) => e.img.file!),
+            (progress) => setCompressionProgress(progress)
+          );
+        } catch (compErr) {
+          throw new Error(
+            `Image compression failed: ${compErr instanceof Error ? compErr.message : 'Unknown error'}`
+          );
+        }
       }
 
-      // ── Stage 2: Upload Compressed WebP Pairs to Supabase ──
-      setUploadStage('Uploading optimized artwork images...');
-      const uploadedPairs: { cardUrl: string; fullUrl: string }[] = [];
-
-      for (let i = 0; i < compressionResults.length; i++) {
-        setUploadStage(`Uploading image ${i + 1} of ${compressionResults.length}...`);
-        const urls = await uploadCompressedPair(supabase, userId, compressionResults[i], i);
-        uploadedPairs.push(urls);
+      // ── Stage 2: Upload Compressed WebP Pairs to Supabase Storage ──
+      if (newItemsToCompress.length > 0) {
+        setUploadStage('Uploading optimized artwork images...');
       }
 
-      // Cover image = first uploaded image pair
-      const coverImage = uploadedPairs[0].cardUrl;
-      const coverImageFull = uploadedPairs[0].fullUrl;
-      const additionalImages = uploadedPairs.slice(1).map((p) => p.cardUrl);
-      const additionalImagesFull = uploadedPairs.slice(1).map((p) => p.fullUrl);
-      const coverMeta = compressionResults[0];
+      const finalPairs: { cardUrl: string; fullUrl: string; meta?: CompressionResult }[] = new Array(
+        formImages.length
+      );
+
+      // Pre-fill existing untouched images
+      formImages.forEach((img, idx) => {
+        if (!img.file && img.isExisting) {
+          finalPairs[idx] = {
+            cardUrl: img.cardUrl,
+            fullUrl: img.fullUrl || img.cardUrl,
+            meta:
+              img.width && img.height
+                ? ({
+                    originalWidth: img.width,
+                    originalHeight: img.height,
+                    aspectRatio: img.width / img.height,
+                  } as CompressionResult)
+                : undefined,
+          };
+        }
+      });
+
+      // Upload newly compressed files and assign in exact order
+      for (let i = 0; i < newItemsToCompress.length; i++) {
+        const { idx } = newItemsToCompress[i];
+        const comp = compressionResults[i];
+        setUploadStage(`Uploading image ${i + 1} of ${newItemsToCompress.length}...`);
+        const urls = await uploadCompressedPair(supabase, userId, comp, idx);
+        finalPairs[idx] = {
+          cardUrl: urls.cardUrl,
+          fullUrl: urls.fullUrl,
+          meta: comp,
+        };
+      }
+
+      // Cover image = first pair in finalPairs
+      const coverPair = finalPairs[0];
+      const coverImage = coverPair.cardUrl;
+      const coverImageFull = coverPair.fullUrl;
+      const additionalImages = finalPairs.slice(1).map((p) => p.cardUrl);
+      const additionalImagesFull = finalPairs.slice(1).map((p) => p.fullUrl);
+      const coverMeta = coverPair.meta;
+
+      const imageWidth = coverMeta?.originalWidth || initialArtwork?.image_width || undefined;
+      const imageHeight = coverMeta?.originalHeight || initialArtwork?.image_height || undefined;
+      const aspectRatio = coverMeta?.aspectRatio || initialArtwork?.aspect_ratio || undefined;
 
       // Format dimensions string
       let formattedDimensions = '';
@@ -598,54 +675,93 @@ export default function ArtworkUploadForm({
         saveCustomStyle(finalStyle);
       }
 
-      // ── Stage 3: Create Artwork in Database ──
-      setUploadStage('Finalizing artwork catalog entry...');
+      // ── Stage 3: Create or Update Artwork in Database ──
       const targetUserId = mode === 'admin' ? selectedCreatorId : userId;
-      const created = await createArtwork({
-        userId: targetUserId || undefined,
-        title: data.title.trim(),
-        artType: finalMedium,
-        artistName: data.artistName.trim(),
-        description: data.description?.trim() || undefined,
-        externalLink: data.externalLink?.trim() || undefined,
-        imageUrl: coverImage,
-        imageUrlFull: coverImageFull,
-        additionalImages,
-        additionalImagesFull,
-        imageWidth: coverMeta.originalWidth,
-        imageHeight: coverMeta.originalHeight,
-        aspectRatio: coverMeta.aspectRatio,
-        price: numericPrice,
-        year: data.year?.trim() || undefined,
-        dimensions: formattedDimensions || undefined,
-        width: data.width?.trim() || undefined,
-        height: data.height?.trim() || undefined,
-        location: data.location?.trim() || undefined,
-        style: finalStyle?.trim() || undefined,
-        tags,
-        collection: data.collection?.trim() || undefined,
-        priceVisibility: data.priceVisibility,
-        isPublished,
-        status: isPublished ? data.status : 'Not for sale',
-      });
+      let savedArtworkResult: any = null;
+      if (isEditMode) {
+        setUploadStage('Updating artwork portfolio entry...');
+        savedArtworkResult = await updateArtwork(initialArtwork.id, {
+          userId: targetUserId || undefined,
+          title: data.title.trim(),
+          artType: finalMedium,
+          artistName: data.artistName.trim(),
+          description: data.description?.trim() || undefined,
+          externalLink: data.externalLink?.trim() || undefined,
+          imageUrl: coverImage,
+          imageUrlFull: coverImageFull,
+          additionalImages,
+          additionalImagesFull,
+          imageWidth,
+          imageHeight,
+          aspectRatio,
+          price: numericPrice,
+          year: data.year?.trim() || undefined,
+          dimensions: formattedDimensions || undefined,
+          width: data.width?.trim() || undefined,
+          height: data.height?.trim() || undefined,
+          location: data.location?.trim() || undefined,
+          style: finalStyle?.trim() || undefined,
+          tags,
+          collection: data.collection?.trim() || undefined,
+          priceVisibility: data.priceVisibility,
+          isPublished,
+          status: isPublished ? data.status : 'Not for sale',
+        });
+      } else {
+        setUploadStage(
+          mode === 'admin'
+            ? 'Finalizing artwork catalog entry...'
+            : 'Finalizing artwork portfolio entry...'
+        );
+        savedArtworkResult = await createArtwork({
+          userId: targetUserId || undefined,
+          title: data.title.trim(),
+          artType: finalMedium,
+          artistName: data.artistName.trim(),
+          description: data.description?.trim() || undefined,
+          externalLink: data.externalLink?.trim() || undefined,
+          imageUrl: coverImage,
+          imageUrlFull: coverImageFull,
+          additionalImages,
+          additionalImagesFull,
+          imageWidth,
+          imageHeight,
+          aspectRatio,
+          price: numericPrice,
+          year: data.year?.trim() || undefined,
+          dimensions: formattedDimensions || undefined,
+          width: data.width?.trim() || undefined,
+          height: data.height?.trim() || undefined,
+          location: data.location?.trim() || undefined,
+          style: finalStyle?.trim() || undefined,
+          tags,
+          collection: data.collection?.trim() || undefined,
+          priceVisibility: data.priceVisibility,
+          isPublished,
+          status: isPublished ? data.status : 'Not for sale',
+        });
+      }
 
       if (onSuccess) {
         // Map database record to UI Artwork format
         const normalizedArtwork = {
-          id: created?.id,
-          title: created?.title || data.title.trim(),
-          creatorId: created?.creator_id || targetUserId,
-          creatorName: created?.artist_name || data.artistName.trim(),
-          medium: created?.art_type || finalMedium,
-          dimensions: created?.dimensions || formattedDimensions || '',
-          price: typeof created?.price === 'number' ? created.price : (numericPrice || 0),
-          imageUrl: created?.image_url || coverImage,
+          id: savedArtworkResult?.id || initialArtwork?.id,
+          title: savedArtworkResult?.title || data.title.trim(),
+          creatorId: savedArtworkResult?.creator_id || targetUserId,
+          creatorName: savedArtworkResult?.artist_name || data.artistName.trim(),
+          medium: savedArtworkResult?.art_type || finalMedium,
+          dimensions: savedArtworkResult?.dimensions || formattedDimensions || '',
+          price:
+            typeof savedArtworkResult?.price === 'number'
+              ? savedArtworkResult.price
+              : numericPrice || 0,
+          imageUrl: savedArtworkResult?.image_url || coverImage,
           status: isPublished ? 'published' : 'draft',
-          createdAt: created?.created_at || new Date().toISOString(),
-          year: created?.year || data.year?.trim(),
-          location: created?.location || data.location?.trim(),
-          collection: created?.collection || data.collection?.trim(),
-          description: created?.description || data.description?.trim(),
+          createdAt: savedArtworkResult?.created_at || new Date().toISOString(),
+          year: savedArtworkResult?.year || data.year?.trim(),
+          location: savedArtworkResult?.location || data.location?.trim(),
+          collection: savedArtworkResult?.collection || data.collection?.trim(),
+          description: savedArtworkResult?.description || data.description?.trim(),
           availability: data.status,
           priceVisibility: data.priceVisibility,
         };
@@ -656,8 +772,8 @@ export default function ArtworkUploadForm({
         router.refresh();
       }
     } catch (err: any) {
-      console.error('Artwork creation failed:', err);
-      setError(err?.message || 'Failed to upload artwork. Please try again.');
+      console.error('Artwork submission failed:', err);
+      setError(err?.message || 'Failed to save artwork. Please try again.');
     } finally {
       setIsLoading(false);
       setUploadStage(null);
@@ -684,27 +800,39 @@ export default function ArtworkUploadForm({
   };
 
   const handleSaveDraft = () => {
-    if (selectedFiles.length === 0) {
+    if (formImages.length === 0) {
       setError('Please upload at least one image before saving a draft.');
       return;
     }
     const currentValues = watch();
     const draftTitle =
       currentValues.title?.trim() ||
-      stripFileExtension(selectedFiles[0]?.name) ||
-      'Untitled Draft';
-    submitArtwork({ ...currentValues, title: draftTitle }, false);
+      formImages[0]?.name ||
+      'Untitled Artwork Draft';
+
+    const draftData: UploadForm = {
+      title: draftTitle,
+      artistName: currentValues.artistName?.trim() || defaultArtistName,
+      artType: currentValues.artType || 'Other',
+      year: currentValues.year || '',
+      dimensionUnit: currentValues.dimensionUnit || 'in',
+      width: currentValues.width || '',
+      height: currentValues.height || '',
+      location: currentValues.location || '',
+      style: currentValues.style || '',
+      collection: currentValues.collection || '',
+      description: currentValues.description || '',
+      externalLink: currentValues.externalLink || '',
+      price: currentValues.price || '',
+      priceVisibility: currentValues.priceVisibility || 'Show Price',
+      status: 'Not for sale',
+    };
+
+    submitArtwork(draftData, false);
   };
 
-  const currentPreviewFile = selectedFiles[selectedPreviewIndex];
-  const activeMeta = filesMeta[selectedPreviewIndex] || {
-    name: currentPreviewFile?.name || '',
-    sizeFormatted: currentPreviewFile ? formatFileSize(currentPreviewFile.size) : '',
-    width: undefined,
-    height: undefined,
-  };
-
-  const currentCoverUrl = previewUrls[0] || null;
+  const activeImage = formImages[selectedPreviewIndex] || formImages[0];
+  const currentCoverUrl = formImages[0]?.cardUrl || null;
 
   return (
     <div
@@ -809,7 +937,7 @@ export default function ArtworkUploadForm({
                   step === 1 ? 'text-[#141413]' : 'text-[#6E6E69]'
                 }`}
               >
-                Upload artwork
+                {isEditMode ? 'Artwork images' : 'Upload artwork'}
               </span>
             </div>
 
@@ -819,9 +947,9 @@ export default function ArtworkUploadForm({
             {/* Step 2 Indicator */}
             <div
               className={`flex items-center gap-2.5 ${
-                selectedFiles.length > 0 ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'
+                formImages.length > 0 ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'
               }`}
-              onClick={() => selectedFiles.length > 0 && setStep(2)}
+              onClick={() => formImages.length > 0 && setStep(2)}
             >
               <div
                 className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-medium transition-all ${
@@ -898,17 +1026,17 @@ export default function ArtworkUploadForm({
                   Artwork images <span className="text-red-500">*</span>
                 </span>
                 <span className="text-xs sm:text-sm text-[#6E6E69]">
-                  {selectedFiles.length} of 5 images uploaded
+                  {formImages.length} of 5 images uploaded
                 </span>
               </div>
 
               {/* Main Card with Preview Image & Details */}
-              {selectedFiles.length > 0 ? (
+              {formImages.length > 0 ? (
                 <div className="w-full border border-[#E8E8E3] rounded-3xl overflow-hidden bg-white shadow-2xs">
                   {/* Large Image Box */}
                   <div className="w-full h-[320px] sm:h-[440px] md:h-[500px] bg-[#F7F7F5] flex items-center justify-center p-4 relative overflow-hidden select-none">
                     <img
-                      src={previewUrls[selectedPreviewIndex]}
+                      src={activeImage?.cardUrl}
                       alt="Artwork Preview"
                       className="max-w-full max-h-full object-contain rounded-lg shadow-xs pointer-events-none"
                     />
@@ -934,12 +1062,12 @@ export default function ArtworkUploadForm({
                       )}
                       <div className="min-w-0">
                         <p className="text-xs sm:text-sm font-medium text-[#141413] truncate">
-                          {activeMeta.name}
+                          {activeImage?.name}
                         </p>
                         <p className="text-[11px] sm:text-xs text-[#6E6E69] truncate">
-                          {activeMeta.width && activeMeta.height
-                            ? `${activeMeta.width} × ${activeMeta.height} px · ${activeMeta.sizeFormatted}`
-                            : activeMeta.sizeFormatted}
+                          {activeImage?.width && activeImage?.height
+                            ? `${activeImage.width} × ${activeImage.height} px · ${activeImage.sizeFormatted}`
+                            : activeImage?.sizeFormatted}
                         </p>
                       </div>
                     </div>
@@ -1006,15 +1134,15 @@ export default function ArtworkUploadForm({
               )}
 
               {/* Thumbnails Strip & Dropzone Tile Row */}
-              {selectedFiles.length > 0 && (
+              {formImages.length > 0 && (
                 <div className="flex flex-wrap items-center gap-3.5 pt-1">
-                  {selectedFiles.map((file, idx) => {
+                  {formImages.map((img, idx) => {
                     const isCover = idx === 0;
                     const isSelected = idx === selectedPreviewIndex;
 
                     return (
                       <div
-                        key={idx}
+                        key={img.id}
                         draggable
                         onDragStart={(e) => handleDragStartThumb(e, idx)}
                         onDragOver={(e) => e.preventDefault()}
@@ -1041,7 +1169,7 @@ export default function ArtworkUploadForm({
                         >
                           <div className="w-full h-full rounded-xl overflow-hidden bg-gray-100 relative">
                             <img
-                              src={previewUrls[idx]}
+                              src={img.cardUrl}
                               alt={`Thumb ${idx + 1}`}
                               className="w-full h-full object-cover"
                             />
@@ -1080,7 +1208,7 @@ export default function ArtworkUploadForm({
                   })}
 
                   {/* Add more images tile (if fewer than 5) */}
-                  {selectedFiles.length < 5 && (
+                  {formImages.length < 5 && (
                     <div
                       onClick={() => fileInputRef.current?.click()}
                       onDragEnter={handleDragEnter}
@@ -1104,7 +1232,7 @@ export default function ArtworkUploadForm({
               )}
 
               {/* Help Reorder Note */}
-              {selectedFiles.length > 0 && (
+              {formImages.length > 0 && (
                 <p className="text-xs text-[#6E6E69] flex items-center gap-1.5 pt-1">
                   <GripVertical size={13} className="text-[#6E6E69]" />
                   <span>Drag to reorder. The first image is always your cover.</span>
@@ -1142,7 +1270,7 @@ export default function ArtworkUploadForm({
                 {/* Artwork Title & Artist Info */}
                 <div className="flex flex-col gap-1">
                   <h4 className="text-sm sm:text-base font-medium text-[#141413] truncate">
-                    {stripFileExtension(selectedFiles[0]?.name) || 'Cover image'}
+                    {formImages[0]?.name || 'Cover image'}
                   </h4>
                   <p className="text-xs text-[#6E6E69] truncate">
                     {defaultArtistName || 'Artist'}
@@ -1192,7 +1320,7 @@ export default function ArtworkUploadForm({
                     Your artwork
                   </span>
                   <span className="px-2.5 py-0.5 rounded-md bg-[#F3F3EF] border border-[#E5E5DF] text-[11px] font-medium text-[#6E6E69]">
-                    Draft
+                    {isEditMode ? (initialArtwork?.is_published ? 'Published' : 'Draft') : 'Draft'}
                   </span>
                 </div>
 
@@ -1220,7 +1348,7 @@ export default function ArtworkUploadForm({
                       fontStyle: 'italic',
                     }}
                   >
-                    {watchedTitle?.trim() || stripFileExtension(selectedFiles[0]?.name) || 'Untitled'}
+                    {watchedTitle?.trim() || formImages[0]?.name || 'Untitled'}
                   </h3>
                   <p className="text-xs sm:text-[13px] text-[#6E6E69]">
                     {watchedArtistName?.trim() || defaultArtistName || 'Artist'}
@@ -1241,9 +1369,9 @@ export default function ArtworkUploadForm({
 
                 {/* Thumbnail Preview Strip */}
                 <div className="flex items-center gap-2.5 overflow-hidden">
-                  {previewUrls.slice(0, 3).map((url, i) => (
+                  {formImages.slice(0, 3).map((img, i) => (
                     <div
-                      key={i}
+                      key={img.id || i}
                       className={`w-14 h-11 rounded-lg overflow-hidden ${
                         i === 0 ? '' : 'border border-[#E8E8E3]'
                       }`}
@@ -1257,11 +1385,11 @@ export default function ArtworkUploadForm({
                           : undefined
                       }
                     >
-                      <img src={url} alt={`Thumb ${i}`} className="w-full h-full object-cover" />
+                      <img src={img.cardUrl} alt={`Thumb ${i}`} className="w-full h-full object-cover" />
                     </div>
                   ))}
                   <span className="text-xs text-[#6E6E69] ml-1">
-                    {selectedFiles.length} {selectedFiles.length === 1 ? 'image' : 'images'}
+                    {formImages.length} {formImages.length === 1 ? 'image' : 'images'}
                   </span>
                 </div>
 
@@ -2013,28 +2141,28 @@ export default function ArtworkUploadForm({
               {/* Step 1 Actions */}
               <div className="flex items-center gap-3 sm:gap-4">
                 <span className="text-xs sm:text-sm text-[#6E6E69] hidden md:inline">
-                  {selectedFiles.length === 5 ? 'All images uploaded' : `${selectedFiles.length} of 5 images uploaded`}
+                  {formImages.length === 5 ? 'All images added' : `${formImages.length} of 5 images added`}
                 </span>
 
                 <button
                   type="button"
                   onClick={handleSaveDraft}
-                  disabled={isLoading || selectedFiles.length === 0}
+                  disabled={isLoading || formImages.length === 0}
                   className="px-6 py-2.5 rounded-full border border-[#E8E8E3] bg-white text-xs sm:text-sm font-medium text-[#141413] hover:border-black transition-colors disabled:opacity-40 disabled:cursor-not-allowed shadow-2xs cursor-pointer select-none"
                 >
-                  Save draft
+                  {isEditMode ? 'Save as draft' : 'Save draft'}
                 </button>
 
                 <button
                   type="button"
                   onClick={() => {
-                    if (selectedFiles.length === 0) {
+                    if (formImages.length === 0) {
                       setError('Please select at least one image before continuing.');
                       return;
                     }
                     setStep(2);
                   }}
-                  disabled={selectedFiles.length === 0}
+                  disabled={formImages.length === 0}
                   className="px-6 sm:px-8 py-2.5 sm:py-3 rounded-full btn-eras-gradient text-xs sm:text-sm font-medium flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm cursor-pointer select-none"
                 >
                   <span>Continue to details</span>
@@ -2057,7 +2185,7 @@ export default function ArtworkUploadForm({
               {/* Step 2 Actions */}
               <div className="flex items-center gap-3 sm:gap-4">
                 <span className="text-xs sm:text-sm text-[#6E6E69] hidden md:inline">
-                  Ready to share your perspective?
+                  {isEditMode ? 'Keep your portfolio up to date' : 'Ready to share your perspective?'}
                 </span>
 
                 <button
@@ -2066,7 +2194,7 @@ export default function ArtworkUploadForm({
                   disabled={isLoading}
                   className="px-6 py-2.5 rounded-full border border-[#E8E8E3] bg-white text-xs sm:text-sm font-medium text-[#141413] hover:border-black transition-colors disabled:opacity-40 shadow-2xs cursor-pointer select-none"
                 >
-                  Save draft
+                  {isEditMode ? 'Save as draft' : 'Save draft'}
                 </button>
 
                 <button
@@ -2078,11 +2206,11 @@ export default function ArtworkUploadForm({
                   {isLoading ? (
                     <>
                       <Loader2 size={16} className="animate-spin text-white" />
-                      <span>Publishing...</span>
+                      <span>{isEditMode ? 'Saving changes...' : 'Publishing...'}</span>
                     </>
                   ) : (
                     <>
-                      <span>Publish artwork</span>
+                      <span>{isEditMode ? 'Save changes' : 'Publish artwork'}</span>
                       <ArrowRight size={16} />
                     </>
                   )}

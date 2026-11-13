@@ -1,29 +1,46 @@
-import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import ArtworkEditForm from '@/components/features/creator/ArtworkEditForm';
+import { createClient, getAuthenticatedProfile } from '@/lib/supabase/server';
+import { getCreatorCollections } from '@/actions/collectionActions';
+import ArtworkUploadForm from '@/components/features/creator/ArtworkUploadForm';
 
-export default async function EditArtworkPage({ params }: { params: Promise<{ id: string }> | { id: string } }) {
-  // Await params if it's a promise (Next.js 15+ compatibility)
+export const dynamic = 'force-dynamic';
+
+export default async function EditArtworkPage({
+  params,
+}: {
+  params: Promise<{ id: string }> | { id: string };
+}) {
   const resolvedParams = await params;
-  
+
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: artwork } = await supabase
-    .from('artworks')
-    .select('*')
-    .eq('id', resolvedParams.id)
-    .eq('creator_id', user.id)
-    .single();
+  const [artworkRes, profile, collections] = await Promise.all([
+    supabase
+      .from('artworks')
+      .select('*')
+      .eq('id', resolvedParams.id)
+      .eq('creator_id', user.id)
+      .single(),
+    getAuthenticatedProfile(user.id),
+    getCreatorCollections(user.id),
+  ]);
+
+  const artwork = artworkRes.data;
 
   if (!artwork) {
-    redirect('/portfolio'); // If it doesn't exist or doesn't belong to the user
+    redirect('/portfolio');
   }
 
   return (
-    <div style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}>
-      <ArtworkEditForm userId={user.id} artwork={artwork} />
-    </div>
+    <ArtworkUploadForm
+      userId={user.id}
+      profile={profile}
+      collections={collections || []}
+      initialArtwork={artwork}
+    />
   );
 }
