@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
-import { Search, Plus, Minus, X } from 'lucide-react';
+import { Plus, Minus } from 'lucide-react';
 
 interface FaqItemData {
   id: string;
@@ -54,20 +54,8 @@ const FAQ_ITEMS: FaqItemData[] = [
 ];
 
 export default function FaqPage() {
-  const [searchQuery, setSearchQuery] = useState('');
   // Item 01 is open by default to match the editorial reference
   const [openId, setOpenId] = useState<string | null>('01');
-
-  const filteredFaqs = useMemo(() => {
-    const query = searchQuery.trim().toLowerCase();
-    if (!query) return FAQ_ITEMS;
-    return FAQ_ITEMS.filter(
-      (item) =>
-        item.q.toLowerCase().includes(query) ||
-        item.a.toLowerCase().includes(query) ||
-        item.id.includes(query)
-    );
-  }, [searchQuery]);
 
   const toggleItem = (id: string) => {
     setOpenId((prev) => (prev === id ? null : id));
@@ -89,92 +77,52 @@ export default function FaqPage() {
         </h1>
 
         {/* Subtitle */}
-        <p className="text-sm sm:text-base text-[#6E6E69] font-normal mb-8 max-w-2xl">
+        <p className="text-sm sm:text-base text-[#6E6E69] font-normal mb-10 sm:mb-12 max-w-2xl">
           A little more about the art, the artists and everything in between.
         </p>
 
-        {/* Search Bar */}
-        <div className="relative w-full max-w-md mb-12">
-          <Search
-            size={16}
-            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8A8A85] pointer-events-none"
-          />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search a question or topic"
-            className="w-full pl-10 pr-9 py-2.5 bg-white border border-[#E8E8E3] rounded-md text-sm text-[#141413] placeholder-[#A0A09B] focus:outline-none focus:border-[#141413] transition-colors"
-          />
-          {searchQuery && (
-            <button
-              type="button"
-              onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8A8A85] hover:text-[#141413] transition-colors"
-              aria-label="Clear search"
-            >
-              <X size={15} />
-            </button>
-          )}
-        </div>
-
         {/* FAQ Accordion List */}
         <div className="border-t border-[#EAEAE5]">
-          {filteredFaqs.length === 0 ? (
-            <div className="py-16 text-center">
-              <p className="text-sm text-[#6E6E69] mb-3">
-                No questions found matching &ldquo;{searchQuery}&rdquo;
-              </p>
-              <button
-                type="button"
-                onClick={() => setSearchQuery('')}
-                className="text-xs uppercase tracking-[0.08em] font-medium text-[#141413] underline underline-offset-4 hover:opacity-75 transition-opacity"
+          {FAQ_ITEMS.map((item) => {
+            const isOpen = openId === item.id;
+            return (
+              <div
+                key={item.id}
+                className="border-b border-[#EAEAE5] transition-colors"
               >
-                Clear search
-              </button>
-            </div>
-          ) : (
-            filteredFaqs.map((item) => {
-              const isOpen = openId === item.id;
-              return (
-                <div
-                  key={item.id}
-                  className="border-b border-[#EAEAE5] transition-colors"
+                <button
+                  type="button"
+                  onClick={() => toggleItem(item.id)}
+                  className="w-full py-5 sm:py-6 flex items-start sm:items-center justify-between gap-4 text-left group cursor-pointer"
+                  aria-expanded={isOpen}
                 >
-                  <button
-                    type="button"
-                    onClick={() => toggleItem(item.id)}
-                    className="w-full py-5 sm:py-6 flex items-start sm:items-center justify-between gap-4 text-left group cursor-pointer"
-                    aria-expanded={isOpen}
-                  >
-                    <div className="flex items-baseline gap-4 sm:gap-8 flex-1 min-w-0">
-                      <span className="text-xs sm:text-sm font-mono text-[#8A8A85] select-none shrink-0 w-6">
-                        {item.id}
-                      </span>
-                      <h3 className="text-sm sm:text-base font-medium text-[#141413] group-hover:text-black transition-colors leading-snug">
-                        {item.q}
-                      </h3>
-                    </div>
-                    <span className="shrink-0 text-[#6E6E69] group-hover:text-[#141413] transition-colors ml-2 mt-0.5 sm:mt-0">
-                      {isOpen ? (
-                        <Minus size={16} strokeWidth={1.5} />
-                      ) : (
-                        <Plus size={16} strokeWidth={1.5} />
-                      )}
+                  <div className="flex items-baseline gap-4 sm:gap-8 flex-1 min-w-0">
+                    <span className="text-xs sm:text-sm font-mono text-[#8A8A85] select-none shrink-0 w-6">
+                      {item.id}
                     </span>
-                  </button>
+                    <h3 className="text-sm sm:text-base font-medium text-[#141413] group-hover:text-black transition-colors leading-snug">
+                      {item.q}
+                    </h3>
+                  </div>
+                  <span className="shrink-0 text-[#6E6E69] group-hover:text-[#141413] transition-colors ml-2 mt-0.5 sm:mt-0">
+                    {isOpen ? (
+                      <Minus size={16} strokeWidth={1.5} />
+                    ) : (
+                      <Plus size={16} strokeWidth={1.5} />
+                    )}
+                  </span>
+                </button>
 
-                  {isOpen && (
-                    <div className="pb-6 pl-10 sm:pl-14 pr-4 sm:pr-12 animate-in fade-in-50 duration-200">
-                      <p className="text-xs sm:text-sm text-[#6E6E69] leading-relaxed max-w-3xl">
-                        {item.a}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              );
-            })
-          )}
+                {isOpen && (
+                  <div className="pb-6 pl-10 sm:pl-14 pr-4 sm:pr-12 animate-in fade-in-50 duration-200">
+                    <p className="text-xs sm:text-sm text-[#6E6E69] leading-relaxed max-w-3xl">
+                      {item.a}
+                    </p>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
 
         {/* Something else on your mind? Section */}
