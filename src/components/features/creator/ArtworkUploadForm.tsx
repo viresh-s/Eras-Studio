@@ -628,12 +628,15 @@ export default function ArtworkUploadForm({
         }
       });
 
+      // Target creator user ID for storage path & database records
+      const targetUserId = (mode === 'admin' ? selectedCreatorId : userId) || userId;
+
       // Upload newly compressed files and assign in exact order
       for (let i = 0; i < newItemsToCompress.length; i++) {
         const { idx } = newItemsToCompress[i];
         const comp = compressionResults[i];
         setUploadStage(`Uploading image ${i + 1} of ${newItemsToCompress.length}...`);
-        const urls = await uploadCompressedPair(supabase, userId, comp, idx);
+        const urls = await uploadCompressedPair(supabase, targetUserId, comp, idx);
         finalPairs[idx] = {
           cardUrl: urls.cardUrl,
           fullUrl: urls.fullUrl,
@@ -676,7 +679,6 @@ export default function ArtworkUploadForm({
       }
 
       // ── Stage 3: Create or Update Artwork in Database ──
-      const targetUserId = mode === 'admin' ? selectedCreatorId : userId;
       let savedArtworkResult: any = null;
       if (isEditMode) {
         setUploadStage('Updating artwork portfolio entry...');

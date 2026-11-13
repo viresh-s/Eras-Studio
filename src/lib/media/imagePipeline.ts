@@ -110,8 +110,8 @@ export function validateImageFile(file: File): void {
     );
   }
 
-  // Check MIME type (also allow empty type for some browsers)
-  if (file.type && !SUPPORTED_TYPES.has(file.type)) {
+  // Check MIME type (case-insensitive, also allow empty type for some camera inputs)
+  if (file.type && !SUPPORTED_TYPES.has(file.type.toLowerCase())) {
     throw new Error(
       `File "${file.name}" has unsupported format "${file.type}". Supported: JPEG, PNG, WebP, BMP, GIF, TIFF.`
     );
@@ -184,7 +184,18 @@ function resizeAndCompress(
     canvas.toBlob(
       (blob) => {
         if (!blob) {
-          reject(new Error('Canvas WebP export failed.'));
+          // Graceful fallback to JPEG if WebP export is unsupported on an exotic browser/device
+          canvas.toBlob(
+            (jpegBlob) => {
+              if (!jpegBlob) {
+                reject(new Error('Canvas image export failed.'));
+                return;
+              }
+              resolve({ blob: jpegBlob, width: targetW, height: targetH });
+            },
+            'image/jpeg',
+            quality
+          );
           return;
         }
         resolve({ blob, width: targetW, height: targetH });
