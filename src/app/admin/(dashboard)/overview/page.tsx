@@ -2,12 +2,14 @@ import React from "react";
 import Link from "next/link";
 import {
   ArrowRight,
-  Palette,
-  Sparkles,
-  FileText,
-  UserCheck,
   CheckCircle2,
 } from "lucide-react";
+import {
+  ArtworksIcon,
+  CreatorsIcon,
+  ApplicationsIcon,
+  UsersIcon,
+} from "@/components/admin/icons";
 import {
   usersRepo,
   creatorsRepo,
@@ -65,15 +67,15 @@ export default async function OverviewPage() {
     )
     .slice(0, 5);
 
-  const statCards = [
-    { label: "Total Users", value: userStats.total },
-    { label: "Creators", value: userStats.creators },
-    { label: "Collectors", value: userStats.collectors },
-    { label: "Artworks", value: artworkStats.published },
-    { label: "Free Tier", value: creatorStats.free },
-    { label: "Elite Tier", value: creatorStats.elite },
-    { label: "Pro Tier", value: creatorStats.pro },
-    { label: "COR Members", value: corStats.active },
+  const keyMatrixStats = [
+    { label: "Total Users", value: userStats.total, href: "/admin/users" },
+    { label: "Creators", value: userStats.creators, href: "/admin/creators" },
+    { label: "Collectors", value: userStats.collectors, href: "/admin/collectors" },
+    { label: "Artworks", value: artworkStats.published, href: "/admin/artworks" },
+    { label: "Free Tier", value: creatorStats.free, href: "/admin/users" },
+    { label: "Elite Tier", value: creatorStats.elite, href: "/admin/users" },
+    { label: "Pro Tier", value: creatorStats.pro, href: "/admin/users" },
+    { label: "COR Members", value: corStats.active, href: "/admin/cor/members" },
   ];
 
   const attentionItems = [
@@ -82,21 +84,21 @@ export default async function OverviewPage() {
       description: "Submissions awaiting curatorial review",
       count: artworkStats.pending,
       href: "/admin/artworks?status=pending",
-      icon: Palette,
+      icon: ArtworksIcon,
     },
     {
       title: "Pending Creators",
       description: "Creator applications awaiting verification",
       count: creatorStats.pending,
       href: "/admin/creators?status=pending",
-      icon: Sparkles,
+      icon: CreatorsIcon,
     },
     {
       title: "Pending Applications",
       description: "Open call & residency submissions",
       count: appStats.pending,
       href: "/admin/cor/applications",
-      icon: FileText,
+      icon: ApplicationsIcon,
     },
   ];
 
@@ -123,26 +125,38 @@ export default async function OverviewPage() {
         </div>
       </div>
 
-      {/* Top Row: 8 Stat Cards */}
+      {/* REDESIGNED KEY MATRIX: Clean Compact Inline Dashboard Strip */}
       <div className="space-y-3">
-        <h2 className="text-xs font-medium uppercase tracking-[0.2em] text-[#1345EE] font-sans flex items-center gap-2">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#1345EE]" />
-          Key Metrics
-        </h2>
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
-          {statCards.map((stat) => (
-            <div
-              key={stat.label}
-              className="bg-white border border-[#E8E8E3] rounded-2xl p-4 flex flex-col justify-between transition-all hover:border-[#1345EE]/40 shadow-soft-sm hover:shadow-soft-md group"
-            >
-              <span className="text-[11px] font-medium text-[#73736C] leading-snug">
-                {stat.label}
-              </span>
-              <span className="text-2xl sm:text-3xl font-semibold tracking-tight text-[#141413] mt-2 group-hover:text-[#1345EE] transition-colors">
-                {stat.value}
-              </span>
-            </div>
-          ))}
+        <div className="flex items-center justify-between">
+          <h2 className="text-xs font-medium uppercase tracking-[0.2em] text-[#1345EE] font-sans flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#1345EE]" />
+            Key Matrix
+          </h2>
+          <span className="text-[11px] text-[#8A8A85] font-sans hidden sm:inline">
+            Platform Vitals Overview
+          </span>
+        </div>
+
+        {/* Inline Metrics Strip: Clean horizontal arrangement on desktop, wrapping on tablet/mobile with subtle hairline dividers */}
+        <div className="bg-white border border-[#E8E8E3] rounded-2xl shadow-soft-sm overflow-hidden">
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 divide-y divide-[#E8E8E3] sm:divide-y-0 sm:divide-x divide-y-reverse">
+            {keyMatrixStats.map((stat, idx) => (
+              <Link
+                key={stat.label}
+                href={stat.href}
+                className={`group block px-4 py-3.5 sm:py-4 transition-colors hover:bg-[#F2F0ED]/50 ${
+                  idx >= 4 ? "sm:border-t lg:border-t-0 sm:border-[#E8E8E3]" : ""
+                } ${idx % 2 === 1 ? "border-l border-[#E8E8E3] sm:border-l-0" : ""}`}
+              >
+                <span className="block text-[10px] sm:text-[11px] font-medium uppercase tracking-wider text-[#73736C] group-hover:text-[#1345EE] transition-colors truncate">
+                  {stat.label}
+                </span>
+                <span className="block text-2xl sm:text-3xl font-semibold tracking-tight text-[#141413] mt-1 group-hover:text-[#1345EE] transition-colors font-sans tabular-nums">
+                  {stat.value}
+                </span>
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -166,7 +180,7 @@ export default async function OverviewPage() {
           <Card padded={false} className="overflow-hidden rounded-2xl shadow-soft-sm border border-[#E8E8E3]">
             {recentSignups.length === 0 ? (
               <EmptyState
-                icon={<UserCheck className="w-5 h-5 text-[#8A8A85]" />}
+                icon={<UsersIcon size={24} className="text-[#8A8A85]" />}
                 title="No recent signups"
                 description="New member registrations will appear here in chronological order."
                 className="py-12 border-none"
@@ -282,7 +296,7 @@ export default async function OverviewPage() {
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-start gap-3.5 min-w-0">
                       <div className="w-9 h-9 rounded-xl bg-[#000000] border border-black flex items-center justify-center shrink-0 text-white group-hover:bg-[#1345EE] group-hover:text-white transition-colors">
-                        <Icon className="w-4 h-4 stroke-[1.75]" />
+                        <Icon size={16} className="stroke-[1.75]" />
                       </div>
                       <div className="min-w-0">
                         <h4 className="text-xs font-medium text-[#141413] group-hover:text-[#1345EE] transition-colors">

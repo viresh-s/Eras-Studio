@@ -7,11 +7,11 @@ import {
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
-  Sparkles,
   CheckCircle2,
   Ban,
   Award,
 } from "lucide-react";
+import { CreatorsIcon } from "@/components/admin/icons";
 import { Creator, UserPlan } from "@/lib/types";
 import {
   Table,
@@ -411,7 +411,7 @@ export function CreatorsClient({
       {/* Table Container */}
       {sortedCreators.length === 0 ? (
         <EmptyState
-          icon={<Sparkles className="w-5 h-5 text-[#8A8A85]" />}
+          icon={<CreatorsIcon size={20} className="text-[#8A8A85]" />}
           title="No creators found"
           description={
             hasActiveFilters

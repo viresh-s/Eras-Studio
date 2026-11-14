@@ -7,10 +7,10 @@ import {
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
-  Sparkles,
   CheckCircle2,
   Ban,
 } from "lucide-react";
+import { CollectorsIcon } from "@/components/admin/icons";
 import { Collector } from "@/lib/types";
 import {
   Table,
@@ -306,7 +306,7 @@ export function CollectorsClient({
       {/* Table Container */}
       {sortedCollectors.length === 0 ? (
         <EmptyState
-          icon={<Sparkles className="w-5 h-5 text-[#8A8A85]" />}
+          icon={<CollectorsIcon size={20} className="text-[#8A8A85]" />}
           title="No collectors found"
           description={
             hasActiveFilters
@@ -405,7 +405,7 @@ export function CollectorsClient({
                         const count = inquiryCounts[collector.id] || 0;
                         return count > 0 ? (
                           <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-[#F0F5F1] text-[#28633B] border border-[#CDE3D4]">
-                            <Sparkles className="w-3 h-3 text-[#28633B]" />
+                            <CollectorsIcon size={12} className="text-[#28633B]" />
                             {count} {count === 1 ? "Artwork" : "Artworks"}
                           </span>
                         ) : (

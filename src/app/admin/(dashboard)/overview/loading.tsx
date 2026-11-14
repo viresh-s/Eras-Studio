@@ -10,19 +10,21 @@ export default function OverviewLoading() {
         <Skeleton className="h-4 w-72" />
       </div>
 
-      {/* 8 Stat Cards Skeleton Grid */}
+      {/* Inline Key Matrix Skeleton */}
       <div className="space-y-3">
         <Skeleton className="h-4 w-28" />
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div
-              key={i}
-              className="bg-white border border-[#E8E8E3] rounded-lg p-4 space-y-2"
-            >
-              <Skeleton className="h-3 w-16" />
-              <Skeleton className="h-8 w-12" />
-            </div>
-          ))}
+        <div className="bg-white border border-[#E8E8E3] rounded-2xl overflow-hidden">
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 divide-y divide-[#E8E8E3] sm:divide-y-0 sm:divide-x">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div
+                key={i}
+                className="px-4 py-4 space-y-2"
+              >
+                <Skeleton className="h-3 w-16" />
+                <Skeleton className="h-7 w-12" />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -31,7 +33,7 @@ export default function OverviewLoading() {
         {/* Recent Signups Skeleton (span 2) */}
         <div className="lg:col-span-2 space-y-3">
           <Skeleton className="h-5 w-36" />
-          <div className="bg-white border border-[#E8E8E3] rounded-lg p-5 space-y-4">
+          <div className="bg-white border border-[#E8E8E3] rounded-2xl p-5 space-y-4">
             {Array.from({ length: 5 }).map((_, i) => (
               <div key={i} className="flex items-center justify-between py-2 border-b border-[#F0F0EB] last:border-none">
                 <div className="space-y-1.5">
@@ -54,7 +56,7 @@ export default function OverviewLoading() {
             {Array.from({ length: 3 }).map((_, i) => (
               <div
                 key={i}
-                className="bg-white border border-[#E8E8E3] rounded-lg p-4 flex items-center justify-between"
+                className="bg-white border border-[#E8E8E3] rounded-3xl p-4 flex items-center justify-between"
               >
                 <div className="space-y-1.5">
                   <Skeleton className="h-4 w-28" />

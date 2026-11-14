@@ -12,14 +12,12 @@ import {
 import { CorNavTabs } from "@/components/cor/CorNavTabs";
 import { ApplyForMemberModal } from "@/components/cor/ApplyForMemberModal";
 import { Button } from "@/components/ui/Button";
+import { Plus } from "lucide-react";
 import {
-  Users,
-  UserPlus,
-  Briefcase,
-  FileText,
-  AlertCircle,
-  Plus,
-} from "lucide-react";
+  RequestsIcon,
+  ApplicationsIcon,
+  OpportunitiesIcon,
+} from "@/components/admin/icons";
 
 interface CorClientProps {
   requests: CorRequest[];
@@ -95,7 +93,7 @@ export function CorClient({
             <div className="flex items-center justify-between p-4 sm:p-5 bg-white border border-[#E8E8E3] rounded-2xl shadow-soft-sm hover:shadow-soft-md transition-all">
               <div className="flex items-center gap-3.5">
                 <div className="w-9 h-9 rounded-full bg-[#000000] border border-black flex items-center justify-center shrink-0">
-                  <AlertCircle className="w-4 h-4 text-white" />
+                  <RequestsIcon size={16} className="text-white" />
                 </div>
                 <span className="text-sm font-medium text-[#141413]">
                   {pendingRequests.length} {pendingRequests.length === 1 ? "creator is" : "creators are"} waiting for COR approval
@@ -111,7 +109,7 @@ export function CorClient({
             <div className="flex items-center justify-between p-4 sm:p-5 bg-white border border-[#E8E8E3] rounded-2xl shadow-soft-sm hover:shadow-soft-md transition-all">
               <div className="flex items-center gap-3.5">
                 <div className="w-9 h-9 rounded-full bg-[#000000] border border-black flex items-center justify-center shrink-0">
-                  <AlertCircle className="w-4 h-4 text-white" />
+                  <ApplicationsIcon size={16} className="text-white" />
                 </div>
                 <span className="text-sm font-medium text-[#141413]">
                   {activeApplications.length} {activeApplications.length === 1 ? "application is" : "applications are"} currently active
@@ -127,7 +125,7 @@ export function CorClient({
             <div className="flex items-center justify-between p-4 sm:p-5 bg-white border border-[#E8E8E3] rounded-2xl shadow-soft-sm hover:shadow-soft-md transition-all">
               <div className="flex items-center gap-3.5">
                 <div className="w-9 h-9 rounded-full bg-[#EAF2EC] border border-[#D4E6D8] flex items-center justify-center shrink-0">
-                  <AlertCircle className="w-4 h-4 text-[#28633B]" />
+                  <OpportunitiesIcon size={16} className="text-[#28633B]" />
                 </div>
                 <span className="text-sm font-medium text-[#141413]">
                   {openOpportunities.length} {openOpportunities.length === 1 ? "opportunity is" : "opportunities are"} available to match

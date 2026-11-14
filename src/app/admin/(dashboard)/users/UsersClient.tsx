@@ -9,8 +9,8 @@ import {
   Ban,
   CheckCircle,
   AlertTriangle,
-  User as UserIcon,
 } from "lucide-react";
+import { UsersIcon } from "@/components/admin/icons";
 import { User, UserStatus } from "@/lib/types";
 import {
   Table,
@@ -331,7 +331,7 @@ export function UsersClient({ initialUsers }: UsersClientProps) {
       {/* Table Container */}
       {sortedUsers.length === 0 ? (
         <EmptyState
-          icon={<UserIcon className="w-5 h-5 text-[#8A8A85]" />}
+          icon={<UsersIcon size={20} className="text-[#8A8A85]" />}
           title="No users found"
           description={
             searchQuery

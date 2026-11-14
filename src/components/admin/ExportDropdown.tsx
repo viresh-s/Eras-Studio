@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { Download, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import { ExportIcon } from "@/components/admin/icons";
 import { useToast } from "@/components/ui";
 
 interface ExportDropdownProps {
@@ -70,7 +71,7 @@ export function ExportDropdown({ exportType, filters }: ExportDropdownProps) {
       {isExporting ? (
         <Loader2 className="w-3.5 h-3.5 text-[#1345EE] group-hover:text-white animate-spin" />
       ) : (
-        <Download className="w-3.5 h-3.5 text-[#1345EE] group-hover:text-white" />
+        <ExportIcon size={14} className="text-[#1345EE] group-hover:text-white" />
       )}
       <span>{isExporting ? "Preparing CSV..." : "Download CSV"}</span>
     </button>

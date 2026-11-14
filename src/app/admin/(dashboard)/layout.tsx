@@ -5,16 +5,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  LayoutDashboard,
-  Users,
-  Sparkles,
-  Palette,
-  Award,
-  ShieldAlert,
-  ShieldCheck,
-  CreditCard,
-  Sliders,
-  Briefcase,
   Menu,
   X,
   LogOut,
@@ -22,6 +12,23 @@ import {
   ArrowUpRight,
   Database as DbIcon,
 } from "lucide-react";
+import {
+  OverviewIcon,
+  UsersIcon,
+  SubscriptionsIcon,
+  CreatorsIcon,
+  CollectorsIcon,
+  ArtworksIcon,
+  ReportsIcon,
+  CorIcon,
+  CareersIcon,
+  SecurityIcon,
+  SettingsIcon,
+  RequestsIcon,
+  MembersIcon,
+  ApplicationsIcon,
+  OpportunitiesIcon,
+} from "@/components/admin/icons";
 import { ToastProvider } from "@/components/ui";
 import { isBrowserSupabaseConfigured } from "@/lib/supabase/client";
 import { getAdminSidebarCountsAction, SidebarCounts } from "@/app/admin/sidebar-actions";
@@ -30,28 +37,28 @@ import { motion, LayoutGroup } from "framer-motion";
 interface NavItem {
   name: string;
   href: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: React.ComponentType<{ className?: string; size?: number | string; strokeWidth?: number }>;
 }
 
 const navItems: NavItem[] = [
-  { name: "Overview", href: "/admin/overview", icon: LayoutDashboard },
-  { name: "Users", href: "/admin/users", icon: Users },
-  { name: "Subscriptions", href: "/admin/subscriptions", icon: CreditCard },
-  { name: "Creators", href: "/admin/creators", icon: Sparkles },
-  { name: "Collectors", href: "/admin/collectors", icon: Users },
-  { name: "Artworks", href: "/admin/artworks", icon: Palette },
-  { name: "Reports", href: "/admin/reports", icon: ShieldAlert },
-  { name: "COR", href: "/admin/cor", icon: Award },
-  { name: "Careers", href: "/admin/careers", icon: Briefcase },
-  { name: "Security Centre", href: "/admin/security", icon: ShieldCheck },
-  { name: "Studio Settings", href: "/admin/settings", icon: Sliders },
+  { name: "Overview", href: "/admin/overview", icon: OverviewIcon },
+  { name: "Users", href: "/admin/users", icon: UsersIcon },
+  { name: "Subscriptions", href: "/admin/subscriptions", icon: SubscriptionsIcon },
+  { name: "Creators", href: "/admin/creators", icon: CreatorsIcon },
+  { name: "Collectors", href: "/admin/collectors", icon: CollectorsIcon },
+  { name: "Artworks", href: "/admin/artworks", icon: ArtworksIcon },
+  { name: "Reports", href: "/admin/reports", icon: ReportsIcon },
+  { name: "COR", href: "/admin/cor", icon: CorIcon },
+  { name: "Careers", href: "/admin/careers", icon: CareersIcon },
+  { name: "Security Centre", href: "/admin/security", icon: SecurityIcon },
+  { name: "Studio Settings", href: "/admin/settings", icon: SettingsIcon },
 ];
 
 const corSubNav = [
-  { name: "Requests", href: "/admin/cor/requests" },
-  { name: "Members", href: "/admin/cor/members" },
-  { name: "Applications", href: "/admin/cor/applications" },
-  { name: "Opportunities", href: "/admin/cor/opportunities" },
+  { name: "Requests", href: "/admin/cor/requests", icon: RequestsIcon },
+  { name: "Members", href: "/admin/cor/members", icon: MembersIcon },
+  { name: "Applications", href: "/admin/cor/applications", icon: ApplicationsIcon },
+  { name: "Opportunities", href: "/admin/cor/opportunities", icon: OpportunitiesIcon },
 ];
 
 function getPageTitle(pathname: string): string {
@@ -418,7 +425,16 @@ export default function DashboardLayout({
                                       exit={{ opacity: 0 }}
                                     />
                                   )}
-                                  <span>{sub.name}</span>
+                                  <div className="flex items-center gap-2">
+                                    {sub.icon && (
+                                      <sub.icon
+                                        className={`w-3.5 h-3.5 transition-colors ${
+                                          isSubActive || isSubHovered ? "text-[#1345EE]" : "text-[#8A8A85]"
+                                        }`}
+                                      />
+                                    )}
+                                    <span>{sub.name}</span>
+                                  </div>
                                   <div className="flex items-center gap-1.5">
                                     {sub.name === "Requests" && displayCounts.corRequests > 0 && (
                                       <span
@@ -681,7 +697,16 @@ export default function DashboardLayout({
                                     exit={{ opacity: 0 }}
                                   />
                                 )}
-                                <span>{sub.name}</span>
+                                <div className="flex items-center gap-2">
+                                  {sub.icon && (
+                                    <sub.icon
+                                      className={`w-3.5 h-3.5 transition-colors ${
+                                        isSubActive || isSubHovered ? "text-[#1345EE]" : "text-[#8A8A85]"
+                                      }`}
+                                    />
+                                  )}
+                                  <span>{sub.name}</span>
+                                </div>
                                 <div className="flex items-center gap-1.5">
                                   {sub.name === "Requests" && displayCounts.corRequests > 0 && (
                                     <span

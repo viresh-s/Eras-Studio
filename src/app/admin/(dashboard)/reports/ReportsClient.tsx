@@ -5,7 +5,6 @@ import Image from "next/image";
 import {
   Search,
   X,
-  ShieldAlert,
   Eye,
   CheckCircle2,
   XCircle,
@@ -20,6 +19,7 @@ import {
   Check,
   ChevronDown,
 } from "lucide-react";
+import { ReportsIcon } from "@/components/admin/icons";
 import { Report, ReportStatus } from "@/lib/types";
 import { Button } from "@/components/ui/Button";
 import { Drawer } from "@/components/ui/Drawer";
@@ -544,7 +544,7 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
       {/* ========================================================================= */}
       {filteredReports.length === 0 ? (
         <EmptyState
-          icon={<ShieldAlert className="w-6 h-6 text-[#8A8A85]" />}
+          icon={<ReportsIcon size={24} className="text-[#8A8A85]" />}
           title={
             activeTab === "pending"
               ? "No pending reports"

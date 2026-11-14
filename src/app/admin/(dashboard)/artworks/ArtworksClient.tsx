@@ -12,7 +12,6 @@ import {
   CheckCircle2,
   XCircle,
   Archive,
-  Palette,
   Eye,
   EyeOff,
   Star,
@@ -26,9 +25,9 @@ import {
   CheckSquare,
   Square,
   MinusSquare,
-  Sparkles,
   Flag,
 } from "lucide-react";
+import { ArtworksIcon } from "@/components/admin/icons";
 import { TriangleAlertIcon, SaveIcon } from "@/components/ui/icons";
 import { Artwork, ArtworkStatus, Creator } from "@/lib/types";
 import { Badge } from "@/components/ui/Badge";
@@ -1028,7 +1027,7 @@ export function ArtworksClient({
       {/* ========================================================================= */}
       {filteredArtworks.length === 0 ? (
         <EmptyState
-          icon={<Palette className="w-6 h-6 text-[#8A8A85]" />}
+          icon={<ArtworksIcon size={24} className="text-[#8A8A85]" />}
           title="No artworks found"
           description={
             hasActiveFilters

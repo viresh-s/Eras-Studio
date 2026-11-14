@@ -7,7 +7,7 @@ import { useToast } from "@/components/ui";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
-import { Check, AlertCircle, RefreshCw, Sparkles, Shield, Award } from "lucide-react";
+import { Check, AlertCircle, RefreshCw } from "lucide-react";
 
 interface SettingsClientProps {
   initialSettings: PlatformSettings;

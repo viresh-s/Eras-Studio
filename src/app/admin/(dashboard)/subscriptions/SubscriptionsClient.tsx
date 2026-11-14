@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
-import { Search, X, Users, ChevronDown } from "lucide-react";
+import { Search, X, ChevronDown } from "lucide-react";
+import { SubscriptionsIcon } from "@/components/admin/icons";
 import { Subscriber, SubscriptionStats } from "@/lib/data/subscriptions";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Pagination } from "@/components/ui/Pagination";
@@ -296,7 +297,7 @@ export function SubscriptionsClient({ initialSubscribers, stats }: Subscriptions
 
       {filtered.length === 0 ? (
         <EmptyState
-          icon={<Users className="w-6 h-6 text-[#8A8A85]" />}
+          icon={<SubscriptionsIcon size={24} className="text-[#8A8A85]" />}
           title="No subscribers found"
           description="No members match the selected filter or search query."
         />

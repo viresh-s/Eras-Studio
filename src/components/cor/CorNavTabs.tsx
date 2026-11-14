@@ -3,7 +3,13 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Award, UserCheck, Briefcase, FileText, LayoutDashboard } from "lucide-react";
+import {
+  OverviewIcon,
+  RequestsIcon,
+  MembersIcon,
+  OpportunitiesIcon,
+  ApplicationsIcon,
+} from "@/components/admin/icons";
 
 interface CorNavTabsProps {
   counts?: {
@@ -21,14 +27,14 @@ export function CorNavTabs({ counts }: CorNavTabsProps) {
     {
       name: "Overview",
       href: "/admin/cor",
-      icon: LayoutDashboard,
+      icon: OverviewIcon,
       exact: true,
       count: undefined,
     },
     {
       name: "Creator Requests",
       href: "/admin/cor/requests",
-      icon: Award,
+      icon: RequestsIcon,
       exact: false,
       count: counts?.requests,
       highlightCount: (counts?.requests || 0) > 0,
@@ -36,21 +42,21 @@ export function CorNavTabs({ counts }: CorNavTabsProps) {
     {
       name: "COR Members",
       href: "/admin/cor/members",
-      icon: UserCheck,
+      icon: MembersIcon,
       exact: false,
       count: counts?.members,
     },
     {
       name: "Opportunities",
       href: "/admin/cor/opportunities",
-      icon: Briefcase,
+      icon: OpportunitiesIcon,
       exact: false,
       count: counts?.opportunities,
     },
     {
       name: "Applications",
       href: "/admin/cor/applications",
-      icon: FileText,
+      icon: ApplicationsIcon,
       exact: false,
       count: counts?.applications,
     },
