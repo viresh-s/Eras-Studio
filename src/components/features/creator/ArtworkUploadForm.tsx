@@ -910,11 +910,6 @@ export default function ArtworkUploadForm({
             >
               {step === 1 ? 'Upload your artwork' : 'Artwork details'}
             </h1>
-            <p className="text-xs sm:text-sm text-[#6E6E69] font-normal mt-2">
-              {step === 1
-                ? 'Give your work the space it deserves. Start with your images.'
-                : 'Tell the story of your work, then make it part of ERAS.'}
-            </p>
           </div>
 
           {/* Stepper Component */}
@@ -1278,10 +1273,6 @@ export default function ArtworkUploadForm({
                     {defaultArtistName || 'Artist'}
                   </p>
                 </div>
-
-                <p className="text-[11px] sm:text-xs text-[#6E6E69] leading-relaxed pt-1 border-t border-[#E8E8E3]">
-                  Your first image introduces this work in your portfolio and across ERAS.
-                </p>
               </div>
 
               {/* "Let the artwork lead" Guidelines Card */}
@@ -1445,9 +1436,6 @@ export default function ArtworkUploadForm({
                       <h3 className="text-base sm:text-lg font-medium text-[#141413]">
                         The essentials
                       </h3>
-                      <p className="text-xs sm:text-[13px] text-[#6E6E69] mt-0.5">
-                        The name, material and scale of your work.
-                      </p>
                     </div>
                   </div>
                   <span className="text-xs text-[#6E6E69] shrink-0">* Required fields</span>
@@ -1774,9 +1762,6 @@ export default function ArtworkUploadForm({
                     <h3 className="text-base sm:text-lg font-medium text-[#141413]">
                       Story & discovery
                     </h3>
-                    <p className="text-xs sm:text-[13px] text-[#6E6E69] mt-0.5">
-                      Help collectors understand and find your artwork.
-                    </p>
                   </div>
                 </div>
 
@@ -1976,9 +1961,6 @@ export default function ArtworkUploadForm({
                       </button>
                     )}
                   </div>
-                  <p className="text-[11px] text-[#6E6E69] mt-1.5">
-                    Choose keywords that describe the subject, mood or technique.
-                  </p>
                 </div>
 
                 {/* Form Fields: Row 3 (Related Link) */}
@@ -2005,9 +1987,6 @@ export default function ArtworkUploadForm({
                     placeholder="Share the inspiration, process or story behind this piece."
                     className="w-full px-4 py-3 rounded-2xl input-gradient-border text-xs sm:text-sm text-[#141413] placeholder:text-[#6E6E69] font-normal shadow-2xs resize-none"
                   />
-                  <p className="text-[11px] text-[#6E6E69] mt-1">
-                    Share the inspiration, process or story behind this piece.
-                  </p>
                 </div>
               </div>
 
@@ -2031,9 +2010,6 @@ export default function ArtworkUploadForm({
                     <h3 className="text-base sm:text-lg font-medium text-[#141413]">
                       Availability & pricing
                     </h3>
-                    <p className="text-xs sm:text-[13px] text-[#6E6E69] mt-0.5">
-                      Choose how your work is presented to collectors.
-                    </p>
                   </div>
                 </div>
 
@@ -2117,9 +2093,6 @@ export default function ArtworkUploadForm({
                         : 'input-gradient-border'
                     }`}
                   />
-                  <p className="text-[11px] text-[#6E6E69] mt-1.5">
-                    Max amount: {MAX_PRICE_INR_FORMATTED}
-                  </p>
                 </div>
               </div>
             </div>
@@ -2186,10 +2159,6 @@ export default function ArtworkUploadForm({
 
               {/* Step 2 Actions */}
               <div className="flex items-center gap-3 sm:gap-4">
-                <span className="text-xs sm:text-sm text-[#6E6E69] hidden md:inline">
-                  {isEditMode ? 'Keep your portfolio up to date' : 'Ready to share your perspective?'}
-                </span>
-
                 <button
                   type="button"
                   onClick={handleSaveDraft}

@@ -385,9 +385,6 @@ export function SettingsClient({ initialSettings }: SettingsClientProps) {
             {fieldErrors.platformAnnouncement && (
               <p className="text-xs text-[#D94E4E]">{fieldErrors.platformAnnouncement}</p>
             )}
-            <p className="text-[11px] text-[#8A8A85]">
-              Broadcasted on top of studio discovery views and member portals.
-            </p>
           </div>
 
           <div className="border-t border-[#F0F0EB]" />
@@ -407,7 +404,6 @@ export function SettingsClient({ initialSettings }: SettingsClientProps) {
                 { label: "Public — Open in directory & global search", value: "public" },
                 { label: "Private — Unlisted until approved by curator", value: "private" },
               ]}
-              helperText="Determines initial privacy preference for newly registered collector and artist profiles."
             />
           </div>
 

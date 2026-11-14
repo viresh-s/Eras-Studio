@@ -144,10 +144,6 @@ export default function CorLandingPage({
               Your practice deserves the right opportunities.
             </h1>
 
-            <p className="text-sm sm:text-base md:text-lg text-[#5A5A55] font-normal leading-relaxed max-w-xl">
-              Thoughtful guidance, curated opportunities and professional representation for artists ready to take their practice further.
-            </p>
-
             <div className="pt-2">
               <Link
                 href={isPro ? '/cor/profile' : '/subscription'}

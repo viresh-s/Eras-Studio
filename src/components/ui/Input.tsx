@@ -59,8 +59,6 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         </div>
         {error ? (
           <p className="text-[11px] text-red-500 font-normal mt-1">{error}</p>
-        ) : helperText ? (
-          <p className="text-[11px] text-[#929292] mt-1">{helperText}</p>
         ) : null}
       </div>
     );

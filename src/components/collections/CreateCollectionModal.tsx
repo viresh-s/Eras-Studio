@@ -104,9 +104,6 @@ export default function CreateCollectionModal({
           >
             {collectionToEdit ? 'Edit Collection' : 'Create New Collection'}
           </h2>
-          <p className="text-xs sm:text-[13px] text-[#6E6E69] font-normal mt-1">
-            Curate a series or theme of artworks to present together on your portfolio and public profile.
-          </p>
         </div>
 
         {error && (

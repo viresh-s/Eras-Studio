@@ -210,12 +210,6 @@ export default function CollectionManager({
               >
                 Manage Collections
               </h1>
-              <p
-                className="text-xs sm:text-[13px] text-[#6E6E69] font-normal mt-1"
-                style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
-              >
-                Organize and curate your artworks into thematic series or exhibition drops.
-              </p>
             </div>
 
             {/* Create Collection Button (matching ERAS blue gradient button) */}
@@ -475,9 +469,6 @@ export default function CollectionManager({
                 >
                   {selectedCollectionForArtworks.title}
                 </h2>
-                <p className="text-xs text-[#6E6E69] font-normal mt-1">
-                  Click on an artwork to add or remove it from this collection.
-                </p>
               </div>
               <button
                 onClick={() => setSelectedCollectionForArtworks(null)}

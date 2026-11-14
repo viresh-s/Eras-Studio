@@ -26,11 +26,6 @@ export default function CorPageHeader({
         <h1 className="century-heading text-3xl sm:text-4xl text-[#141413] tracking-tight leading-tight">
           {title}
         </h1>
-        {description && (
-          <p className="text-xs sm:text-sm text-[#6E6E69] font-sans mt-2 max-w-2xl leading-relaxed">
-            {description}
-          </p>
-        )}
       </div>
 
       {actions && (

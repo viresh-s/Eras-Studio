@@ -362,9 +362,6 @@ export default function AccountSettingsForm({
                 </span>
                 <h3 className="font-serif text-lg font-bold text-[#141413]">Email Address</h3>
               </div>
-              <p className="text-xs text-[#6E6E69]">
-                The primary email linked to your account for signing in and receiving inquiries.
-              </p>
             </div>
             <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#F0F5F1] border border-[#CDE3D4] text-[#28633B] text-xs font-medium self-start sm:self-auto">
               <Check className="w-3 h-3" />
@@ -412,7 +409,6 @@ export default function AccountSettingsForm({
                 value={newEmail}
                 onChange={(e) => setNewEmail(e.target.value)}
                 leftIcon={<Mail className="w-4 h-4 text-[#8A8A85]" />}
-                helperText="We'll send a verification link to confirm ownership before updating your account."
                 required
               />
             </div>
@@ -443,9 +439,6 @@ export default function AccountSettingsForm({
                 </span>
                 <h3 className="font-serif text-lg font-bold text-[#141413]">Password & Security</h3>
               </div>
-              <p className="text-xs text-[#6E6E69]">
-                Use a strong, unique passphrase to keep your artist profile and transactions secure.
-              </p>
             </div>
             <span className="text-xs text-[#8A8A85] hidden sm:inline">Min. 6 characters</span>
           </div>
@@ -598,9 +591,6 @@ export default function AccountSettingsForm({
               </span>
               <h3 className="font-serif text-lg font-bold text-[#141413]">Security & Authentication</h3>
             </div>
-            <p className="text-xs text-[#6E6E69]">
-              How your session and personal information are protected across the Eras platform.
-            </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
@@ -661,8 +651,7 @@ export default function AccountSettingsForm({
           )}
 
           {!isDeleting ? (
-            <div className="flex items-center justify-between pt-1">
-              <p className="text-xs text-[#8A8A85]">Carefully consider before proceeding.</p>
+            <div className="flex items-center justify-end pt-1">
               <Button
                 type="button"
                 variant="danger"

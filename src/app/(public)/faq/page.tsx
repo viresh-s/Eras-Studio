@@ -76,11 +76,6 @@ export default function FaqPage() {
           Questions, answered.
         </h1>
 
-        {/* Subtitle */}
-        <p className="text-sm sm:text-base text-[#6E6E69] font-normal mb-10 sm:mb-12 max-w-2xl">
-          A little more about the art, the artists and everything in between.
-        </p>
-
         {/* FAQ Accordion List */}
         <div className="border-t border-[#EAEAE5]">
           {FAQ_ITEMS.map((item) => {

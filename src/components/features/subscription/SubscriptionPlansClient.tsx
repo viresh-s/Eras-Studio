@@ -228,12 +228,6 @@ export function SubscriptionPlansClient({
           >
             A plan for your practice
           </h1>
-          <p
-            className="text-xs sm:text-sm text-[#6E6E69] font-normal mt-2 max-w-2xl leading-relaxed"
-            style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
-          >
-            Start with your art. Add curatorial guidance, portfolio collections, and institutional opportunities when you are ready.
-          </p>
         </div>
       </div>
 

@@ -782,9 +782,6 @@ function GuidelineSlidingBox() {
           <h3 className="text-sm font-medium text-[#181A1F] tracking-tight">
             Curatorial Proposal Dossier Guide
           </h3>
-          <p className="text-xs text-[#71716D] mt-0.5">
-            Recommended structure for exhibitions, institution reviews, and residency applications on Eras.
-          </p>
         </div>
         <span className="text-[11px] text-[#8E8E88] shrink-0 font-normal">
           Format: PDF (3–8 pages recommended)
