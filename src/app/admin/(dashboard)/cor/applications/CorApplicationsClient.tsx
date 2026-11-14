@@ -177,9 +177,6 @@ export function CorApplicationsClient({
           <h1 className="admin-century-title text-3xl sm:text-4xl text-[#141413] tracking-tight leading-tight">
             Representation Applications.
           </h1>
-          <p className="mt-1.5 text-xs sm:text-sm text-[#6E6E69] max-w-2xl leading-relaxed">
-            Keep every candidate and opportunity moving together. Update pipeline stages, manage interviews, and track offers.
-          </p>
         </div>
 
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 shrink-0">

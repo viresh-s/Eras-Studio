@@ -143,9 +143,6 @@ export function SettingsClient({ initialSettings }: SettingsClientProps) {
           <h1 className="admin-century-title text-3xl sm:text-4xl text-[#141413] tracking-tight leading-tight">
             Studio Settings.
           </h1>
-          <p className="mt-1.5 text-xs sm:text-sm text-[#6E6E69] max-w-2xl leading-relaxed">
-            Configure rules and platform controls. Saved changes apply to the live marketplace.
-          </p>
         </div>
 
         {/* Live sync & status tag */}

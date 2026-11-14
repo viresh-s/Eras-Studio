@@ -170,9 +170,6 @@ export function CorRequestsClient({
           <h1 className="admin-century-title text-3xl sm:text-4xl text-[#141413] tracking-tight leading-tight">
             Creator Requests.
           </h1>
-          <p className="mt-1.5 text-xs sm:text-sm text-[#6E6E69] max-w-2xl leading-relaxed">
-            Review creators seeking curatorial representation, career advising, and institutional opportunity matching.
-          </p>
         </div>
 
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">

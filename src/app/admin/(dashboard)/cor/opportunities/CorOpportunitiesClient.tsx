@@ -224,9 +224,6 @@ export function CorOpportunitiesClient({
           <h1 className="admin-century-title text-3xl sm:text-4xl text-[#141413] tracking-tight leading-tight">
             Institutional Opportunities.
           </h1>
-          <p className="mt-1.5 text-xs sm:text-sm text-[#6E6E69] max-w-2xl leading-relaxed">
-            Curate and manage exclusive commissions, residencies, and roles. Match verified COR creators and submit representations.
-          </p>
         </div>
 
         <div className="flex items-center gap-3 shrink-0">

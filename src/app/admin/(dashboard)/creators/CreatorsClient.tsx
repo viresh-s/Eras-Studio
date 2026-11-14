@@ -369,9 +369,6 @@ export function CreatorsClient({
           <h1 className="admin-century-title text-3xl sm:text-4xl tracking-tight text-[#141413] leading-tight">
             Creator Roster.
           </h1>
-          <p className="mt-1.5 text-xs sm:text-sm text-[#6E6E69] max-w-2xl leading-relaxed">
-            Curated studio artists, verification review, and exhibition tiers.
-          </p>
         </div>
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 shrink-0 self-start sm:self-auto">
           <ExportDropdown exportType="creators" filters={{ query: searchQuery, status: selectedStatus === "all" ? undefined : selectedStatus, plan: selectedPlan === "all" ? undefined : selectedPlan }} />

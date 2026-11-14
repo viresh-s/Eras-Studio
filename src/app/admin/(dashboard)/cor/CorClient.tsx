@@ -61,9 +61,6 @@ export function CorClient({
           <h1 className="admin-century-title text-3xl sm:text-4xl text-[#141413] tracking-tight leading-tight">
             Representation.
           </h1>
-          <p className="mt-1.5 text-xs sm:text-sm text-[#6E6E69] max-w-2xl leading-relaxed">
-            Manage creator career opportunities, institutional applications, and represented artist rosters.
-          </p>
         </div>
         <div className="flex items-center gap-2.5">
           <Button

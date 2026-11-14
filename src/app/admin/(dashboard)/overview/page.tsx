@@ -113,9 +113,6 @@ export default async function OverviewPage() {
           <h1 className="admin-century-title text-3xl sm:text-4xl tracking-tight text-[#141413] leading-tight">
             Studio Pulse.
           </h1>
-          <p className="mt-1.5 text-xs sm:text-sm text-[#6E6E69] max-w-2xl leading-relaxed">
-            Live marketplace activity, member registrations, and curatorial queues.
-          </p>
         </div>
         <div className="flex items-center gap-3 self-start sm:self-auto flex-shrink-0">
           <span className="text-[11px] text-[#8A8A85] tracking-tight hidden md:inline">

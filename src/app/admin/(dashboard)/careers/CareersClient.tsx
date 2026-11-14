@@ -517,9 +517,6 @@ export function CareersClient({
             <h1 className="admin-century-title text-3xl sm:text-4xl text-[#141413] tracking-tight leading-tight">
               Careers Overview
             </h1>
-            <p className="mt-1.5 text-xs sm:text-sm text-[#6E6E69] max-w-2xl leading-relaxed">
-              Manage open positions, review applicants, and publish institutional career paths.
-            </p>
           </div>
           <div className="flex items-center gap-3 self-start sm:self-auto shrink-0">
             <Button

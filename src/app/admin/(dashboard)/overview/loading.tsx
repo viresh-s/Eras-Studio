@@ -5,9 +5,8 @@ export default function OverviewLoading() {
   return (
     <div className="space-y-8 animate-in fade-in duration-150">
       {/* Page Header Skeleton */}
-      <div className="border-b border-[#E8E8E3] pb-5 space-y-2">
+      <div className="border-b border-[#E8E8E3] pb-5">
         <Skeleton className="h-7 w-32" />
-        <Skeleton className="h-4 w-72" />
       </div>
 
       {/* Inline Key Matrix Skeleton */}

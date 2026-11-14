@@ -75,9 +75,6 @@ export function SecurityClient({ initialData }: SecurityClientProps) {
           >
             Security Centre.
           </h1>
-          <p className="text-xs sm:text-sm text-[#71716D] mt-1 font-normal">
-            Real-time security telemetry, access controls, database RLS, and admin accountability.
-          </p>
         </div>
 
         <div className="flex items-center gap-3">

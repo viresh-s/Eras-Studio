@@ -131,9 +131,6 @@ export function CorMembersClient({
           <h1 className="admin-century-title text-3xl sm:text-4xl text-[#141413] tracking-tight leading-tight">
             COR Members.
           </h1>
-          <p className="mt-1.5 text-xs sm:text-sm text-[#6E6E69] max-w-2xl leading-relaxed">
-            Active roster of creators with COR representation. Review career profiles, track applications, and match opportunities.
-          </p>
         </div>
 
         <div className="flex items-center gap-3 shrink-0">

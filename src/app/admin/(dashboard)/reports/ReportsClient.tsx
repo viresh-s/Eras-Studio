@@ -473,9 +473,6 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
             <h1 className="admin-century-title text-3xl sm:text-4xl text-[#141413] tracking-tight leading-tight">
               Reports & Moderation.
             </h1>
-            <p className="mt-1.5 text-xs sm:text-sm text-[#6E6E69] max-w-2xl leading-relaxed">
-              Community moderation, content disputes, copyright protection, and member conduct reviews.
-            </p>
           </div>
           <div className="flex items-center gap-3 shrink-0 self-start sm:self-auto">
             <ExportDropdown exportType="reports" filters={{ query: debouncedSearch, status: activeTab === "all" ? undefined : activeTab }} />

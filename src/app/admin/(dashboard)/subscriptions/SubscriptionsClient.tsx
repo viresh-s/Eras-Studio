@@ -215,9 +215,6 @@ export function SubscriptionsClient({ initialSubscribers, stats }: Subscriptions
           <h1 className="admin-century-title text-3xl sm:text-4xl text-[#141413] tracking-tight leading-tight">
             Patronage & Subscriptions.
           </h1>
-          <p className="mt-1.5 text-xs sm:text-sm text-[#6E6E69] max-w-2xl leading-relaxed">
-            Platform membership administration, creator tier privileges, and active subscriber ledger.
-          </p>
         </div>
         <div className="flex items-center gap-3 shrink-0 self-start sm:self-auto">
           <div className="text-xs px-3.5 py-1.5 rounded-xl border border-[#E8E8E3] bg-white text-[#6E6E69] font-medium shadow-2xs">

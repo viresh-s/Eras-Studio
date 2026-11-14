@@ -837,9 +837,6 @@ export function ArtworksClient({
             <h1 className="admin-century-title text-3xl sm:text-4xl text-[#141413] tracking-tight leading-tight">
               Curatorial Gallery.
             </h1>
-            <p className="mt-1.5 text-xs sm:text-sm text-[#6E6E69] max-w-2xl leading-relaxed">
-              Catalog of creator submissions, editorial features, medium specifications, and publication review.
-            </p>
           </div>
 
           <div className="flex items-center gap-2.5 self-start sm:self-auto">
