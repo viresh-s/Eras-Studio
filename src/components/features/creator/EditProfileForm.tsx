@@ -1591,7 +1591,7 @@ export default function EditProfileForm({ userProfile }: { userProfile: Profile 
                             Profile Cover Banner
                           </label>
                           <p className="text-[11px] text-[#71716D] mt-0.5 truncate">
-                            Widescreen header · Max 10 MB
+                            1920 × 500 px recommended · Max 10 MB
                           </p>
                         </div>
                       </div>
@@ -1601,6 +1601,7 @@ export default function EditProfileForm({ userProfile }: { userProfile: Profile 
                           type="button"
                           disabled={isUploadingCover}
                           onClick={() => coverInputRef.current?.click()}
+                          title="Recommended size: 1920 × 500 px"
                           className="px-4 py-1.5 rounded-[12px] border border-[#CBCBCB] bg-white hover:bg-[#F3F3F3] text-[#343434] text-xs font-medium transition-all inline-flex items-center gap-1.5 cursor-pointer shadow-2xs disabled:opacity-50"
                         >
                           <Camera size={13} />
