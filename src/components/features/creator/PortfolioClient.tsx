@@ -335,19 +335,8 @@ export default function PortfolioClient({
               </div>
             </div>
 
-            {/* Action Buttons: Add Artwork & Bulk Upload */}
-            <div className="shrink-0 flex items-center gap-3">
-              {!isLimited && (
-                <Link
-                  href="/portfolio/upload?mode=bulk"
-                  className="px-4 sm:px-5 py-2.5 text-xs sm:text-sm font-medium text-[#1345EE] bg-white border border-[#1345EE]/30 hover:bg-[#1345EE]/5 transition-colors select-none rounded-full"
-                  style={{
-                    fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
-                  }}
-                >
-                  Bulk upload
-                </Link>
-              )}
+            {/* + Add Artwork Button */}
+            <div className="shrink-0">
               <RestrictedUploadAction
                 isLimited={isLimited}
                 label="Add artwork"
@@ -391,17 +380,15 @@ export default function PortfolioClient({
             <button
               type="button"
               onClick={() => handleTabChange('artworks')}
-              className={`pb-3.5 relative flex items-center gap-2.5 text-sm sm:text-base cursor-pointer select-none transition-colors ${
-                activeTab === 'artworks'
-                  ? 'text-[#1345EE] font-semibold'
-                  : 'text-[#62636B] font-normal hover:text-[#141413]'
-              }`}
+              className={`pb-3.5 relative flex items-center gap-2.5 text-sm sm:text-base cursor-pointer select-none transition-colors ${activeTab === 'artworks'
+                ? 'text-[#1345EE] font-semibold'
+                : 'text-[#62636B] font-normal hover:text-[#141413]'
+                }`}
             >
               <span style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}>Artworks</span>
               <span
-                className={`text-xs px-2 py-0.5 rounded font-medium ${
-                  activeTab === 'artworks' ? 'text-[#1345EE]' : 'text-[#62636B]'
-                }`}
+                className={`text-xs px-2 py-0.5 rounded font-medium ${activeTab === 'artworks' ? 'text-[#1345EE]' : 'text-[#62636B]'
+                  }`}
               >
                 {publishedCount}
               </span>
@@ -419,17 +406,15 @@ export default function PortfolioClient({
             <button
               type="button"
               onClick={() => handleTabChange('collections')}
-              className={`pb-3.5 relative flex items-center gap-2.5 text-sm sm:text-base cursor-pointer select-none transition-colors ${
-                activeTab === 'collections'
-                  ? 'text-[#1345EE] font-semibold'
-                  : 'text-[#62636B] font-normal hover:text-[#141413]'
-              }`}
+              className={`pb-3.5 relative flex items-center gap-2.5 text-sm sm:text-base cursor-pointer select-none transition-colors ${activeTab === 'collections'
+                ? 'text-[#1345EE] font-semibold'
+                : 'text-[#62636B] font-normal hover:text-[#141413]'
+                }`}
             >
               <span style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}>Collections</span>
               <span
-                className={`text-xs px-2 py-0.5 rounded font-medium ${
-                  activeTab === 'collections' ? 'text-[#1345EE]' : 'text-[#62636B]'
-                }`}
+                className={`text-xs px-2 py-0.5 rounded font-medium ${activeTab === 'collections' ? 'text-[#1345EE]' : 'text-[#62636B]'
+                  }`}
               >
                 {collectionsList.length}
               </span>
@@ -447,17 +432,15 @@ export default function PortfolioClient({
             <button
               type="button"
               onClick={() => handleTabChange('archived')}
-              className={`pb-3.5 relative flex items-center gap-2.5 text-sm sm:text-base cursor-pointer select-none transition-colors ${
-                activeTab === 'archived'
-                  ? 'text-[#1345EE] font-semibold'
-                  : 'text-[#62636B] font-normal hover:text-[#141413]'
-              }`}
+              className={`pb-3.5 relative flex items-center gap-2.5 text-sm sm:text-base cursor-pointer select-none transition-colors ${activeTab === 'archived'
+                ? 'text-[#1345EE] font-semibold'
+                : 'text-[#62636B] font-normal hover:text-[#141413]'
+                }`}
             >
               <span style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}>Archived</span>
               <span
-                className={`text-xs px-2 py-0.5 rounded font-medium ${
-                  activeTab === 'archived' ? 'text-[#1345EE]' : 'text-[#62636B]'
-                }`}
+                className={`text-xs px-2 py-0.5 rounded font-medium ${activeTab === 'archived' ? 'text-[#1345EE]' : 'text-[#62636B]'
+                  }`}
               >
                 {archivedCount}
               </span>
@@ -759,136 +742,136 @@ export default function PortfolioClient({
           ) : filteredArtworks.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
               {paginatedArtworks.map((artwork) => {
-                  const isArchived = !artwork.is_published || artwork.status === 'Not for sale';
+                const isArchived = !artwork.is_published || artwork.status === 'Not for sale';
 
-                  return (
-                    <div
-                      key={artwork.id}
-                      className="bg-white border border-[#E8E8E3] overflow-hidden flex flex-col justify-between shadow-2xs hover:shadow-md transition-shadow group select-none"
-                      style={{ borderRadius: 14 }}
+                return (
+                  <div
+                    key={artwork.id}
+                    className="bg-white border border-[#E8E8E3] overflow-hidden flex flex-col justify-between shadow-2xs hover:shadow-md transition-shadow group select-none"
+                    style={{ borderRadius: 14 }}
+                  >
+                    {/* Artwork Image */}
+                    <Link
+                      href={`/artwork/${artwork.id}`}
+                      className={`block relative w-full aspect-[16/10.5] bg-gray-100 overflow-hidden ${PROTECTED_CONTAINER_CLASS}`}
                     >
-                      {/* Artwork Image */}
-                      <Link
-                        href={`/artwork/${artwork.id}`}
-                        className={`block relative w-full aspect-[16/10.5] bg-gray-100 overflow-hidden ${PROTECTED_CONTAINER_CLASS}`}
-                      >
-                        <img
-                          src={artwork.image_url}
-                          alt={artwork.title}
-                          className={`w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500 ease-out select-none pointer-events-none ${PROTECTED_IMAGE_CLASS}`}
-                        />
-                        <div className="absolute inset-0 z-[1]" />
-                        {artwork.is_published === false && (
-                          <span className="absolute top-3 left-3 px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-amber-100 text-amber-800 z-[2] shadow-2xs">
-                            Draft
-                          </span>
-                        )}
-                      </Link>
+                      <img
+                        src={artwork.image_url}
+                        alt={artwork.title}
+                        className={`w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500 ease-out select-none pointer-events-none ${PROTECTED_IMAGE_CLASS}`}
+                      />
+                      <div className="absolute inset-0 z-[1]" />
+                      {artwork.is_published === false && (
+                        <span className="absolute top-3 left-3 px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-amber-100 text-amber-800 z-[2] shadow-2xs">
+                          Draft
+                        </span>
+                      )}
+                    </Link>
 
-                      {/* Artwork Details Body */}
-                      <div className="p-4 sm:p-5 flex flex-col gap-3">
-                        {/* Row 1: Title & Year */}
-                        <div className="flex items-center justify-between gap-2">
-                          <Link href={`/artwork/${artwork.id}`} className="min-w-0">
-                            <h3
-                              className="text-[16px] sm:text-[17px] font-medium text-[#141413] truncate hover:text-[#1345EE] transition-colors"
-                              style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
-                            >
-                              {artwork.title}
-                            </h3>
-                          </Link>
-                          <span
-                            className="text-[11px] sm:text-xs text-[#6E6E69] font-normal shrink-0"
+                    {/* Artwork Details Body */}
+                    <div className="p-4 sm:p-5 flex flex-col gap-3">
+                      {/* Row 1: Title & Year */}
+                      <div className="flex items-center justify-between gap-2">
+                        <Link href={`/artwork/${artwork.id}`} className="min-w-0">
+                          <h3
+                            className="text-[16px] sm:text-[17px] font-medium text-[#141413] truncate hover:text-[#1345EE] transition-colors"
                             style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
                           >
-                            {artwork.year || ''}
-                          </span>
-                        </div>
-
-                        {/* Row 2: Artist · Medium/Category */}
-                        <div
-                          className="flex items-center gap-1.5 text-[11px] sm:text-xs text-[#6E6E69] font-normal truncate"
+                            {artwork.title}
+                          </h3>
+                        </Link>
+                        <span
+                          className="text-[11px] sm:text-xs text-[#6E6E69] font-normal shrink-0"
                           style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
                         >
-                          <span className="truncate">{displayName}</span>
-                          <span className="text-[#E8E8E3]">·</span>
-                          <span className="truncate">{artwork.art_type || 'Branding'}</span>
+                          {artwork.year || ''}
+                        </span>
+                      </div>
+
+                      {/* Row 2: Artist · Medium/Category */}
+                      <div
+                        className="flex items-center gap-1.5 text-[11px] sm:text-xs text-[#6E6E69] font-normal truncate"
+                        style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+                      >
+                        <span className="truncate">{displayName}</span>
+                        <span className="text-[#E8E8E3]">·</span>
+                        <span className="truncate">{artwork.art_type || 'Branding'}</span>
+                      </div>
+
+                      {/* Row 3: Stats (Heart & Views) */}
+                      <div
+                        className="flex items-center gap-4 text-[11px] sm:text-xs text-[#6E6E69] font-normal pt-0.5"
+                        style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+                      >
+                        <div className="flex items-center gap-1" title={`${artwork.likes_count || 0} likes`}>
+                          <Heart size={13} className="text-[#6E6E69]" strokeWidth={1.75} />
+                          <span>{artwork.likes_count || 0}</span>
                         </div>
-
-                        {/* Row 3: Stats (Heart & Views) */}
-                        <div
-                          className="flex items-center gap-4 text-[11px] sm:text-xs text-[#6E6E69] font-normal pt-0.5"
-                          style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
-                        >
-                          <div className="flex items-center gap-1" title={`${artwork.likes_count || 0} likes`}>
-                            <Heart size={13} className="text-[#6E6E69]" strokeWidth={1.75} />
-                            <span>{artwork.likes_count || 0}</span>
-                          </div>
-                          <div className="flex items-center gap-1" title={`${artwork.views_count || 0} views`}>
-                            <Eye size={13} className="text-[#6E6E69]" strokeWidth={1.75} />
-                            <span>{artwork.views_count || 0}</span>
-                          </div>
-                        </div>
-
-                        {/* Divider Line */}
-                        <div className="h-[1px] bg-[#E8E8E3] w-full my-0.5" />
-
-                        {/* Row 4: Action Footer (Edit + Archive on Left, Delete on Right) */}
-                        <div className="flex items-center justify-between pt-0.5">
-                          {/* Left Group: Edit & Archive Button */}
-                          <div className="flex items-center gap-2">
-                            {/* Edit Button */}
-                            <Link
-                              href={`/portfolio/artworks/${artwork.id}/edit`}
-                              className="w-8 h-9 sm:w-[32px] sm:h-[34px] bg-white border border-[#E8E8E3] flex items-center justify-center text-[#6E6E69] hover:text-[#141413] hover:border-gray-400 transition-colors shadow-2xs"
-                              style={{ borderRadius: 8 }}
-                              title="Edit artwork"
-                            >
-                              <Pencil size={14} className="text-[#6E6E69]" />
-                            </Link>
-
-                            {/* Archive / Status Pill Button */}
-                            <button
-                              type="button"
-                              onClick={() => handleToggleArchive(artwork.id, artwork.status, artwork.is_published)}
-                              disabled={isUpdatingId === artwork.id}
-                              className="h-9 sm:h-[34px] px-3.5 sm:px-4 rounded-full bg-[#FAF5EC] border border-[#EACEC0] text-[#865E16] text-[11px] sm:text-xs font-medium hover:bg-[#F5EADB] transition-colors cursor-pointer select-none flex items-center justify-center"
-                              style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
-                            >
-                              {isUpdatingId === artwork.id
-                                ? 'Updating...'
-                                : isArchived
-                                ? 'Unarchive'
-                                : 'Archive'}
-                            </button>
-                          </div>
-
-                          {/* Right Group: Delete Button */}
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setDeleteTarget({
-                                type: 'artwork',
-                                id: artwork.id,
-                                title: artwork.title || 'Untitled artwork',
-                              })
-                            }
-                            disabled={isDeleting && deleteTarget?.id === artwork.id}
-                            className="w-8 h-9 sm:w-[32px] sm:h-[34px] bg-white border border-[#E8E8E3] flex items-center justify-center text-[#6E6E69] hover:text-red-600 hover:border-red-200 transition-colors shadow-2xs cursor-pointer ml-auto"
-                            style={{ borderRadius: 8 }}
-                            title="Delete artwork"
-                          >
-                            {isDeleting && deleteTarget?.id === artwork.id ? (
-                              <Loader2 size={14} className="animate-spin text-red-500" />
-                            ) : (
-                              <Trash2 size={14} />
-                            )}
-                          </button>
+                        <div className="flex items-center gap-1" title={`${artwork.views_count || 0} views`}>
+                          <Eye size={13} className="text-[#6E6E69]" strokeWidth={1.75} />
+                          <span>{artwork.views_count || 0}</span>
                         </div>
                       </div>
+
+                      {/* Divider Line */}
+                      <div className="h-[1px] bg-[#E8E8E3] w-full my-0.5" />
+
+                      {/* Row 4: Action Footer (Edit + Archive on Left, Delete on Right) */}
+                      <div className="flex items-center justify-between pt-0.5">
+                        {/* Left Group: Edit & Archive Button */}
+                        <div className="flex items-center gap-2">
+                          {/* Edit Button */}
+                          <Link
+                            href={`/portfolio/artworks/${artwork.id}/edit`}
+                            className="w-8 h-9 sm:w-[32px] sm:h-[34px] bg-white border border-[#E8E8E3] flex items-center justify-center text-[#6E6E69] hover:text-[#141413] hover:border-gray-400 transition-colors shadow-2xs"
+                            style={{ borderRadius: 8 }}
+                            title="Edit artwork"
+                          >
+                            <Pencil size={14} className="text-[#6E6E69]" />
+                          </Link>
+
+                          {/* Archive / Status Pill Button */}
+                          <button
+                            type="button"
+                            onClick={() => handleToggleArchive(artwork.id, artwork.status, artwork.is_published)}
+                            disabled={isUpdatingId === artwork.id}
+                            className="h-9 sm:h-[34px] px-3.5 sm:px-4 rounded-full bg-[#FAF5EC] border border-[#EACEC0] text-[#865E16] text-[11px] sm:text-xs font-medium hover:bg-[#F5EADB] transition-colors cursor-pointer select-none flex items-center justify-center"
+                            style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+                          >
+                            {isUpdatingId === artwork.id
+                              ? 'Updating...'
+                              : isArchived
+                                ? 'Unarchive'
+                                : 'Archive'}
+                          </button>
+                        </div>
+
+                        {/* Right Group: Delete Button */}
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setDeleteTarget({
+                              type: 'artwork',
+                              id: artwork.id,
+                              title: artwork.title || 'Untitled artwork',
+                            })
+                          }
+                          disabled={isDeleting && deleteTarget?.id === artwork.id}
+                          className="w-8 h-9 sm:w-[32px] sm:h-[34px] bg-white border border-[#E8E8E3] flex items-center justify-center text-[#6E6E69] hover:text-red-600 hover:border-red-200 transition-colors shadow-2xs cursor-pointer ml-auto"
+                          style={{ borderRadius: 8 }}
+                          title="Delete artwork"
+                        >
+                          {isDeleting && deleteTarget?.id === artwork.id ? (
+                            <Loader2 size={14} className="animate-spin text-red-500" />
+                          ) : (
+                            <Trash2 size={14} />
+                          )}
+                        </button>
+                      </div>
                     </div>
-                  );
-                })}
+                  </div>
+                );
+              })}
             </div>
           ) : (
             /* Empty State */
@@ -946,11 +929,10 @@ export default function PortfolioClient({
                     key={pageItem}
                     type="button"
                     onClick={() => setCurrentPage(pageItem)}
-                    className={`w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center text-xs sm:text-sm font-medium transition-all cursor-pointer shadow-2xs ${
-                      isActive
-                        ? 'bg-black text-white'
-                        : 'bg-white border border-[#E8E8E3] text-[#6E6E69] hover:text-black hover:bg-gray-50'
-                    }`}
+                    className={`w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center text-xs sm:text-sm font-medium transition-all cursor-pointer shadow-2xs ${isActive
+                      ? 'bg-black text-white'
+                      : 'bg-white border border-[#E8E8E3] text-[#6E6E69] hover:text-black hover:bg-gray-50'
+                      }`}
                     style={{
                       borderRadius: 12,
                       fontFamily: "var(--font-poppins), 'Poppins', sans-serif",

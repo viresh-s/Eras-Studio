@@ -28,11 +28,10 @@ function UploadPageContent({ userId, profile, collections, freemiumStatus }: Upl
           <button
             type="button"
             onClick={() => setMode('single')}
-            className={`px-4 sm:px-6 py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 cursor-pointer select-none ${
-              mode === 'single'
-                ? 'text-white shadow-md'
-                : 'text-[#6E6E69] hover:text-[#141413]'
-            }`}
+            className={`px-4 sm:px-6 py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 cursor-pointer select-none ${mode === 'single'
+              ? 'text-white shadow-md'
+              : 'text-[#6E6E69] hover:text-[#141413]'
+              }`}
             style={mode === 'single' ? {
               background: 'linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%)',
               fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
@@ -45,11 +44,10 @@ function UploadPageContent({ userId, profile, collections, freemiumStatus }: Upl
           <button
             type="button"
             onClick={() => setMode('bulk')}
-            className={`px-4 sm:px-6 py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 cursor-pointer select-none ${
-              mode === 'bulk'
-                ? 'text-white shadow-md'
-                : 'text-[#6E6E69] hover:text-[#141413]'
-            }`}
+            className={`px-4 sm:px-6 py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 cursor-pointer select-none ${mode === 'bulk'
+              ? 'text-white shadow-md'
+              : 'text-[#6E6E69] hover:text-[#141413]'
+              }`}
             style={mode === 'bulk' ? {
               background: 'linear-gradient(90deg, #082779 0%, #1345EE 62%, #458CFF 100%)',
               fontFamily: "var(--font-poppins), 'Poppins', sans-serif",

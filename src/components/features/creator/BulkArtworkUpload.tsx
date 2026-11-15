@@ -343,8 +343,8 @@ export default function BulkArtworkUpload({
           error: titleEmpty
             ? 'Title is required'
             : priceInvalid
-            ? 'Invalid price'
-            : undefined,
+              ? 'Invalid price'
+              : undefined,
         };
       })
     );
@@ -401,10 +401,10 @@ export default function BulkArtworkUpload({
             event.status === 'compressing'
               ? `Compressing image ${event.fileIndex + 1} of ${event.totalFiles}...`
               : event.status === 'uploading'
-              ? `Uploading optimized image ${event.fileIndex + 1} of ${event.totalFiles}...`
-              : event.status === 'done'
-              ? `Uploaded ${doneCount} of ${event.totalFiles}`
-              : `Error on file ${event.fileIndex + 1}`,
+                ? `Uploading optimized image ${event.fileIndex + 1} of ${event.totalFiles}...`
+                : event.status === 'done'
+                  ? `Uploaded ${doneCount} of ${event.totalFiles}`
+                  : `Error on file ${event.fileIndex + 1}`,
         });
       };
 
@@ -557,8 +557,8 @@ export default function BulkArtworkUpload({
           ${isDragging
             ? 'border-[#1345EE] bg-blue-50/60 shadow-md scale-[1.005]'
             : files.length > 0
-            ? 'border-[#E8E8E3] bg-[#F8F7F4] hover:border-[#1345EE]/50 hover:bg-white'
-            : 'border-[#E8E8E3] bg-white hover:border-[#1345EE]/50 shadow-xs'
+              ? 'border-[#E8E8E3] bg-[#F8F7F4] hover:border-[#1345EE]/50 hover:bg-white'
+              : 'border-[#E8E8E3] bg-white hover:border-[#1345EE]/50 shadow-xs'
           }
         `}
       >
@@ -734,9 +734,8 @@ export default function BulkArtworkUpload({
                     return (
                       <React.Fragment key={f.id}>
                         <tr
-                          className={`group transition-colors ${
-                            !f.isValid ? 'bg-red-50/40' : 'hover:bg-[#F8F7F4]/70'
-                          }`}
+                          className={`group transition-colors ${!f.isValid ? 'bg-red-50/40' : 'hover:bg-[#F8F7F4]/70'
+                            }`}
                         >
                           {/* Thumbnail */}
                           <td className="py-2.5 px-3 text-center">
@@ -757,11 +756,10 @@ export default function BulkArtworkUpload({
                               value={f.title}
                               onChange={e => updateFile(f.id, { title: e.target.value })}
                               placeholder="Artwork title"
-                              className={`input-gradient-border-sm w-full text-xs sm:text-sm rounded-lg px-3 py-2 bg-white text-[#141413] ${
-                                !f.isValid && !f.title.trim()
-                                  ? 'ring-2 ring-red-400 border-red-400'
-                                  : ''
-                              }`}
+                              className={`input-gradient-border-sm w-full text-xs sm:text-sm rounded-lg px-3 py-2 bg-white text-[#141413] ${!f.isValid && !f.title.trim()
+                                ? 'ring-2 ring-red-400 border-red-400'
+                                : ''
+                                }`}
                             />
                             {!f.isValid && f.error && (
                               <p className="text-[11px] text-red-500 mt-0.5">{f.error}</p>
@@ -795,11 +793,10 @@ export default function BulkArtworkUpload({
                                 });
                               }}
                               placeholder="₹ Optional"
-                              className={`input-gradient-border-sm w-full text-xs sm:text-sm rounded-lg px-3 py-2 bg-white text-[#141413] ${
-                                !f.isValid && f.error === 'Invalid price'
-                                  ? 'ring-2 ring-red-400 border-red-400'
-                                  : ''
-                              }`}
+                              className={`input-gradient-border-sm w-full text-xs sm:text-sm rounded-lg px-3 py-2 bg-white text-[#141413] ${!f.isValid && f.error === 'Invalid price'
+                                ? 'ring-2 ring-red-400 border-red-400'
+                                : ''
+                                }`}
                             />
                           </td>
 
@@ -950,9 +947,8 @@ export default function BulkArtworkUpload({
             {files.map((f) => (
               <div
                 key={f.id}
-                className={`border rounded-2xl p-4 bg-white shadow-xs transition-shadow ${
-                  !f.isValid ? 'border-red-300 bg-red-50/20' : 'border-[#E8E8E3]'
-                }`}
+                className={`border rounded-2xl p-4 bg-white shadow-xs transition-shadow ${!f.isValid ? 'border-red-300 bg-red-50/20' : 'border-[#E8E8E3]'
+                  }`}
               >
                 {/* Header: Thumbnail + Title + Delete */}
                 <div className="flex items-start gap-3">
@@ -970,11 +966,10 @@ export default function BulkArtworkUpload({
                       value={f.title}
                       onChange={e => updateFile(f.id, { title: e.target.value })}
                       placeholder="Artwork title"
-                      className={`input-gradient-border-sm w-full text-sm rounded-lg px-3 py-2 bg-white text-[#141413] ${
-                        !f.isValid && !f.title.trim()
-                          ? 'ring-2 ring-red-400 border-red-400'
-                          : ''
-                      }`}
+                      className={`input-gradient-border-sm w-full text-sm rounded-lg px-3 py-2 bg-white text-[#141413] ${!f.isValid && !f.title.trim()
+                        ? 'ring-2 ring-red-400 border-red-400'
+                        : ''
+                        }`}
                     />
                     {!f.isValid && f.error && (
                       <p className="text-xs text-red-500 mt-1">{f.error}</p>
@@ -1266,12 +1261,12 @@ export default function BulkArtworkUpload({
                         {status === 'compressing'
                           ? 'Dual WebP compression...'
                           : status === 'uploading'
-                          ? 'Uploading storage pair...'
-                          : status === 'done'
-                          ? 'Optimized & uploaded'
-                          : status === 'error'
-                          ? 'Failed'
-                          : 'Waiting in queue'}
+                            ? 'Uploading storage pair...'
+                            : status === 'done'
+                              ? 'Optimized & uploaded'
+                              : status === 'error'
+                                ? 'Failed'
+                                : 'Waiting in queue'}
                       </p>
                     </div>
                   </div>
