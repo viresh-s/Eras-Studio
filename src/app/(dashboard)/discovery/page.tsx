@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
-import { Search, SlidersHorizontal, X, Check } from 'lucide-react';
+import { Search, SlidersHorizontal, X, Check, RotateCcw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createChatSession } from '@/actions/chatActions';
 import TopCreatorsRow from '@/components/features/discovery/TopCreatorsRow';
@@ -52,6 +52,51 @@ const getInitials = (name: string) => {
 // Module-level cache for default view (eliminates blank skeleton flash on navigation)
 let cachedDefaultArtworks: ArtworkItem[] | null = null;
 let cachedHasMore: boolean = true;
+
+function MasonryColumns({
+  items,
+  renderItem,
+}: {
+  items: ArtworkItem[];
+  renderItem: (item: ArtworkItem) => React.ReactNode;
+}) {
+  const [cols, setCols] = useState(2);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const w = window.innerWidth;
+      if (w < 768) setCols(2);
+      else if (w < 1024) setCols(3);
+      else setCols(4);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const columns = useMemo(() => {
+    const buckets: ArtworkItem[][] = Array.from({ length: cols }, () => []);
+    items.forEach((item, idx) => {
+      buckets[idx % cols].push(item);
+    });
+    return buckets;
+  }, [items, cols]);
+
+  return (
+    <div
+      className="grid gap-2.5 sm:gap-4 md:gap-5 items-start"
+      style={{
+        gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
+      }}
+    >
+      {columns.map((colItems, colIdx) => (
+        <div key={colIdx} className="flex flex-col gap-2.5 sm:gap-4 md:gap-5 w-full min-w-0">
+          {colItems.map(renderItem)}
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default function BrowsePage() {
   const router = useRouter();
@@ -292,7 +337,7 @@ export default function BrowsePage() {
         {/* ========================================================================= */}
         {/* 2. SEARCH BAR & FILTERS BUTTON                                            */}
         {/* ========================================================================= */}
-        <div className="bg-white rounded-2xl sm:rounded-full border border-[#E8E8E3] p-1.5 sm:p-2 shadow-[0_2px_12px_rgba(0,0,0,0.03)] flex items-center gap-3 mb-5">
+        <div className="search-gradient-border-pill p-1.5 sm:p-2 shadow-[0_2px_12px_rgba(0,0,0,0.03)] flex items-center gap-3 mb-5">
           <div className="pl-3.5 text-gray-400 flex items-center shrink-0">
             <Search size={18} className="stroke-[1.75]" />
           </div>
@@ -306,7 +351,7 @@ export default function BrowsePage() {
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="p-1 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+              className="p-1 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
               aria-label="Clear search"
             >
               <X size={15} />
@@ -315,16 +360,22 @@ export default function BrowsePage() {
           <button
             type="button"
             onClick={() => setShowFilters(!showFilters)}
-            className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-semibold transition-all shrink-0 cursor-pointer ${showFilters || activeFilterCount > 0
-                ? 'border-[#141413] bg-[#141413] text-white'
-                : 'border-[#E8E8E3] bg-white text-gray-700 hover:border-gray-400'
-              }`}
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold transition-all shrink-0 cursor-pointer ${
+              showFilters || activeFilterCount > 0
+                ? 'btn-premium-gradient-pill text-white shadow-xs'
+                : 'border border-[#E8E8E3] bg-white text-gray-700 hover:text-[#1345EE] hover:border-[#1345EE]/40 hover:shadow-2xs'
+            }`}
           >
             <SlidersHorizontal size={14} />
             <span>Filters</span>
             {activeFilterCount > 0 && (
-              <span className={`w-4 h-4 rounded-full text-[10px] font-bold flex items-center justify-center ${showFilters || activeFilterCount > 0 ? 'bg-white text-[#141413]' : 'bg-[#141413] text-white'
-                }`}>
+              <span
+                className={`w-4 h-4 rounded-full text-[10px] font-bold flex items-center justify-center ${
+                  showFilters || activeFilterCount > 0
+                    ? 'bg-white text-[#1345EE]'
+                    : 'bg-[#141413] text-white'
+                }`}
+              >
                 {activeFilterCount}
               </span>
             )}
@@ -334,17 +385,18 @@ export default function BrowsePage() {
         {/* ========================================================================= */}
         {/* 3. CATEGORY PILLS BAR                                                     */}
         {/* ========================================================================= */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-3 mb-8 scrollbar-none">
+        <div className="flex items-center gap-2 overflow-x-auto pb-3 mb-6 scrollbar-none">
           {categoryPills.map((cat) => {
             const isActive = artTypeFilter === cat.value;
             return (
               <button
                 key={cat.value}
                 onClick={() => setArtTypeFilter(cat.value)}
-                className={`px-4 py-2 rounded-full whitespace-nowrap text-xs font-medium transition-all duration-150 cursor-pointer ${isActive
-                    ? 'bg-[#141413] text-white shadow-xs'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-black/5'
-                  }`}
+                className={`px-4 py-2 rounded-full whitespace-nowrap text-xs font-medium cursor-pointer transition-all duration-150 ${
+                  isActive
+                    ? 'bg-[#141413] text-white shadow-xs is-active font-semibold'
+                    : 'text-gray-600 bg-transparent category-pill-gradient-hover'
+                }`}
               >
                 {cat.label}
               </button>
@@ -364,99 +416,144 @@ export default function BrowsePage() {
               className="overflow-hidden mb-8"
             >
               <div className="bg-white border border-[#E8E8E3] rounded-2xl p-5 shadow-xs space-y-4">
+                {/* Filter Drawer Header */}
                 <div className="flex items-center justify-between pb-3 border-b border-gray-100">
                   <h3 className="text-sm font-bold text-[#141413]">Filter Artworks</h3>
-                  {activeFilterCount > 0 && (
-                    <button
-                      onClick={() => {
-                        setArtTypeFilter('');
-                        setPriceFilter('all');
-                        setSortBy('recommended');
-                      }}
-                      className="text-xs font-medium text-[#B8532F] hover:underline"
-                    >
-                      Reset all filters
-                    </button>
-                  )}
+                  <button
+                    type="button"
+                    onClick={() => setShowFilters(false)}
+                    className="p-1 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
+                    aria-label="Close filters"
+                  >
+                    <X size={16} />
+                  </button>
                 </div>
 
+                {/* Filter Options Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 pt-1">
                   {/* Price Filter */}
                   <div>
-                    <label className="block text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">
+                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
                       Price Range
                     </label>
-                    <div className="space-y-1.5 text-xs">
+                    <div className="space-y-1 text-xs">
                       {[
                         { value: 'all', label: 'All Prices' },
                         { value: 'on_request', label: 'Price on Request Only' },
                         { value: 'under10k', label: 'Under ₹10,000' },
                         { value: '10k-50k', label: '₹10,000 – ₹50,000' },
                         { value: '50kPlus', label: '₹50,000 and above' },
-                      ].map((item) => (
-                        <label
-                          key={item.value}
-                          className="flex items-center gap-2 cursor-pointer text-gray-700 hover:text-black py-0.5"
-                        >
-                          <input
-                            type="radio"
-                            name="priceFilter"
-                            checked={priceFilter === item.value}
-                            onChange={() => setPriceFilter(item.value as any)}
-                            className="text-[#141413] focus:ring-[#141413]"
-                          />
-                          <span>{item.label}</span>
-                        </label>
-                      ))}
+                      ].map((item) => {
+                        const isSelected = priceFilter === item.value;
+                        return (
+                          <label
+                            key={item.value}
+                            className="flex items-center gap-2.5 py-1 cursor-pointer text-xs transition-colors"
+                          >
+                            <input
+                              type="radio"
+                              name="priceFilter"
+                              checked={isSelected}
+                              onChange={() => setPriceFilter(item.value as any)}
+                              className="accent-[#1345EE] w-3.5 h-3.5 text-[#1345EE] focus:ring-[#1345EE] cursor-pointer"
+                            />
+                            <span className={isSelected ? 'text-[#1345EE] font-medium' : 'text-gray-700 hover:text-black'}>
+                              {item.label}
+                            </span>
+                          </label>
+                        );
+                      })}
                     </div>
                   </div>
 
                   {/* Medium Filter */}
                   <div>
-                    <label className="block text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">
+                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
                       All Mediums
                     </label>
-                    <div className="space-y-1.5 text-xs">
-                      {categoryPills.map((cat) => (
-                        <label
-                          key={cat.value}
-                          className="flex items-center gap-2 cursor-pointer text-gray-700 hover:text-black py-0.5"
-                        >
-                          <input
-                            type="radio"
-                            name="mediumFilter"
-                            checked={artTypeFilter === cat.value}
-                            onChange={() => setArtTypeFilter(cat.value)}
-                            className="text-[#141413] focus:ring-[#141413]"
-                          />
-                          <span>{cat.label}</span>
-                        </label>
-                      ))}
+                    <div className="space-y-1 text-xs max-h-56 overflow-y-auto pr-1">
+                      {categoryPills.map((cat) => {
+                        const isSelected = artTypeFilter === cat.value;
+                        return (
+                          <label
+                            key={cat.value}
+                            className="flex items-center gap-2.5 py-1 cursor-pointer text-xs transition-colors"
+                          >
+                            <input
+                              type="radio"
+                              name="mediumFilter"
+                              checked={isSelected}
+                              onChange={() => setArtTypeFilter(cat.value)}
+                              className="accent-[#1345EE] w-3.5 h-3.5 text-[#1345EE] focus:ring-[#1345EE] cursor-pointer"
+                            />
+                            <span className={isSelected ? 'text-[#1345EE] font-medium' : 'text-gray-700 hover:text-black'}>
+                              {cat.label}
+                            </span>
+                          </label>
+                        );
+                      })}
                     </div>
                   </div>
 
-                  {/* Sort by */}
+                  {/* Sort By Filter */}
                   <div>
-                    <label className="block text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">
+                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
                       Sort By
                     </label>
-                    <div className="space-y-1.5 text-xs">
-                      {sortOptions.map((opt) => (
-                        <label
-                          key={opt.value}
-                          className="flex items-center gap-2 cursor-pointer text-gray-700 hover:text-black py-0.5"
-                        >
-                          <input
-                            type="radio"
-                            name="sortByFilter"
-                            checked={sortBy === opt.value}
-                            onChange={() => setSortBy(opt.value)}
-                            className="text-[#141413] focus:ring-[#141413]"
-                          />
-                          <span>{opt.label}</span>
-                        </label>
-                      ))}
+                    <div className="space-y-1 text-xs">
+                      {sortOptions.map((opt) => {
+                        const isSelected = sortBy === opt.value;
+                        return (
+                          <label
+                            key={opt.value}
+                            className="flex items-center gap-2.5 py-1 cursor-pointer text-xs transition-colors"
+                          >
+                            <input
+                              type="radio"
+                              name="sortByFilter"
+                              checked={isSelected}
+                              onChange={() => setSortBy(opt.value)}
+                              className="accent-[#1345EE] w-3.5 h-3.5 text-[#1345EE] focus:ring-[#1345EE] cursor-pointer"
+                            />
+                            <span className={isSelected ? 'text-[#1345EE] font-medium' : 'text-gray-700 hover:text-black'}>
+                              {opt.label}
+                            </span>
+                          </label>
+                        );
+                      })}
                     </div>
+                  </div>
+                </div>
+
+                {/* Filter Drawer Footer - Only this ONE gradient Remove Filters button is kept */}
+                <div className="flex items-center justify-between pt-3.5 border-t border-gray-100 mt-2">
+                  <span className="text-xs text-gray-500 font-normal">
+                    {activeFilterCount > 0
+                      ? `${activeFilterCount} active filter${activeFilterCount > 1 ? 's' : ''}`
+                      : 'All filters clear'}
+                  </span>
+                  <div className="flex items-center gap-2.5">
+                    {activeFilterCount > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setArtTypeFilter('');
+                          setPriceFilter('all');
+                          setSortBy('recommended');
+                        }}
+                        className="btn-premium-gradient-pill px-4 py-2 text-xs font-semibold gap-1.5 cursor-pointer shadow-xs active:scale-95"
+                      >
+                        <RotateCcw size={12} />
+                        <span>Remove Filters</span>
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setShowFilters(false)}
+                      className="px-5 py-2 rounded-full border border-[#E8E8E3] bg-white text-gray-700 hover:bg-gray-50 text-xs font-semibold cursor-pointer transition-colors"
+                    >
+                      Done
+                    </button>
                   </div>
                 </div>
               </div>
@@ -468,19 +565,21 @@ export default function BrowsePage() {
         {/* 5. ARTWORK GALLERY GRID (Pinterest Masonry Layout matching reference spec) */}
         {/* ========================================================================= */}
         {isLoading && artworks.length === 0 ? (
-          <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 sm:gap-5 [column-fill:_balance]">
-            {[320, 240, 420, 280, 360, 260, 380, 300].map((height, i) => (
-              <div key={i} className="break-inside-avoid mb-4 sm:mb-5">
-                <div className="bg-white rounded-[22px] border border-[#E8E8E3] animate-pulse p-2 shadow-xs">
-                  <div
-                    style={{ height: `${height}px` }}
-                    className="w-full bg-gray-100 rounded-[18px] mb-2.5"
-                  />
-                  <div className="space-y-2 px-1 pb-1">
-                    <div className="h-4 bg-gray-100 rounded-full w-3/4" />
-                    <div className="h-3 bg-gray-100 rounded-full w-1/2" />
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-4 md:gap-5 items-start">
+            {[0, 1, 2, 3].map((colIdx) => (
+              <div key={colIdx} className="flex flex-col gap-2.5 sm:gap-4 md:gap-5 w-full min-w-0">
+                {[320, 260].map((height, i) => (
+                  <div key={i} className="bg-white rounded-[16px] sm:rounded-[22px] border border-[#E8E8E3] animate-pulse p-1.5 sm:p-2 shadow-xs">
+                    <div
+                      style={{ height: `${colIdx % 2 === 0 ? height : height + 40}px` }}
+                      className="w-full bg-gray-100 rounded-[13px] sm:rounded-[18px] mb-2"
+                    />
+                    <div className="space-y-1.5 px-1 pb-1">
+                      <div className="h-3.5 bg-gray-100 rounded-full w-3/4" />
+                      <div className="h-2.5 bg-gray-100 rounded-full w-1/2" />
+                    </div>
                   </div>
-                </div>
+                ))}
               </div>
             ))}
           </div>
@@ -491,11 +590,11 @@ export default function BrowsePage() {
                 const creatorName = artwork.artist_name || artwork.profiles?.full_name || 'Independent Artist';
 
                 return (
-                  <div key={artwork.id} className="break-inside-avoid mb-4 sm:mb-5 group">
-                    <div className="relative bg-white rounded-[22px] p-2 border border-[#EBEBE6] shadow-[0_2px_10px_rgba(20,20,19,0.03)] hover:shadow-[0_10px_28px_rgba(20,20,19,0.08)] transition-all duration-300">
+                  <div key={artwork.id} className="w-full group">
+                    <div className="relative bg-white rounded-[16px] sm:rounded-[22px] p-1.5 sm:p-2 border border-[#EBEBE6] shadow-[0_2px_10px_rgba(20,20,19,0.03)] hover:shadow-[0_10px_28px_rgba(20,20,19,0.08)] transition-all duration-300">
                       <Link href={`/artwork/${artwork.id}`} className="block cursor-pointer">
                         {/* Artwork Image Container - Unconstrained natural height with Anti-Download Shield */}
-                        <div className={`relative overflow-hidden rounded-[18px] bg-[#F5F5F0] ${PROTECTED_CONTAINER_CLASS}`}>
+                        <div className={`relative overflow-hidden rounded-[13px] sm:rounded-[18px] bg-[#F5F5F0] ${PROTECTED_CONTAINER_CLASS}`}>
                           <img
                             src={artwork.image_url}
                             alt={artwork.title}
@@ -516,8 +615,8 @@ export default function BrowsePage() {
 
                           {/* Medium Badge (subtle overlay on top-right on hover) */}
                           {artwork.art_type && (
-                            <div className="absolute top-2.5 right-2.5 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                              <span className="inline-block px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider rounded-full bg-white/95 backdrop-blur-md text-[#141413] shadow-xs">
+                            <div className="absolute top-2 right-2 sm:top-2.5 sm:right-2.5 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                              <span className="inline-block px-2 py-0.5 sm:px-2.5 sm:py-1 text-[8px] sm:text-[9px] font-bold uppercase tracking-wider rounded-full bg-white/95 backdrop-blur-md text-[#141413] shadow-xs">
                                 {artwork.art_type}
                               </span>
                             </div>
@@ -525,10 +624,10 @@ export default function BrowsePage() {
                         </div>
 
                         {/* Single Row: [Avatar] Creator Name (Poppins) on left, Availability (Poppins) on right */}
-                        <div className="pt-2.5 pb-1 px-1 flex items-center justify-between gap-2">
-                          <div className="min-w-0 flex items-center gap-2 truncate">
+                        <div className="pt-2 pb-0.5 sm:pt-2.5 sm:pb-1 px-0.5 sm:px-1 flex items-center justify-between gap-1 sm:gap-2">
+                          <div className="min-w-0 flex items-center gap-1.5 sm:gap-2 truncate">
                             <div
-                              className="w-5 h-5 rounded-full bg-gray-200 border border-gray-300/60 overflow-hidden flex items-center justify-center text-[9px] font-bold text-gray-700 shrink-0 font-sans"
+                              className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-gray-200 border border-gray-300/60 overflow-hidden flex items-center justify-center text-[8px] sm:text-[9px] font-bold text-gray-700 shrink-0 font-sans"
                               style={{ fontFamily: "'Poppins', sans-serif" }}
                             >
                               {artwork.profiles?.profile_pic_url ? (
@@ -542,14 +641,14 @@ export default function BrowsePage() {
                               )}
                             </div>
                             <span
-                              className="font-sans text-[12px] sm:text-[13px] font-medium text-[#141413] group-hover:text-[#B8532F] transition-colors truncate"
+                              className="font-sans text-[11px] sm:text-[13px] font-medium text-[#141413] group-hover:text-[#B8532F] transition-colors truncate"
                               style={{ fontFamily: "'Poppins', sans-serif" }}
                             >
                               {creatorName}
                             </span>
                           </div>
 
-                          <div className="flex items-center gap-1.5 shrink-0 pl-1">
+                          <div className="flex items-center gap-1 shrink-0 pl-0.5 sm:pl-1">
                             <span
                               className={`w-1.5 h-1.5 rounded-full ${
                                 artwork.status === 'Available'
@@ -560,7 +659,7 @@ export default function BrowsePage() {
                               }`}
                             />
                             <span
-                              className="font-sans text-[11px] sm:text-[12px] font-medium text-gray-600 capitalize tracking-tight"
+                              className="font-sans text-[10px] sm:text-[12px] font-medium text-gray-600 capitalize tracking-tight"
                               style={{ fontFamily: "'Poppins', sans-serif" }}
                             >
                               {artwork.status || 'Available'}
@@ -573,15 +672,14 @@ export default function BrowsePage() {
                 );
               };
 
-              const firstBatch = topCreators.length > 0 ? artworks.slice(0, 8) : artworks;
-              const remainingBatch = topCreators.length > 0 ? artworks.slice(8) : [];
+              const hasEnoughForSplit = topCreators.length > 0 && artworks.length >= 12;
+              const firstBatch = hasEnoughForSplit ? artworks.slice(0, 8) : artworks;
+              const remainingBatch = hasEnoughForSplit ? artworks.slice(8) : [];
 
               return (
                 <>
                   {/* First Batch Masonry Columns */}
-                  <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 sm:gap-5 [column-fill:_balance]">
-                    {firstBatch.map(renderArtworkCard)}
-                  </div>
+                  <MasonryColumns items={firstBatch} renderItem={renderArtworkCard} />
 
                   {/* Spotlight: Top 10 Creators Row (Between Batches, 100% full width) */}
                   {topCreators && topCreators.length > 0 && (
@@ -592,9 +690,7 @@ export default function BrowsePage() {
 
                   {/* Remaining Batch Masonry Columns */}
                   {remainingBatch.length > 0 && (
-                    <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 sm:gap-5 [column-fill:_balance]">
-                      {remainingBatch.map(renderArtworkCard)}
-                    </div>
+                    <MasonryColumns items={remainingBatch} renderItem={renderArtworkCard} />
                   )}
                 </>
               );

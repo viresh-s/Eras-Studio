@@ -116,3 +116,70 @@ export async function getArtworkMetrics(artworkId: string): Promise<{ views: num
     return { views: 0, likes: 0 };
   }
 }
+
+/**
+ * Record a whole collection view in the database.
+ */
+export async function recordCollectionView(collectionId: string, viewerId?: string | null) {
+  if (!collectionId) return;
+
+  try {
+    const admin = getSupabaseAdmin();
+    const client: any = admin || (await createClient());
+
+    // 1. Try stored procedure
+    const { error: rpcError } = await client.rpc('increment_collection_view', {
+      target_collection_id: collectionId,
+      viewer_user_id: viewerId || null,
+      client_ip_hash: null,
+    });
+
+    if (!rpcError) {
+      return;
+    }
+
+    // 2. Fallback: insert log if table exists
+    await client.from('collection_views').insert({
+      collection_id: collectionId,
+      viewer_id: viewerId || null,
+    });
+
+    // 3. Fallback: increment counter on collections table
+    const { data: col } = await client
+      .from('collections')
+      .select('views_count')
+      .eq('id', collectionId)
+      .maybeSingle();
+
+    if (col && typeof col.views_count === 'number') {
+      await client
+        .from('collections')
+        .update({ views_count: col.views_count + 1 })
+        .eq('id', collectionId);
+    }
+  } catch (error) {
+    console.warn('Silent notice: Could not record collection view:', error);
+  }
+}
+
+/**
+ * Fetch likes and views count for a specific collection.
+ */
+export async function getCollectionMetrics(collectionId: string): Promise<{ views: number; likes: number }> {
+  try {
+    const supabase: any = await createClient();
+
+    const [viewsRes, likesRes, colRes] = await Promise.all([
+      supabase.from('collection_views').select('*', { count: 'exact', head: true }).eq('collection_id', collectionId),
+      supabase.from('saved_collections').select('*', { count: 'exact', head: true }).eq('collection_id', collectionId),
+      supabase.from('collections').select('views_count, likes_count').eq('id', collectionId).maybeSingle(),
+    ]);
+
+    const views = colRes.data?.views_count ?? viewsRes.count ?? 0;
+    const likes = colRes.data?.likes_count ?? likesRes.count ?? 0;
+
+    return { views, likes };
+  } catch {
+    return { views: 0, likes: 0 };
+  }
+}

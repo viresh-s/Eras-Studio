@@ -259,19 +259,19 @@ export default function PortfolioClient({
 
   return (
     <div
-      className="-mt-8 -mx-6 -mb-8 flex flex-col flex-1 min-h-screen"
+      className="-mt-5 sm:-mt-8 -mx-4 sm:-mx-6 -mb-5 sm:-mb-8 flex flex-col flex-1 min-h-screen"
       style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
     >
       {/* ======================================================== */}
       {/* 1. TOP HEADER SECTION: PURE WHITE */}
       {/* ======================================================== */}
-      <div className="bg-white border-b border-[#E3E3E7] w-full pt-8 sm:pt-10 pb-0">
-        <div className="max-w-[1400px] mx-auto px-6">
+      <div className="bg-white border-b border-[#E3E3E7] w-full pt-6 sm:pt-10 pb-0">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
           {/* Row 1: Profile Capsule Card (Left) & Add Artwork Button (Right) */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6 mb-6 sm:mb-8">
             {/* Profile Card matching exact Figma specs */}
             <div
-              className="inline-flex items-center gap-4 sm:gap-6 p-3 sm:p-3.5 pr-8 sm:pr-10 bg-white border border-[#E8E8E3] shadow-xs max-w-xl transition-shadow select-none"
+              className="flex items-center gap-3.5 sm:gap-6 p-3 sm:p-3.5 pr-4 sm:pr-10 bg-white border border-[#E8E8E3] shadow-xs w-full sm:w-auto max-w-xl transition-shadow select-none"
               style={{ borderRadius: 20 }}
             >
               {/* Avatar with Progress Arc & Edit Badge */}
@@ -375,7 +375,7 @@ export default function PortfolioClient({
           </div>
 
           {/* Row 3: Horizontal Tab Navigation Bar */}
-          <div className="flex items-center gap-8 sm:gap-12 pt-2">
+          <div className="flex items-center gap-6 sm:gap-12 pt-2 overflow-x-auto pb-1 scrollbar-none">
             {/* Tab 1: Artworks */}
             <button
               type="button"
@@ -466,8 +466,8 @@ export default function PortfolioClient({
       {/* ======================================================== */}
       {/* 2. LOWER SECTION: WARM #F2F0ED BACKGROUND */}
       {/* ======================================================== */}
-      <div className="bg-[#F2F0ED] flex-1 w-full py-8 sm:py-10">
-        <div className="max-w-[1400px] mx-auto px-6">
+      <div className="bg-[#F2F0ED] flex-1 w-full py-6 sm:py-10">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
           {/* Controls Bar */}
           <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-8">
             {/* Search Input */}
@@ -642,6 +642,21 @@ export default function PortfolioClient({
                         >
                           {col.description || `${col.artwork_count || 0} curated works in this series`}
                         </p>
+
+                        {/* Row 4: Stats (Heart & Views) */}
+                        <div
+                          className="flex items-center gap-4 text-[11px] sm:text-xs text-[#6E6E69] font-normal pt-0.5"
+                          style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+                        >
+                          <div className="flex items-center gap-1" title={`${col.likes_count || 0} likes`}>
+                            <Heart size={13} className="text-[#6E6E69]" strokeWidth={1.75} />
+                            <span>{col.likes_count || 0}</span>
+                          </div>
+                          <div className="flex items-center gap-1" title={`${col.views_count || 0} views`}>
+                            <Eye size={13} className="text-[#6E6E69]" strokeWidth={1.75} />
+                            <span>{col.views_count || 0}</span>
+                          </div>
+                        </div>
 
                         {/* Divider Line */}
                         <div className="h-[1px] bg-[#E8E8E3] w-full my-0.5" />

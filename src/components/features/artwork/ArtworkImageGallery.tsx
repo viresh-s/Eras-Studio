@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAssetProtection, PROTECTED_CONTAINER_CLASS, PROTECTED_IMAGE_CLASS } from '@/lib/media/assetProtection';
 
 interface ArtworkImageGalleryProps {
@@ -45,14 +44,14 @@ export default function ArtworkImageGallery({
   return (
     <div
       ref={containerRef}
-      className={`relative group bg-white border border-gray-100 rounded-xl shadow-sm p-2.5 flex items-center justify-center ${PROTECTED_CONTAINER_CLASS}`}
+      className={`relative group bg-white border border-[#E8E8E3] rounded-3xl shadow-xs p-3 flex items-center justify-center ${PROTECTED_CONTAINER_CLASS}`}
     >
-      <div className="relative w-full max-h-[80vh] overflow-hidden rounded-lg bg-gray-50 flex items-center justify-center">
+      <div className="relative w-full max-h-[60vh] sm:max-h-[75vh] lg:max-h-[80vh] overflow-hidden rounded-2xl bg-[#F9F9F8] flex items-center justify-center">
         {/* Use full-res image for detail view */}
         <img
           src={allFullImages[currentIndex]}
           alt={`${altText} - Image ${currentIndex + 1}`}
-          className={`w-full h-auto max-h-[80vh] object-contain ${PROTECTED_IMAGE_CLASS}`}
+          className={`w-full h-auto max-h-[60vh] sm:max-h-[75vh] lg:max-h-[80vh] object-contain ${PROTECTED_IMAGE_CLASS}`}
           draggable={false}
           onContextMenu={(e) => e.preventDefault()}
           onDragStart={(e) => e.preventDefault()}
@@ -75,17 +74,17 @@ export default function ArtworkImageGallery({
           <>
             <button
               onClick={prevImage}
-              className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 text-gray-900 shadow-md backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white z-[3]"
+              className="btn-gradient-border-hover absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/90 text-[#141413] shadow-md backdrop-blur-sm flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity z-[3] cursor-pointer"
               aria-label="Previous image"
             >
-              <ChevronLeft size={20} />
+              <span className="text-lg sm:text-xl font-light leading-none -mt-0.5">‹</span>
             </button>
             <button
               onClick={nextImage}
-              className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 text-gray-900 shadow-md backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white z-[3]"
+              className="btn-gradient-border-hover absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/90 text-[#141413] shadow-md backdrop-blur-sm flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity z-[3] cursor-pointer"
               aria-label="Next image"
             >
-              <ChevronRight size={20} />
+              <span className="text-lg sm:text-xl font-light leading-none -mt-0.5">›</span>
             </button>
             
             {/* Dots */}

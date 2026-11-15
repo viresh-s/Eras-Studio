@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from 'react';
 import { toggleSaveArtwork } from '@/actions/saveArtworkActions';
-import { Bookmark } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 interface SaveArtworkButtonProps {
@@ -42,14 +41,14 @@ export default function SaveArtworkButton({ artworkId, initialIsSaved, userId }:
     <button
       onClick={handleToggle}
       disabled={isPending}
-      className={`px-6 py-3 rounded-full text-sm font-semibold transition-colors shadow-sm flex items-center gap-2 ${
+      className={`px-5 py-2.5 rounded-full text-xs font-medium transition-colors shadow-2xs flex items-center gap-2 cursor-pointer ${
         isSaved
-          ? 'bg-gray-900 text-white hover:bg-gray-800'
-          : 'bg-white border border-gray-200 text-gray-900 hover:bg-gray-50'
+          ? 'bg-[#141413] text-white hover:bg-black'
+          : 'btn-gradient-border-hover'
       }`}
+      style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
     >
-      <Bookmark size={16} fill={isSaved ? 'currentColor' : 'none'} className={isSaved ? 'text-white' : 'text-gray-900'} />
-      {isSaved ? 'Saved' : 'Save Artwork'}
+      <span>{isSaved ? 'Saved' : 'Save Artwork'}</span>
     </button>
   );
 }

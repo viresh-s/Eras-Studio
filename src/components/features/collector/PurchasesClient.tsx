@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import {
   ChevronDown,
@@ -60,6 +60,51 @@ const getInitials = (name: string) => {
   if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
   return name.substring(0, 2).toUpperCase();
 };
+
+function PurchasesMasonry<T>({
+  items,
+  renderItem,
+}: {
+  items: T[];
+  renderItem: (item: T) => React.ReactNode;
+}) {
+  const [cols, setCols] = useState(2);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const w = window.innerWidth;
+      if (w < 768) setCols(2);
+      else if (w < 1024) setCols(3);
+      else setCols(4);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const columns = useMemo(() => {
+    const buckets: T[][] = Array.from({ length: cols }, () => []);
+    items.forEach((item, idx) => {
+      buckets[idx % cols].push(item);
+    });
+    return buckets;
+  }, [items, cols]);
+
+  return (
+    <div
+      className="grid gap-2.5 sm:gap-4 md:gap-5 items-start"
+      style={{
+        gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
+      }}
+    >
+      {columns.map((colItems, colIdx) => (
+        <div key={colIdx} className="flex flex-col gap-2.5 sm:gap-4 md:gap-5 w-full min-w-0">
+          {colItems.map(renderItem)}
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default function PurchasesClient({
   initialAcquisitions,
@@ -146,9 +191,9 @@ export default function PurchasesClient({
   return (
     <div style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}>
       {/* Header matching website portfolio / dashboard pages */}
-      <div className="mb-8">
+      <div className="mb-6 sm:mb-8">
         <h1
-          className="text-4xl sm:text-5xl font-serif italic font-semibold text-[var(--color-cor-ink,#141413)] tracking-tight"
+          className="text-3xl sm:text-4xl md:text-5xl font-serif italic font-semibold text-[var(--color-cor-ink,#141413)] tracking-tight"
           style={{
             fontFamily: "'Century Schoolbook', Century, 'TeX Gyre Schola', Georgia, serif",
             fontStyle: 'italic',
@@ -220,20 +265,21 @@ export default function PurchasesClient({
           activeAcquisitions.length === 0
             ? renderEmptyState('Interested')
             : (
-              <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 sm:gap-5 [column-fill:_balance]">
-                {activeAcquisitions.map((acq) => {
+              <PurchasesMasonry
+                items={activeAcquisitions}
+                renderItem={(acq) => {
                   const currentStageIdx = PROGRESS_STAGES.indexOf(statuses[acq.id]);
 
                   return (
                     <div
                       key={acq.id}
-                      className="break-inside-avoid mb-4 sm:mb-5 group"
+                      className="w-full group"
                     >
-                      <div className="relative bg-white rounded-[22px] p-2 sm:p-2.5 border border-[#EBEBE6] shadow-[0_2px_10px_rgba(20,20,19,0.03)] hover:shadow-[0_10px_28px_rgba(20,20,19,0.08)] transition-all duration-300 flex flex-col">
+                      <div className="relative bg-white rounded-[18px] sm:rounded-[22px] p-2 sm:p-2.5 border border-[#EBEBE6] shadow-[0_2px_10px_rgba(20,20,19,0.03)] hover:shadow-[0_10px_28px_rgba(20,20,19,0.08)] transition-all duration-300 flex flex-col">
                         {/* Artwork Clickable Area: Image & Discovery Row */}
                         <Link href={`/artwork/${acq.artworkId}`} className="block cursor-pointer">
                           {/* Image with Anti-Download Shield & Natural Dynamic Height (h-auto) */}
-                          <div className={`relative overflow-hidden rounded-[18px] bg-[#F5F5F0] ${PROTECTED_CONTAINER_CLASS}`}>
+                          <div className={`relative overflow-hidden rounded-[16px] sm:rounded-[18px] bg-[#F5F5F0] ${PROTECTED_CONTAINER_CLASS}`}>
                             <img
                               src={acq.imageUrl}
                               alt={acq.title}
@@ -386,8 +432,8 @@ export default function PurchasesClient({
                       </div>
                     </div>
                   );
-                })}
-              </div>
+                }}
+              />
             )
         )}
 
@@ -396,15 +442,16 @@ export default function PurchasesClient({
           completedAcquisitions.length === 0
             ? renderEmptyState('Completed')
             : (
-              <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 sm:gap-5 [column-fill:_balance]">
-                {completedAcquisitions.map((acq) => (
+              <PurchasesMasonry
+                items={completedAcquisitions}
+                renderItem={(acq) => (
                   <div
                     key={acq.id}
-                    className="break-inside-avoid mb-4 sm:mb-5 group opacity-95"
+                    className="w-full group opacity-95"
                   >
-                    <div className="relative bg-white rounded-[22px] p-2 sm:p-2.5 border border-[#EBEBE6] shadow-[0_2px_10px_rgba(20,20,19,0.03)] hover:shadow-[0_10px_28px_rgba(20,20,19,0.08)] transition-all duration-300 flex flex-col">
+                    <div className="relative bg-white rounded-[18px] sm:rounded-[22px] p-2 sm:p-2.5 border border-[#EBEBE6] shadow-[0_2px_10px_rgba(20,20,19,0.03)] hover:shadow-[0_10px_28px_rgba(20,20,19,0.08)] transition-all duration-300 flex flex-col">
                       <Link href={`/artwork/${acq.artworkId}`} className="block cursor-pointer">
-                        <div className={`relative overflow-hidden rounded-[18px] bg-[#F5F5F0] ${PROTECTED_CONTAINER_CLASS}`}>
+                        <div className={`relative overflow-hidden rounded-[16px] sm:rounded-[18px] bg-[#F5F5F0] ${PROTECTED_CONTAINER_CLASS}`}>
                           <img
                             src={acq.imageUrl}
                             alt={acq.title}
@@ -482,23 +529,26 @@ export default function PurchasesClient({
                       </div>
                     </div>
                   </div>
-                ))}
-              </div>
+                )}
+              />
             )
         )}
 
         {/* SAVED TAB (Rendered in Discovery Masonry Columns) */}
         {activeTab === 'Saved' && (
           savedArtworks.length > 0 ? (
-            <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 sm:gap-5 [column-fill:_balance] mt-2">
-              {savedArtworks.map((artwork) => (
-                <DiscoveryArtworkCard
-                  key={artwork.id}
-                  artwork={artwork}
-                  creatorName={artwork.profiles?.full_name || artwork.artist_name}
-                  creatorAvatar={artwork.profiles?.profile_pic_url}
-                />
-              ))}
+            <div className="mt-2">
+              <PurchasesMasonry
+                items={savedArtworks}
+                renderItem={(artwork) => (
+                  <DiscoveryArtworkCard
+                    key={artwork.id}
+                    artwork={artwork}
+                    creatorName={artwork.profiles?.full_name || artwork.artist_name}
+                    creatorAvatar={artwork.profiles?.profile_pic_url}
+                  />
+                )}
+              />
             </div>
           ) : (
             renderEmptyState('Saved')

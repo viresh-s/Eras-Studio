@@ -79,10 +79,10 @@ export default async function ArtistProfilePage({ params }: ArtistProfilePagePro
         viewerId={user?.id}
         isOwner={isOwner}
       />
-      <div className="max-w-[1400px] mx-auto px-6 pt-10">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 pt-6 sm:pt-10">
         
         {/* Cover Image (Rounded, not full width) */}
-        <div className="h-48 md:h-64 rounded-[20px] bg-gradient-to-br from-[#2C4A5A] to-[#4A6670] relative overflow-hidden shadow-sm mx-auto max-w-6xl">
+        <div className="h-36 sm:h-48 md:h-64 rounded-[20px] bg-gradient-to-br from-[#2C4A5A] to-[#4A6670] relative overflow-hidden shadow-sm mx-auto max-w-6xl">
           {profile.cover_image_url ? (
             <img
               src={profile.cover_image_url}
@@ -114,7 +114,7 @@ export default async function ArtistProfilePage({ params }: ArtistProfilePagePro
           </p>
           
           <h1
-            className="text-5xl sm:text-6xl text-gray-900 mb-5 tracking-tight font-serif italic"
+            className="text-3xl sm:text-5xl md:text-6xl text-gray-900 mb-5 tracking-tight font-serif italic"
             style={{ fontFamily: "'Century Schoolbook', Century, serif", fontStyle: 'italic' }}
           >
             {profile.full_name}

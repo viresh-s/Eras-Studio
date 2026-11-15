@@ -902,7 +902,7 @@ export default function ArtworkUploadForm({
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div>
             <h1
-              className="text-3xl sm:text-4xl lg:text-[42px] font-bold text-[#141413] tracking-tight leading-tight"
+              className="text-2xl sm:text-4xl lg:text-[42px] font-bold text-[#141413] tracking-tight leading-tight"
               style={{
                 fontFamily: "'Century Schoolbook', Century, 'TeX Gyre Schola', Georgia, serif",
                 fontStyle: 'italic',

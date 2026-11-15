@@ -16,6 +16,8 @@ export interface CollectionItem {
   created_at: string;
   artwork_count?: number;
   artworks?: any[];
+  likes_count?: number;
+  views_count?: number;
 }
 
 const CreateCollectionSchema = z.object({
@@ -66,13 +68,36 @@ export async function getCreatorCollections(creatorId?: string): Promise<Collect
       .order('created_at', { ascending: false });
 
     if (!error && collections) {
+      const collectionIds = collections.map((c) => c.id).filter(Boolean);
+
+      // Query real-time collection_views and saved_collections
+      const viewsMap = new Map<string, number>();
+      const likesMap = new Map<string, number>();
+
+      if (collectionIds.length > 0) {
+        try {
+          const [viewsRes, likesRes] = await Promise.all([
+            (dbClient as any).from('collection_views').select('collection_id').in('collection_id', collectionIds),
+            (dbClient as any).from('saved_collections').select('collection_id').in('collection_id', collectionIds),
+          ]);
+          ((viewsRes?.data as any[]) || []).forEach((v) => {
+            if (v?.collection_id) viewsMap.set(v.collection_id, (viewsMap.get(v.collection_id) || 0) + 1);
+          });
+          ((likesRes?.data as any[]) || []).forEach((l) => {
+            if (l?.collection_id) likesMap.set(l.collection_id, (likesMap.get(l.collection_id) || 0) + 1);
+          });
+        } catch {
+          // Non-blocking fallback if log tables are not yet created
+        }
+      }
+
       // Fetch artworks count per collection
       const { data: artworks } = await dbClient
         .from('artworks')
         .select('id, collection_id, collection, image_url')
         .eq('creator_id', targetId);
 
-      const items: CollectionItem[] = collections.map((col) => {
+      const items: CollectionItem[] = collections.map((col: any) => {
         const matchingArtworks = (artworks || []).filter(
           (a) => a.collection_id === col.id || (a.collection && a.collection.trim().toLowerCase() === col.title.trim().toLowerCase())
         );
@@ -81,6 +106,8 @@ export async function getCreatorCollections(creatorId?: string): Promise<Collect
           ...col,
           cover_image_url: autoCover,
           artwork_count: matchingArtworks.length,
+          likes_count: col.likes_count ?? likesMap.get(col.id) ?? 0,
+          views_count: col.views_count ?? viewsMap.get(col.id) ?? 0,
         };
       });
 
@@ -118,6 +145,8 @@ export async function getCreatorCollections(creatorId?: string): Promise<Collect
       is_published: true,
       created_at: info.date,
       artwork_count: info.count,
+      likes_count: 0,
+      views_count: 0,
     }));
   } catch {
     return [];

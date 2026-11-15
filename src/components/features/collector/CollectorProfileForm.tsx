@@ -245,7 +245,7 @@ export default function CollectorProfileForm({ profile, email }: CollectorProfil
               </div>
 
               {/* 2. Primary Navigation with Signature Soft Pill Hover & Active Effect */}
-              <div className="p-3 sm:p-3.5 space-y-1.5 bg-white">
+              <div className="p-2 sm:p-3.5 flex flex-row overflow-x-auto md:flex-col gap-1.5 md:space-y-1.5 scrollbar-none bg-white">
                 {/* Tab 1: Basic Information */}
                 <button
                   type="button"
@@ -254,7 +254,7 @@ export default function CollectorProfileForm({ profile, email }: CollectorProfil
                     background: activeTab === 'basic' ? '#F1F2FF' : 'transparent',
                     borderRadius: 12,
                   }}
-                  className={`w-full text-left px-4 py-3 flex items-center justify-between transition-all duration-200 cursor-pointer group focus:outline-none ${
+                  className={`w-auto md:w-full shrink-0 whitespace-nowrap text-left px-3.5 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between gap-3 transition-all duration-200 cursor-pointer group focus:outline-none ${
                     activeTab === 'basic'
                       ? 'text-[#1345EE] font-medium'
                       : 'text-[#646A77] hover:bg-[#F1F2FF] hover:text-[#1345EE] font-medium'
@@ -264,7 +264,7 @@ export default function CollectorProfileForm({ profile, email }: CollectorProfil
                     style={{
                       fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
                     }}
-                    className="text-[13.5px] block transition-colors"
+                    className="text-[13px] sm:text-[13.5px] block transition-colors"
                   >
                     Basic Information
                   </span>
@@ -281,7 +281,7 @@ export default function CollectorProfileForm({ profile, email }: CollectorProfil
                     background: activeTab === 'activity' ? '#F1F2FF' : 'transparent',
                     borderRadius: 12,
                   }}
-                  className={`w-full text-left px-4 py-3 flex items-center justify-between transition-all duration-200 cursor-pointer group focus:outline-none ${
+                  className={`w-auto md:w-full shrink-0 whitespace-nowrap text-left px-3.5 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between gap-3 transition-all duration-200 cursor-pointer group focus:outline-none ${
                     activeTab === 'activity'
                       ? 'text-[#1345EE] font-medium'
                       : 'text-[#646A77] hover:bg-[#F1F2FF] hover:text-[#1345EE] font-medium'
@@ -291,7 +291,7 @@ export default function CollectorProfileForm({ profile, email }: CollectorProfil
                     style={{
                       fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
                     }}
-                    className="text-[13.5px] block transition-colors"
+                    className="text-[13px] sm:text-[13.5px] block transition-colors"
                   >
                     Account & Activity
                   </span>
@@ -305,7 +305,7 @@ export default function CollectorProfileForm({ profile, email }: CollectorProfil
           </nav>
 
           {/* Right Main Content Pane */}
-          <main className="p-7 sm:p-10 flex flex-col justify-between">
+          <main className="p-4 sm:p-7 md:p-10 flex flex-col justify-between">
             <form onSubmit={handleSubmit} className="space-y-6 flex-1 flex flex-col justify-between">
               <div>
                 {/* TAB 1: BASIC INFORMATION */}

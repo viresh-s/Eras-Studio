@@ -134,7 +134,7 @@ export default function CorLandingPage({
           {/* Left Column: Heading, Supporting Text, Primary CTA */}
           <div className="lg:col-span-7 space-y-6 sm:space-y-8">
             <h1
-              className="text-4xl sm:text-5xl md:text-6xl lg:text-[68px] leading-[1.05] text-[#141413] tracking-tight"
+              className="text-3xl sm:text-5xl md:text-6xl lg:text-[68px] leading-[1.05] text-[#141413] tracking-tight"
               style={{
                 fontFamily: "'Century Schoolbook', Century, Georgia, serif",
                 fontStyle: 'italic',
@@ -186,7 +186,7 @@ export default function CorLandingPage({
       <section className="py-16 sm:py-24 border-t border-[#E8E8E3]">
         <div className="max-w-2xl mb-12 sm:mb-16">
           <h2
-            className="text-3xl sm:text-4xl md:text-5xl text-[#141413] leading-[1.08] tracking-tight mb-4"
+            className="text-2xl sm:text-4xl md:text-5xl text-[#141413] leading-[1.08] tracking-tight mb-4"
             style={{
               fontFamily: "'Century Schoolbook', Century, Georgia, serif",
               fontStyle: 'italic',
@@ -238,7 +238,7 @@ export default function CorLandingPage({
       <section className="py-16 sm:py-24 border-t border-[#E8E8E3]">
         <div className="max-w-2xl mb-12 sm:mb-16">
           <h2
-            className="text-3xl sm:text-4xl md:text-5xl text-[#141413] leading-[1.08] tracking-tight mb-4"
+            className="text-2xl sm:text-4xl md:text-5xl text-[#141413] leading-[1.08] tracking-tight mb-4"
             style={{
               fontFamily: "'Century Schoolbook', Century, Georgia, serif",
               fontStyle: 'italic',
@@ -276,7 +276,7 @@ export default function CorLandingPage({
       <section className="py-16 sm:py-24 border-t border-[#E8E8E3]">
         <div className="max-w-2xl mb-12 sm:mb-16">
           <h2
-            className="text-3xl sm:text-4xl md:text-5xl text-[#141413] leading-[1.08] tracking-tight mb-4"
+            className="text-2xl sm:text-4xl md:text-5xl text-[#141413] leading-[1.08] tracking-tight mb-4"
             style={{
               fontFamily: "'Century Schoolbook', Century, Georgia, serif",
               fontStyle: 'italic',

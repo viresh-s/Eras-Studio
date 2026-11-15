@@ -55,9 +55,10 @@ export default function ExpressInterestButton({
     return (
       <button
         onClick={() => router.push(`/messages?chatId=${initialChatId}`)}
-        className="px-6 py-3 bg-gray-900 text-white rounded-full text-sm font-semibold hover:bg-gray-800 transition-colors flex items-center gap-2 shadow-sm"
+        className="btn-gradient-border-hover px-5 py-2.5 rounded-full text-xs font-medium shadow-2xs flex items-center gap-2 cursor-pointer"
+        style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
       >
-        Open Message <span className="text-lg leading-none">→</span>
+        <span>Open Message</span>
       </button>
     );
   }
@@ -79,76 +80,86 @@ export default function ExpressInterestButton({
   const buttonLabel = isRequested
     ? (isPriceOnRequest ? 'Price Requested' : 'Request Sent')
     : canResend
-    ? (isPriceOnRequest ? 'Resend Price Request →' : 'Resend Interest →')
-    : (isPriceOnRequest ? 'Request Price →' : 'Express Interest →');
+    ? (isPriceOnRequest ? 'Resend Price Request' : 'Resend Interest')
+    : (isPriceOnRequest ? 'Request Price' : 'Express Interest');
 
   return (
     <>
       <button
         onClick={() => !isRequested && setShowInput(true)}
         disabled={isLoading || isRequested}
-        className={`px-6 py-3 rounded-full text-sm font-semibold transition-colors flex items-center gap-2 shadow-sm ${
+        className={`px-5 py-2.5 rounded-full text-xs font-medium transition-colors flex items-center gap-2 shadow-2xs cursor-pointer ${
           isRequested 
-            ? 'bg-gray-100 text-gray-500 cursor-not-allowed border border-gray-200'
-            : 'bg-gray-900 text-white hover:bg-gray-800 disabled:opacity-70 disabled:cursor-not-allowed'
+            ? 'bg-gray-100 text-[#6E6E69] cursor-not-allowed border border-[#E8E8E3]'
+            : 'btn-premium-gradient-pill text-white'
         }`}
+        style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
       >
-        {buttonLabel}
+        <span>{buttonLabel}</span>
       </button>
 
       {showInput && (
         <div 
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-sm animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#141413]/40 backdrop-blur-xs animate-in fade-in duration-200"
           onClick={() => setShowInput(false)}
         >
           <div 
-            className="bg-white rounded-[24px] shadow-2xl w-full max-w-md overflow-hidden transform animate-in zoom-in-95 duration-200" 
+            className="bg-white rounded-3xl border border-[#E8E8E3] shadow-2xl w-full max-w-md overflow-hidden transform animate-in zoom-in-95 duration-200" 
             onClick={(e) => e.stopPropagation()}
+            style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
           >
-            <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
-              <h3 className="text-[17px] font-bold text-gray-900">
+            <div className="px-6 py-5 border-b border-[#E8E8E3] flex items-center justify-between bg-[#FDFDFC]">
+              <h3
+                className="text-lg font-serif italic font-normal text-[#141413]"
+                style={{
+                  fontFamily: "'Century Schoolbook', Century, 'TeX Gyre Schola', Georgia, serif",
+                  fontStyle: 'italic',
+                }}
+              >
                 {isPriceOnRequest ? 'Request Price' : 'Express Interest'}
               </h3>
               <button 
                 onClick={() => setShowInput(false)} 
-                className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-400 hover:text-gray-600 hover:bg-gray-200 transition-colors"
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-[#6E6E69] hover:text-[#141413] hover:bg-gray-200 transition-colors cursor-pointer"
                 aria-label="Close modal"
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
               </button>
             </div>
             
             <div className="p-6">
-              <label className="block text-[13px] font-bold text-gray-900 mb-2 uppercase tracking-wide">
+              <label className="block text-xs font-medium text-[#141413] mb-1.5 uppercase tracking-wide">
                 {isPriceOnRequest ? 'Price inquiry to creator' : 'Message to creator'}
               </label>
               <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-400 focus:bg-white transition-all resize-none mb-2"
+                className="w-full px-4 py-3 bg-[#F9F9F8] border border-[#E8E8E3] rounded-xl text-xs text-[#141413] focus:outline-none focus:ring-1 focus:ring-[#1345EE] focus:border-[#1345EE] focus:bg-white transition-all resize-none mb-2"
                 rows={4}
-                placeholder={isPriceOnRequest ? "Ask about pricing and availability..." : "Add a custom message..."}
+                placeholder={isPriceOnRequest ? "Ask about pricing, dimensions, and acquisition details..." : "Add a custom message..."}
               />
-              <p className="text-xs text-gray-500 mb-8 font-medium">
+              <p className="text-[11px] text-[#6E6E69] mb-6 font-normal">
                 {isPriceOnRequest
                   ? "This will start a conversation with the creator to receive price and acquisition terms."
                   : "This message will start a new conversation with the creator."}
               </p>
               
-              <div className="flex items-center justify-end gap-3">
+              <div className="flex items-center justify-end gap-2.5">
                 <button
+                  type="button"
                   onClick={() => setShowInput(false)}
                   disabled={isLoading}
-                  className="px-5 py-2.5 text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors"
+                  className="px-4 py-2 text-xs font-medium text-[#6E6E69] hover:text-[#141413] transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
+                  type="button"
                   onClick={handleExpressInterest}
                   disabled={isLoading || !message.trim()}
-                  className="px-6 py-2.5 bg-gray-900 text-white rounded-full text-sm font-semibold hover:bg-gray-800 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  className="btn-premium-gradient-pill px-5 py-2.5 text-white rounded-full text-xs font-medium shadow-2xs disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 cursor-pointer"
                 >
-                  {isLoading ? 'Sending...' : (isPriceOnRequest ? 'Send Price Request →' : 'Send Request →')}
+                  <span>{isLoading ? 'Sending...' : (isPriceOnRequest ? 'Send Price Request' : 'Send Request')}</span>
                 </button>
               </div>
             </div>

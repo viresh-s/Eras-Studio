@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Settings, LogOut, ChevronDown, User } from 'lucide-react';
+import { Settings, ChevronDown, User, Menu, X } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import type { Profile } from '@/types/database';
 import NotificationBell from './NotificationBell';
@@ -61,8 +61,24 @@ export default function Navbar({ profile }: NavbarProps) {
       : userNavLinks;
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileMenuOpen]);
 
   const handleLogout = async () => {
     if (isLoggingOut) return;
@@ -143,7 +159,7 @@ export default function Navbar({ profile }: NavbarProps) {
           </nav>
 
           {/* Right Section */}
-          <div className="relative flex items-center">
+          <div className="relative flex items-center gap-1 sm:gap-2">
             <NotificationBell />
             
             <div className="relative flex items-center" ref={dropdownRef}>
@@ -151,7 +167,7 @@ export default function Navbar({ profile }: NavbarProps) {
                 onClick={() => setDropdownOpen(!dropdownOpen)}
                 className="flex items-center gap-2.5 p-1 rounded-full hover:bg-gray-50 transition-colors cursor-pointer"
               >
-              <div className="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-600 overflow-hidden flex-shrink-0">
+              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gray-200 flex items-center justify-center text-xs sm:text-sm font-bold text-gray-600 overflow-hidden shrink-0">
                 {profile.profile_pic_url ? (
                   <img
                     src={profile.profile_pic_url}
@@ -212,44 +228,159 @@ export default function Navbar({ profile }: NavbarProps) {
                   type="button"
                   onClick={handleLogout}
                   disabled={isLoggingOut}
-                  className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-[#FDF2F2] transition-colors w-full text-left cursor-pointer disabled:opacity-50"
+                  className="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-[#FDF2F2] transition-colors w-full text-left cursor-pointer disabled:opacity-50"
                 >
-                  <LogOut size={16} /> {isLoggingOut ? 'Signing out...' : 'Sign out'}
+                  <span>{isLoggingOut ? 'Logging out...' : 'Log out'}</span>
                 </button>
               </div>
             )}
           </div>
+
+          {/* Mobile Hamburger Button */}
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden p-2 rounded-xl text-[var(--color-cor-ink)] hover:bg-gray-100 transition-colors ml-1 cursor-pointer flex items-center justify-center min-w-[40px] min-h-[40px]"
+            aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+          >
+            {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile Navigation */}
-      <nav className="md:hidden border-t border-gray-100 overflow-x-auto">
-        <div className="flex px-4">
-          {links.map((link) => {
-            const isActive =
-              pathname === link.href ||
-              (link.href !== '/' && pathname.startsWith(link.href));
+      {/* Mobile Slide-out Drawer */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 z-50 md:hidden">
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity animate-in fade-in duration-200"
+            onClick={() => setMobileMenuOpen(false)}
+          />
 
-            return (
+          {/* Drawer Panel */}
+          <div className="fixed top-0 right-0 bottom-0 w-[300px] max-w-[85vw] bg-white shadow-2xl flex flex-col justify-between z-50 animate-in slide-in-from-right duration-250 border-l border-[#E8E8E3]">
+            {/* Top: Header & User Info */}
+            <div className="p-5 border-b border-[#F0F0EB]">
+              <div className="flex items-center justify-between mb-4">
+                <Link href="/discovery" onClick={() => setMobileMenuOpen(false)}>
+                  <Image
+                    src="/images/eras-logo.png"
+                    alt="ERAS Studio"
+                    width={110}
+                    height={18}
+                    className="h-5 w-auto object-contain"
+                  />
+                </Link>
+                <button
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="p-1.5 rounded-full text-gray-500 hover:text-[#141413] hover:bg-gray-100 transition-colors cursor-pointer"
+                  aria-label="Close menu"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              {/* User Profile Capsule in Drawer */}
+              <div className="flex items-center gap-3 pt-2">
+                <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-600 overflow-hidden shrink-0">
+                  {profile.profile_pic_url ? (
+                    <img
+                      src={profile.profile_pic_url}
+                      alt="Profile"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    getInitials(profile.full_name)
+                  )}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-[#141413] truncate">
+                    {profile.full_name || 'Creator'}
+                  </p>
+                  <p className="text-xs text-[#6E6E69] truncate">
+                    {planLabel}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Middle: Navigation Links */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-1">
+              <p className="px-3 py-1.5 text-[10px] uppercase tracking-wider font-semibold text-[#8E8E88]">
+                Navigation
+              </p>
+              {links.map((link) => {
+                const isActive =
+                  pathname === link.href ||
+                  (link.href !== '/' && pathname.startsWith(link.href));
+
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                      isActive
+                        ? 'bg-[#141413] text-white'
+                        : 'text-[#4A4A46] hover:bg-gray-100 hover:text-[#141413]'
+                    }`}
+                  >
+                    <span>{link.label}</span>
+                    {isActive && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-white" />
+                    )}
+                  </Link>
+                );
+              })}
+
+              <div className="h-px bg-[#F0F0EB] my-3" />
+
+              <p className="px-3 py-1.5 text-[10px] uppercase tracking-wider font-semibold text-[#8E8E88]">
+                Account
+              </p>
               <Link
-                key={link.href}
-                href={link.href}
-                className={`relative px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors ${
-                  isActive
-                    ? 'text-[var(--color-cor-ink)]'
-                    : 'text-[var(--color-cor-ink-light)] hover:text-[var(--color-cor-ink)]'
-                }`}
+                href={profile.role === 'Creator' ? '/profile' : '/user/profile'}
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 px-3.5 py-2 rounded-xl text-sm text-[#4A4A46] hover:bg-gray-100 hover:text-[#141413] transition-colors"
               >
-                {link.label}
-                {isActive && (
-                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-[2px] bg-[var(--color-cor-ink)] rounded-full" />
-                )}
+                <User size={16} />
+                <span>Edit Profile</span>
               </Link>
-            );
-          })}
+              <Link
+                href="/settings"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 px-3.5 py-2 rounded-xl text-sm text-[#4A4A46] hover:bg-gray-100 hover:text-[#141413] transition-colors"
+              >
+                <Settings size={16} />
+                <span>Account Settings</span>
+              </Link>
+              <Link
+                href="/subscription"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 px-3.5 py-2 rounded-xl text-sm text-[#4A4A46] hover:bg-gray-100 hover:text-[#141413] transition-colors"
+              >
+                <span>Subscription</span>
+              </Link>
+            </div>
+
+            {/* Bottom: Logout */}
+            <div className="p-4 border-t border-[#F0F0EB] bg-gray-50/50">
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  handleLogout();
+                }}
+                disabled={isLoggingOut}
+                className="w-full py-2.5 px-4 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 transition-colors text-left flex items-center justify-between cursor-pointer disabled:opacity-50"
+              >
+                <span>{isLoggingOut ? 'Logging out...' : 'Log out'}</span>
+              </button>
+            </div>
+          </div>
         </div>
-      </nav>
+      )}
     </header>
   );
 }

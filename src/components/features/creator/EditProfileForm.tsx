@@ -1369,7 +1369,7 @@ export default function EditProfileForm({ userProfile }: { userProfile: Profile 
               </div>
 
               {/* 2. Menu Item Buttons with Signature Soft Pill Hover & Active Effect */}
-              <div className="p-3 sm:p-3.5 space-y-1.5 bg-white">
+              <div className="p-2 sm:p-3.5 flex flex-row overflow-x-auto md:flex-col gap-1.5 md:space-y-1.5 scrollbar-none bg-white">
                 {CREATOR_TABS.map((tab) => {
                   const isActive = activeTab === tab.key;
                   return (
@@ -1381,7 +1381,7 @@ export default function EditProfileForm({ userProfile }: { userProfile: Profile 
                         background: isActive ? '#F1F2FF' : 'transparent',
                         borderRadius: 12,
                       }}
-                      className={`w-full text-left px-4 py-3 flex items-center justify-between transition-all duration-200 cursor-pointer group focus:outline-none ${
+                      className={`w-auto md:w-full shrink-0 whitespace-nowrap text-left px-3.5 sm:px-4 py-2 sm:py-3 flex items-center justify-between gap-3 transition-all duration-200 cursor-pointer group focus:outline-none ${
                         isActive
                           ? 'text-[#1345EE] font-semibold'
                           : 'text-[#646A77] hover:bg-[#F1F2FF] hover:text-[#1345EE] font-medium'
@@ -1391,7 +1391,7 @@ export default function EditProfileForm({ userProfile }: { userProfile: Profile 
                         style={{
                           fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
                         }}
-                        className="text-[13.5px] block transition-colors"
+                        className="text-[13px] sm:text-[13.5px] block transition-colors"
                       >
                         {tab.label}
                       </span>
@@ -1404,7 +1404,7 @@ export default function EditProfileForm({ userProfile }: { userProfile: Profile 
               </div>
 
               {/* 3. Simple Profile Completeness Progress Bar (Clean White) */}
-              <div className="p-5 border-t border-[#E8E8E3] bg-white space-y-2">
+              <div className="hidden md:block p-5 border-t border-[#E8E8E3] bg-white space-y-2">
                 <div className="flex items-center justify-between text-xs">
                   <span className="font-medium text-[#71716D]">Profile Completeness</span>
                   <span className="font-semibold text-blue-600">{readinessScore}%</span>
@@ -1427,7 +1427,7 @@ export default function EditProfileForm({ userProfile }: { userProfile: Profile 
             </div>
 
             {/* 5. Bottom Trust Badge */}
-            <div className="p-5 border-t border-[#E8E8E3] bg-white">
+            <div className="hidden md:block p-5 border-t border-[#E8E8E3] bg-white">
               <div className="flex items-center justify-center gap-1.5 text-[10px] text-[#8E8E88]">
                 <CheckCircle2 size={12} className="text-emerald-600" />
                 <span>Verified Creator Portfolio</span>
@@ -1436,7 +1436,7 @@ export default function EditProfileForm({ userProfile }: { userProfile: Profile 
           </nav>
 
           {/* Right Main Content Pane */}
-          <main className="p-7 sm:p-10 flex flex-col justify-between">
+          <main className="p-4 sm:p-7 md:p-10 flex flex-col justify-between">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 flex-1 flex flex-col justify-between">
               <div>
                 {/* TAB 1: BASIC INFORMATION (with Socials & Website) */}

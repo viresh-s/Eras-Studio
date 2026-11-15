@@ -44,19 +44,19 @@ export default function ReportArtworkButton({
           type="button"
           onClick={handleClick}
           title="Report this artwork"
-          className={`p-2.5 rounded-full text-gray-400 hover:text-red-600 hover:bg-red-50/70 border border-gray-200 transition-colors shadow-xs ${className}`}
+          className={`p-2.5 rounded-full text-[#6E6E69] hover:text-red-600 hover:bg-red-50/70 border border-[#E8E8E3] transition-colors shadow-2xs cursor-pointer ${className}`}
           aria-label="Report Artwork"
         >
-          <Icon size={16} />
+          <Icon size={14} />
         </button>
       ) : (
         <button
           type="button"
           onClick={handleClick}
-          className={`px-5 py-3 rounded-full text-xs font-bold transition-all shadow-xs flex items-center gap-2 border border-gray-200 text-gray-600 hover:text-red-600 hover:border-red-200 hover:bg-red-50/60 ${className}`}
+          className={`btn-gradient-border-hover px-4 py-2.5 rounded-full text-xs font-medium shadow-2xs flex items-center gap-2 cursor-pointer ${className}`}
+          style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
           aria-label="Report Artwork"
         >
-          <Icon size={14} className="text-current" />
           <span>Report Artwork</span>
         </button>
       )}

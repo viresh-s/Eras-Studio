@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import ArtworkGridCard from '@/components/features/creator/ArtworkGridCard';
 import { CollectionItem } from '@/actions/collectionActions';
-import { ArrowLeft, Folder, Layers, Sparkles } from 'lucide-react';
+import { recordCollectionView } from '@/actions/metricsActions';
+import { ArrowLeft, Folder, Layers, Sparkles, Heart, Eye } from 'lucide-react';
 
 interface ProfileTabsProps {
   artworks: any[];
@@ -27,6 +28,20 @@ export default function ProfileTabs({ artworks, profile, collections = [] }: Pro
     setSelectedCollection(null);
   };
 
+  // Open and record view for a whole collection
+  const handleSelectCollection = (col: CollectionItem) => {
+    setSelectedCollection(col);
+    try {
+      const storageKey = `eras_view_col_${col.id}`;
+      if (!sessionStorage.getItem(storageKey)) {
+        sessionStorage.setItem(storageKey, '1');
+        recordCollectionView(col.id);
+      }
+    } catch {
+      recordCollectionView(col.id);
+    }
+  };
+
   // Filter artworks for the active selected collection view
   const activeCollectionArtworks = selectedCollection
     ? artworks.filter(
@@ -39,12 +54,12 @@ export default function ProfileTabs({ artworks, profile, collections = [] }: Pro
   return (
     <div style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}>
       {/* Tab Headers */}
-      <div className="flex items-center gap-2 mb-10 border-b border-transparent">
+      <div className="flex items-center gap-2 mb-8 overflow-x-auto pb-1 scrollbar-none border-b border-transparent">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => handleTabChange(tab.id)}
-            className={`px-6 py-2.5 text-xs font-normal rounded-full transition-colors cursor-pointer ${
+            className={`px-5 sm:px-6 py-2 sm:py-2.5 text-xs font-normal rounded-full transition-colors cursor-pointer shrink-0 whitespace-nowrap ${
               activeTab === tab.id
                 ? 'bg-[#1A1A1A] text-white shadow-xs'
                 : 'bg-transparent text-gray-500 hover:text-gray-900'
@@ -59,7 +74,7 @@ export default function ProfileTabs({ artworks, profile, collections = [] }: Pro
       {activeTab === 'works' && (
         <div>
           {artworks.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 md:gap-5">
               {artworks.map((artwork) => (
                 <ArtworkGridCard key={artwork.id} artwork={artwork} creatorName={profile.full_name} />
               ))}
@@ -103,16 +118,27 @@ export default function ProfileTabs({ artworks, profile, collections = [] }: Pro
                       </p>
                     )}
                   </div>
-                  <span className="text-xs text-gray-500 font-normal shrink-0">
-                    {activeCollectionArtworks.length}{' '}
-                    {activeCollectionArtworks.length === 1 ? 'Artwork' : 'Artworks'}
-                  </span>
+                  <div className="flex items-center gap-3 text-xs text-gray-500 font-normal shrink-0">
+                    <div className="flex items-center gap-1" title={`${selectedCollection.likes_count || 0} likes`}>
+                      <Heart size={13} className="text-gray-400" strokeWidth={1.75} />
+                      <span>{selectedCollection.likes_count || 0}</span>
+                    </div>
+                    <div className="flex items-center gap-1" title={`${selectedCollection.views_count || 0} views`}>
+                      <Eye size={13} className="text-gray-400" strokeWidth={1.75} />
+                      <span>{selectedCollection.views_count || 0}</span>
+                    </div>
+                    <span className="text-gray-300">·</span>
+                    <span>
+                      {activeCollectionArtworks.length}{' '}
+                      {activeCollectionArtworks.length === 1 ? 'Artwork' : 'Artworks'}
+                    </span>
+                  </div>
                 </div>
               </div>
 
               {/* Artworks in this Collection */}
               {activeCollectionArtworks.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 md:gap-5">
                   {activeCollectionArtworks.map((artwork) => (
                     <ArtworkGridCard key={artwork.id} artwork={artwork} creatorName={profile.full_name} />
                   ))}
@@ -127,7 +153,7 @@ export default function ProfileTabs({ artworks, profile, collections = [] }: Pro
             </div>
           ) : collections.length > 0 ? (
             /* Grid of Collection Cards */
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {collections.map((col) => {
                 const count = artworks.filter(
                   (a) =>
@@ -138,7 +164,7 @@ export default function ProfileTabs({ artworks, profile, collections = [] }: Pro
                 return (
                   <div
                     key={col.id}
-                    onClick={() => setSelectedCollection(col)}
+                    onClick={() => handleSelectCollection(col)}
                     className="bg-white rounded-3xl border border-gray-200 overflow-hidden shadow-2xs hover:shadow-md transition-all duration-200 cursor-pointer group flex flex-col"
                   >
                     {/* Cover Preview */}
@@ -183,7 +209,17 @@ export default function ProfileTabs({ artworks, profile, collections = [] }: Pro
                         )}
                       </div>
                       <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500 font-normal">
-                        <span className="text-[11px] text-[#2356FF]">Explore Collection &rarr;</span>
+                        <div className="flex items-center gap-3 text-[11px] text-[#6E6E69]">
+                          <div className="flex items-center gap-1" title={`${col.likes_count || 0} likes`}>
+                            <Heart size={13} className="text-[#6E6E69]" strokeWidth={1.75} />
+                            <span>{col.likes_count || 0}</span>
+                          </div>
+                          <div className="flex items-center gap-1" title={`${col.views_count || 0} views`}>
+                            <Eye size={13} className="text-[#6E6E69]" strokeWidth={1.75} />
+                            <span>{col.views_count || 0}</span>
+                          </div>
+                        </div>
+                        <span className="text-[11px] text-[#2356FF] font-medium">Explore Collection</span>
                       </div>
                     </div>
                   </div>
@@ -203,7 +239,7 @@ export default function ProfileTabs({ artworks, profile, collections = [] }: Pro
       {/* Tab Content: About */}
       {activeTab === 'about' && (
         <div className="max-w-2xl">
-          <div className="bg-white rounded-xl border border-gray-200 p-8">
+          <div className="bg-white rounded-2xl border border-gray-200 p-5 sm:p-8">
             {profile.about_me && (
               <div className="mb-6">
                 <h3 className="text-xs font-normal tracking-[0.15em] text-gray-400 uppercase mb-2">Biography</h3>

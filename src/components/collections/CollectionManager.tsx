@@ -16,6 +16,8 @@ import {
   ArrowLeft,
   Search,
   Image as ImageIcon,
+  Heart,
+  Eye,
 } from 'lucide-react';
 import {
   CollectionItem,
@@ -183,14 +185,14 @@ export default function CollectionManager({
 
   return (
     <div
-      className="-mt-8 -mx-6 -mb-8 flex flex-col flex-1 min-h-screen"
+      className="-mt-5 sm:-mt-8 -mx-4 sm:-mx-6 -mb-5 sm:-mb-8 flex flex-col flex-1 min-h-screen"
       style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
     >
       {/* ======================================================== */}
       {/* 1. TOP HEADER SECTION: PURE WHITE                        */}
       {/* ======================================================== */}
-      <div className="bg-white border-b border-[#E3E3E7] w-full pt-8 sm:pt-10 pb-6">
-        <div className="max-w-[1400px] mx-auto px-6">
+      <div className="bg-white border-b border-[#E3E3E7] w-full pt-6 sm:pt-10 pb-6">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
           {/* Breadcrumb / Back Link */}
           <div className="mb-4">
             <Link
@@ -240,8 +242,8 @@ export default function CollectionManager({
       {/* ======================================================== */}
       {/* 2. LOWER SECTION: WARM #F2F0ED BACKGROUND                */}
       {/* ======================================================== */}
-      <div className="bg-[#F2F0ED] flex-1 w-full py-8 sm:py-10">
-        <div className="max-w-[1400px] mx-auto px-6">
+      <div className="bg-[#F2F0ED] flex-1 w-full py-6 sm:py-10">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
           {/* Controls Bar: Search */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-8">
             <div
@@ -337,12 +339,29 @@ export default function CollectionManager({
                       </div>
 
                       {/* Row 3: Description */}
-                      <p
-                        className="text-[11px] sm:text-xs text-[#6E6E69] line-clamp-2 leading-relaxed"
+                      {col.description?.trim() ? (
+                        <p
+                          className="text-[11px] sm:text-xs text-[#6E6E69] line-clamp-2 leading-relaxed"
+                          style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+                        >
+                          {col.description}
+                        </p>
+                      ) : null}
+
+                      {/* Row 4: Stats (Heart & Views) */}
+                      <div
+                        className="flex items-center gap-4 text-[11px] sm:text-xs text-[#6E6E69] font-normal pt-0.5"
                         style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
                       >
-                        {col.description || 'No curatorial statement provided.'}
-                      </p>
+                        <div className="flex items-center gap-1" title={`${col.likes_count || 0} likes`}>
+                          <Heart size={13} className="text-[#6E6E69]" strokeWidth={1.75} />
+                          <span>{col.likes_count || 0}</span>
+                        </div>
+                        <div className="flex items-center gap-1" title={`${col.views_count || 0} views`}>
+                          <Eye size={13} className="text-[#6E6E69]" strokeWidth={1.75} />
+                          <span>{col.views_count || 0}</span>
+                        </div>
+                      </div>
 
                       {/* Divider Line */}
                       <div className="h-[1px] bg-[#E8E8E3] w-full my-0.5" />

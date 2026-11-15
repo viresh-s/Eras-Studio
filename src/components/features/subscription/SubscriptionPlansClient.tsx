@@ -71,8 +71,8 @@ export function SubscriptionPlansClient({
           targetPlan === 'pro'
             ? 'Welcome to Pro! You now have full access to COR career tools and unlimited uploads.'
             : targetPlan === 'lite'
-            ? 'Upgraded to Lite! Your portfolio capacity has expanded to 50 artworks.'
-            : 'Plan updated to Free.'
+              ? 'Upgraded to Lite! Your portfolio capacity has expanded to 50 artworks.'
+              : 'Plan updated to Free.'
         );
         router.refresh();
       } else {
@@ -232,7 +232,7 @@ export function SubscriptionPlansClient({
       </div>
 
       {/* Active Subscription Status Banner (Capsule style) */}
-      <div className="mb-10 flex items-center justify-between flex-wrap gap-3 px-5 py-3 rounded-full bg-white border border-[#EBEBE6] shadow-2xs">
+      <div className="mb-10 flex items-center justify-between flex-wrap gap-3 px-4 sm:px-5 py-3 rounded-2xl sm:rounded-full bg-white border border-[#EBEBE6] shadow-2xs">
         <div className="flex items-center gap-3">
           <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
           <p className="text-xs text-gray-600 font-normal">
@@ -535,8 +535,8 @@ export function SubscriptionPlansClient({
                   {selectedPlanForModal === 'pro'
                     ? '₹999 / month'
                     : selectedPlanForModal === 'lite'
-                    ? '₹499 / month'
-                    : '₹0 / month'}
+                      ? '₹499 / month'
+                      : '₹0 / month'}
                 </span>
               </div>
               <div className="flex justify-between items-center pt-2 border-t border-[#EBEBE6] text-gray-500 font-normal">

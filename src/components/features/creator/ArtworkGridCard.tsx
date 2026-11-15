@@ -64,39 +64,39 @@ export default function ArtworkGridCard({ artwork, creatorName, children }: Artw
           </div>
           
           {/* Content Container */}
-          <div className="pt-4 pb-2">
-            <div className="flex justify-between items-baseline mb-1 gap-2">
+          <div className="pt-2.5 sm:pt-4 pb-2">
+            <div className="flex justify-between items-baseline mb-1 gap-1.5">
               <h3
-                className="font-serif italic text-lg sm:text-xl font-semibold text-gray-900 truncate tracking-tight"
+                className="font-serif italic text-sm sm:text-base md:text-xl font-semibold text-gray-900 truncate tracking-tight"
                 style={{ fontFamily: "'Century Schoolbook', Century, serif", fontStyle: 'italic' }}
               >
                 {artwork.title}
               </h3>
               {artwork.year && (
-                <span className="font-sans text-[11px] text-gray-400 font-medium tracking-wider ml-auto flex-shrink-0" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                <span className="font-sans text-[10px] sm:text-[11px] text-gray-400 font-medium tracking-wider ml-auto flex-shrink-0" style={{ fontFamily: "'Poppins', sans-serif" }}>
                   {artwork.year}
                 </span>
               )}
             </div>
             
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center text-[9px] font-bold text-gray-600 flex-shrink-0 font-sans" style={{ fontFamily: "'Poppins', sans-serif" }}>
+            <div className="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
+              <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-gray-200 flex items-center justify-center text-[8px] sm:text-[9px] font-bold text-gray-600 flex-shrink-0 font-sans" style={{ fontFamily: "'Poppins', sans-serif" }}>
                 {getInitials(displayName)}
               </div>
-              <p className="font-sans text-[11px] text-gray-500 truncate" style={{ fontFamily: "'Poppins', sans-serif" }}>
+              <p className="font-sans text-[10px] sm:text-[11px] text-gray-500 truncate" style={{ fontFamily: "'Poppins', sans-serif" }}>
                 <span className="font-medium text-gray-700">{displayName}</span>{' '}
                 <span className="text-gray-400 mx-0.5">·</span>{' '}
                 {artwork.art_type}
               </p>
             </div>
             
-            <div className="flex items-center justify-between border-t border-gray-100 pt-3">
+            <div className="flex items-center justify-between border-t border-gray-100 pt-2 sm:pt-3">
               <div className="flex items-center gap-1.5 font-sans">
                 <span className={`w-1.5 h-1.5 rounded-full ${
                   artwork.status === 'Available' ? 'bg-green-500' :
                   artwork.status === 'Sold' ? 'bg-red-400' : 'bg-gray-400'
                 }`} />
-                <span className="font-sans text-[10px] font-bold text-gray-600 uppercase tracking-widest" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                <span className="font-sans text-[9px] sm:text-[10px] font-bold text-gray-600 uppercase tracking-widest" style={{ fontFamily: "'Poppins', sans-serif" }}>
                   {artwork.status}
                 </span>
               </div>

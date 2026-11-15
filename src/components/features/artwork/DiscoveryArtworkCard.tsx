@@ -47,11 +47,11 @@ export default function DiscoveryArtworkCard({
     null;
 
   return (
-    <div className={`break-inside-avoid group ${className !== '' ? className : 'mb-4 sm:mb-5'}`}>
-      <div className="relative bg-white rounded-[22px] p-2 border border-[#EBEBE6] shadow-[0_2px_10px_rgba(20,20,19,0.03)] hover:shadow-[0_10px_28px_rgba(20,20,19,0.08)] transition-all duration-300">
+    <div className={`w-full group ${className !== '' ? className : 'mb-3 sm:mb-5'}`}>
+      <div className="relative bg-white rounded-[16px] sm:rounded-[22px] p-1.5 sm:p-2 border border-[#EBEBE6] shadow-[0_2px_10px_rgba(20,20,19,0.03)] hover:shadow-[0_10px_28px_rgba(20,20,19,0.08)] transition-all duration-300">
         <Link href={`/artwork/${artwork.id}`} className="block cursor-pointer">
           {/* Artwork Image Container with Anti-Download Shield */}
-          <div className={`relative overflow-hidden rounded-[18px] bg-[#F5F5F0] ${PROTECTED_CONTAINER_CLASS}`}>
+          <div className={`relative overflow-hidden rounded-[13px] sm:rounded-[18px] bg-[#F5F5F0] ${PROTECTED_CONTAINER_CLASS}`}>
             <img
               src={artwork.image_url}
               alt={artwork.title}
@@ -81,10 +81,10 @@ export default function DiscoveryArtworkCard({
           </div>
 
           {/* Single Row: [Avatar] Creator Name on left, Availability on right */}
-          <div className="pt-2.5 pb-1 px-1 flex items-center justify-between gap-2">
-            <div className="min-w-0 flex items-center gap-2 truncate">
+          <div className="pt-2 pb-0.5 sm:pt-2.5 sm:pb-1 px-0.5 sm:px-1 flex items-center justify-between gap-1 sm:gap-2">
+            <div className="min-w-0 flex items-center gap-1.5 sm:gap-2 truncate">
               <div
-                className="w-5 h-5 rounded-full bg-gray-200 border border-gray-300/60 overflow-hidden flex items-center justify-center text-[9px] font-normal text-gray-700 shrink-0 font-sans"
+                className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-gray-200 border border-gray-300/60 overflow-hidden flex items-center justify-center text-[8px] sm:text-[9px] font-normal text-gray-700 shrink-0 font-sans"
                 style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
               >
                 {avatarUrl ? (
@@ -98,7 +98,7 @@ export default function DiscoveryArtworkCard({
                 )}
               </div>
               <span
-                className="text-[12px] sm:text-[13px] font-normal text-[#141413] group-hover:text-[#B8532F] transition-colors truncate"
+                className="text-[11px] sm:text-[13px] font-normal text-[#141413] group-hover:text-[#B8532F] transition-colors truncate"
                 style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
               >
                 {creatorName}
@@ -116,7 +116,7 @@ export default function DiscoveryArtworkCard({
                 }`}
               />
               <span
-                className="text-[11px] sm:text-[12px] font-normal text-gray-600 capitalize tracking-tight"
+                className="text-[10px] sm:text-[12px] font-normal text-gray-600 capitalize tracking-tight"
                 style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
               >
                 {artwork.status || 'Available'}

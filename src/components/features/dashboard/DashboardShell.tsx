@@ -17,7 +17,7 @@ export default function DashboardShell({ profile, children }: DashboardShellProp
   return (
     <div className="min-h-screen flex flex-col bg-[var(--color-cor-bg)]">
       <Navbar profile={profile} />
-      <main className="max-w-[1400px] mx-auto px-6 py-8 flex-1 w-full">
+      <main className="max-w-[1400px] mx-auto px-4 sm:px-6 py-5 sm:py-8 flex-1 w-full overflow-x-hidden">
         {children}
       </main>
       <Footer />

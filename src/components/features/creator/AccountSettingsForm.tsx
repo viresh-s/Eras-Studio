@@ -234,7 +234,7 @@ export default function AccountSettingsForm({
         </div>
 
         {/* Quick Section Navigation Links */}
-        <div className="bg-white rounded-2xl p-2.5 border border-[#E8E8E3] shadow-xs space-y-1">
+        <div className="hidden lg:block bg-white rounded-2xl p-2.5 border border-[#E8E8E3] shadow-xs space-y-1">
           <button
             type="button"
             onClick={() => {
@@ -352,7 +352,7 @@ export default function AccountSettingsForm({
         {/* Section 1: Change Email */}
         <section
           id="email-section"
-          className="bg-white rounded-2xl p-6 sm:p-8 border border-[#E8E8E3] shadow-xs space-y-6"
+          className="bg-white rounded-2xl p-4 sm:p-6 lg:p-8 border border-[#E8E8E3] shadow-xs space-y-6"
         >
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-[#F0F0EB] pb-5">
             <div className="space-y-1">
@@ -429,7 +429,7 @@ export default function AccountSettingsForm({
         {/* Section 2: Change Password */}
         <section
           id="password-section"
-          className="bg-white rounded-2xl p-6 sm:p-8 border border-[#E8E8E3] shadow-xs space-y-6"
+          className="bg-white rounded-2xl p-4 sm:p-6 lg:p-8 border border-[#E8E8E3] shadow-xs space-y-6"
         >
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-[#F0F0EB] pb-5">
             <div className="space-y-1">
@@ -582,7 +582,7 @@ export default function AccountSettingsForm({
         {/* Section 3: Security & Session Protocols */}
         <section
           id="security-section"
-          className="bg-white rounded-2xl p-6 sm:p-8 border border-[#E8E8E3] shadow-xs space-y-4"
+          className="bg-white rounded-2xl p-4 sm:p-6 lg:p-8 border border-[#E8E8E3] shadow-xs space-y-4"
         >
           <div className="space-y-1 border-b border-[#F0F0EB] pb-4">
             <div className="flex items-center gap-2">
@@ -617,7 +617,7 @@ export default function AccountSettingsForm({
         {/* Section 4: Danger Zone */}
         <section
           id="danger-section"
-          className="bg-[#FCF6F6] rounded-2xl p-6 sm:p-8 border border-[#F2D8D8] shadow-xs space-y-6"
+          className="bg-[#FCF6F6] rounded-2xl p-4 sm:p-6 lg:p-8 border border-[#F2D8D8] shadow-xs space-y-6"
         >
           <div className="flex items-start justify-between gap-4 border-b border-[#F7E5E5] pb-5">
             <div className="space-y-1">

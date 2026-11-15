@@ -300,7 +300,7 @@ export default function ChatListClient({ initialChats, currentUserId }: ChatList
           background: '#F6F7F8',
           borderRadius: 24,
         }}
-        className="p-4 sm:p-6 lg:p-7 border border-[#ECEEF1] shadow-2xs overflow-hidden"
+        className="p-2.5 sm:p-5 lg:p-7 border border-[#ECEEF1] shadow-2xs overflow-hidden"
       >
         {/* ======================================================== */}
         {/* TAB 1: MESSAGES (Split-view Sidebar + Conversation Pane) */}

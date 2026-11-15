@@ -1,8 +1,15 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Poppins } from "next/font/google";
 import { Suspense } from "react";
 import "./globals.css";
 import NavigationProgress from "@/components/providers/NavigationProgress";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: "#FFFFFF",
+};
 
 const poppins = Poppins({
   subsets: ["latin"],

@@ -494,14 +494,9 @@ export default function DashboardLayout({
                     handleLogout();
                   }}
                   disabled={isLoggingOut}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-[#E8E8E3] bg-white text-xs uppercase tracking-[0.08em] font-medium text-[#6E6E69] hover:text-[#B83838] hover:border-[#F2C6C6] hover:bg-[#FDF2F2] transition-colors cursor-pointer"
+                  className="inline-flex items-center px-4 py-2 rounded-xl border border-[#E8E8E3] bg-white text-xs uppercase tracking-[0.08em] font-medium text-[#6E6E69] hover:text-[#B83838] hover:border-[#F2C6C6] hover:bg-[#FDF2F2] transition-colors cursor-pointer"
                 >
-                  {isLoggingOut ? (
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  ) : (
-                    <LogOut className="w-3.5 h-3.5 stroke-[1.75]" />
-                  )}
-                  <span>Logout</span>
+                  <span>{isLoggingOut ? "Logging out..." : "Logout"}</span>
                 </button>
               </div>
             </div>
@@ -855,14 +850,9 @@ export default function DashboardLayout({
                 onClick={handleLogout}
                 disabled={isLoggingOut}
                 aria-label="Log out"
-                className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-xl border border-[#E8E8E3] bg-white text-xs uppercase tracking-[0.08em] font-medium text-[#141413] hover:text-[#B83838] hover:border-[#F2C6C6] hover:bg-[#FDF2F2] transition-colors cursor-pointer disabled:opacity-50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#141413] shadow-2xs"
+                className="inline-flex items-center px-4 py-1.5 rounded-xl border border-[#E8E8E3] bg-white text-xs uppercase tracking-[0.08em] font-medium text-[#141413] hover:text-[#B83838] hover:border-[#F2C6C6] hover:bg-[#FDF2F2] transition-colors cursor-pointer disabled:opacity-50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#141413] shadow-2xs"
               >
-                {isLoggingOut ? (
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                ) : (
-                  <LogOut className="w-3.5 h-3.5 stroke-[1.75]" />
-                )}
-                <span>Logout</span>
+                <span>{isLoggingOut ? "Logging out..." : "Logout"}</span>
               </button>
             </div>
           </header>
