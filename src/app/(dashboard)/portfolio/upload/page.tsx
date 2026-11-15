@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation';
 import { createClient, getAuthenticatedProfile } from '@/lib/supabase/server';
 import { checkFreemiumStatus } from '@/lib/freemium/check';
 import { getCreatorCollections } from '@/actions/collectionActions';
-import ArtworkUploadForm from '@/components/features/creator/ArtworkUploadForm';
+import UploadPageClient from './UploadPageClient';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,7 +22,7 @@ export default async function UploadPage() {
   }
 
   return (
-    <ArtworkUploadForm
+    <UploadPageClient
       userId={user.id}
       profile={profile}
       collections={collections || []}

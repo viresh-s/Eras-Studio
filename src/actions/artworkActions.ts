@@ -247,3 +247,119 @@ export async function updateArtwork(artworkId: string, data: Partial<CreateArtwo
   revalidatePath('/discovery');
   revalidatePath('/admin/artworks');
 }
+
+// ---------------------------------------------------------------------------
+// Bulk Artwork Creation
+// ---------------------------------------------------------------------------
+
+export interface BulkArtworkInput {
+  title: string;
+  artType: string;
+  artistName: string;
+  year?: string;
+  price?: number | null;
+  priceVisibility: string;
+  status: string;
+  collectionId?: string | null;
+  collection?: string | null;
+  dimensions?: string;
+  width?: string;
+  height?: string;
+  style?: string;
+  cardUrl: string;
+  fullUrl: string;
+  imageWidth?: number;
+  imageHeight?: number;
+  aspectRatio?: number;
+}
+
+/**
+ * Creates multiple artworks in a single atomic insert.
+ *
+ * Rate-limited to 5 bulk operations per hour per user.
+ * Enforces freemium quota before inserting.
+ */
+export async function createArtworksBulkAction(items: BulkArtworkInput[]) {
+  // 1. Authentication
+  const { user, supabase } = await requireAuth({ requireActive: true });
+
+  // 2. Rate limiting
+  const rateLimit = checkRateLimit(`artwork:bulk:${user.id}`, {
+    maxRequests: 5,
+    windowSeconds: 3600,
+  });
+  if (!rateLimit.allowed) {
+    securityLogger.alert('RATE_LIMIT_EXCEEDED_BULK_ARTWORK', { userId: user.id });
+    throw new Error('Bulk upload limit reached. Please wait before uploading more.');
+  }
+
+  // 3. Freemium quota check
+  const freemiumStatus = await checkFreemiumStatus(user.id);
+  const remaining =
+    freemiumStatus.artworksLimit !== -1 && freemiumStatus.artworksLimit != null
+      ? freemiumStatus.artworksLimit - freemiumStatus.artworksUsed
+      : Infinity;
+
+  if (items.length > remaining) {
+    securityLogger.alert('FREEMIUM_BULK_LIMIT_BLOCKED', {
+      userId: user.id,
+      requested: items.length,
+      remaining,
+    });
+    throw new Error(
+      `You can only upload ${remaining} more artwork(s) on your current plan. Upgrade to publish more.`
+    );
+  }
+
+  // 4. Map items to DB records with sanitization
+  const records = items.map((item) => ({
+    creator_id: user.id,
+    title: sanitizeText(item.title, 255),
+    art_type: item.artType,
+    artist_name: sanitizeText(item.artistName, 255),
+    year: item.year || null,
+    price: item.price ?? null,
+    status: item.status || 'Available',
+    dimensions: item.dimensions || null,
+    width: item.width || null,
+    height: item.height || null,
+    style: item.style ? sanitizeText(item.style, 100) : null,
+    collection: item.collection ? sanitizeText(item.collection, 100) : null,
+    price_visibility: item.priceVisibility || 'Show Price',
+    image_url: item.cardUrl,
+    image_url_full: item.fullUrl,
+    image_width: item.imageWidth || null,
+    image_height: item.imageHeight || null,
+    aspect_ratio: item.aspectRatio || null,
+    is_published: true,
+  }));
+
+  // 5. Atomic bulk insert
+  const { data, error } = await supabase
+    .from('artworks')
+    .insert(records)
+    .select('id');
+
+  if (error) {
+    securityLogger.alert('BULK_ARTWORK_CREATE_DB_ERROR', {
+      userId: user.id,
+      error: error.message,
+      count: items.length,
+    });
+    throw new Error('Failed to create artworks. Please try again.');
+  }
+
+  // 6. Logging
+  securityLogger.info('BULK_ARTWORK_CREATED', {
+    userId: user.id,
+    count: data.length,
+    ids: data.map((d: any) => d.id),
+  });
+
+  // 7. Revalidate cached paths
+  revalidatePath('/portfolio');
+  revalidatePath('/discovery');
+  revalidatePath('/admin/artworks');
+
+  return { success: true as const, count: data.length, ids: data.map((d: any) => d.id) };
+}

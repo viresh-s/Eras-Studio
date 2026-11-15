@@ -335,8 +335,19 @@ export default function PortfolioClient({
               </div>
             </div>
 
-            {/* + Add Artwork Button */}
-            <div className="shrink-0">
+            {/* Action Buttons: Add Artwork & Bulk Upload */}
+            <div className="shrink-0 flex items-center gap-3">
+              {!isLimited && (
+                <Link
+                  href="/portfolio/upload?mode=bulk"
+                  className="px-4 sm:px-5 py-2.5 text-xs sm:text-sm font-medium text-[#1345EE] bg-white border border-[#1345EE]/30 hover:bg-[#1345EE]/5 transition-colors select-none rounded-full"
+                  style={{
+                    fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
+                  }}
+                >
+                  Bulk upload
+                </Link>
+              )}
               <RestrictedUploadAction
                 isLimited={isLimited}
                 label="Add artwork"
