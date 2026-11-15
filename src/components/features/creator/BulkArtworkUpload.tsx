@@ -501,20 +501,20 @@ export default function BulkArtworkUpload({
 
   return (
     <div
-      className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20"
+      className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 font-sans"
       style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
     >
       {/* Header */}
       <div className="mb-6 sm:mb-8 text-center sm:text-left">
         <h1
-          className="text-2xl sm:text-3xl font-bold text-[#141413] tracking-normal"
-          style={{ fontFamily: 'var(--font-century-schoolbook-italic)' }}
+          className="text-2xl sm:text-4xl lg:text-[42px] font-bold text-[#141413] tracking-tight leading-tight"
+          style={{
+            fontFamily: "'Century Schoolbook', Century, 'TeX Gyre Schola', Georgia, serif",
+            fontStyle: 'italic',
+          }}
         >
-          Bulk Upload Artworks
+          Bulk upload artworks
         </h1>
-        <p className="text-xs sm:text-sm text-[#6E6E69] mt-1.5 max-w-2xl">
-          Upload up to {batchLimit} artworks in a single batch. Adjust titles, mediums, prices, and dimensions individually or apply shared details across the entire collection.
-        </p>
       </div>
 
       {/* Global Error Banner */}
@@ -613,9 +613,6 @@ export default function BulkArtworkUpload({
           <div className="flex items-center justify-between gap-2 mb-3">
             <span className="text-xs font-semibold text-[#141413] uppercase tracking-wider">
               Apply to All Artworks
-            </span>
-            <span className="text-[11px] text-[#6E6E69]">
-              Set shared values once across the entire batch
             </span>
           </div>
 
@@ -1194,7 +1191,10 @@ export default function BulkArtworkUpload({
             {/* Modal Heading */}
             <h2
               className="text-xl sm:text-2xl font-bold text-[#141413] mb-1.5"
-              style={{ fontFamily: 'var(--font-century-schoolbook-italic)' }}
+              style={{
+                fontFamily: "'Century Schoolbook', Century, 'TeX Gyre Schola', Georgia, serif",
+                fontStyle: 'italic',
+              }}
             >
               Publishing Artworks
             </h2>
