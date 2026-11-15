@@ -268,6 +268,8 @@ export interface BulkArtworkInput {
   style?: string;
   cardUrl: string;
   fullUrl: string;
+  additionalImages?: string[];
+  additionalImagesFull?: string[];
   imageWidth?: number;
   imageHeight?: number;
   aspectRatio?: number;
@@ -328,6 +330,8 @@ export async function createArtworksBulkAction(items: BulkArtworkInput[]) {
     price_visibility: item.priceVisibility || 'Show Price',
     image_url: item.cardUrl,
     image_url_full: item.fullUrl,
+    additional_images: item.additionalImages || [],
+    additional_images_full: item.additionalImagesFull || [],
     image_width: item.imageWidth || null,
     image_height: item.imageHeight || null,
     aspect_ratio: item.aspectRatio || null,
