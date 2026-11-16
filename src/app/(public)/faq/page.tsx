@@ -118,28 +118,18 @@ export default function FaqPage() {
       {/* ========================================================================= */}
       {/* 1. HERO SECTION (Editorial ERAS Style)                                     */}
       {/* ========================================================================= */}
-      <section className="relative overflow-hidden pt-12 pb-14 sm:pt-20 sm:pb-20 border-b border-[#E8E8E3] bg-[#FAF9F5]">
+      <section className="relative overflow-hidden pt-14 pb-14 sm:pt-20 sm:pb-18 border-b border-[#E8E8E3] bg-[#FAF9F5]">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          {/* Subtle Pill Tag */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#E8E8E3] bg-white text-xs text-[#6E6E69] mb-5 shadow-xs">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#1345EE]" />
-            <span>Eras Studio Support</span>
-            <span className="text-[#8A8A85]">·</span>
-            <span className="text-[#1345EE] font-medium">FAQ & Help Center</span>
-          </div>
-
           {/* Editorial Title */}
-          <h1 className="font-serif italic font-medium text-4xl sm:text-5xl md:text-6xl tracking-tight text-[#141413] mb-4 leading-[1.12]">
+          <h1
+            className="font-serif italic font-medium text-4xl sm:text-5xl md:text-6xl tracking-tight text-[#141413] mb-8 leading-[1.12]"
+            style={{ fontFamily: "'Century', 'Century Schoolbook', serif", fontStyle: "italic" }}
+          >
             Questions, answered.
           </h1>
 
-          {/* Subtitle */}
-          <p className="text-sm sm:text-base text-[#6E6E69] max-w-xl mx-auto leading-relaxed">
-            Everything you need to know about collecting, exhibiting, acquiring, and connecting on Eras Studio.
-          </p>
-
           {/* Interactive Search Bar Pill */}
-          <div className="mt-8 max-w-xl mx-auto">
+          <div className="max-w-xl mx-auto">
             <div className="search-gradient-border-pill p-1.5 sm:p-2 bg-white shadow-[0_2px_14px_rgba(0,0,0,0.04)] flex items-center gap-3">
               <div className="pl-3.5 text-gray-400 flex items-center shrink-0">
                 <Search size={18} className="stroke-[1.75]" />
@@ -150,6 +140,7 @@ export default function FaqPage() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search questions, topics, or keywords..."
                 className="flex-1 bg-transparent text-sm text-[#141413] placeholder:text-gray-400 outline-none min-w-0"
+                style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
               />
               {searchQuery && (
                 <button
@@ -225,18 +216,19 @@ export default function FaqPage() {
                     aria-expanded={isOpen}
                   >
                     <div className="flex items-start sm:items-center gap-3 sm:gap-4 flex-1 min-w-0">
-                      {/* Monospace Item Counter */}
-                      <span className="text-xs font-mono text-[#8A8A85] shrink-0 pt-0.5 sm:pt-0">
+                      {/* Item Counter */}
+                      <span
+                        className="text-xs text-[#8A8A85] shrink-0 pt-0.5 sm:pt-0 font-medium"
+                        style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+                      >
                         {item.id}
                       </span>
 
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-[10px] uppercase tracking-wider font-semibold px-2 py-0.5 rounded-md bg-[#FAF9F5] border border-[#E8E8E3] text-[#6E6E69]">
-                            {item.categoryLabel}
-                          </span>
-                        </div>
-                        <h3 className="text-sm sm:text-base font-medium text-[#141413] group-hover:text-[#1345EE] transition-colors leading-snug">
+                        <h3
+                          className="text-sm sm:text-base font-medium text-[#141413] group-hover:text-[#1345EE] transition-colors leading-snug"
+                          style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+                        >
                           {item.q}
                         </h3>
                       </div>
@@ -268,7 +260,10 @@ export default function FaqPage() {
                       >
                         <div className="px-5 pb-6 pt-0 sm:px-6 sm:pb-6">
                           <div className="pl-7 sm:pl-9 pt-3 border-t border-[#F0F0EB]">
-                            <p className="text-xs sm:text-sm text-[#555550] leading-relaxed">
+                            <p
+                              className="text-xs sm:text-sm text-[#555550] leading-relaxed"
+                              style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+                            >
                               {item.a}
                             </p>
                           </div>
