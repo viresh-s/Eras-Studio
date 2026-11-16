@@ -59,11 +59,25 @@ export default function TopCreatorsRow({ creators, isLoading }: TopCreatorsRowPr
 
   if (isLoading) {
     return (
-      <div className="w-full my-8 bg-white/60 border border-[#E8E8E3] rounded-3xl p-6 sm:p-8 backdrop-blur-xs">
-        <div className="h-6 bg-gray-200 rounded-full w-48 mb-4 animate-pulse" />
-        <div className="flex gap-4 overflow-hidden">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="w-[260px] h-[320px] bg-white rounded-2xl border border-[#E8E8E3] animate-pulse shrink-0 p-5" />
+      <div className="w-full my-8 bg-white border border-[#E8E8E3] rounded-3xl p-5 sm:p-7 shadow-[0_4px_24px_rgba(20,20,19,0.03)] overflow-hidden animate-pulse">
+        <div className="h-7 bg-[#ECECE7] rounded-xl w-44 mb-6" />
+        <div className="flex gap-4 sm:gap-5 overflow-hidden">
+          {[0, 1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="w-[230px] sm:w-[250px] shrink-0 bg-white rounded-2xl border border-[#E8E8E3] p-4 sm:p-5 flex flex-col justify-between space-y-4"
+            >
+              <div className="flex items-center justify-between">
+                <div className="h-5 w-12 bg-[#ECECE7] rounded-full" />
+                <div className="h-5 w-16 bg-[#ECECE7] rounded-full" />
+              </div>
+              <div className="flex flex-col items-center space-y-3 py-2">
+                <div className="w-16 h-16 rounded-full bg-[#EBEBE6]" />
+                <div className="h-4 w-28 bg-[#ECECE7] rounded-full" />
+                <div className="h-3 w-20 bg-[#ECECE7] rounded-full" />
+              </div>
+              <div className="h-9 w-full bg-[#ECECE7] rounded-full" />
+            </div>
           ))}
         </div>
       </div>

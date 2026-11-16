@@ -2,6 +2,7 @@ import { createClient, getAuthenticatedUser } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
 import ChatListClient from './components/ChatListClient';
+import { ChatListSkeleton } from '@/components/ui/Skeleton';
 
 export default async function MessagesPage() {
   const user = await getAuthenticatedUser();
@@ -21,7 +22,7 @@ export default async function MessagesPage() {
 
   return (
     <div className="py-4">
-      <Suspense fallback={<div className="h-96 flex items-center justify-center text-gray-400 font-sans">Loading your inbox...</div>}>
+      <Suspense fallback={<ChatListSkeleton />}>
         <ChatListClient initialChats={chats || []} currentUserId={user.id} />
       </Suspense>
     </div>

@@ -11,6 +11,7 @@ import { fetchRankedDiscoveryArtworksAction } from '@/actions/rankingActions';
 import TopCreatorsRow from '@/components/features/discovery/TopCreatorsRow';
 import { getTopCreators, RankedCreator } from '@/lib/services/rankingService';
 import { PROTECTED_CONTAINER_CLASS, PROTECTED_IMAGE_CLASS } from '@/lib/media/assetProtection';
+import { ArtworkGridSkeleton } from '@/components/ui/Skeleton';
 
 const categoryPills = [
   { value: '', label: 'All works' },
@@ -615,24 +616,7 @@ export default function BrowsePage() {
         {/* 5. ARTWORK GALLERY GRID (Pinterest Masonry Layout matching reference spec) */}
         {/* ========================================================================= */}
         {isLoading && artworks.length === 0 ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-4 md:gap-5 items-start">
-            {[0, 1, 2, 3].map((colIdx) => (
-              <div key={colIdx} className="flex flex-col gap-2.5 sm:gap-4 md:gap-5 w-full min-w-0">
-                {[320, 260].map((height, i) => (
-                  <div key={i} className="bg-white rounded-[16px] sm:rounded-[22px] border border-[#E8E8E3] animate-pulse p-1.5 sm:p-2 shadow-xs">
-                    <div
-                      style={{ height: `${colIdx % 2 === 0 ? height : height + 40}px` }}
-                      className="w-full bg-gray-100 rounded-[13px] sm:rounded-[18px] mb-2"
-                    />
-                    <div className="space-y-1.5 px-1 pb-1">
-                      <div className="h-3.5 bg-gray-100 rounded-full w-3/4" />
-                      <div className="h-2.5 bg-gray-100 rounded-full w-1/2" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ))}
-          </div>
+          <ArtworkGridSkeleton count={8} />
         ) : artworks.length > 0 ? (
           <>
             {(() => {
