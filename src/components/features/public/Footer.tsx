@@ -16,7 +16,8 @@ export default function Footer() {
                   alt="ERAS Studio"
                   width={140}
                   height={23}
-                  className="h-7 sm:h-8 w-auto object-contain select-none"
+                  className="h-7 sm:h-8 w-auto object-contain select-none brightness-0 invert"
+                  style={{ filter: 'brightness(0) invert(1)' }}
                 />
               </Link>
               <p className="mt-3 text-[#9E9E98] text-xs sm:text-sm leading-relaxed max-w-xs">
