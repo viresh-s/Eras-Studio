@@ -9,11 +9,6 @@ import {
   Minus,
   ArrowRight,
   HelpCircle,
-  Mail,
-  ShieldCheck,
-  MessageSquare,
-  Palette,
-  Sparkles,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -311,71 +306,21 @@ export default function FaqPage() {
         )}
 
         {/* ========================================================================= */}
-        {/* 3. SUPPORT & CONTACT CTA CARD (ERAS Webapp Theme)                         */}
+        {/* 3. CALL TO ACTION                                                         */}
         {/* ========================================================================= */}
-        <div className="mt-16 sm:mt-24 bg-[#FAF9F5] border border-[#E8E8E3] rounded-3xl p-8 sm:p-12 shadow-xs">
-          <div className="text-center max-w-xl mx-auto mb-10">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-[#E8E8E3] text-[11px] text-[#6E6E69] font-medium mb-3">
-              <Sparkles size={12} className="text-[#1345EE]" />
-              <span>Personalized Advisory</span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-serif italic text-[#141413] tracking-tight mb-2.5">
-              Still have questions on your mind?
-            </h2>
-            <p className="text-xs sm:text-sm text-[#6E6E69] leading-relaxed">
-              Our curatorial and support specialists are always here to assist with acquisitions, onboarding, and platform navigation.
-            </p>
-          </div>
-
-          {/* 3 Value Pillars */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-            <div className="bg-white border border-[#E8E8E3] rounded-2xl p-5 text-center shadow-2xs">
-              <div className="w-9 h-9 rounded-full bg-[#FAF9F5] border border-[#E8E8E3] flex items-center justify-center mx-auto mb-3 text-[#1345EE]">
-                <Mail size={16} />
-              </div>
-              <h4 className="text-xs font-semibold text-[#141413] uppercase tracking-wider mb-1">
-                Email Advisory
-              </h4>
-              <p className="text-xs text-[#6E6E69]">hello@eras.art</p>
-              <span className="inline-block mt-2 text-[10px] text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full font-medium">
-                Within 24 hours
-              </span>
-            </div>
-
-            <div className="bg-white border border-[#E8E8E3] rounded-2xl p-5 text-center shadow-2xs">
-              <div className="w-9 h-9 rounded-full bg-[#FAF9F5] border border-[#E8E8E3] flex items-center justify-center mx-auto mb-3 text-[#1345EE]">
-                <MessageSquare size={16} />
-              </div>
-              <h4 className="text-xs font-semibold text-[#141413] uppercase tracking-wider mb-1">
-                Direct Dialogue
-              </h4>
-              <p className="text-xs text-[#6E6E69]">Inquire with creators</p>
-              <span className="inline-block mt-2 text-[10px] text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full font-medium">
-                1-to-1 Chat
-              </span>
-            </div>
-
-            <div className="bg-white border border-[#E8E8E3] rounded-2xl p-5 text-center shadow-2xs">
-              <div className="w-9 h-9 rounded-full bg-[#FAF9F5] border border-[#E8E8E3] flex items-center justify-center mx-auto mb-3 text-[#1345EE]">
-                <ShieldCheck size={16} />
-              </div>
-              <h4 className="text-xs font-semibold text-[#141413] uppercase tracking-wider mb-1">
-                Authenticity
-              </h4>
-              <p className="text-xs text-[#6E6E69]">Curated & verified</p>
-              <span className="inline-block mt-2 text-[10px] text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full font-medium">
-                COA Protected
-              </span>
-            </div>
-          </div>
-
-          {/* Primary Contact CTA Button */}
+        <div className="mt-16 sm:mt-24 bg-[#FAF9F5] border border-[#E8E8E3] rounded-3xl p-8 sm:p-14 text-center">
+          <h2 className="text-2xl sm:text-3xl font-serif italic text-[#141413] tracking-tight mb-2.5">
+            Still have questions?
+          </h2>
+          <p className="text-xs sm:text-sm text-[#6E6E69] max-w-md mx-auto mb-8 font-normal leading-relaxed">
+            We&apos;re here to help. Reach out to our team and we will get back to you shortly.
+          </p>
           <div className="text-center">
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 px-7 py-3 bg-[#141413] text-white rounded-full text-xs uppercase tracking-[0.08em] font-medium hover:bg-black transition-all shadow-xs group"
+              className="inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-[#141413] text-white rounded-full text-xs uppercase tracking-[0.08em] font-medium hover:bg-black transition-all shadow-xs group cursor-pointer"
             >
-              <span>Get in touch with Eras Studio</span>
+              <span>Get in Touch</span>
               <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
