@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { Search, SlidersHorizontal, X, Check, RotateCcw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createChatSession } from '@/actions/chatActions';
+import { fetchRankedDiscoveryArtworksAction } from '@/actions/rankingActions';
 import TopCreatorsRow from '@/components/features/discovery/TopCreatorsRow';
 import { getTopCreators, RankedCreator } from '@/lib/services/rankingService';
 import { PROTECTED_CONTAINER_CLASS, PROTECTED_IMAGE_CLASS } from '@/lib/media/assetProtection';
@@ -39,6 +40,9 @@ interface ArtworkItem {
   price_visibility?: string | null;
   status: string;
   year?: string | null;
+  created_at?: string;
+  views_count?: number | null;
+  likes_count?: number | null;
   profiles: { full_name: string; profile_pic_url?: string | null } | null;
 }
 
@@ -152,11 +156,51 @@ export default function BrowsePage() {
     if (isReset && (!cachedDefaultArtworks || cachedDefaultArtworks.length === 0)) {
       setIsLoading(true);
     }
+
+    const isDefaultView = !searchQuery && !artTypeFilter && sortBy === 'recommended' && priceFilter === 'all';
+
+    try {
+      // 1. Fetch server-ranked artworks (Priority 1: Inquiries > Priority 2: Views > Priority 3: Likes + Freshness Boost)
+      const res = await fetchRankedDiscoveryArtworksAction({
+        page: targetPage,
+        limit: ITEMS_PER_PAGE,
+        searchQuery,
+        artTypeFilter,
+        priceFilter,
+        sortBy,
+      });
+
+      if (res && Array.isArray(res.artworks) && res.artworks.length > 0) {
+        const finalArtworks = res.artworks as unknown as ArtworkItem[];
+
+        if (isReset) {
+          setArtworks(finalArtworks);
+          if (isDefaultView) {
+            cachedDefaultArtworks = finalArtworks;
+            cachedHasMore = res.hasMore;
+          }
+        } else {
+          setArtworks((prev) => {
+            const existingIds = new Set(prev.map((a) => a.id));
+            const uniqueNew = finalArtworks.filter((a) => !existingIds.has(a.id));
+            return [...prev, ...uniqueNew];
+          });
+        }
+
+        setHasMore(res.hasMore);
+        setIsLoading(false);
+        return;
+      }
+    } catch (err) {
+      console.warn('Ranked action fallback to client query:', err);
+    }
+
+    // 2. Client-side fallback if server action returns empty or encounters network error
     const supabase = createClient();
 
     let query = supabase
       .from('artworks')
-      .select('id, creator_id, title, art_type, artist_name, image_url, price, price_visibility, status, year, created_at, profiles(full_name, profile_pic_url)', { count: 'exact' })
+      .select('id, creator_id, title, art_type, artist_name, image_url, price, price_visibility, status, year, created_at, views_count, likes_count, profiles(full_name, profile_pic_url)', { count: 'exact' })
       .eq('status', 'Available');
 
     // Sorting
@@ -201,6 +245,10 @@ export default function BrowsePage() {
       let finalArtworks = data as any[];
 
       // Dynamic Artwork Scoring for "Recommended for you"
+      // Priority 1: Interest raised (40 pts per inquiry)
+      // Priority 2: Views (3 pts per view)
+      // Priority 3: Likes (2 pts per like)
+      // Freshness Boost for newly uploaded works
       if (sortBy === 'recommended' && finalArtworks.length > 0) {
         try {
           const artworkIds = finalArtworks.map((a: any) => a.id);
@@ -215,22 +263,25 @@ export default function BrowsePage() {
           const inqMap = new Map<string, number>();
           ((inqs as any[]) || []).forEach((i: any) => inqMap.set(i.artwork_id, (inqMap.get(i.artwork_id) || 0) + 1));
 
+          const now = Date.now();
           finalArtworks = [...finalArtworks].sort((a: any, b: any) => {
-            const aSaves = saveMap.get(a.id) || 0;
-            const bSaves = saveMap.get(b.id) || 0;
+            const aSaves = Number(a.likes_count) || saveMap.get(a.id) || 0;
+            const bSaves = Number(b.likes_count) || saveMap.get(b.id) || 0;
             const aInqs = inqMap.get(a.id) || 0;
             const bInqs = inqMap.get(b.id) || 0;
+            const aViews = Number(a.views_count) || 0;
+            const bViews = Number(b.views_count) || 0;
 
             const aDate = a.created_at ? new Date(a.created_at).getTime() : 0;
             const bDate = b.created_at ? new Date(b.created_at).getTime() : 0;
-            const aAgeDays = (Date.now() - aDate) / (1000 * 60 * 60 * 24);
-            const bAgeDays = (Date.now() - bDate) / (1000 * 60 * 60 * 24);
+            const aAgeDays = (now - aDate) / (1000 * 60 * 60 * 24);
+            const bAgeDays = (now - bDate) / (1000 * 60 * 60 * 24);
 
-            const aFreshness = aAgeDays <= 7 ? 20 : aAgeDays <= 14 ? 10 : aAgeDays <= 30 ? 5 : 0;
-            const bFreshness = bAgeDays <= 7 ? 20 : bAgeDays <= 14 ? 10 : bAgeDays <= 30 ? 5 : 0;
+            const aFreshness = aAgeDays <= 3 ? 30 : aAgeDays <= 7 ? 18 : aAgeDays <= 14 ? 10 : aAgeDays <= 30 ? 4 : 0;
+            const bFreshness = bAgeDays <= 3 ? 30 : bAgeDays <= 7 ? 18 : bAgeDays <= 14 ? 10 : bAgeDays <= 30 ? 4 : 0;
 
-            const aScore = (aInqs * 10) + (aSaves * 6) + aFreshness;
-            const bScore = (bInqs * 10) + (bSaves * 6) + bFreshness;
+            const aScore = (aInqs * 40) + (aViews * 3) + (aSaves * 2) + aFreshness;
+            const bScore = (bInqs * 40) + (bViews * 3) + (bSaves * 2) + bFreshness;
 
             if (bScore !== aScore) return bScore - aScore;
             return bDate - aDate;
@@ -240,7 +291,6 @@ export default function BrowsePage() {
         }
       }
 
-      const isDefaultView = !searchQuery && !artTypeFilter && sortBy === 'recommended' && priceFilter === 'all';
       const calculatedHasMore = count !== null ? from + data.length < count : data.length === ITEMS_PER_PAGE;
 
       if (isReset) {
