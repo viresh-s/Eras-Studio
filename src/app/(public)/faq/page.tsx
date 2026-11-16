@@ -178,8 +178,9 @@ export default function FaqPage() {
                 className={`px-4 py-2 rounded-full whitespace-nowrap text-xs font-medium cursor-pointer transition-all duration-150 flex items-center gap-2 ${
                   isActive
                     ? 'bg-[#141413] text-white shadow-xs font-semibold'
-                    : 'text-gray-600 bg-white border border-[#E8E8E3] hover:border-[#141413]/30 hover:text-[#141413]'
+                    : 'text-gray-600 bg-white border border-[#E8E8E3] hover:border-[#1345EE] hover:text-[#1345EE]'
                 }`}
+                style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
               >
                 <span>{cat.label}</span>
                 <span
@@ -203,22 +204,24 @@ export default function FaqPage() {
               return (
                 <div
                   key={item.id}
-                  className={`bg-white rounded-2xl sm:rounded-3xl border transition-all duration-200 overflow-hidden ${
+                  className={`group bg-white rounded-2xl sm:rounded-3xl border transition-all duration-200 overflow-hidden cursor-pointer ${
                     isOpen
-                      ? 'border-[#141413]/30 shadow-[0_6px_20px_rgba(20,20,19,0.05)]'
-                      : 'border-[#E8E8E3] hover:border-[#D1D1CB] shadow-[0_2px_8px_rgba(20,20,19,0.02)]'
+                      ? 'border-[#1345EE] shadow-[0_8px_24px_rgba(19,69,238,0.08)]'
+                      : 'border-[#E8E8E3] hover:border-[#1345EE] hover:shadow-[0_8px_24px_rgba(19,69,238,0.08)] shadow-[0_2px_8px_rgba(20,20,19,0.02)]'
                   }`}
                 >
                   <button
                     type="button"
                     onClick={() => toggleItem(item.id)}
-                    className="w-full p-5 sm:p-6 flex items-start sm:items-center justify-between gap-4 text-left group cursor-pointer"
+                    className="w-full p-5 sm:p-6 flex items-start sm:items-center justify-between gap-4 text-left cursor-pointer"
                     aria-expanded={isOpen}
                   >
                     <div className="flex items-start sm:items-center gap-3 sm:gap-4 flex-1 min-w-0">
                       {/* Item Counter */}
                       <span
-                        className="text-xs text-[#8A8A85] shrink-0 pt-0.5 sm:pt-0 font-medium"
+                        className={`text-xs shrink-0 pt-0.5 sm:pt-0 font-medium transition-colors ${
+                          isOpen ? 'text-[#1345EE]' : 'text-[#8A8A85] group-hover:text-[#1345EE]'
+                        }`}
                         style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
                       >
                         {item.id}
@@ -226,7 +229,9 @@ export default function FaqPage() {
 
                       <div className="flex-1 min-w-0">
                         <h3
-                          className="text-sm sm:text-base font-medium text-[#141413] group-hover:text-[#1345EE] transition-colors leading-snug"
+                          className={`text-sm sm:text-base font-medium transition-colors leading-snug ${
+                            isOpen ? 'text-[#1345EE]' : 'text-[#141413] group-hover:text-[#1345EE]'
+                          }`}
                           style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
                         >
                           {item.q}
@@ -238,8 +243,8 @@ export default function FaqPage() {
                     <span
                       className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full border flex items-center justify-center shrink-0 transition-all ml-1 mt-0.5 sm:mt-0 ${
                         isOpen
-                          ? 'bg-[#141413] text-white border-[#141413]'
-                          : 'bg-[#FAF9F5] text-[#6E6E69] border-[#E8E8E3] group-hover:border-[#141413]/40 group-hover:text-[#141413]'
+                          ? 'bg-[#1345EE] text-white border-[#1345EE]'
+                          : 'bg-[#FAF9F5] text-[#6E6E69] border-[#E8E8E3] group-hover:border-[#1345EE] group-hover:bg-[#1345EE]/10 group-hover:text-[#1345EE]'
                       }`}
                     >
                       {isOpen ? (
