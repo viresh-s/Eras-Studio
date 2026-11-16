@@ -308,22 +308,14 @@ export default function FaqPage() {
         {/* ========================================================================= */}
         {/* 3. CALL TO ACTION                                                         */}
         {/* ========================================================================= */}
-        <div className="mt-16 sm:mt-24 bg-[#FAF9F5] border border-[#E8E8E3] rounded-3xl p-8 sm:p-14 text-center">
-          <h2 className="text-2xl sm:text-3xl font-serif italic text-[#141413] tracking-tight mb-2.5">
-            Still have questions?
-          </h2>
-          <p className="text-xs sm:text-sm text-[#6E6E69] max-w-md mx-auto mb-8 font-normal leading-relaxed">
-            We&apos;re here to help. Reach out to our team and we will get back to you shortly.
-          </p>
-          <div className="text-center">
-            <Link
-              href="/contact"
-              className="btn-premium-gradient-pill px-8 py-3.5 text-xs uppercase tracking-[0.08em] font-medium gap-2 cursor-pointer shadow-md group"
-            >
-              <span>Get in Touch</span>
-              <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-            </Link>
-          </div>
+        <div className="mt-12 sm:mt-16 flex justify-center">
+          <Link
+            href="/contact"
+            className="btn-premium-gradient-pill px-8 py-3.5 text-xs uppercase tracking-[0.08em] font-medium gap-2 cursor-pointer shadow-md group"
+          >
+            <span>Get in Touch</span>
+            <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+          </Link>
         </div>
       </section>
     </div>
