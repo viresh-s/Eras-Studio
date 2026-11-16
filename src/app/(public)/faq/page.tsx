@@ -125,7 +125,7 @@ export default function FaqPage() {
             className="font-serif italic font-medium text-4xl sm:text-5xl md:text-6xl tracking-tight text-[#141413] mb-8 leading-[1.12]"
             style={{ fontFamily: "'Century', 'Century Schoolbook', serif", fontStyle: "italic" }}
           >
-            Questions, answered.
+            Frequently Asked Questions
           </h1>
 
           {/* Interactive Search Bar Pill */}
