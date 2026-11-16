@@ -318,7 +318,7 @@ export default function FaqPage() {
           <div className="text-center">
             <Link
               href="/contact"
-              className="inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-[#141413] text-white rounded-full text-xs uppercase tracking-[0.08em] font-medium hover:bg-black transition-all shadow-xs group cursor-pointer"
+              className="btn-premium-gradient-pill px-8 py-3.5 text-xs uppercase tracking-[0.08em] font-medium gap-2 cursor-pointer shadow-md group"
             >
               <span>Get in Touch</span>
               <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
