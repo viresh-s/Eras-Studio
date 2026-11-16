@@ -70,15 +70,50 @@ interface BulkArtworkUploadProps {
 // Helpers
 // ---------------------------------------------------------------------------
 
-function extractTitleFromFilename(filename: string): string {
-  return filename
-    .replace(/\.[^/.]+$/, '')
+/**
+ * Extracts a normalized grouping key and clean artwork title from a filename.
+ * Strips sequence numbers (_1, -02, (3)), angle/view descriptors (front, back, angle, detail),
+ * and extensions so that related photos automatically cluster into a single artwork.
+ *
+ * Examples:
+ *   "mona_lisa_1.jpg"        -> groupKey: "mona lisa", cleanTitle: "Mona Lisa"
+ *   "mona_lisa_2.jpg"        -> groupKey: "mona lisa", cleanTitle: "Mona Lisa"
+ *   "mona_lisa_detail.png"   -> groupKey: "mona lisa", cleanTitle: "Mona Lisa"
+ *   "blue-sunset (1).webp"   -> groupKey: "blue sunset", cleanTitle: "Blue Sunset"
+ *   "blue-sunset (2).webp"   -> groupKey: "blue sunset", cleanTitle: "Blue Sunset"
+ */
+function extractArtworkGroupingInfo(filename: string): { groupKey: string; cleanTitle: string } {
+  // 1. Strip file extension
+  let base = filename.replace(/\.[^/.]+$/, '');
+
+  // 2. Strip trailing parentheses numbers like (1), (2), [1], etc.
+  base = base.replace(/[\s-_]*[\(\[]\s*\d+\s*[\)\]]$/, '');
+
+  // 3. Strip trailing view descriptors (front, back, angle, detail, close, zoom, side, full, etc.)
+  base = base.replace(/[-_\s]+(front|back|side|angle|detail|closeup|close|zoom|full|view\d*|shot\d*)$/i, '');
+
+  // 4. Strip trailing sequence numbers like _1, _01, -2, -003, or space 1
+  base = base.replace(/[-_\s]+0*\d+$/, '');
+
+  // 5. Clean up remaining dashes, underscores, and multiple spaces
+  const normalized = base
     .replace(/[-_]+/g, ' ')
     .replace(/\s+/g, ' ')
-    .trim()
+    .trim();
+
+  // If normalized ends up empty, fallback to raw stripped name
+  const fallback = filename.replace(/\.[^/.]+$/, '').trim() || 'Untitled Artwork';
+  const finalRaw = normalized.length > 0 ? normalized : fallback;
+
+  // Title-case the clean title
+  const cleanTitle = finalRaw
     .split(' ')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join(' ');
+
+  const groupKey = finalRaw.toLowerCase();
+
+  return { groupKey, cleanTitle };
 }
 
 const visibilityOptions = [
@@ -183,13 +218,12 @@ export default function BulkArtworkUpload({
   }, []);
 
   // ---------------------------------------------------------------------------
-  // Main File Handling (Creating Artwork Rows)
+  // Main File Handling (Auto-Grouping by Filename into Artworks)
   // ---------------------------------------------------------------------------
 
   const addArtworksFromFiles = useCallback(
     async (incoming: FileList | File[]) => {
       const newFiles = Array.from(incoming);
-      const remaining = batchLimit - artworks.length;
 
       if (batchLimit === 0) {
         setGlobalError(
@@ -198,69 +232,185 @@ export default function BulkArtworkUpload({
         return;
       }
 
-      if (remaining <= 0) {
+      const remainingArtworkSlots = batchLimit - artworks.length;
+      if (remainingArtworkSlots <= 0) {
         setGlobalError(`Batch limit reached (${batchLimit} artworks). Remove some artworks to add more.`);
         return;
       }
 
-      const toProcess = newFiles.slice(0, remaining);
-      if (newFiles.length > remaining) {
-        setGlobalError(`Only ${remaining} more artwork(s) allowed. ${newFiles.length - remaining} file(s) were skipped.`);
+      // 1. Filter out invalid files
+      const validFiles: File[] = [];
+      for (const file of newFiles) {
+        try {
+          validateImageFile(file);
+          validFiles.push(file);
+        } catch (err: any) {
+          setGlobalError(err.message || `Invalid file: ${file.name}`);
+        }
+      }
+
+      if (validFiles.length === 0) return;
+
+      // 2. Group incoming files by normalized base artwork name
+      // e.g. "mona_lisa_1.jpg", "mona_lisa_2.jpg" -> Group "mona lisa"
+      const groupsMap = new Map<string, { cleanTitle: string; files: File[] }>();
+
+      for (const file of validFiles) {
+        const { groupKey, cleanTitle } = extractArtworkGroupingInfo(file.name);
+        if (!groupsMap.has(groupKey)) {
+          groupsMap.set(groupKey, { cleanTitle, files: [] });
+        }
+        groupsMap.get(groupKey)!.files.push(file);
+      }
+
+      // 3. Sort files in each group naturally (so _1 comes before _2, etc.)
+      for (const group of groupsMap.values()) {
+        group.files.sort((a, b) =>
+          a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
+        );
+      }
+
+      // 4. Form artwork rows (max 5 images per artwork)
+      const existingArtworksUpdated = [...artworks];
+      const newlyCreatedRows: BulkArtworkRow[] = [];
+
+      for (const [groupKey, group] of groupsMap.entries()) {
+        // Check if this group can be appended to an already queued artwork with matching title
+        const existingIdx = existingArtworksUpdated.findIndex(
+          art => extractArtworkGroupingInfo(art.title).groupKey === groupKey
+        );
+
+        if (existingIdx !== -1 && existingArtworksUpdated[existingIdx].images.length < 5) {
+          const target = existingArtworksUpdated[existingIdx];
+          const availableSlots = 5 - target.images.length;
+          const filesToAppend = group.files.slice(0, availableSlots);
+
+          const appendedPhotos: ArtworkPhotoItem[] = [];
+          for (const file of filesToAppend) {
+            const previewUrl = URL.createObjectURL(file);
+            const dims = await new Promise<{ w: number; h: number }>((resolve) => {
+              const img = new window.Image();
+              img.onload = () => resolve({ w: img.naturalWidth, h: img.naturalHeight });
+              img.onerror = () => resolve({ w: 0, h: 0 });
+              img.src = previewUrl;
+            });
+
+            appendedPhotos.push({
+              id: `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+              file,
+              previewUrl,
+              width: dims.w,
+              height: dims.h,
+            });
+          }
+
+          if (appendedPhotos.length > 0) {
+            target.images = [...target.images, ...appendedPhotos];
+          }
+
+          // Remaining files beyond availableSlots form new artwork row
+          const remainingGroupFiles = group.files.slice(availableSlots);
+          for (let i = 0; i < remainingGroupFiles.length; i += 5) {
+            const chunk = remainingGroupFiles.slice(i, i + 5);
+            const photos: ArtworkPhotoItem[] = [];
+
+            for (const file of chunk) {
+              const previewUrl = URL.createObjectURL(file);
+              const dims = await new Promise<{ w: number; h: number }>((resolve) => {
+                const img = new window.Image();
+                img.onload = () => resolve({ w: img.naturalWidth, h: img.naturalHeight });
+                img.onerror = () => resolve({ w: 0, h: 0 });
+                img.src = previewUrl;
+              });
+
+              photos.push({
+                id: `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+                file,
+                previewUrl,
+                width: dims.w,
+                height: dims.h,
+              });
+            }
+
+            newlyCreatedRows.push({
+              id: `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+              title: group.cleanTitle,
+              artType: applyMedium || 'Painting',
+              year: applyYear || new Date().getFullYear().toString(),
+              price: '',
+              priceVisibility: applyPriceVisibility || 'Show Price',
+              status: applyStatus || 'Available',
+              collection: applyCollection || '',
+              style: '',
+              width: '',
+              height: '',
+              dimensionUnit: 'in',
+              isValid: true,
+              images: photos,
+              coverImageId: photos[0].id,
+            });
+          }
+        } else {
+          // New artwork: chunk group files into max 5 images per artwork
+          for (let i = 0; i < group.files.length; i += 5) {
+            const chunk = group.files.slice(i, i + 5);
+            const photos: ArtworkPhotoItem[] = [];
+
+            for (const file of chunk) {
+              const previewUrl = URL.createObjectURL(file);
+              const dims = await new Promise<{ w: number; h: number }>((resolve) => {
+                const img = new window.Image();
+                img.onload = () => resolve({ w: img.naturalWidth, h: img.naturalHeight });
+                img.onerror = () => resolve({ w: 0, h: 0 });
+                img.src = previewUrl;
+              });
+
+              photos.push({
+                id: `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+                file,
+                previewUrl,
+                width: dims.w,
+                height: dims.h,
+              });
+            }
+
+            newlyCreatedRows.push({
+              id: `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+              title: group.cleanTitle,
+              artType: applyMedium || 'Painting',
+              year: applyYear || new Date().getFullYear().toString(),
+              price: '',
+              priceVisibility: applyPriceVisibility || 'Show Price',
+              status: applyStatus || 'Available',
+              collection: applyCollection || '',
+              style: '',
+              width: '',
+              height: '',
+              dimensionUnit: 'in',
+              isValid: true,
+              images: photos,
+              coverImageId: photos[0].id,
+            });
+          }
+        }
+      }
+
+      // Check remaining artwork quota
+      const allowedNewRows = batchLimit - existingArtworksUpdated.length;
+      let finalNewRows = newlyCreatedRows;
+
+      if (newlyCreatedRows.length > allowedNewRows) {
+        finalNewRows = newlyCreatedRows.slice(0, Math.max(0, allowedNewRows));
+        setGlobalError(
+          `Your plan allows up to ${batchLimit} artworks. Added ${finalNewRows.length} artwork(s); ${newlyCreatedRows.length - allowedNewRows} artwork(s) exceeded the batch limit.`
+        );
       } else {
         setGlobalError(null);
       }
 
-      const newRows: BulkArtworkRow[] = [];
-
-      for (const file of toProcess) {
-        try {
-          validateImageFile(file);
-        } catch (err: any) {
-          setGlobalError(err.message || 'Invalid file');
-          continue;
-        }
-
-        const previewUrl = URL.createObjectURL(file);
-
-        // Read native dimensions
-        const dims = await new Promise<{ w: number; h: number }>((resolve) => {
-          const img = new window.Image();
-          img.onload = () => resolve({ w: img.naturalWidth, h: img.naturalHeight });
-          img.onerror = () => resolve({ w: 0, h: 0 });
-          img.src = previewUrl;
-        });
-
-        const photoId = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
-        const initialPhoto: ArtworkPhotoItem = {
-          id: photoId,
-          file,
-          previewUrl,
-          width: dims.w,
-          height: dims.h,
-        };
-
-        newRows.push({
-          id: `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
-          title: extractTitleFromFilename(file.name),
-          artType: applyMedium || 'Painting',
-          year: applyYear || new Date().getFullYear().toString(),
-          price: '',
-          priceVisibility: applyPriceVisibility || 'Show Price',
-          status: applyStatus || 'Available',
-          collection: applyCollection || '',
-          style: '',
-          width: '',
-          height: '',
-          dimensionUnit: 'in',
-          isValid: true,
-          images: [initialPhoto],
-          coverImageId: photoId,
-        });
-      }
-
-      setArtworks(prev => [...prev, ...newRows]);
+      setArtworks([...existingArtworksUpdated, ...finalNewRows]);
     },
-    [batchLimit, artworks.length, applyMedium, applyYear, applyPriceVisibility, applyStatus, applyCollection]
+    [batchLimit, artworks, applyMedium, applyYear, applyPriceVisibility, applyStatus, applyCollection]
   );
 
   // ---------------------------------------------------------------------------
@@ -464,10 +614,10 @@ export default function BulkArtworkUpload({
           error: titleEmpty
             ? 'Title is required'
             : priceInvalid
-            ? 'Invalid price'
-            : noImages
-            ? 'At least one photo required'
-            : undefined,
+              ? 'Invalid price'
+              : noImages
+                ? 'At least one photo required'
+                : undefined,
         };
       })
     );
@@ -558,10 +708,10 @@ export default function BulkArtworkUpload({
             event.status === 'compressing'
               ? `Compressing image ${event.fileIndex + 1} of ${event.totalFiles}...`
               : event.status === 'uploading'
-              ? `Uploading optimized image ${event.fileIndex + 1} of ${event.totalFiles}...`
-              : event.status === 'done'
-              ? `Processed ${event.fileIndex + 1} of ${event.totalFiles} images`
-              : `Error on file ${event.fileIndex + 1}`,
+                ? `Uploading optimized image ${event.fileIndex + 1} of ${event.totalFiles}...`
+                : event.status === 'done'
+                  ? `Processed ${event.fileIndex + 1} of ${event.totalFiles} images`
+                  : `Error on file ${event.fileIndex + 1}`,
         });
       };
 
@@ -754,8 +904,8 @@ export default function BulkArtworkUpload({
           ${isDragging
             ? 'border-[#1345EE] bg-blue-50/60 shadow-md scale-[1.005]'
             : artworks.length > 0
-            ? 'border-[#E8E8E3] bg-[#F8F7F4] hover:border-[#1345EE]/50 hover:bg-white'
-            : 'border-[#E8E8E3] bg-white hover:border-[#1345EE]/50 shadow-xs'
+              ? 'border-[#E8E8E3] bg-[#F8F7F4] hover:border-[#1345EE]/50 hover:bg-white'
+              : 'border-[#E8E8E3] bg-white hover:border-[#1345EE]/50 shadow-xs'
           }
         `}
       >
@@ -787,9 +937,9 @@ export default function BulkArtworkUpload({
             </p>
           </div>
 
-          <div className="flex items-center gap-2 mt-1">
+          <div className="flex flex-wrap items-center justify-center gap-2 mt-1">
             <span className="text-xs px-3 py-1 rounded-full bg-blue-50 text-[#1345EE] font-medium border border-blue-100">
-              {artworks.length} of {batchLimit} artworks added
+              {artworks.length} of {batchLimit} artworks ({artworks.reduce((acc, a) => acc + a.images.length, 0)} photos)
             </span>
             {freemiumStatus.artworksLimit !== -1 && (
               <span className="text-xs text-[#6E6E69]">
@@ -797,6 +947,9 @@ export default function BulkArtworkUpload({
               </span>
             )}
           </div>
+          <p className="text-[11px] text-[#6E6E69] mt-0.5 max-w-lg text-center">
+            Files with matching names (e.g. <span className="font-medium text-[#141413]">mona_lisa_1</span>, <span className="font-medium text-[#141413]">mona_lisa_2</span>) are automatically grouped into 1 artwork with up to 5 photos.
+          </p>
         </div>
       </div>
 
@@ -929,9 +1082,8 @@ export default function BulkArtworkUpload({
                     return (
                       <React.Fragment key={art.id}>
                         <tr
-                          className={`group transition-colors ${
-                            !art.isValid ? 'bg-red-50/40' : 'hover:bg-[#F8F7F4]/70'
-                          }`}
+                          className={`group transition-colors ${!art.isValid ? 'bg-red-50/40' : 'hover:bg-[#F8F7F4]/70'
+                            }`}
                         >
                           {/* Thumbnail / Cover Preview */}
                           <td className="py-2.5 px-3 text-center">
@@ -966,11 +1118,10 @@ export default function BulkArtworkUpload({
                               value={art.title}
                               onChange={e => updateArtwork(art.id, { title: e.target.value })}
                               placeholder="Artwork title"
-                              className={`input-gradient-border-sm w-full text-xs sm:text-sm rounded-lg px-3 py-2 bg-white text-[#141413] ${
-                                !art.isValid && !art.title.trim()
-                                  ? 'ring-2 ring-red-400 border-red-400'
-                                  : ''
-                              }`}
+                              className={`input-gradient-border-sm w-full text-xs sm:text-sm rounded-lg px-3 py-2 bg-white text-[#141413] ${!art.isValid && !art.title.trim()
+                                ? 'ring-2 ring-red-400 border-red-400'
+                                : ''
+                                }`}
                             />
                             {!art.isValid && art.error && (
                               <p className="text-[11px] text-red-500 mt-0.5">{art.error}</p>
@@ -1004,11 +1155,10 @@ export default function BulkArtworkUpload({
                                 });
                               }}
                               placeholder="₹ Optional"
-                              className={`input-gradient-border-sm w-full text-xs sm:text-sm rounded-lg px-3 py-2 bg-white text-[#141413] ${
-                                !art.isValid && art.error === 'Invalid price'
-                                  ? 'ring-2 ring-red-400 border-red-400'
-                                  : ''
-                              }`}
+                              className={`input-gradient-border-sm w-full text-xs sm:text-sm rounded-lg px-3 py-2 bg-white text-[#141413] ${!art.isValid && art.error === 'Invalid price'
+                                ? 'ring-2 ring-red-400 border-red-400'
+                                : ''
+                                }`}
                             />
                           </td>
 
@@ -1066,9 +1216,8 @@ export default function BulkArtworkUpload({
                               <button
                                 type="button"
                                 onClick={() => toggleCard(art.id)}
-                                className={`p-1.5 rounded-lg transition-colors ${
-                                  isExpanded ? 'bg-blue-50 text-[#1345EE]' : 'text-[#6E6E69] hover:text-[#1345EE] hover:bg-blue-50'
-                                }`}
+                                className={`p-1.5 rounded-lg transition-colors ${isExpanded ? 'bg-blue-50 text-[#1345EE]' : 'text-[#6E6E69] hover:text-[#1345EE] hover:bg-blue-50'
+                                  }`}
                                 title="Manage photos & extra details"
                               >
                                 {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -1136,11 +1285,10 @@ export default function BulkArtworkUpload({
                                     return (
                                       <div
                                         key={img.id}
-                                        className={`relative group/photo shrink-0 w-20 h-20 rounded-xl overflow-hidden bg-white border-2 transition-all ${
-                                          isCover
-                                            ? 'border-[#1345EE] shadow-sm ring-2 ring-[#1345EE]/20'
-                                            : 'border-[#E8E8E3] hover:border-gray-400'
-                                        }`}
+                                        className={`relative group/photo shrink-0 w-20 h-20 rounded-xl overflow-hidden bg-white border-2 transition-all ${isCover
+                                          ? 'border-[#1345EE] shadow-sm ring-2 ring-[#1345EE]/20'
+                                          : 'border-[#E8E8E3] hover:border-gray-400'
+                                          }`}
                                       >
                                         {/* eslint-disable-next-line @next/next/no-img-element */}
                                         <img
@@ -1267,9 +1415,8 @@ export default function BulkArtworkUpload({
               return (
                 <div
                   key={art.id}
-                  className={`border rounded-2xl p-4 bg-white shadow-xs transition-shadow ${
-                    !art.isValid ? 'border-red-300 bg-red-50/20' : 'border-[#E8E8E3]'
-                  }`}
+                  className={`border rounded-2xl p-4 bg-white shadow-xs transition-shadow ${!art.isValid ? 'border-red-300 bg-red-50/20' : 'border-[#E8E8E3]'
+                    }`}
                 >
                   {/* Header: Thumbnail + Title + Delete */}
                   <div className="flex items-start gap-3">
@@ -1295,11 +1442,10 @@ export default function BulkArtworkUpload({
                         value={art.title}
                         onChange={e => updateArtwork(art.id, { title: e.target.value })}
                         placeholder="Artwork title"
-                        className={`input-gradient-border-sm w-full text-sm rounded-lg px-3 py-2 bg-white text-[#141413] ${
-                          !art.isValid && !art.title.trim()
-                            ? 'ring-2 ring-red-400 border-red-400'
-                            : ''
-                        }`}
+                        className={`input-gradient-border-sm w-full text-sm rounded-lg px-3 py-2 bg-white text-[#141413] ${!art.isValid && !art.title.trim()
+                          ? 'ring-2 ring-red-400 border-red-400'
+                          : ''
+                          }`}
                       />
                       {!art.isValid && art.error && (
                         <p className="text-xs text-red-500 mt-1">{art.error}</p>
@@ -1356,9 +1502,8 @@ export default function BulkArtworkUpload({
                           <div
                             key={img.id}
                             onClick={() => setCoverPhoto(art.id, img.id)}
-                            className={`relative shrink-0 w-14 h-14 rounded-lg overflow-hidden border-2 cursor-pointer ${
-                              isCover ? 'border-[#1345EE] ring-2 ring-[#1345EE]/30' : 'border-[#E8E8E3]'
-                            }`}
+                            className={`relative shrink-0 w-14 h-14 rounded-lg overflow-hidden border-2 cursor-pointer ${isCover ? 'border-[#1345EE] ring-2 ring-[#1345EE]/30' : 'border-[#E8E8E3]'
+                              }`}
                           >
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
@@ -1676,10 +1821,10 @@ export default function BulkArtworkUpload({
                         {status === 'done'
                           ? `All ${art.images.length} photo(s) published`
                           : status === 'error'
-                          ? 'Failed'
-                          : status === 'uploading' || status === 'compressing'
-                          ? `Optimizing ${art.images.length} photo(s)...`
-                          : `Waiting (${art.images.length} photo${art.images.length > 1 ? 's' : ''})`}
+                            ? 'Failed'
+                            : status === 'uploading' || status === 'compressing'
+                              ? `Optimizing ${art.images.length} photo(s)...`
+                              : `Waiting (${art.images.length} photo${art.images.length > 1 ? 's' : ''})`}
                       </p>
                     </div>
                   </div>
