@@ -220,9 +220,9 @@ export default function DashboardLayout({
             <Image
               src="/images/eras-logo.png"
               alt="ERAS Studio"
-              width={130}
-              height={21}
-              className="h-5 w-auto object-contain"
+              width={117}
+              height={19}
+              className="h-[18px] w-auto object-contain"
               priority
             />
           </Link>
@@ -511,9 +511,9 @@ export default function DashboardLayout({
               <Image
                 src="/images/eras-logo.png"
                 alt="ERAS Studio"
-                width={150}
-                height={24}
-                className="h-6 w-auto object-contain group-hover:opacity-85 transition-opacity"
+                width={135}
+                height={22}
+                className="h-[21.5px] w-auto object-contain group-hover:opacity-85 transition-opacity"
                 priority
               />
             </Link>

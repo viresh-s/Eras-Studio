@@ -596,9 +596,9 @@ function ForgotPasswordContent() {
               <Image
                 src="/images/eras-logo.png"
                 alt="ERAS Studio"
-                width={160}
-                height={26}
-                className="h-8 w-auto object-contain select-none"
+                width={144}
+                height={23}
+                className="h-[29px] w-auto object-contain select-none"
                 priority
               />
             </Link>

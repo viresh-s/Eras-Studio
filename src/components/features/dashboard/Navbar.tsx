@@ -125,9 +125,9 @@ export default function Navbar({ profile }: NavbarProps) {
             <Image
               src="/images/eras-logo.png"
               alt="ERAS Studio"
-              width={140}
-              height={23}
-              className="h-7 w-auto object-contain select-none"
+              width={126}
+              height={20}
+              className="h-[25px] w-auto object-contain select-none"
               priority
             />
           </Link>
@@ -267,9 +267,9 @@ export default function Navbar({ profile }: NavbarProps) {
                   <Image
                     src="/images/eras-logo.png"
                     alt="ERAS Studio"
-                    width={110}
-                    height={18}
-                    className="h-5 w-auto object-contain"
+                    width={99}
+                    height={16}
+                    className="h-[18px] w-auto object-contain"
                   />
                 </Link>
                 <button

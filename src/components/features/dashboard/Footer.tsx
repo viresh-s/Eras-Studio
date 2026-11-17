@@ -10,9 +10,9 @@ export default function Footer() {
             <Image
               src="/images/eras-logo.png"
               alt="ERAS Studio"
-              width={110}
-              height={18}
-              className="h-5 w-auto object-contain select-none"
+              width={99}
+              height={16}
+              className="h-[18px] w-auto object-contain select-none"
             />
           </Link>
           <span className="text-xs text-[var(--color-cor-ink-light)] ml-2">· All eyes. A single perspective.</span>
