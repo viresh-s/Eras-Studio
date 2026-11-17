@@ -3,20 +3,9 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import {
-  Search,
-  Send,
-  ArrowLeft,
-  MoreHorizontal,
-  ExternalLink,
-  MessageCircle,
-  Eye,
-  Check,
-  Clock,
-} from 'lucide-react';
 import { acceptChatRequest, sendMessage, rejectChatRequest } from '@/actions/chatActions';
 import { createClient } from '@/lib/supabase/client';
-import ReportUserButton from '@/components/features/user/ReportUserButton';
+import ReportUserModal from '@/components/features/user/ReportUserModal';
 
 // Palette for contacts without a profile picture
 const AVATAR_COLORS = ['#8C3EF2', '#FFAE4C', '#F31C85', '#1345EE', '#7324DB', '#26BD68'];
@@ -360,9 +349,8 @@ export default function ChatListClient({ initialChats, currentUserId }: ChatList
                   background: '#F3F4F6',
                   borderRadius: 12,
                 }}
-                className="px-3.5 py-2.5 flex items-center gap-2.5 border border-transparent focus-within:border-gray-300 focus-within:bg-white transition-all mb-4"
+                className="px-3.5 py-2.5 flex items-center border border-transparent focus-within:border-gray-300 focus-within:bg-white transition-all mb-4"
               >
-                <Search size={15} className="text-[#8A909D] shrink-0" />
                 <input
                   type="text"
                   value={searchQuery}
@@ -373,6 +361,15 @@ export default function ChatListClient({ initialChats, currentUserId }: ChatList
                   }}
                   className="bg-transparent text-xs sm:text-[13px] text-[#171E2C] placeholder-[#7E8491] outline-none w-full"
                 />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery('')}
+                    className="text-[11px] text-[#7E8491] hover:text-[#171E2C] px-1.5 py-0.5 rounded cursor-pointer shrink-0 font-medium"
+                  >
+                    Clear
+                  </button>
+                )}
               </div>
 
               {/* Conversations Title & Count Badge */}
@@ -404,14 +401,16 @@ export default function ChatListClient({ initialChats, currentUserId }: ChatList
               <div className="flex-1 overflow-y-auto space-y-1.5 pr-1 -mr-1">
                 {filteredActiveChats.length === 0 ? (
                   <div className="h-full flex flex-col items-center justify-center text-center p-6 text-[#7E8491]">
-                    <MessageCircle size={28} className="text-[#8A909D]/60 mb-2" />
                     <p
-                      style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
-                      className="text-xs font-medium text-[#171E2C]"
+                      style={{
+                        fontFamily: "'Century Schoolbook', Century, 'TeX Gyre Schola', Georgia, serif",
+                        fontStyle: 'italic',
+                      }}
+                      className="text-sm font-medium text-[#171E2C] mb-1"
                     >
-                      No conversations found
+                      {searchQuery ? 'No matching conversations' : 'No conversations yet'}
                     </p>
-                    <p className="text-[11px] text-[#7E8491] mt-1">
+                    <p className="text-[11px] text-[#7E8491] max-w-[210px] leading-relaxed">
                       {searchQuery ? 'Try adjusting your search query' : 'Your active chats will appear here'}
                     </p>
                   </div>
@@ -546,17 +545,18 @@ export default function ChatListClient({ initialChats, currentUserId }: ChatList
                 />
               ) : (
                 <div className="flex-1 flex flex-col items-center justify-center p-8 text-center text-[#7E8491]">
-                  <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center text-[#1345EE] shadow-sm mb-4">
-                    <MessageCircle size={28} />
-                  </div>
                   <h3
-                    style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
-                    className="text-base font-semibold text-[#171E2C] mb-1"
+                    style={{
+                      fontFamily: "'Century Schoolbook', Century, 'TeX Gyre Schola', Georgia, serif",
+                      fontStyle: 'italic',
+                      fontWeight: 500,
+                    }}
+                    className="text-2xl text-[#141413] mb-2 tracking-tight"
                   >
                     Select a conversation
                   </h3>
-                  <p className="text-xs text-[#7E8491] max-w-xs">
-                    Choose an inquiry from the left sidebar to read messages, discuss works, and connect.
+                  <p className="text-xs sm:text-sm text-[#7E8491] max-w-xs leading-relaxed">
+                    Choose an inquiry from the sidebar to review details, discuss artwork, and connect directly.
                   </p>
                 </div>
               )}
@@ -633,8 +633,8 @@ export default function ChatListClient({ initialChats, currentUserId }: ChatList
                             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-gray-400">
-                            <Eye size={24} />
+                          <div className="w-full h-full flex items-center justify-center text-[11px] font-semibold text-[#8A8A85] uppercase tracking-wider bg-[#ECECE7]">
+                            {artwork?.title ? artwork.title.substring(0, 2).toUpperCase() : 'ART'}
                           </div>
                         )}
                       </Link>
@@ -751,16 +751,17 @@ export default function ChatListClient({ initialChats, currentUserId }: ChatList
                 }}
                 className="p-16 text-center shadow-xs max-w-lg mx-auto"
               >
-                <div className="w-14 h-14 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-4">
-                  <Check size={26} />
-                </div>
                 <h3
-                  style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
-                  className="text-base font-semibold text-[#171E2C] mb-1"
+                  style={{
+                    fontFamily: "'Century Schoolbook', Century, 'TeX Gyre Schola', Georgia, serif",
+                    fontStyle: 'italic',
+                    fontWeight: 500,
+                  }}
+                  className="text-2xl sm:text-3xl text-[#141413] mb-2 tracking-tight"
                 >
-                  All caught up!
+                  All caught up
                 </h3>
-                <p className="text-xs text-[#7E8491] mb-6">
+                <p className="text-xs sm:text-sm text-[#7E8491] mb-6 max-w-sm mx-auto leading-relaxed">
                   You don&apos;t have any pending requests. Switch over to Messages to check on ongoing conversations.
                 </p>
                 <button
@@ -806,6 +807,7 @@ function ConversationActiveView({
   const [newMessage, setNewMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -916,11 +918,11 @@ function ConversationActiveView({
           <button
             type="button"
             onClick={onBack}
-            className="md:hidden flex items-center gap-1.5 py-1.5 px-2.5 -ml-1 text-[#171E2C] bg-[#F3F4F6] hover:bg-[#E5E7EB] active:scale-95 rounded-full transition-all cursor-pointer shrink-0 font-medium text-xs border border-[#E5E7EB] shadow-2xs"
+            className="md:hidden flex items-center gap-1.5 py-1.5 px-3 -ml-1 text-[#171E2C] bg-[#F3F4F6] hover:bg-[#E5E7EB] active:scale-95 rounded-full transition-all cursor-pointer shrink-0 font-medium text-xs border border-[#E5E7EB] shadow-2xs"
             aria-label="Back to conversations"
             title="Back to conversations"
           >
-            <ArrowLeft size={15} className="stroke-[2.5]" />
+            <span className="text-sm leading-none font-bold select-none">←</span>
             <span className="text-[12px] font-medium">Chats</span>
           </button>
 
@@ -999,10 +1001,12 @@ function ConversationActiveView({
           <button
             type="button"
             onClick={() => setMenuOpen(!menuOpen)}
-            className="p-2 text-[#8A909D] hover:text-[#171E2C] rounded-full hover:bg-gray-100 transition-colors cursor-pointer"
+            className="w-8 h-8 flex items-center justify-center gap-[3px] text-[#8A909D] hover:text-[#171E2C] rounded-full hover:bg-gray-100 transition-colors cursor-pointer"
             aria-label="More options"
           >
-            <MoreHorizontal size={20} />
+            <span className="w-1 h-1 rounded-full bg-current" />
+            <span className="w-1 h-1 rounded-full bg-current" />
+            <span className="w-1 h-1 rounded-full bg-current" />
           </button>
 
           {/* Dropdown Menu */}
@@ -1018,32 +1022,38 @@ function ConversationActiveView({
               {artworkId && (
                 <Link
                   href={`/artwork/${artworkId}`}
-                  className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-[#171E2C] hover:bg-gray-50 rounded-lg transition-colors"
+                  className="flex items-center justify-between px-3 py-2 text-xs font-medium text-[#171E2C] hover:bg-gray-50 rounded-lg transition-colors"
                   onClick={() => setMenuOpen(false)}
                 >
-                  <Eye size={14} className="text-[#8A909D]" />
                   <span>View Artwork</span>
+                  <span className="text-[11px] text-[#8A909D]">→</span>
                 </Link>
               )}
               {otherPerson?.id && (
                 <Link
                   href={`/artist/${otherPerson.id}`}
-                  className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-[#171E2C] hover:bg-gray-50 rounded-lg transition-colors"
+                  className="flex items-center justify-between px-3 py-2 text-xs font-medium text-[#171E2C] hover:bg-gray-50 rounded-lg transition-colors"
                   onClick={() => setMenuOpen(false)}
                 >
-                  <ExternalLink size={14} className="text-[#8A909D]" />
                   <span>View Profile</span>
+                  <span className="text-[11px] text-[#8A909D]">↗</span>
                 </Link>
               )}
-              <div className="border-t border-gray-100 my-1" />
-              <div className="px-2 py-1">
-                <ReportUserButton
-                  reportedUserId={otherPerson?.id}
-                  reportedUserName={contactName}
-                  currentUserId={currentUserId}
-                  variant="icon-only"
-                />
-              </div>
+              {otherPerson?.id && (
+                <>
+                  <div className="border-t border-gray-100 my-1" />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      setIsReportModalOpen(true);
+                    }}
+                    className="w-full flex items-center justify-between px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer text-left"
+                  >
+                    <span>Report Contact</span>
+                  </button>
+                </>
+              )}
             </div>
           )}
         </div>
@@ -1096,8 +1106,8 @@ function ConversationActiveView({
                     className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-gray-400">
-                    <Eye size={24} />
+                  <div className="w-full h-full flex items-center justify-center text-xs font-semibold text-[#8A8A85] uppercase tracking-wider bg-[#ECECE7]">
+                    {artwork?.title ? artwork.title.substring(0, 2).toUpperCase() : 'ARTWORK'}
                   </div>
                 )}
               </Link>
@@ -1268,13 +1278,21 @@ function ConversationActiveView({
               fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
               fontWeight: 500,
             }}
-            className="px-5 sm:px-6 py-2.5 sm:py-2.5 text-xs sm:text-[13px] flex items-center justify-center gap-1.5 cursor-pointer hover:brightness-110 active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed select-none shadow-md shrink-0"
+            className="px-6 py-2.5 text-xs sm:text-[13px] flex items-center justify-center cursor-pointer hover:brightness-110 active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed select-none shadow-md shrink-0 font-medium"
           >
-            <span>Send</span>
-            <Send size={13} className="text-white" />
+            Send
           </button>
         </div>
       </div>
+
+      {otherPerson?.id && (
+        <ReportUserModal
+          isOpen={isReportModalOpen}
+          onClose={() => setIsReportModalOpen(false)}
+          reportedUserId={otherPerson.id}
+          reportedUserName={contactName}
+        />
+      )}
     </>
   );
 }
