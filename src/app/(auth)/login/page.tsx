@@ -170,9 +170,9 @@ function LoginFormContent() {
               <Image
                 src="/images/eras-logo.png"
                 alt="ERAS Studio"
-                width={144}
-                height={23}
-                className="h-[29px] sm:h-[32px] w-auto object-contain select-none"
+                width={140}
+                height={22}
+                className="h-[28px] sm:h-[31px] w-auto object-contain select-none"
                 priority
               />
             </Link>

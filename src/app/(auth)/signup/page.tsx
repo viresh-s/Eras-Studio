@@ -135,9 +135,9 @@ function SignupFormContent() {
               <Image
                 src="/images/eras-logo.png"
                 alt="ERAS Studio"
-                width={144}
-                height={23}
-                className="h-[29px] w-auto object-contain select-none"
+                width={140}
+                height={22}
+                className="h-[28px] w-auto object-contain select-none"
                 priority
               />
             </Link>
