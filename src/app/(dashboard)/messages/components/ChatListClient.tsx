@@ -775,10 +775,9 @@ export default function ChatListClient({ initialChats, currentUserId }: ChatList
                     fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
                     fontWeight: 500,
                   }}
-                  className="px-6 py-2.5 text-xs font-semibold cursor-pointer shadow-md hover:brightness-110 transition-all inline-flex items-center gap-2"
+                  className="px-6 py-2.5 text-xs font-semibold cursor-pointer shadow-md hover:brightness-110 transition-all inline-flex items-center"
                 >
-                  <span>Go to Messages</span>
-                  <span className="text-sm">→</span>
+                  Go to Messages
                 </button>
               </div>
             )}
@@ -1022,21 +1021,19 @@ function ConversationActiveView({
               {artworkId && (
                 <Link
                   href={`/artwork/${artworkId}`}
-                  className="flex items-center justify-between px-3 py-2 text-xs font-medium text-[#171E2C] hover:bg-gray-50 rounded-lg transition-colors"
+                  className="block px-3 py-2 text-xs font-medium text-[#171E2C] hover:bg-gray-50 rounded-lg transition-colors"
                   onClick={() => setMenuOpen(false)}
                 >
-                  <span>View Artwork</span>
-                  <span className="text-[11px] text-[#8A909D]">→</span>
+                  View Artwork
                 </Link>
               )}
               {otherPerson?.id && (
                 <Link
                   href={`/artist/${otherPerson.id}`}
-                  className="flex items-center justify-between px-3 py-2 text-xs font-medium text-[#171E2C] hover:bg-gray-50 rounded-lg transition-colors"
+                  className="block px-3 py-2 text-xs font-medium text-[#171E2C] hover:bg-gray-50 rounded-lg transition-colors"
                   onClick={() => setMenuOpen(false)}
                 >
-                  <span>View Profile</span>
-                  <span className="text-[11px] text-[#8A909D]">↗</span>
+                  View Profile
                 </Link>
               )}
               {otherPerson?.id && (
