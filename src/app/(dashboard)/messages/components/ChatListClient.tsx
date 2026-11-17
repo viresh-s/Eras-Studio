@@ -119,16 +119,32 @@ export default function ChatListClient({ initialChats, currentUserId }: ChatList
     return chats.filter((c) => c.status === 'Active');
   }, [chats]);
 
-  // Ensure an active chat is selected by default on desktop if available
+  const isInitialMount = useRef(true);
+
+  // Auto-select conversation:
+  // - If initialChatId was specified in URL, open it on both mobile and desktop
+  // - Otherwise, ONLY auto-select the first conversation on desktop screens (>= 768px)
+  // - On mobile screens (< 768px), keep selectedChatId null so the user sees the conversations list!
   useEffect(() => {
-    if (activeTab === 'Messages') {
+    if (activeTab !== 'Messages') return;
+
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
       if (initialChatId && activeChats.some((c) => c.id === initialChatId)) {
         setSelectedChatId(initialChatId);
-      } else if (!selectedChatId && activeChats.length > 0) {
+        return;
+      }
+      if (typeof window !== 'undefined' && window.innerWidth >= 768 && activeChats.length > 0) {
         setSelectedChatId(activeChats[0].id);
       }
+      return;
     }
-  }, [activeTab, activeChats, initialChatId, selectedChatId]);
+
+    // On desktop, if active chat was closed or cleared and screen is >= 768px, fallback to first
+    if (typeof window !== 'undefined' && window.innerWidth >= 768 && !selectedChatId && activeChats.length > 0) {
+      setSelectedChatId(activeChats[0].id);
+    }
+  }, [activeTab, activeChats, initialChatId]);
 
   // Filtered active conversations for search
   const filteredActiveChats = useMemo(() => {
@@ -146,7 +162,24 @@ export default function ChatListClient({ initialChats, currentUserId }: ChatList
   const handleTabChange = (tab: 'Requests' | 'Messages') => {
     setActiveTab(tab);
     if (tab === 'Messages' && activeChats.length > 0 && !selectedChatId) {
-      setSelectedChatId(activeChats[0].id);
+      if (typeof window !== 'undefined' && window.innerWidth >= 768) {
+        setSelectedChatId(activeChats[0].id);
+      }
+    }
+  };
+
+  const handleBackToConversations = () => {
+    setSelectedChatId(null);
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      if (url.searchParams.has('chatId')) {
+        url.searchParams.delete('chatId');
+        window.history.replaceState(
+          null,
+          '',
+          url.pathname + (url.searchParams.toString() ? `?${url.searchParams.toString()}` : '')
+        );
+      }
     }
   };
 
@@ -193,7 +226,11 @@ export default function ChatListClient({ initialChats, currentUserId }: ChatList
   return (
     <div className="w-full">
       {/* 1. TOP HEADER: "Your Inbox" on left, Segmented Pill Toggle on right */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8 px-1">
+      <div
+        className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8 px-1 ${
+          selectedChatId ? 'hidden md:flex' : 'flex'
+        }`}
+      >
         <div>
           <h1
             style={{
@@ -306,7 +343,7 @@ export default function ChatListClient({ initialChats, currentUserId }: ChatList
         {/* TAB 1: MESSAGES (Split-view Sidebar + Conversation Pane) */}
         {/* ======================================================== */}
         {activeTab === 'Messages' && (
-          <div className="flex flex-col md:flex-row gap-5 lg:gap-6 min-h-[580px] md:h-[680px] lg:h-[720px]">
+          <div className="flex flex-col md:flex-row gap-5 lg:gap-6 h-[calc(100dvh-130px)] min-h-[560px] md:h-[680px] lg:h-[720px]">
             {/* LEFT SIDEBAR: Conversations List */}
             <div
               style={{
@@ -505,7 +542,7 @@ export default function ChatListClient({ initialChats, currentUserId }: ChatList
                       return other?.id ? onlineUserIds.has(other.id) : false;
                     })()
                   }
-                  onBack={() => setSelectedChatId(null)}
+                  onBack={handleBackToConversations}
                 />
               ) : (
                 <div className="flex-1 flex flex-col items-center justify-center p-8 text-center text-[#7E8491]">
@@ -875,14 +912,16 @@ function ConversationActiveView({
         className="h-16 sm:h-[68px] px-5 sm:px-6 flex items-center justify-between shrink-0 rounded-t-[18px] relative z-20"
       >
         <div className="flex items-center gap-3 min-w-0">
-          {/* Mobile Back Button */}
+          {/* Mobile Back Button to return to Conversations Sidebar */}
           <button
             type="button"
             onClick={onBack}
-            className="md:hidden p-1.5 -ml-1 text-[#8A909D] hover:text-[#171E2C] rounded-lg transition-colors cursor-pointer"
+            className="md:hidden flex items-center gap-1.5 py-1.5 px-2.5 -ml-1 text-[#171E2C] bg-[#F3F4F6] hover:bg-[#E5E7EB] active:scale-95 rounded-full transition-all cursor-pointer shrink-0 font-medium text-xs border border-[#E5E7EB] shadow-2xs"
             aria-label="Back to conversations"
+            title="Back to conversations"
           >
-            <ArrowLeft size={18} />
+            <ArrowLeft size={15} className="stroke-[2.5]" />
+            <span className="text-[12px] font-medium">Chats</span>
           </button>
 
           {/* Contact Avatar */}
