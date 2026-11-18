@@ -19,7 +19,7 @@ export default function Footer() {
         </div>
         <div className="flex items-center gap-6">
           <Link href="/discovery" className="text-xs text-[var(--color-cor-ink-light)] hover:text-[var(--color-cor-ink)] transition-colors">
-            Explore galleries →
+            Explore galleries
           </Link>
           <span className="text-xs text-[var(--color-cor-ink-light)]">
             About our creators · Terms of use
