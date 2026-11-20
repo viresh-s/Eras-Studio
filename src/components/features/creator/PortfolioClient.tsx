@@ -259,7 +259,7 @@ export default function PortfolioClient({
 
   return (
     <div
-      className="-mt-5 sm:-mt-8 -mx-4 sm:-mx-6 -mb-5 sm:-mb-8 flex flex-col flex-1 min-h-screen"
+      className="flex flex-col flex-1 min-h-screen"
       style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
     >
       {/* ======================================================== */}
