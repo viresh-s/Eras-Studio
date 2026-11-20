@@ -81,21 +81,18 @@ export default async function OverviewPage() {
   const attentionItems = [
     {
       title: "Pending Artworks",
-      description: "Submissions awaiting curatorial review",
       count: artworkStats.pending,
       href: "/admin/artworks?status=pending",
       icon: ArtworksIcon,
     },
     {
       title: "Pending Creators",
-      description: "Creator applications awaiting verification",
       count: creatorStats.pending,
       href: "/admin/creators?status=pending",
       icon: CreatorsIcon,
     },
     {
       title: "Pending Applications",
-      description: "Open call & residency submissions",
       count: appStats.pending,
       href: "/admin/cor/applications",
       icon: ApplicationsIcon,
@@ -115,9 +112,6 @@ export default async function OverviewPage() {
           </h1>
         </div>
         <div className="flex items-center gap-3 self-start sm:self-auto flex-shrink-0">
-          <span className="text-[11px] text-[#8A8A85] tracking-tight hidden md:inline">
-            Refreshed live
-          </span>
           <GenerateReportButton />
         </div>
       </div>
@@ -288,24 +282,21 @@ export default async function OverviewPage() {
                 <Link
                   key={item.title}
                   href={item.href}
-                  className="group block bg-white border border-[#E8E8E3] hover:border-[#1345EE]/40 rounded-3xl p-4 transition-all duration-150 shadow-soft-sm hover:shadow-soft-md"
+                  className="group block bg-white border border-[#E8E8E3] hover:border-[#1345EE]/40 focus:border-[#1345EE]/40 focus-visible:border-[#1345EE]/40 rounded-3xl p-4 transition-all duration-150 shadow-soft-sm hover:shadow-soft-md outline-none focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0"
                 >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-start gap-3.5 min-w-0">
-                      <div className="w-9 h-9 rounded-xl bg-[#000000] border border-black flex items-center justify-center shrink-0 text-white group-hover:bg-[#1345EE] group-hover:text-white transition-colors">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3.5 min-w-0">
+                      <div className="w-9 h-9 rounded-xl bg-[#000000] border border-black group-hover:border-[#1345EE] group-focus:border-[#1345EE] group-focus-visible:border-[#1345EE] flex items-center justify-center shrink-0 text-white group-hover:bg-[#1345EE] group-focus:bg-[#1345EE] group-focus-visible:bg-[#1345EE] group-hover:text-white transition-colors">
                         <Icon size={16} className="stroke-[1.75]" />
                       </div>
                       <div className="min-w-0">
-                        <h4 className="text-xs font-medium text-[#141413] group-hover:text-[#1345EE] transition-colors">
+                        <h4 className="text-xs font-medium text-[#141413] group-hover:text-[#1345EE] group-focus:text-[#1345EE] group-focus-visible:text-[#1345EE] transition-colors">
                           {item.title}
                         </h4>
-                        <p className="text-[11px] text-[#6E6E69] mt-0.5 leading-snug">
-                          {item.description}
-                        </p>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 shrink-0">
+                    <div className="flex items-center shrink-0">
                       <span
                         className={`text-xs font-medium px-2.5 py-0.5 rounded-md ${
                           hasPending
@@ -315,7 +306,6 @@ export default async function OverviewPage() {
                       >
                         {item.count}
                       </span>
-                      <ArrowRight className="w-3.5 h-3.5 text-[#8A8A85] group-hover:text-[#1345EE] group-hover:translate-x-0.5 transition-all" />
                     </div>
                   </div>
                 </Link>
