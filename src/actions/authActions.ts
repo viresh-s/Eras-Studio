@@ -22,7 +22,11 @@ import {
   resolveLoginIdentifier,
   isAuthorizedAdminEmail,
   isAuthorizedAdminUserId,
+  resolveAdminLoginIdentifierAsync,
+  isAuthorizedAdminEmailAsync,
 } from '@/lib/security/adminWhitelist';
+import { adminAccountsRepo } from '@/lib/data/adminAccounts';
+import { AppRole } from '@/lib/security/rbac';
 
 async function getRequestOrigin(): Promise<string> {
   try {
@@ -76,7 +80,7 @@ export async function login(formData: FormData): Promise<AuthResult> {
     return { error: `Validation Error: ${parsed.error.errors[0].message}` };
   }
   const { email: rawIdentifier, password } = parsed.data;
-  const resolvedAuthEmail = resolveLoginIdentifier(rawIdentifier);
+  const resolvedAuthEmail = await resolveAdminLoginIdentifierAsync(rawIdentifier);
 
   // Rate Limiting by Account: 5 failed attempts per 5 minutes to prevent brute-force attacks
   const emailRate = checkRateLimit(`login:account:${resolvedAuthEmail.toLowerCase()}`, { maxRequests: 5, windowSeconds: 300 });
@@ -140,8 +144,9 @@ export async function login(formData: FormData): Promise<AuthResult> {
 
   // 3. Authoritative Role-Based Routing & Single Session Enforcement
   if (profile?.role === 'Admin') {
-    // Phase 25: Strict Whitelist - Only the two predefined admin accounts are permitted
-    if (!isAuthorizedAdminEmail(user.email) || !isAuthorizedAdminUserId(user.id)) {
+    // Authoritative Admin Check: Validates against predefined and created admin accounts
+    const isAuthorized = await isAuthorizedAdminEmailAsync(user.email || resolvedAuthEmail);
+    if (!isAuthorized) {
       securityLogger.alert('UNAUTHORIZED_ADMIN_ROLE_LOGIN_BLOCKED', {
         userId: user.id,
         email: user.email,
@@ -178,17 +183,21 @@ export async function login(formData: FormData): Promise<AuthResult> {
       };
     }
 
+    const adminRecord = await adminAccountsRepo.getByEmail(user.email || resolvedAuthEmail);
+    const assignedRole: AppRole =
+      adminRecord?.role || ((user.email || resolvedAuthEmail) === 'admin123@internal.eras.studio' ? 'super_admin' : 'admin');
+
     const token = await createSessionToken({
       id: user.id,
-      username: user.user_metadata?.username || (user.email || resolvedAuthEmail).split('@')[0],
-      role: 'super_admin',
-      name: profile.full_name || 'Administrator',
+      username: adminRecord?.username || user.user_metadata?.username || (user.email || resolvedAuthEmail).split('@')[0],
+      role: assignedRole,
+      name: adminRecord?.displayName || profile.full_name || 'Administrator',
       email: user.email || resolvedAuthEmail,
       sessionId: sessionResult.sessionId,
     });
 
     cookieStore.set(AUTH_COOKIE_NAME, token, COOKIE_OPTIONS);
-    securityLogger.info('ADMIN_LOGIN_SUCCESS', { adminId: user.id, ip });
+    securityLogger.info('ADMIN_LOGIN_SUCCESS', { adminId: user.id, role: assignedRole, ip });
     return { role: 'Admin', redirectUrl: '/admin/overview' };
   }
 

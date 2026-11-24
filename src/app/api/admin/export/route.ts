@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { AUTH_COOKIE_NAME, verifySessionToken } from "@/lib/auth";
+import { hasPermission } from "@/lib/security/rbac";
 import {
   usersRepo,
   artworksRepo,
@@ -50,6 +51,14 @@ export async function POST(req: NextRequest) {
     const authCheck = await verifyAdminAuth(req);
     if ("error" in authCheck) {
       return NextResponse.json({ error: authCheck.error }, { status: authCheck.status });
+    }
+
+    const session = (authCheck as any).session;
+    if (!hasPermission(session?.role, "audit:export")) {
+      return NextResponse.json(
+        { error: "Forbidden: Simple Admin accounts do not have permission to download or export files." },
+        { status: 403 }
+      );
     }
 
     let body: any = {};

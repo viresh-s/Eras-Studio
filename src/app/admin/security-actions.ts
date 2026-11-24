@@ -1,9 +1,24 @@
 "use server";
 
 import { requireAdminSession } from "@/lib/auth";
-import { getSecurityAuditStats, getRecentSecurityEvents, SecurityLogEntry } from "@/lib/security/logger";
-import { usersRepo } from "@/lib/data";
-import { User } from "@/lib/types";
+import { getSecurityAuditStats, getRecentSecurityEvents, SecurityLogEntry, securityLogger } from "@/lib/security/logger";
+import { adminAccountsRepo, AdminAccount } from "@/lib/data/adminAccounts";
+import { AppRole, isSuperAdmin, getRoleDisplayName, normalizeRole } from "@/lib/security/rbac";
+import { revalidatePath } from "next/cache";
+
+export interface AdminAccountItem {
+  id: string;
+  username: string;
+  name: string;
+  email: string;
+  role: "super_admin" | "moderator" | "admin";
+  roleDisplay: string;
+  status: string;
+  mfaEnrolled: boolean;
+  isRoot: boolean;
+  sessionIsActive: boolean;
+  createdAt: string;
+}
 
 export interface SecurityCentreData {
   stats: {
@@ -18,15 +33,14 @@ export interface SecurityCentreData {
     status: "Active" | "Warning" | "Inactive";
     description: string;
   }>;
-  adminAccounts: Array<{
-    id: string;
-    name: string;
-    email: string;
-    role: string;
-    status: string;
-    mfaEnrolled: boolean;
-  }>;
+  adminAccounts: AdminAccountItem[];
   recentEvents: SecurityLogEntry[];
+  currentAdmin?: {
+    id: string;
+    username: string;
+    role: AppRole;
+    isSuperAdmin: boolean;
+  };
 }
 
 export async function getAdminSecurityOverviewAction(): Promise<{
@@ -35,7 +49,7 @@ export async function getAdminSecurityOverviewAction(): Promise<{
   error?: string;
 }> {
   try {
-    await requireAdminSession();
+    const session = await requireAdminSession();
 
     // 1. Live Security Events and Alert Statistics
     const stats = getSecurityAuditStats();
@@ -92,30 +106,21 @@ export async function getAdminSecurityOverviewAction(): Promise<{
       },
     ];
 
-    // 3. Fetch Admin Users
-    const allUsers = await usersRepo.list();
-    const adminUsers = allUsers
-      .filter((u: any) => (u.role as string)?.toLowerCase() === "admin")
-      .map((u: User) => ({
-        id: u.id,
-        name: u.name,
-        email: u.email,
-        role: "Administrator",
-        status: u.status || "active",
-        mfaEnrolled: true,
-      }));
-
-    // If no admin user explicitly labeled in database yet, include the active administrator
-    if (adminUsers.length === 0) {
-      adminUsers.push({
-        id: "adm_01",
-        name: "Studio Administrator",
-        email: "admin@erasstudio.com",
-        role: "Super Admin",
-        status: "active",
-        mfaEnrolled: true,
-      });
-    }
+    // 3. Fetch Real Unified Admin Accounts
+    const rawAdmins = await adminAccountsRepo.list();
+    const adminAccounts: AdminAccountItem[] = rawAdmins.map((acc: AdminAccount) => ({
+      id: acc.id,
+      username: acc.username,
+      name: acc.displayName || acc.username,
+      email: acc.email,
+      role: acc.role,
+      roleDisplay: getRoleDisplayName(acc.role),
+      status: acc.isActive ? "active" : "inactive",
+      mfaEnrolled: true,
+      isRoot: Boolean(acc.isRoot || acc.username.toLowerCase() === "admin123"),
+      sessionIsActive: Boolean(acc.sessionIsActive),
+      createdAt: acc.createdAt,
+    }));
 
     // 4. Recent Audit Events
     const recentEvents = getRecentSecurityEvents(40);
@@ -125,8 +130,14 @@ export async function getAdminSecurityOverviewAction(): Promise<{
       data: {
         stats,
         securityControls,
-        adminAccounts: adminUsers,
+        adminAccounts,
         recentEvents,
+        currentAdmin: {
+          id: session.id,
+          username: session.username,
+          role: session.role,
+          isSuperAdmin: isSuperAdmin(session.role) || session.username.toLowerCase() === "admin123",
+        },
       },
     };
   } catch (err: any) {
@@ -135,5 +146,170 @@ export async function getAdminSecurityOverviewAction(): Promise<{
       success: false,
       error: err.message || "Failed to load security overview.",
     };
+  }
+}
+
+/**
+ * Super Admin Action: Create a new Administrator Account
+ */
+export async function createAdminAccountAction(data: {
+  username: string;
+  email: string;
+  password: string;
+  displayName?: string;
+  role: "super_admin" | "moderator" | "admin";
+}): Promise<{ success: boolean; account?: AdminAccountItem; error?: string }> {
+  try {
+    const session = await requireAdminSession("admin:manage");
+
+    if (!isSuperAdmin(session.role) && session.username.toLowerCase() !== "admin123") {
+      return { success: false, error: "Forbidden: Only Super Administrators can create admin accounts." };
+    }
+
+    if (!data.username || !data.email || !data.password) {
+      return { success: false, error: "Username, email, and password are required." };
+    }
+
+    if (data.password.length < 6) {
+      return { success: false, error: "Password must be at least 6 characters long." };
+    }
+
+    const res = await adminAccountsRepo.create({
+      username: data.username,
+      email: data.email,
+      password: data.password,
+      displayName: data.displayName,
+      role: data.role,
+    });
+
+    if (!res.success || !res.account) {
+      return { success: false, error: res.error || "Failed to create administrator account." };
+    }
+
+    securityLogger.audit("ADMIN_ACCOUNT_CREATED", {
+      actorId: session.id,
+      actorUsername: session.username,
+      createdUsername: res.account.username,
+      createdRole: res.account.role,
+      createdEmail: res.account.email,
+    });
+
+    revalidatePath("/admin/security");
+
+    return {
+      success: true,
+      account: {
+        id: res.account.id,
+        username: res.account.username,
+        name: res.account.displayName,
+        email: res.account.email,
+        role: res.account.role,
+        roleDisplay: getRoleDisplayName(res.account.role),
+        status: res.account.isActive ? "active" : "inactive",
+        mfaEnrolled: true,
+        isRoot: false,
+        sessionIsActive: false,
+        createdAt: res.account.createdAt,
+      },
+    };
+  } catch (err: any) {
+    console.error("createAdminAccountAction error:", err);
+    return { success: false, error: err.message || "Failed to create administrator account." };
+  }
+}
+
+/**
+ * Super Admin Action: Delete an Administrator Account
+ * Primary Super Admin (admin123) cannot be deleted.
+ */
+export async function deleteAdminAccountAction(
+  adminId: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const session = await requireAdminSession("admin:manage");
+
+    if (!isSuperAdmin(session.role) && session.username.toLowerCase() !== "admin123") {
+      return { success: false, error: "Forbidden: Only Super Administrators can delete admin accounts." };
+    }
+
+    if (session.id === adminId) {
+      return { success: false, error: "Administrators cannot delete their own active account." };
+    }
+
+    const target = await adminAccountsRepo.getById(adminId);
+    if (!target) {
+      return { success: false, error: "Admin account not found." };
+    }
+
+    if (target.username.toLowerCase() === "admin123" || target.isRoot) {
+      return { success: false, error: "The primary Super Admin account (admin123) cannot be deleted." };
+    }
+
+    const res = await adminAccountsRepo.delete(adminId);
+    if (!res.success) {
+      return { success: false, error: res.error || "Failed to delete administrator account." };
+    }
+
+    securityLogger.alert("ADMIN_ACCOUNT_DELETED", {
+      actorId: session.id,
+      actorUsername: session.username,
+      deletedAdminId: adminId,
+      deletedUsername: target.username,
+      deletedRole: target.role,
+    });
+
+    revalidatePath("/admin/security");
+    return { success: true };
+  } catch (err: any) {
+    console.error("deleteAdminAccountAction error:", err);
+    return { success: false, error: err.message || "Failed to delete administrator account." };
+  }
+}
+
+/**
+ * Super Admin Action: Update Administrator Role
+ * Primary Super Admin (admin123) role cannot be changed.
+ */
+export async function updateAdminAccountRoleAction(
+  adminId: string,
+  newRole: "super_admin" | "moderator" | "admin"
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const session = await requireAdminSession("admin:manage");
+
+    if (!isSuperAdmin(session.role) && session.username.toLowerCase() !== "admin123") {
+      return { success: false, error: "Forbidden: Only Super Administrators can modify admin roles." };
+    }
+
+    const target = await adminAccountsRepo.getById(adminId);
+    if (!target) {
+      return { success: false, error: "Admin account not found." };
+    }
+
+    if (target.username.toLowerCase() === "admin123" || target.isRoot) {
+      return { success: false, error: "The role of the primary Super Admin (admin123) cannot be modified." };
+    }
+
+    const cleanRole = normalizeRole(newRole) as "super_admin" | "moderator" | "admin";
+    const res = await adminAccountsRepo.updateRole(adminId, cleanRole);
+
+    if (!res.success) {
+      return { success: false, error: res.error || "Failed to update administrator role." };
+    }
+
+    securityLogger.audit("ADMIN_ROLE_UPDATED", {
+      actorId: session.id,
+      actorUsername: session.username,
+      targetAdminId: adminId,
+      targetUsername: target.username,
+      previousRole: target.role,
+      updatedRole: cleanRole,
+    });
+
+    revalidatePath("/admin/security");
+    return { success: true };
+  } catch (err: any) {
+    console.error("updateAdminAccountRoleAction error:", err);
+    return { success: false, error: err.message || "Failed to update administrator role." };
   }
 }
