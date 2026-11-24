@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { useToast } from "@/components/ui";
 import { updateCreatorAction, deleteCreatorAction } from "@/app/admin/actions";
+import { MaskedId } from "@/components/admin/MaskedId";
 import {
   ArrowLeft,
   Sparkles,
@@ -246,8 +247,8 @@ export function CreatorDetailClient({
           </div>
           <div className="bg-[#F2F0ED]/70 p-3.5 rounded-xl border border-[#E8E8E3]">
             <span className="text-[#73736C] font-sans font-semibold uppercase tracking-wider text-[11px]">Creator ID</span>
-            <div className="font-mono text-xs font-medium text-[#141413] mt-2 truncate" title={creatorState.id}>
-              {creatorState.id}
+            <div className="font-mono text-xs font-medium text-[#141413] mt-2">
+              <MaskedId id={creatorState.id} showCopyIcon />
             </div>
           </div>
         </div>
@@ -298,14 +299,14 @@ export function CreatorDetailClient({
                 <div className="grid grid-cols-3 gap-2">
                   <div className="text-[#6E6E69]">Creator ID</div>
                   <div className="col-span-2 font-mono text-xs font-medium text-[#141413] bg-[#F2F0ED] px-2 py-0.5 rounded-md border border-[#E8E8E3] inline-block w-fit">
-                    {creatorState.id}
+                    <MaskedId id={creatorState.id} showCopyIcon />
                   </div>
                 </div>
                 {creatorState.userId && creatorState.userId !== creatorState.id && (
                   <div className="grid grid-cols-3 gap-2">
                     <div className="text-[#6E6E69]">User ID</div>
                     <div className="col-span-2 font-mono text-xs font-medium text-[#141413] bg-[#F2F0ED] px-2 py-0.5 rounded-md border border-[#E8E8E3] inline-block w-fit">
-                      {creatorState.userId}
+                      <MaskedId id={creatorState.userId} showCopyIcon />
                     </div>
                   </div>
                 )}

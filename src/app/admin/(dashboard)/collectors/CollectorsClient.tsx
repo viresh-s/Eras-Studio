@@ -29,6 +29,7 @@ import { Pagination } from "@/components/ui/Pagination";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useToast } from "@/components/ui";
 import { updateCollectorAction } from "@/app/admin/actions";
+import { MaskedId } from "@/components/admin/MaskedId";
 
 interface CollectorsClientProps {
   initialCollectors: Collector[];
@@ -384,8 +385,8 @@ export function CollectorsClient({
                           <p className="font-medium text-[#141413]">
                             {collector.name}
                           </p>
-                          <p className="text-[11px] text-[#71716D]">
-                            ID: {collector.id}
+                          <p className="text-[11px] text-[#71716D] flex items-center gap-1">
+                            <span>ID:</span> <MaskedId id={collector.id} />
                           </p>
                         </div>
                       </div>
@@ -542,7 +543,7 @@ export function CollectorsClient({
               <div className="flex items-center justify-between py-2.5 border-b border-[#F0F0EB]">
                 <span className="text-[#6E6E69]">Collector ID</span>
                 <span className="font-mono text-[11px] text-[#141413] bg-[#F2F0ED] border border-[#E8E8E3] px-2 py-0.5 rounded-md">
-                  {selectedCollector.id}
+                  <MaskedId id={selectedCollector.id} showCopyIcon />
                 </span>
               </div>
 

@@ -30,6 +30,7 @@ import { Pagination } from "@/components/ui/Pagination";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useToast } from "@/components/ui";
 import { updateCreatorAction } from "@/app/admin/actions";
+import { MaskedId } from "@/components/admin/MaskedId";
 
 interface CreatorsClientProps {
   initialCreators: Creator[];
@@ -501,8 +502,8 @@ export function CreatorsClient({
                           <p className="font-medium text-[#141413]">
                             {creator.name}
                           </p>
-                          <p className="text-[11px] text-[#71716D]">
-                            ID: {creator.id}
+                          <p className="text-[11px] text-[#71716D] flex items-center gap-1">
+                            <span>ID:</span> <MaskedId id={creator.id} />
                           </p>
                         </div>
                       </div>
@@ -733,14 +734,14 @@ export function CreatorsClient({
               <div className="flex items-center justify-between py-2.5 border-b border-[#F0F0EB]">
                 <span className="text-[#6E6E69]">Creator ID</span>
                 <span className="font-mono text-[11px] text-[#141413] bg-[#F2F0ED] border border-[#E8E8E3] px-2 py-0.5 rounded-md">
-                  {selectedCreator.id}
+                  <MaskedId id={selectedCreator.id} showCopyIcon />
                 </span>
               </div>
 
               <div className="flex items-center justify-between py-2.5 border-b border-[#F0F0EB]">
                 <span className="text-[#6E6E69]">Linked User ID</span>
                 <span className="font-mono text-[11px] text-[#141413] bg-[#F2F0ED] border border-[#E8E8E3] px-2 py-0.5 rounded-md">
-                  {selectedCreator.userId}
+                  <MaskedId id={selectedCreator.userId} showCopyIcon />
                 </span>
               </div>
 

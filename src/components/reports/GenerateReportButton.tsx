@@ -168,7 +168,6 @@ export function GenerateReportButton() {
           if (!isGenerating) setIsOpen(false);
         }}
         title="Generate Performance Report"
-        description="Choose a reporting period and generate a concise overview of your studio's performance."
         maxWidth="md"
         footer={null}
       >
@@ -287,24 +286,9 @@ export function GenerateReportButton() {
                   <h5 className="text-sm font-medium text-[#141413]">
                     {previewInfo.title}
                   </h5>
-                  <p className="text-xs text-[#6E6E69] mt-1 mb-4">
+                  <p className="text-xs text-[#6E6E69] mt-1">
                     {previewInfo.range}
                   </p>
-                  <div className="space-y-2">
-                    <p className="text-xs font-medium text-[#141413] mb-2 uppercase tracking-wider">Includes:</p>
-                    <div className="flex items-center gap-2 text-xs text-[#6E6E69]">
-                      <Check className="w-3.5 h-3.5 text-[#28633B]" />
-                      <span>Platform performance</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-[#6E6E69]">
-                      <Check className="w-3.5 h-3.5 text-[#28633B]" />
-                      <span>Content & creator activity</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-[#6E6E69]">
-                      <Check className="w-3.5 h-3.5 text-[#28633B]" />
-                      <span>Key curatorial & financial insights</span>
-                    </div>
-                  </div>
                 </div>
               </div>
 

@@ -68,13 +68,13 @@ export default async function OverviewPage() {
     .slice(0, 5);
 
   const keyMatrixStats = [
-    { label: "Total Users", value: userStats.total, href: "/admin/users" },
+    { label: "All Members", value: userStats.total, href: "/admin/users" },
     { label: "Creators", value: userStats.creators, href: "/admin/creators" },
     { label: "Collectors", value: userStats.collectors, href: "/admin/collectors" },
+    { label: "Free Plan", value: creatorStats.free, href: "/admin/users" },
+    { label: "Elite Plan", value: creatorStats.elite, href: "/admin/users" },
+    { label: "Pro Plan", value: creatorStats.pro, href: "/admin/users" },
     { label: "Artworks", value: artworkStats.published, href: "/admin/artworks" },
-    { label: "Free Tier", value: creatorStats.free, href: "/admin/users" },
-    { label: "Elite Tier", value: creatorStats.elite, href: "/admin/users" },
-    { label: "Pro Tier", value: creatorStats.pro, href: "/admin/users" },
     { label: "COR Members", value: corStats.active, href: "/admin/cor/members" },
   ];
 
@@ -116,38 +116,41 @@ export default async function OverviewPage() {
         </div>
       </div>
 
-      {/* REDESIGNED KEY MATRIX: Clean Compact Inline Dashboard Strip */}
+      {/* Key Matrix: Pill filter style */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-xs font-medium uppercase tracking-[0.2em] text-[#1345EE] font-sans flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-[#1345EE]" />
             Key Matrix
           </h2>
-          <span className="text-[11px] text-[#8A8A85] font-sans hidden sm:inline">
-            Platform Vitals Overview
-          </span>
         </div>
 
-        {/* Inline Metrics Strip: Clean horizontal arrangement on desktop, wrapping on tablet/mobile with subtle hairline dividers */}
-        <div className="bg-white border border-[#E8E8E3] rounded-2xl shadow-soft-sm overflow-hidden">
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 divide-y divide-[#E8E8E3] sm:divide-y-0 sm:divide-x divide-y-reverse">
-            {keyMatrixStats.map((stat, idx) => (
+        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none select-none flex-wrap">
+          {keyMatrixStats.map((stat, idx) => {
+            const isFirst = idx === 0;
+            return (
               <Link
                 key={stat.label}
                 href={stat.href}
-                className={`group block px-4 py-3.5 sm:py-4 transition-colors hover:bg-[#F2F0ED]/50 ${
-                  idx >= 4 ? "sm:border-t lg:border-t-0 sm:border-[#E8E8E3]" : ""
-                } ${idx % 2 === 1 ? "border-l border-[#E8E8E3] sm:border-l-0" : ""}`}
+                className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-all duration-200 cursor-pointer select-none whitespace-nowrap shadow-2xs ${
+                  isFirst
+                    ? "bg-[#000000] text-white font-medium border border-black shadow-xs hover:bg-[#141413]"
+                    : "bg-white text-[#6E6E69] border border-[#E8E8E3] hover:text-[#141413] hover:bg-[#F2F0ED]"
+                }`}
               >
-                <span className="block text-[10px] sm:text-[11px] font-medium uppercase tracking-wider text-[#73736C] group-hover:text-[#1345EE] transition-colors truncate">
-                  {stat.label}
-                </span>
-                <span className="block text-2xl sm:text-3xl font-semibold tracking-tight text-[#141413] mt-1 group-hover:text-[#1345EE] transition-colors font-sans tabular-nums">
+                <span>{stat.label}</span>
+                <span
+                  className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
+                    isFirst
+                      ? "bg-white text-[#1345EE]"
+                      : "bg-[#F2F0ED] text-[#1345EE] border border-[#1345EE]/25"
+                  }`}
+                >
                   {stat.value}
                 </span>
               </Link>
-            ))}
-          </div>
+            );
+          })}
         </div>
       </div>
 

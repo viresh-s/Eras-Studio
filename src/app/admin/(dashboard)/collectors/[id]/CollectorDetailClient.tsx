@@ -13,6 +13,7 @@ import {
   deleteCollectorAction,
   updateInquiryStatusAction,
 } from "@/app/admin/actions";
+import { MaskedId } from "@/components/admin/MaskedId";
 import {
   ArrowLeft,
   Sparkles,
@@ -358,8 +359,8 @@ export function CollectorDetailClient({
           </div>
           <div className="bg-[#F2F0ED]/70 p-3.5 rounded-xl border border-[#E8E8E3]">
             <span className="text-[#73736C] font-sans font-semibold uppercase tracking-wider text-[11px]">Collector ID</span>
-            <div className="font-mono text-xs font-medium text-[#141413] mt-2 truncate" title={collectorState.id}>
-              {collectorState.id}
+            <div className="font-mono text-xs font-medium text-[#141413] mt-2">
+              <MaskedId id={collectorState.id} showCopyIcon />
             </div>
           </div>
         </div>
@@ -542,14 +543,14 @@ export function CollectorDetailClient({
                   <div className="grid grid-cols-3 gap-2">
                     <div className="text-[#6E6E69]">Collector ID</div>
                     <div className="col-span-2 font-mono text-xs font-medium text-[#141413] bg-[#F2F0ED] px-2 py-0.5 rounded-md border border-[#E8E8E3] inline-block w-fit">
-                      {collectorState.id}
+                      <MaskedId id={collectorState.id} showCopyIcon />
                     </div>
                   </div>
                   {collectorState.userId && collectorState.userId !== collectorState.id && (
                     <div className="grid grid-cols-3 gap-2">
                       <div className="text-[#6E6E69]">User ID</div>
                       <div className="col-span-2 font-mono text-xs font-medium text-[#141413] bg-[#F2F0ED] px-2 py-0.5 rounded-md border border-[#E8E8E3] inline-block w-fit">
-                        {collectorState.userId}
+                        <MaskedId id={collectorState.userId} showCopyIcon />
                       </div>
                     </div>
                   )}

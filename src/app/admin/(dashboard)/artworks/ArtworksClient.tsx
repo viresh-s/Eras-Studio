@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import { ArtworksIcon } from "@/components/admin/icons";
 import { TriangleAlertIcon, SaveIcon } from "@/components/ui/icons";
+import { MaskedId } from "@/components/admin/MaskedId";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ViewIcon, EyeOffIcon, Flag03Icon } from "@hugeicons-pro/core-stroke-rounded";
 import { Artwork, ArtworkStatus, Creator } from "@/lib/types";
@@ -1537,7 +1538,7 @@ export function ArtworksClient({
                 <div className="flex items-center justify-between py-2 border-b border-[#F0F0EB]">
                   <span className="text-[#71716D]">Creator ID</span>
                   <span className="text-[11px] font-medium text-[#141413] bg-[#F2F0ED] px-2 py-0.5 rounded-full border border-[#E8E8E3]">
-                    {selectedArtwork.creatorId}
+                    <MaskedId id={selectedArtwork.creatorId} showCopyIcon />
                   </span>
                 </div>
               )}
