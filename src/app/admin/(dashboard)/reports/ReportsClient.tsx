@@ -18,7 +18,7 @@ import {
   Info,
   Check,
   ChevronDown,
-} from "lucide-react";
+} from "@/components/admin/icons";
 import { ReportsIcon } from "@/components/admin/icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -529,7 +529,7 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Search reports..."
-            className="w-full text-xs pl-9 pr-8 py-2 rounded-full border border-[#E8E8E3] bg-[#F2F0ED]/50 focus:bg-white text-[#141413] placeholder:text-[#8A8A85] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all shadow-2xs"
+            className="w-full text-xs pl-9 pr-8 py-2 rounded-full border border-[#E8E8E3] bg-[#F2F0ED]/50 focus:bg-white text-[#141413] placeholder:text-[#8A8A85] focus:outline-none focus:border-[#100E90] focus:ring-1 focus:ring-[#100E90] transition-all shadow-2xs"
           />
           {searchInput && (
             <button
@@ -986,7 +986,7 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
                   <h3 className="font-medium text-[#141413] text-base">
                     {selectedReport.artworkTitle}
                   </h3>
-                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#F2F0ED] text-[#1345EE] border border-[#1345EE]/30 capitalize font-medium">
+                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#F2F0ED] text-[#100E90] border border-[#100E90]/30 capitalize font-medium">
                     {selectedReport.artworkStatus || "published"}
                   </span>
                 </div>
@@ -1059,7 +1059,7 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
               <span className="text-xs font-medium text-[#141413] uppercase tracking-wider">
                 Reason for report
               </span>
-              <div className="p-3.5 rounded-2xl border border-[#1345EE]/30 bg-[#F2F0ED] text-xs font-medium text-[#1345EE] shadow-soft-sm">
+              <div className="p-3.5 rounded-2xl border border-[#100E90]/30 bg-[#F2F0ED] text-xs font-medium text-[#100E90] shadow-soft-sm">
                 {selectedReport.reason}
               </div>
             </div>

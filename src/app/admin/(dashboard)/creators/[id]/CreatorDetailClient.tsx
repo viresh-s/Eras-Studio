@@ -17,7 +17,7 @@ import {
   Image as ImageIcon,
   Award,
   AlertTriangle,
-} from "lucide-react";
+} from "@/components/admin/icons";
 
 interface CreatorDetailClientProps {
   creator: Creator;
@@ -141,7 +141,7 @@ export function CreatorDetailClient({
           href="/admin/creators"
           className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-[#E8E8E3] bg-white text-xs font-medium text-[#141413] hover:bg-[#F2F0ED] transition-colors shadow-2xs"
         >
-          <ArrowLeft className="w-3.5 h-3.5 text-[#1345EE]" />
+          <ArrowLeft className="w-3.5 h-3.5 text-[#100E90]" />
           <span>Back to Creator Roster</span>
         </Link>
       </div>
@@ -155,7 +155,7 @@ export function CreatorDetailClient({
               <img
                 src={creatorState.profilePicUrl}
                 alt={creatorState.name}
-                className="w-16 h-16 rounded-full object-cover border-2 border-[#1345EE]/30"
+                className="w-16 h-16 rounded-full object-cover border-2 border-[#100E90]/30"
               />
             ) : (
               <div className="w-16 h-16 rounded-full bg-[#000000] border border-black flex items-center justify-center text-xl font-bold text-white">
@@ -185,7 +185,7 @@ export function CreatorDetailClient({
               <p className="text-xs md:text-sm text-[#6E6E69] mt-1">
                 {creatorState.email || "No email"} · {creatorState.location || "Remote"} · Joined {formatDate(creatorState.createdAt)}
               </p>
-              <div className="text-xs font-medium text-[#1345EE] mt-1 uppercase tracking-wider font-sans">
+              <div className="text-xs font-medium text-[#100E90] mt-1 uppercase tracking-wider font-sans">
                 {creatorState.discipline}
               </div>
             </div>
@@ -349,7 +349,7 @@ export function CreatorDetailClient({
                   <div className="text-[#6E6E69]">Portfolio URL</div>
                   <div className="col-span-2 font-medium text-[#141413]">
                     {creatorState.portfolioUrl ? (
-                      <a href={creatorState.portfolioUrl.startsWith("http") ? creatorState.portfolioUrl : `https://${creatorState.portfolioUrl}`} target="_blank" rel="noreferrer" className="text-[#1345EE] hover:underline inline-flex items-center gap-1">
+                      <a href={creatorState.portfolioUrl.startsWith("http") ? creatorState.portfolioUrl : `https://${creatorState.portfolioUrl}`} target="_blank" rel="noreferrer" className="text-[#100E90] hover:underline inline-flex items-center gap-1">
                         View Portfolio <LinkIcon className="w-3 h-3" />
                       </a>
                     ) : (
@@ -361,7 +361,7 @@ export function CreatorDetailClient({
                   <div className="grid grid-cols-3 gap-2">
                     <div className="text-[#6E6E69]">Curriculum Vitae</div>
                     <div className="col-span-2 font-medium text-[#141413]">
-                      <a href={creatorState.cvUrl} target="_blank" rel="noreferrer" className="text-[#1345EE] hover:underline inline-flex items-center gap-1">
+                      <a href={creatorState.cvUrl} target="_blank" rel="noreferrer" className="text-[#100E90] hover:underline inline-flex items-center gap-1">
                         View CV Document <LinkIcon className="w-3 h-3" />
                       </a>
                     </div>
@@ -393,7 +393,7 @@ export function CreatorDetailClient({
                               href={url}
                               target="_blank"
                               rel="noreferrer"
-                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#F2F0ED] hover:bg-[#E8E8E3] text-[#1345EE] text-xs font-medium transition-colors border border-[#E8E8E3]"
+                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#F2F0ED] hover:bg-[#E8E8E3] text-[#100E90] text-xs font-medium transition-colors border border-[#E8E8E3]"
                             >
                               <LinkIcon className="w-3 h-3" />
                               <span className="capitalize">{platform}: {handle}</span>
@@ -468,7 +468,7 @@ export function CreatorDetailClient({
                 </div>
                 <div className="flex items-center justify-between py-2 border-b border-[#F0F0EB]">
                   <span className="text-[#6E6E69]">Desired Role</span>
-                  <span className="font-medium text-[#1345EE]">{corMember.desiredRole || "Curated Artist"}</span>
+                  <span className="font-medium text-[#100E90]">{corMember.desiredRole || "Curated Artist"}</span>
                 </div>
                 <div className="flex items-center justify-between py-2 border-b border-[#F0F0EB]">
                   <span className="text-[#6E6E69]">Preferred Work Type</span>
@@ -517,7 +517,7 @@ export function CreatorDetailClient({
           </>
         }
       >
-        <div className="p-4 bg-[#F2F0ED] border border-[#1345EE]/30 rounded-3xl text-xs text-[#1345EE] space-y-1">
+        <div className="p-4 bg-[#F2F0ED] border border-[#100E90]/30 rounded-3xl text-xs text-[#100E90] space-y-1">
           <p className="font-medium text-[#141413]">Account Impact:</p>
           <p>• Profile: {creatorState.name} ({creatorState.email || "No email"})</p>
           <p>• Target status: {isSuspended ? "active (reverted)" : "suspended"}</p>
@@ -595,7 +595,7 @@ export function CreatorDetailClient({
           </>
         }
       >
-        <div className="p-4 bg-[#F2F0ED] border border-[#1345EE]/30 rounded-3xl text-xs text-[#6E6E69]">
+        <div className="p-4 bg-[#F2F0ED] border border-[#100E90]/30 rounded-3xl text-xs text-[#6E6E69]">
           <p>
             {isArchived
               ? "Restoring from archive makes the creator visible in main directory searches again."

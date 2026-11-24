@@ -31,7 +31,7 @@ import {
   CheckCircle2,
   Clock,
   ArrowRight,
-} from "lucide-react";
+} from "@/components/admin/icons";
 
 interface CorApplicationsClientProps {
   initialApplications: CorApplication[];
@@ -212,7 +212,7 @@ export function CorApplicationsClient({
           >
             <span>All</span>
             <span className={`text-[11px] px-2 py-0.2 rounded-full ${
-              statusFilter === "all" ? "bg-white text-[#1345EE]" : "bg-[#F2F0ED] text-[#71716D]"
+              statusFilter === "all" ? "bg-white text-[#100E90]" : "bg-[#F2F0ED] text-[#71716D]"
             }`}>
               {statusCounts.all}
             </span>
@@ -235,7 +235,7 @@ export function CorApplicationsClient({
               >
                 <span>{st}</span>
                 <span className={`text-[11px] px-2 py-0.2 rounded-full ${
-                  active ? "bg-white text-[#1345EE]" : "bg-[#F2F0ED] text-[#71716D]"
+                  active ? "bg-white text-[#100E90]" : "bg-[#F2F0ED] text-[#71716D]"
                 }`}>
                   {statusCounts[st] || 0}
                 </span>
@@ -253,7 +253,7 @@ export function CorApplicationsClient({
                 setCompanyFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="text-xs bg-[#F2F0ED]/50 border border-[#E8E8E3] rounded-full px-3 py-1.5 text-[#141413] focus:outline-none focus:bg-white focus:border-[#1345EE] transition-colors"
+              className="text-xs bg-[#F2F0ED]/50 border border-[#E8E8E3] rounded-full px-3 py-1.5 text-[#141413] focus:outline-none focus:bg-white focus:border-[#100E90] transition-colors"
             >
               <option value="all">All Companies</option>
               {uniqueCompanies.map((c) => (
@@ -274,7 +274,7 @@ export function CorApplicationsClient({
                 setSearchQuery(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full text-xs bg-[#F2F0ED]/50 border border-[#E8E8E3] rounded-full pl-9 pr-3.5 py-2 text-[#141413] placeholder-[#8A8A85] focus:outline-none focus:bg-white focus:border-[#1345EE] transition-colors"
+              className="w-full text-xs bg-[#F2F0ED]/50 border border-[#E8E8E3] rounded-full pl-9 pr-3.5 py-2 text-[#141413] placeholder-[#8A8A85] focus:outline-none focus:bg-white focus:border-[#100E90] transition-colors"
             />
           </div>
         </div>
@@ -330,7 +330,7 @@ export function CorApplicationsClient({
                       href={`/admin/cor/applications/${app.id}`}
                       className="group block"
                     >
-                      <div className="text-base font-medium text-[#141413] group-hover:text-[#1345EE] transition-colors">
+                      <div className="text-base font-medium text-[#141413] group-hover:text-[#100E90] transition-colors">
                         {app.company}
                       </div>
                       <div className="text-xs text-[#6E6E69]">
@@ -356,7 +356,7 @@ export function CorApplicationsClient({
                       <div>
                         <Link
                           href={`/admin/cor/members/${app.corMemberId}`}
-                          className="font-medium text-xs text-[#141413] hover:text-[#1345EE] transition-colors"
+                          className="font-medium text-xs text-[#141413] hover:text-[#100E90] transition-colors"
                         >
                           {app.creatorName}
                         </Link>
@@ -376,7 +376,7 @@ export function CorApplicationsClient({
                         onChange={(e) =>
                           handleStatusChange(app.id, e.target.value as CorApplicationStatus)
                         }
-                        className={`text-xs font-medium rounded-full px-3 py-1 border transition-all cursor-pointer focus:outline-none focus:border-[#1345EE] ${
+                        className={`text-xs font-medium rounded-full px-3 py-1 border transition-all cursor-pointer focus:outline-none focus:border-[#100E90] ${
                           app.status === "Offer"
                             ? "bg-[#000000] text-white border-black"
                             : app.status === "Interview"
@@ -407,7 +407,7 @@ export function CorApplicationsClient({
                   {/* Interview Date */}
                   <TableCell className="py-3.5 px-5 text-xs text-[#141413]">
                     {app.interviewDate ? (
-                      <span className="text-sm font-medium text-[#1345EE]">
+                      <span className="text-sm font-medium text-[#100E90]">
                         {formatDate(app.interviewDate)}
                       </span>
                     ) : (

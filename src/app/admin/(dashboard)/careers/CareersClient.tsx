@@ -53,7 +53,7 @@ import {
   Eye,
   X,
   MessageSquare,
-} from "lucide-react";
+} from "@/components/admin/icons";
 
 interface CareersClientProps {
   initialStats: {
@@ -589,12 +589,12 @@ export function CareersClient({
           {/* Card: Total Applications */}
           <div className="bg-white p-5 rounded-2xl border border-[#E8E8E3] shadow-soft-sm col-span-2 md:col-span-1">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-[#1345EE]">Applications</span>
-              <div className="w-8 h-8 rounded-xl bg-[#EEF2FE] flex items-center justify-center text-[#1345EE]">
+              <span className="text-xs font-medium text-[#100E90]">Applications</span>
+              <div className="w-8 h-8 rounded-xl bg-[#EAE9F8] flex items-center justify-center text-[#100E90]">
                 <Users className="w-4 h-4" />
               </div>
             </div>
-            <p className="text-2xl font-semibold text-[#1345EE] mt-3 font-sans" data-numeric>
+            <p className="text-2xl font-semibold text-[#100E90] mt-3 font-sans" data-numeric>
               {stats.totalApplications}
             </p>
             <span className="text-[11px] text-[#8A8A85] mt-1 block">Total submitted CVs</span>
@@ -611,7 +611,7 @@ export function CareersClient({
           onClick={() => setActiveTab("opportunities")}
           className={`pb-3 text-sm font-medium transition-all cursor-pointer relative ${
             activeTab === "opportunities"
-              ? "text-[#1345EE] border-b-2 border-[#1345EE]"
+              ? "text-[#100E90] border-b-2 border-[#100E90]"
               : "text-[#6E6E69] hover:text-[#141413]"
           }`}
         >
@@ -626,7 +626,7 @@ export function CareersClient({
           onClick={() => setActiveTab("applications")}
           className={`pb-3 text-sm font-medium transition-all cursor-pointer relative ${
             activeTab === "applications"
-              ? "text-[#1345EE] border-b-2 border-[#1345EE]"
+              ? "text-[#100E90] border-b-2 border-[#100E90]"
               : "text-[#6E6E69] hover:text-[#141413]"
           }`}
         >
@@ -666,7 +666,7 @@ export function CareersClient({
                     setOppStatusFilter(e.target.value as any);
                     setOppCurrentPage(1);
                   }}
-                  className="bg-white border border-[#E8E8E3] rounded-xl px-3 py-2 text-xs text-[#141413] focus:outline-none focus:border-[#1345EE]"
+                  className="bg-white border border-[#E8E8E3] rounded-xl px-3 py-2 text-xs text-[#141413] focus:outline-none focus:border-[#100E90]"
                 >
                   <option value="all">All Statuses</option>
                   <option value="published">Published</option>
@@ -681,7 +681,7 @@ export function CareersClient({
                 <select
                   value={oppSortBy}
                   onChange={(e) => setOppSortBy(e.target.value as any)}
-                  className="bg-white border border-[#E8E8E3] rounded-xl px-3 py-2 text-xs text-[#141413] focus:outline-none focus:border-[#1345EE]"
+                  className="bg-white border border-[#E8E8E3] rounded-xl px-3 py-2 text-xs text-[#141413] focus:outline-none focus:border-[#100E90]"
                 >
                   <option value="created">Created Date</option>
                   <option value="title">Title</option>
@@ -783,7 +783,7 @@ export function CareersClient({
                             setAppOppFilter(opp.id);
                             setActiveTab("applications");
                           }}
-                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#EEF2FE] hover:bg-[#1345EE]/15 text-[#1345EE] text-xs font-semibold transition-colors cursor-pointer"
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#EAE9F8] hover:bg-[#100E90]/15 text-[#100E90] text-xs font-semibold transition-colors cursor-pointer"
                         >
                           <Users className="w-3 h-3" />
                           <span data-numeric>{opp.applicationCount || 0}</span>
@@ -840,7 +840,7 @@ export function CareersClient({
                             type="button"
                             onClick={() => handleOpenEditModal(opp)}
                             title="Edit Opportunity"
-                            className="p-1.5 rounded-lg border border-[#E8E8E3] bg-white text-[#6E6E69] hover:text-[#1345EE] hover:border-[#1345EE]/30 transition-colors cursor-pointer"
+                            className="p-1.5 rounded-lg border border-[#E8E8E3] bg-white text-[#6E6E69] hover:text-[#100E90] hover:border-[#100E90]/30 transition-colors cursor-pointer"
                           >
                             <Edit3 className="w-3.5 h-3.5" />
                           </button>
@@ -906,7 +906,7 @@ export function CareersClient({
                     setAppOppFilter(e.target.value);
                     setAppCurrentPage(1);
                   }}
-                  className="bg-white border border-[#E8E8E3] rounded-xl px-3 py-2 text-xs text-[#141413] focus:outline-none focus:border-[#1345EE] max-w-xs"
+                  className="bg-white border border-[#E8E8E3] rounded-xl px-3 py-2 text-xs text-[#141413] focus:outline-none focus:border-[#100E90] max-w-xs"
                 >
                   <option value="all">All Opportunities</option>
                   {opportunities.map((opp) => (
@@ -926,7 +926,7 @@ export function CareersClient({
                     setAppStatusFilter(e.target.value as any);
                     setAppCurrentPage(1);
                   }}
-                  className="bg-white border border-[#E8E8E3] rounded-xl px-3 py-2 text-xs text-[#141413] focus:outline-none focus:border-[#1345EE]"
+                  className="bg-white border border-[#E8E8E3] rounded-xl px-3 py-2 text-xs text-[#141413] focus:outline-none focus:border-[#100E90]"
                 >
                   <option value="all">All Statuses</option>
                   {APPLICATION_STATUSES.map((status) => (
@@ -971,7 +971,7 @@ export function CareersClient({
                       {/* Candidate Name */}
                       <TableCell className="font-medium">
                         <div className="flex items-center gap-2">
-                          <div className="w-7 h-7 rounded-full bg-[#1345EE]/10 text-[#1345EE] flex items-center justify-center text-xs font-semibold shrink-0">
+                          <div className="w-7 h-7 rounded-full bg-[#100E90]/10 text-[#100E90] flex items-center justify-center text-xs font-semibold shrink-0">
                             {app.candidateName.charAt(0).toUpperCase()}
                           </div>
                           <div>
@@ -979,7 +979,7 @@ export function CareersClient({
                               {app.candidateName}
                             </p>
                             {app.adminNotes && (
-                              <span className="text-[10px] text-[#1345EE] flex items-center gap-1 font-medium">
+                              <span className="text-[10px] text-[#100E90] flex items-center gap-1 font-medium">
                                 <MessageSquare className="w-2.5 h-2.5" /> Note attached
                               </span>
                             )}
@@ -998,7 +998,7 @@ export function CareersClient({
                       <TableCell>
                         <a
                           href={`mailto:${app.email}`}
-                          className="text-xs text-[#1345EE] hover:underline"
+                          className="text-xs text-[#100E90] hover:underline"
                         >
                           {app.email}
                         </a>
@@ -1027,7 +1027,7 @@ export function CareersClient({
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-[#E8E8E3] bg-[#F2F0ED] hover:bg-[#E8E8E3] text-xs text-[#141413] transition-colors"
                           >
-                            <FileDown className="w-3.5 h-3.5 text-[#1345EE]" />
+                            <FileDown className="w-3.5 h-3.5 text-[#100E90]" />
                             <span>View CV</span>
                           </a>
                         ) : (
@@ -1045,7 +1045,7 @@ export function CareersClient({
                               e.target.value as CareerApplicationStatus
                             )
                           }
-                          className="bg-white border border-[#E8E8E3] rounded-lg px-2.5 py-1 text-xs font-medium text-[#141413] focus:outline-none focus:border-[#1345EE]"
+                          className="bg-white border border-[#E8E8E3] rounded-lg px-2.5 py-1 text-xs font-medium text-[#141413] focus:outline-none focus:border-[#100E90]"
                         >
                           {APPLICATION_STATUSES.map((status) => (
                             <option key={status} value={status}>
@@ -1061,7 +1061,7 @@ export function CareersClient({
                           <button
                             type="button"
                             onClick={() => handleOpenApplication(app)}
-                            className="px-3 py-1.5 rounded-lg border border-[#E8E8E3] bg-white text-xs font-medium text-[#141413] hover:bg-[#F2F0ED] hover:text-[#1345EE] transition-colors cursor-pointer"
+                            className="px-3 py-1.5 rounded-lg border border-[#E8E8E3] bg-white text-xs font-medium text-[#141413] hover:bg-[#F2F0ED] hover:text-[#100E90] transition-colors cursor-pointer"
                           >
                             Review
                           </button>
@@ -1311,7 +1311,7 @@ export function CareersClient({
           maxWidth="2xl"
           title={
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full bg-[#1345EE]/10 text-[#1345EE] flex items-center justify-center text-sm font-bold">
+              <div className="w-9 h-9 rounded-full bg-[#100E90]/10 text-[#100E90] flex items-center justify-center text-sm font-bold">
                 {selectedApplication.candidateName.charAt(0).toUpperCase()}
               </div>
               <div>
@@ -1352,7 +1352,7 @@ export function CareersClient({
                 <span className="text-[11px] text-[#8A8A85] block">Email</span>
                 <a
                   href={`mailto:${selectedApplication.email}`}
-                  className="text-xs text-[#1345EE] hover:underline font-medium truncate block"
+                  className="text-xs text-[#100E90] hover:underline font-medium truncate block"
                 >
                   {selectedApplication.email}
                 </a>
@@ -1382,7 +1382,7 @@ export function CareersClient({
                   href={selectedApplication.resumeUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#1345EE] text-white text-xs font-medium hover:bg-[#0E35B8] transition-colors"
+                  className="btn-premium-gradient-pill inline-flex items-center gap-1.5 px-4 py-2 text-white text-xs font-medium cursor-pointer"
                 >
                   <FileDown className="w-4 h-4" />
                   <span>Download / View Resume</span>
@@ -1395,7 +1395,7 @@ export function CareersClient({
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-[#E8E8E3] bg-white text-xs text-[#141413] hover:bg-[#F2F0ED] transition-colors"
                 >
-                  <ExternalLink className="w-3.5 h-3.5 text-[#1345EE]" />
+                  <ExternalLink className="w-3.5 h-3.5 text-[#100E90]" />
                   <span>Portfolio</span>
                 </a>
               )}
@@ -1406,7 +1406,7 @@ export function CareersClient({
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-[#E8E8E3] bg-white text-xs text-[#141413] hover:bg-[#F2F0ED] transition-colors"
                 >
-                  <ExternalLink className="w-3.5 h-3.5 text-[#1345EE]" />
+                  <ExternalLink className="w-3.5 h-3.5 text-[#100E90]" />
                   <span>LinkedIn Profile</span>
                 </a>
               )}
@@ -1426,7 +1426,7 @@ export function CareersClient({
                     onClick={() => handleUpdateAppStatus(selectedApplication.id, status)}
                     className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
                       selectedApplication.status === status
-                        ? "bg-[#1345EE] text-white shadow-2xs"
+                        ? "bg-[#100E90] text-white shadow-2xs"
                         : "border border-[#E8E8E3] bg-white text-[#6E6E69] hover:bg-[#F2F0ED]"
                     }`}
                   >

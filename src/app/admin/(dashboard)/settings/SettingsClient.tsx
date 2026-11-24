@@ -7,7 +7,7 @@ import { useToast } from "@/components/ui";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
-import { Check, AlertCircle, RefreshCw } from "lucide-react";
+import { Check, AlertCircle, RefreshCw } from "@/components/admin/icons";
 
 interface SettingsClientProps {
   initialSettings: PlatformSettings;
@@ -149,12 +149,12 @@ export function SettingsClient({ initialSettings }: SettingsClientProps) {
         <div className="flex items-center gap-2 self-start sm:self-auto">
           {isDirty ? (
             <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-medium bg-[#000000] text-white border border-black shadow-soft-sm">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#1345EE] animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#100E90] animate-pulse" />
               Unsaved changes
             </span>
           ) : (
             <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-medium bg-white text-[#6E6E69] border border-[#E8E8E3] shadow-soft-sm">
-              <Check className="w-3 h-3 text-[#1345EE]" />
+              <Check className="w-3 h-3 text-[#100E90]" />
               Platform synchronized
             </span>
           )}
@@ -380,7 +380,7 @@ export function SettingsClient({ initialSettings }: SettingsClientProps) {
               placeholder="Enter studio-wide announcement shown to members..."
               className={`w-full bg-[#F2F0ED]/40 text-[#141413] text-xs md:text-sm placeholder:text-[#9A9A94] border ${
                 fieldErrors.platformAnnouncement ? "border-[#D94E4E]" : "border-[#E8E8E3]"
-              } rounded-xl p-3.5 transition-colors focus:outline-none focus:bg-white focus:border-[#1345EE] leading-relaxed`}
+              } rounded-xl p-3.5 transition-colors focus:outline-none focus:bg-white focus:border-[#100E90] leading-relaxed`}
             />
             {fieldErrors.platformAnnouncement && (
               <p className="text-xs text-[#D94E4E]">{fieldErrors.platformAnnouncement}</p>

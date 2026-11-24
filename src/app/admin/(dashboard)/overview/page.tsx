@@ -1,9 +1,7 @@
 import React from "react";
 import Link from "next/link";
-import {
-  ArrowRight,
-  CheckCircle2,
-} from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowRight01Icon, CheckmarkCircle01Icon } from "@hugeicons/core-free-icons";
 import {
   ArtworksIcon,
   CreatorsIcon,
@@ -119,8 +117,8 @@ export default async function OverviewPage() {
       {/* Key Matrix: Pill filter style */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-xs font-medium uppercase tracking-[0.2em] text-[#1345EE] font-sans flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#1345EE]" />
+          <h2 className="text-xs font-medium uppercase tracking-[0.2em] text-[#100E90] font-sans flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#100E90]" />
             Key Matrix
           </h2>
         </div>
@@ -142,8 +140,8 @@ export default async function OverviewPage() {
                 <span
                   className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
                     isFirst
-                      ? "bg-white text-[#1345EE]"
-                      : "bg-[#F2F0ED] text-[#1345EE] border border-[#1345EE]/25"
+                      ? "bg-white text-[#100E90]"
+                      : "bg-[#F2F0ED] text-[#100E90] border border-[#100E90]/25"
                   }`}
                 >
                   {stat.value}
@@ -164,10 +162,10 @@ export default async function OverviewPage() {
             </h3>
             <Link
               href="/admin/users"
-              className="text-xs text-[#141413] hover:text-[#1345EE] font-medium inline-flex items-center gap-1.5 px-3 py-1 rounded-xl border border-[#E8E8E3] bg-white hover:bg-[#F2F0ED] transition-all shadow-2xs"
+              className="text-xs text-[#141413] hover:text-[#100E90] font-medium inline-flex items-center gap-1.5 px-3 py-1 rounded-xl border border-[#E8E8E3] bg-white hover:bg-[#F2F0ED] transition-all shadow-2xs"
             >
               <span>View all patrons</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <HugeiconsIcon icon={ArrowRight01Icon} size={14} />
             </Link>
           </div>
 
@@ -265,7 +263,7 @@ export default async function OverviewPage() {
             </h3>
             {totalNeedsAttention > 0 ? (
               <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-medium bg-[#000000] text-white border border-black">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#1345EE]" />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#100E90]" />
                 {totalNeedsAttention} pending
               </span>
             ) : (
@@ -285,15 +283,15 @@ export default async function OverviewPage() {
                 <Link
                   key={item.title}
                   href={item.href}
-                  className="group block bg-white border border-[#E8E8E3] hover:border-[#1345EE]/40 focus:border-[#1345EE]/40 focus-visible:border-[#1345EE]/40 rounded-3xl p-4 transition-all duration-150 shadow-soft-sm hover:shadow-soft-md outline-none focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0"
+                  className="group block bg-white border border-[#E8E8E3] hover:border-[#100E90]/40 focus:border-[#100E90]/40 focus-visible:border-[#100E90]/40 rounded-3xl p-4 transition-all duration-150 shadow-soft-sm hover:shadow-soft-md outline-none focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0"
                 >
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3.5 min-w-0">
-                      <div className="w-9 h-9 rounded-xl bg-[#000000] border border-black group-hover:border-[#1345EE] group-focus:border-[#1345EE] group-focus-visible:border-[#1345EE] flex items-center justify-center shrink-0 text-white group-hover:bg-[#1345EE] group-focus:bg-[#1345EE] group-focus-visible:bg-[#1345EE] group-hover:text-white transition-colors">
+                      <div className="w-9 h-9 rounded-xl bg-[#000000] border border-black group-hover:border-[#100E90] group-focus:border-[#100E90] group-focus-visible:border-[#100E90] flex items-center justify-center shrink-0 text-white group-hover:bg-[#100E90] group-focus:bg-[#100E90] group-focus-visible:bg-[#100E90] group-hover:text-white transition-colors">
                         <Icon size={16} className="stroke-[1.75]" />
                       </div>
                       <div className="min-w-0">
-                        <h4 className="text-xs font-medium text-[#141413] group-hover:text-[#1345EE] group-focus:text-[#1345EE] group-focus-visible:text-[#1345EE] transition-colors">
+                        <h4 className="text-xs font-medium text-[#141413] group-hover:text-[#100E90] group-focus:text-[#100E90] group-focus-visible:text-[#100E90] transition-colors">
                           {item.title}
                         </h4>
                       </div>
@@ -317,7 +315,7 @@ export default async function OverviewPage() {
 
             {totalNeedsAttention === 0 && (
               <div className="p-6 rounded-3xl border border-dashed border-[#DCDCD5] bg-white/60 text-center">
-                <CheckCircle2 className="w-5 h-5 text-[#28633B] mx-auto mb-1.5" />
+                <HugeiconsIcon icon={CheckmarkCircle01Icon} size={20} className="text-[#28633B] mx-auto mb-1.5" />
                 <p className="text-sm font-medium text-[#141413]">
                   All queues cleared
                 </p>

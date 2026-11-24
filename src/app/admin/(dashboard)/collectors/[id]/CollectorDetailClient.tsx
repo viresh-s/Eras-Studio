@@ -31,7 +31,7 @@ import {
   XCircle,
   HelpCircle,
   MessageCircle,
-} from "lucide-react";
+} from "@/components/admin/icons";
 
 interface CollectorDetailClientProps {
   collector: Collector;
@@ -248,7 +248,7 @@ export function CollectorDetailClient({
           href="/admin/collectors"
           className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-[#E8E8E3] bg-white text-xs font-medium text-[#141413] hover:bg-[#F2F0ED] transition-colors shadow-2xs"
         >
-          <ArrowLeft className="w-3.5 h-3.5 text-[#1345EE]" />
+          <ArrowLeft className="w-3.5 h-3.5 text-[#100E90]" />
           <span>Back to Patron Directory</span>
         </Link>
       </div>
@@ -262,7 +262,7 @@ export function CollectorDetailClient({
               <img
                 src={collectorState.profilePicUrl}
                 alt={collectorState.name}
-                className="w-16 h-16 rounded-full object-cover border-2 border-[#1345EE]/30"
+                className="w-16 h-16 rounded-full object-cover border-2 border-[#100E90]/30"
               />
             ) : (
               <div className="w-16 h-16 rounded-full bg-[#000000] border border-black flex items-center justify-center text-xl font-bold text-white">
@@ -293,7 +293,7 @@ export function CollectorDetailClient({
                 {collectorState.email || "No email"} · {collectorState.location || "Remote"} · Joined {formatDate(collectorState.createdAt)}
               </p>
               <div className="flex items-center gap-2.5 mt-2">
-                <span className="text-xs font-medium text-[#1345EE] uppercase tracking-wider font-sans">
+                <span className="text-xs font-medium text-[#100E90] uppercase tracking-wider font-sans">
                   {collectorState.preferences || "Contemporary Art"}
                 </span>
                 <span className="text-[#C4C4BD]">·</span>
@@ -398,7 +398,7 @@ export function CollectorDetailClient({
             </>
           }
         >
-          <div className="p-4 bg-[#F2F0ED] border border-[#1345EE]/30 rounded-3xl text-xs text-[#1345EE] space-y-1">
+          <div className="p-4 bg-[#F2F0ED] border border-[#100E90]/30 rounded-3xl text-xs text-[#100E90] space-y-1">
             <p className="font-medium text-[#141413]">Account Impact:</p>
             <p>• Profile: {collectorState.name} ({collectorState.email || "No email"})</p>
             <p>• Target status: {isSuspended ? "active (reverted)" : "suspended"}</p>
@@ -476,7 +476,7 @@ export function CollectorDetailClient({
             </>
           }
         >
-          <div className="p-4 bg-[#F2F0ED] border border-[#1345EE]/30 rounded-3xl text-xs text-[#6E6E69]">
+          <div className="p-4 bg-[#F2F0ED] border border-[#100E90]/30 rounded-3xl text-xs text-[#6E6E69]">
             <p>Archiving preserves existing inquiries, messages, and transactional records.</p>
           </div>
         </Modal>
@@ -513,8 +513,8 @@ export function CollectorDetailClient({
                 <span
                   className={`ml-1 text-[10px] font-bold px-2 py-0.5 rounded-md ${
                     active
-                      ? "bg-white text-[#1345EE]"
-                      : "bg-[#F2F0ED] text-[#1345EE] border border-[#1345EE]/30"
+                      ? "bg-white text-[#100E90]"
+                      : "bg-[#F2F0ED] text-[#100E90] border border-[#100E90]/30"
                   }`}
                 >
                   {tab.count}
@@ -606,7 +606,7 @@ export function CollectorDetailClient({
                 </div>
                 <button
                   onClick={() => setActiveTab("collection")}
-                  className="text-xs font-semibold text-[#1345EE] hover:text-[#0E35B8] transition-colors inline-flex items-center gap-1"
+                  className="text-xs font-semibold text-[#100E90] hover:text-[#100E90] transition-colors inline-flex items-center gap-1"
                 >
                   <span>View All in Collection & Activity</span>
                   <span>→</span>

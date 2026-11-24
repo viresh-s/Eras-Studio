@@ -19,17 +19,18 @@ import {
   updateCorOpportunityAction,
 } from "@/app/admin/actions";
 import {
-  ArrowLeft,
-  Briefcase,
-  Send,
-  Sparkles,
-  ExternalLink,
-  CheckCircle2,
-  Calendar,
-  Building,
-  MapPin,
-  Clock,
-} from "lucide-react";
+  ArrowLeft01Icon,
+  Briefcase01Icon,
+  SentIcon,
+  StarIcon,
+  ArrowUpRight01Icon,
+  CheckmarkCircle01Icon,
+  Calendar01Icon,
+  Building01Icon,
+  Location01Icon,
+  Clock01Icon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 
 interface CorOpportunityDetailClientProps {
   opportunity: CorOpportunity;
@@ -102,7 +103,7 @@ export function CorOpportunityDetailClient({
           href="/admin/cor/opportunities"
           className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#E8E8E3] bg-white text-xs font-medium text-[#6E6E69] hover:text-[#141413] hover:bg-[#F2F0ED] transition-all shadow-soft-sm"
         >
-          <ArrowLeft className="w-3.5 h-3.5" />
+          <HugeiconsIcon icon={ArrowLeft01Icon} size={14} strokeWidth={2} />
           <span>Back to Opportunities</span>
         </Link>
       </div>
@@ -118,10 +119,10 @@ export function CorOpportunityDetailClient({
               <CorOpportunityBadge status={opportunity.status} />
             </div>
             <div className="flex items-center gap-2 text-xs md:text-sm text-[#6E6E69] mt-1.5 font-medium">
-              <Building className="w-4 h-4 text-[#1345EE]" />
+              <HugeiconsIcon icon={Building01Icon} size={16} strokeWidth={2} className="text-[#100E90]" />
               <span className="text-[#141413]">{opportunity.company}</span>
               <span>·</span>
-              <MapPin className="w-4 h-4 text-[#8A8A85]" />
+              <HugeiconsIcon icon={Location01Icon} size={16} strokeWidth={2} className="text-[#8A8A85]" />
               <span>{opportunity.location} ({opportunity.workplaceType})</span>
             </div>
           </div>
@@ -129,7 +130,7 @@ export function CorOpportunityDetailClient({
           <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 shrink-0">
             <button
               onClick={handleToggleOpportunityStatus}
-              className="px-4 py-2 rounded-full border border-[#E8E8E3] bg-white text-xs font-medium text-[#6E6E69] hover:text-[#141413] hover:bg-[#F2F0ED] transition-all shadow-soft-sm"
+              className="px-4 py-2 rounded-full border border-[#E8E8E3] bg-white text-xs font-medium text-[#6E6E69] hover:text-[#141413] hover:bg-[#F2F0ED] transition-all shadow-soft-sm cursor-pointer"
             >
               <span>{opportunity.status === "open" ? "Close Opportunity" : "Reopen Opportunity"}</span>
             </button>
@@ -138,9 +139,9 @@ export function CorOpportunityDetailClient({
                 setSelectedMemberId(undefined);
                 setApplyModalOpen(true);
               }}
-              className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#1345EE] text-white text-xs font-medium hover:bg-[#0E35B8] transition-all shadow-soft-sm tracking-[0.04em]"
+              className="btn-premium-gradient-pill inline-flex items-center gap-2 px-5 py-2 text-white text-xs font-medium tracking-[0.04em] shadow-soft-sm cursor-pointer select-none active:scale-[0.98]"
             >
-              <Send className="w-3.5 h-3.5 shrink-0" />
+              <HugeiconsIcon icon={SentIcon} size={14} color="currentColor" strokeWidth={2} className="shrink-0" />
               <span>Apply for Candidate</span>
             </button>
           </div>
@@ -168,7 +169,7 @@ export function CorOpportunityDetailClient({
           </div>
           <div className="p-3.5 rounded-xl bg-[#F2F0ED]/70 border border-[#E8E8E3]/60">
             <span className="text-[#8A8A85] text-[11px] uppercase tracking-wider block">Recruiter / Contact</span>
-            <div className="text-base font-medium text-[#1345EE] mt-0.5 truncate">
+            <div className="text-base font-medium text-[#100E90] mt-0.5 truncate">
               {opportunity.recruiterContact || opportunity.recruiterEmail || "Direct Portal"}
             </div>
           </div>
@@ -209,10 +210,10 @@ export function CorOpportunityDetailClient({
                 href={opportunity.jobUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs font-medium text-[#1345EE] hover:underline"
+                className="inline-flex items-center gap-1.5 text-xs font-medium text-[#100E90] hover:underline"
               >
                 <span>External Listing URL</span>
-                <ExternalLink className="w-3.5 h-3.5" />
+                <HugeiconsIcon icon={ArrowUpRight01Icon} size={14} strokeWidth={2} />
               </a>
             </div>
           )}
@@ -270,7 +271,7 @@ export function CorOpportunityDetailClient({
                   <select
                     value={app.status}
                     onChange={(e) => handleStatusChange(app.id, e.target.value as CorApplicationStatus)}
-                    className="text-xs font-medium border border-[#E8E8E3] rounded-full px-3 py-1.5 bg-[#F2F0ED]/50 text-[#141413] focus:outline-none focus:border-[#1345EE]"
+                    className="text-xs font-medium border border-[#E8E8E3] rounded-full px-3 py-1.5 bg-[#F2F0ED]/50 text-[#141413] focus:outline-none focus:border-[#100E90]"
                   >
                     {[
                       "Recommended",
@@ -307,7 +308,7 @@ export function CorOpportunityDetailClient({
         <div className="p-5 rounded-2xl border border-[#E8E8E3] bg-white shadow-soft-sm flex items-center justify-between">
           <div>
             <h2 className="text-lg font-medium text-[#141413] flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-[#1345EE]" />
+              <HugeiconsIcon icon={StarIcon} size={16} strokeWidth={2} className="text-[#100E90]" />
               <span>Available COR Member Matches</span>
             </h2>
             <p className="text-xs text-[#6E6E69] mt-0.5">
@@ -366,7 +367,7 @@ export function CorOpportunityDetailClient({
                   {match.reasons.map((r, i) => (
                     <div key={i} className="flex items-center gap-2">
                       {r.matched ? (
-                        <CheckCircle2 className="w-3.5 h-3.5 text-[#1345EE] shrink-0" />
+                        <HugeiconsIcon icon={CheckmarkCircle01Icon} size={14} strokeWidth={2} className="text-[#100E90] shrink-0" />
                       ) : (
                         <span className="w-1.5 h-1.5 rounded-full bg-[#8A8A85] shrink-0 ml-1 mr-1" />
                       )}
@@ -383,9 +384,9 @@ export function CorOpportunityDetailClient({
                     setSelectedMemberId(match.member.id);
                     setApplyModalOpen(true);
                   }}
-                  className="admin-btn-premium-gradient inline-flex items-center gap-1.5 px-4 py-2 text-white text-xs uppercase tracking-[0.08em] font-medium cursor-pointer"
+                  className="btn-premium-gradient-pill inline-flex items-center gap-1.5 px-4 py-2 text-white text-xs font-medium cursor-pointer"
                 >
-                  <Send className="w-3 h-3 shrink-0" />
+                  <HugeiconsIcon icon={SentIcon} size={14} className="shrink-0" />
                   <span>Apply for {match.member.name}</span>
                 </button>
               </div>

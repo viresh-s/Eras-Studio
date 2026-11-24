@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowUpRight01Icon } from "@hugeicons/core-free-icons";
 
 interface AdminUserLinkProps {
   userId: string;
@@ -42,7 +43,7 @@ export function AdminUserLink({
   return (
     <Link
       href={route}
-      className={`group inline-flex items-center gap-2 cursor-pointer transition-colors hover:text-[#1345EE] ${className}`}
+      className={`group inline-flex items-center gap-2 cursor-pointer transition-colors hover:text-[#100E90] ${className}`}
     >
       {avatar !== undefined ? (
         avatar ? (
@@ -58,11 +59,15 @@ export function AdminUserLink({
           </div>
         )
       ) : null}
-      <span className="font-medium text-[#141413] group-hover:text-[#1345EE] group-hover:underline decoration-1 underline-offset-2">
+      <span className="font-medium text-[#141413] group-hover:text-[#100E90] group-hover:underline decoration-1 underline-offset-2">
         {name}
       </span>
       {showIcon && (
-        <ArrowUpRight className="w-3.5 h-3.5 text-[#8A8A85] transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[#1345EE]" />
+        <HugeiconsIcon
+          icon={ArrowUpRight01Icon}
+          size={14}
+          className="text-[#8A8A85] transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[#100E90]"
+        />
       )}
     </Link>
   );

@@ -32,7 +32,7 @@ import {
   Trash2,
   AlertCircle,
   Sparkles,
-} from "lucide-react";
+} from "@/components/admin/icons";
 
 interface CorApplicationDetailClientProps {
   application: CorApplication;
@@ -226,7 +226,7 @@ export function CorApplicationDetailClient({
               value={application.status}
               disabled={isUpdatingStatus}
               onChange={(e) => handleUpdateStatus(e.target.value as CorApplicationStatus)}
-              className="text-xs font-medium rounded-full px-3.5 py-1.5 border border-[#E8E8E3] bg-[#F2F0ED]/50 text-[#141413] focus:outline-none focus:border-[#1345EE]"
+              className="text-xs font-medium rounded-full px-3.5 py-1.5 border border-[#E8E8E3] bg-[#F2F0ED]/50 text-[#141413] focus:outline-none focus:border-[#100E90]"
             >
               {ALL_STATUSES.map((st) => (
                 <option key={st} value={st}>
@@ -266,12 +266,12 @@ export function CorApplicationDetailClient({
         <div className="p-6 rounded-2xl border border-[#E8E8E3] bg-white shadow-soft-sm space-y-4">
           <div className="flex items-center justify-between border-b border-[#E8E8E3] pb-3">
             <h2 className="text-xs font-medium uppercase tracking-[0.1em] text-[#6E6E69] flex items-center gap-2">
-              <User className="w-3.5 h-3.5 text-[#1345EE]" />
+              <User className="w-3.5 h-3.5 text-[#100E90]" />
               <span>Creator Details</span>
             </h2>
             <Link
               href={`/admin/cor/members/${application.corMemberId}`}
-              className="text-xs font-medium text-[#1345EE] hover:underline"
+              className="text-xs font-medium text-[#100E90] hover:underline"
             >
               View Full Profile →
             </Link>
@@ -296,7 +296,7 @@ export function CorApplicationDetailClient({
               <div className="text-xs text-[#6E6E69]">
                 {application.creatorEmail}
               </div>
-              <div className="text-xs font-medium text-[#1345EE] mt-0.5">
+              <div className="text-xs font-medium text-[#100E90] mt-0.5">
                 Target Role: {member?.desiredRole || application.creatorRole || "Creative Practitioner"}
               </div>
             </div>
@@ -323,13 +323,13 @@ export function CorApplicationDetailClient({
         <div className="p-6 rounded-2xl border border-[#E8E8E3] bg-white shadow-soft-sm space-y-4">
           <div className="flex items-center justify-between border-b border-[#E8E8E3] pb-3">
             <h2 className="text-xs font-medium uppercase tracking-[0.1em] text-[#6E6E69] flex items-center gap-2">
-              <Building className="w-3.5 h-3.5 text-[#1345EE]" />
+              <Building className="w-3.5 h-3.5 text-[#100E90]" />
               <span>Opportunity Overview</span>
             </h2>
             {opportunity && (
               <Link
                 href={`/admin/cor/opportunities/${opportunity.id}`}
-                className="text-xs font-medium text-[#1345EE] hover:underline"
+                className="text-xs font-medium text-[#100E90] hover:underline"
               >
                 View Opportunity →
               </Link>
@@ -360,7 +360,7 @@ export function CorApplicationDetailClient({
         <div className="flex items-center justify-between border-b border-[#E8E8E3] pb-4">
           <div>
             <h2 className="text-lg font-medium text-[#141413] flex items-center gap-2">
-              <Clock className="w-4 h-4 text-[#1345EE]" />
+              <Clock className="w-4 h-4 text-[#100E90]" />
               <span>Application Timeline & Events</span>
             </h2>
             <p className="text-xs text-[#6E6E69] mt-0.5">
@@ -377,7 +377,7 @@ export function CorApplicationDetailClient({
           {events.map((ev, index) => (
             <div key={ev.id || index} className="relative group">
               {/* Dot */}
-              <div className="absolute -left-[23px] top-1 w-3.5 h-3.5 rounded-full border-2 border-white bg-[#1345EE] shadow-xs" />
+              <div className="absolute -left-[23px] top-1 w-3.5 h-3.5 rounded-full border-2 border-white bg-[#100E90] shadow-xs" />
 
               <div className="space-y-1.5 text-xs">
                 <div className="flex items-center gap-2">
@@ -399,7 +399,7 @@ export function CorApplicationDetailClient({
                 )}
 
                 {ev.scheduledDate && (
-                  <div className="flex items-center gap-1.5 text-[11px] font-medium text-[#1345EE] pt-0.5">
+                  <div className="flex items-center gap-1.5 text-[11px] font-medium text-[#100E90] pt-0.5">
                     <Calendar className="w-3 h-3" />
                     <span>Scheduled for {formatDate(ev.scheduledDate)}</span>
                   </div>
@@ -422,7 +422,7 @@ export function CorApplicationDetailClient({
             <select
               value={application.status}
               onChange={(e) => handleUpdateStatus(e.target.value as CorApplicationStatus)}
-              className="text-xs bg-[#F2F0ED]/50 border border-[#E8E8E3] rounded-xl px-3.5 py-2.5 text-[#141413] focus:outline-none focus:border-[#1345EE]"
+              className="text-xs bg-[#F2F0ED]/50 border border-[#E8E8E3] rounded-xl px-3.5 py-2.5 text-[#141413] focus:outline-none focus:border-[#100E90]"
             >
               {ALL_STATUSES.map((st) => (
                 <option key={st} value={st}>
@@ -436,7 +436,7 @@ export function CorApplicationDetailClient({
               placeholder="Schedule interview date"
               value={interviewDate}
               onChange={(e) => setInterviewDate(e.target.value)}
-              className="text-xs bg-[#F2F0ED]/50 border border-[#E8E8E3] rounded-xl px-3.5 py-2.5 text-[#141413] focus:outline-none focus:border-[#1345EE]"
+              className="text-xs bg-[#F2F0ED]/50 border border-[#E8E8E3] rounded-xl px-3.5 py-2.5 text-[#141413] focus:outline-none focus:border-[#100E90]"
             />
 
             <input
@@ -444,7 +444,7 @@ export function CorApplicationDetailClient({
               placeholder="Timeline note / update details..."
               value={statusNote}
               onChange={(e) => setStatusNote(e.target.value)}
-              className="text-xs bg-[#F2F0ED]/50 border border-[#E8E8E3] rounded-xl px-3.5 py-2.5 text-[#141413] focus:outline-none focus:border-[#1345EE]"
+              className="text-xs bg-[#F2F0ED]/50 border border-[#E8E8E3] rounded-xl px-3.5 py-2.5 text-[#141413] focus:outline-none focus:border-[#100E90]"
             />
           </div>
         </div>
@@ -455,7 +455,7 @@ export function CorApplicationDetailClient({
         <div className="flex items-center justify-between border-b border-[#E8E8E3] pb-4">
           <div>
             <h2 className="text-lg font-medium text-[#141413] flex items-center gap-2">
-              <Lock className="w-4 h-4 text-[#1345EE]" />
+              <Lock className="w-4 h-4 text-[#100E90]" />
               <span>Internal Team Notes & Application Strategy</span>
             </h2>
             <p className="text-xs text-[#6E6E69] mt-0.5">
@@ -474,7 +474,7 @@ export function CorApplicationDetailClient({
             value={newNote}
             onChange={(e) => setNewNote(e.target.value)}
             placeholder="Add internal note on recruiter follow-up, candidate prep, salary negotiation strategy..."
-            className="w-full text-xs md:text-sm bg-[#F2F0ED]/50 border border-[#E8E8E3] rounded-xl p-3.5 text-[#141413] focus:outline-none focus:border-[#1345EE]"
+            className="w-full text-xs md:text-sm bg-[#F2F0ED]/50 border border-[#E8E8E3] rounded-xl p-3.5 text-[#141413] focus:outline-none focus:border-[#100E90]"
           />
           <div className="flex justify-end">
             <button
@@ -502,7 +502,7 @@ export function CorApplicationDetailClient({
               >
                 <div className="flex items-center justify-between">
                   <span className="font-medium text-[#141413] flex items-center gap-2">
-                    <Lock className="w-3 h-3 text-[#1345EE]" />
+                    <Lock className="w-3 h-3 text-[#100E90]" />
                     <span>{note.authorName}</span>
                   </span>
                   <div className="flex items-center gap-2">

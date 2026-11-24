@@ -9,7 +9,7 @@ import {
   ArrowDown,
   CheckCircle2,
   Ban,
-} from "lucide-react";
+} from "@/components/admin/icons";
 import { CollectorsIcon } from "@/components/admin/icons";
 import { Collector } from "@/lib/types";
 import {
@@ -164,9 +164,9 @@ export function CollectorsClient({
       return <ArrowUpDown className="w-3 h-3 text-[#A0A09B] opacity-0 group-hover:opacity-100 transition-opacity" />;
     }
     return sortDirection === "asc" ? (
-      <ArrowUp className="w-3 h-3 text-[#1345EE]" />
+      <ArrowUp className="w-3 h-3 text-[#100E90]" />
     ) : (
-      <ArrowDown className="w-3 h-3 text-[#1345EE]" />
+      <ArrowDown className="w-3 h-3 text-[#100E90]" />
     );
   };
 
@@ -536,7 +536,7 @@ export function CollectorsClient({
 
             {/* Collector Metadata */}
             <div className="space-y-3 text-xs">
-              <h5 className="font-medium text-[#1345EE] uppercase tracking-[0.2em] text-[11px] font-sans">
+              <h5 className="font-medium text-[#100E90] uppercase tracking-[0.2em] text-[11px] font-sans">
                 Patron Dossier
               </h5>
 

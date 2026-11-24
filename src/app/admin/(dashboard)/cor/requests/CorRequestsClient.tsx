@@ -34,7 +34,7 @@ import {
   Award,
   Sparkles,
   AlertTriangle,
-} from "lucide-react";
+} from "@/components/admin/icons";
 
 interface CorRequestsClientProps {
   initialRequests: CorRequest[];
@@ -176,7 +176,7 @@ export function CorRequestsClient({
           <ExportDropdown exportType="cor-requests" filters={{ query: searchQuery, status: statusFilter === "all" ? undefined : statusFilter }} />
           {pendingCount > 0 && (
             <div className="shrink-0 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-black bg-[#000000] text-white text-xs font-medium whitespace-nowrap shadow-soft-sm">
-              <span className="w-2 h-2 rounded-full bg-[#1345EE] animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-[#100E90] animate-pulse" />
               <span>{pendingCount} Pending Review</span>
             </div>
           )}
@@ -215,7 +215,7 @@ export function CorRequestsClient({
                 <span>{tab.label}</span>
                 <span
                   className={`text-[10px] px-1.5 py-0.2 rounded-full ${
-                    active ? "bg-white text-[#1345EE]" : "bg-[#F2F0ED] text-[#71716D] border border-[#E8E8E3]"
+                    active ? "bg-white text-[#100E90]" : "bg-[#F2F0ED] text-[#71716D] border border-[#E8E8E3]"
                   }`}
                 >
                   {tab.count}
@@ -236,7 +236,7 @@ export function CorRequestsClient({
               setSearchQuery(e.target.value);
               setCurrentPage(1);
             }}
-            className="w-full text-xs pl-9 pr-3 py-2 bg-[#F2F0ED]/50 focus:bg-white border border-[#E8E8E3] rounded-full text-[#141413] placeholder-[#8A8A85] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all"
+            className="w-full text-xs pl-9 pr-3 py-2 bg-[#F2F0ED]/50 focus:bg-white border border-[#E8E8E3] rounded-full text-[#141413] placeholder-[#8A8A85] focus:outline-none focus:border-[#100E90] focus:ring-1 focus:ring-[#100E90] transition-all"
           />
         </div>
       </div>
@@ -394,7 +394,7 @@ export function CorRequestsClient({
                   <div className="text-xs text-[#71716D]">
                     {selectedRequest.creatorEmail} · {selectedRequest.location || "Remote"}
                   </div>
-                  <div className="text-xs font-medium text-[#1345EE] mt-0.5">
+                  <div className="text-xs font-medium text-[#100E90] mt-0.5">
                     Target Role: {selectedRequest.desiredRole}
                   </div>
                 </div>
@@ -406,7 +406,7 @@ export function CorRequestsClient({
 
             {/* Decision Action Banner if Pending */}
             {selectedRequest.status === "pending" && (
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-2xl border border-[#1345EE]/30 bg-[#F2F0ED] gap-3 shadow-soft-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-2xl border border-[#100E90]/30 bg-[#F2F0ED] gap-3 shadow-soft-sm">
                 <div className="text-sm text-[#141413] font-medium leading-relaxed">
                   <strong>COR Membership Decision</strong><br/>
                   Would you like to accept this creator into COR?

@@ -10,7 +10,7 @@ import {
   CheckCircle2,
   Ban,
   Award,
-} from "lucide-react";
+} from "@/components/admin/icons";
 import { CreatorsIcon } from "@/components/admin/icons";
 import { Creator, UserPlan } from "@/lib/types";
 import {
@@ -169,9 +169,9 @@ export function CreatorsClient({
       return <ArrowUpDown className="w-3 h-3 text-[#A0A09B] opacity-0 group-hover:opacity-100 transition-opacity" />;
     }
     return sortDirection === "asc" ? (
-      <ArrowUp className="w-3 h-3 text-[#1345EE]" />
+      <ArrowUp className="w-3 h-3 text-[#100E90]" />
     ) : (
-      <ArrowDown className="w-3 h-3 text-[#1345EE]" />
+      <ArrowDown className="w-3 h-3 text-[#100E90]" />
     );
   };
 
@@ -380,7 +380,7 @@ export function CreatorsClient({
             <span>•</span>
             <span>
               Pending:{" "}
-              <strong className="text-[#1345EE]">
+              <strong className="text-[#100E90]">
                 {creators.filter((c) => c.status === "pending").length}
               </strong>
             </span>
@@ -689,7 +689,7 @@ export function CreatorsClient({
             <div className="space-y-3 p-4 rounded-2xl bg-[#F2F0ED]/70 border border-[#E8E8E3]">
               <div className="flex items-center justify-between">
                 <label className="text-xs font-medium text-[#141413] flex items-center gap-1.5 font-sans">
-                  <Award className="w-3.5 h-3.5 text-[#1345EE]" />
+                  <Award className="w-3.5 h-3.5 text-[#100E90]" />
                   <span>Subscription Plan</span>
                 </label>
                 <span className="text-[11px] text-[#71716D]">
@@ -727,7 +727,7 @@ export function CreatorsClient({
 
             {/* Creator Metadata */}
             <div className="space-y-3 text-xs">
-              <h5 className="font-medium text-[#1345EE] uppercase tracking-[0.2em] text-[11px] font-sans">
+              <h5 className="font-medium text-[#100E90] uppercase tracking-[0.2em] text-[11px] font-sans">
                 Creator Dossier
               </h5>
 
@@ -762,8 +762,8 @@ export function CreatorsClient({
 
             {/* Pending Notice if Pending */}
             {selectedCreator.status === "pending" && (
-              <div className="p-4 rounded-3xl bg-[#F2F0ED] border border-[#1345EE]/30 text-xs text-[#141413] space-y-1.5">
-                <p className="font-medium text-[#1345EE]">Curatorial Review Required</p>
+              <div className="p-4 rounded-3xl bg-[#F2F0ED] border border-[#100E90]/30 text-xs text-[#141413] space-y-1.5">
+                <p className="font-medium text-[#100E90]">Curatorial Review Required</p>
                 <p className="text-[11px] text-[#6E6E69] leading-relaxed">
                   This creator’s portfolio is in the onboarding queue. Approving
                   them will unlock public showcase permissions and exhibition

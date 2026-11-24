@@ -5,7 +5,7 @@ import {
   RefreshCw,
   Users,
   ShieldCheck,
-} from "lucide-react";
+} from "@/components/admin/icons";
 import {
   SecurityIcon,
   VerifiedCheckIcon,
@@ -195,7 +195,7 @@ export function SecurityClient({ initialData }: SecurityClientProps) {
                               ? "bg-red-50 text-red-700 border border-red-200"
                               : evt.level === "SECURITY_AUDIT" || evt.level === "WARN"
                               ? "bg-amber-50 text-amber-700 border border-amber-200"
-                              : "bg-blue-50 text-blue-700 border border-blue-200"
+                              : "bg-[#100E90]/10 text-[#100E90] border border-[#100E90]/20"
                           }`}
                         >
                           {evt.level}

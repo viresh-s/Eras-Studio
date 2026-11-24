@@ -26,7 +26,7 @@ import {
   Square,
   MinusSquare,
   Flag,
-} from "lucide-react";
+} from "@/components/admin/icons";
 import { ArtworksIcon } from "@/components/admin/icons";
 import { TriangleAlertIcon, SaveIcon } from "@/components/ui/icons";
 import { MaskedId } from "@/components/admin/MaskedId";
@@ -286,7 +286,7 @@ export function ArtworksClient({
       case "pending":
         return (
           <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-medium bg-[#000000] text-white border border-black">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#1345EE]" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#100E90]" />
             Pending
           </span>
         );
@@ -613,7 +613,7 @@ export function ArtworksClient({
           <button
             type="button"
             onClick={() => setViewingArtwork(null)}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-[#E8E8E3] bg-white text-xs uppercase tracking-[0.08em] font-medium text-[#141413] hover:bg-[#F2F0ED] hover:border-[#1345EE] transition-colors shadow-soft-sm cursor-pointer select-none"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-[#E8E8E3] bg-white text-xs uppercase tracking-[0.08em] font-medium text-[#141413] hover:bg-[#F2F0ED] hover:border-[#100E90] transition-colors shadow-soft-sm cursor-pointer select-none"
           >
             <span>←</span>
             <span>Back to gallery</span>
@@ -639,8 +639,8 @@ export function ArtworksClient({
           {/* Right Column: Metadata, Specifications & Actions */}
           <div className="lg:col-span-6 space-y-5 pt-1 bg-white p-6 sm:p-8 rounded-2xl border border-[#E8E8E3] shadow-soft-sm">
             {/* Category / Year */}
-            <p className="text-xs uppercase tracking-[0.1em] text-[#1345EE] font-medium flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#1345EE]" />
+            <p className="text-xs uppercase tracking-[0.1em] text-[#100E90] font-medium flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#100E90]" />
               {viewingArtwork.medium} / {viewingArtwork.year || "2026"}
             </p>
 
@@ -904,7 +904,7 @@ export function ArtworksClient({
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Search artworks by title, creator, or medium..."
-            className="w-full text-xs md:text-sm pl-10 pr-9 py-2.5 rounded-xl border border-[#E8E8E3] bg-[#F2F0ED]/50 focus:bg-white text-[#141413] placeholder:text-[#8A8A85] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all shadow-2xs"
+            className="w-full text-xs md:text-sm pl-10 pr-9 py-2.5 rounded-xl border border-[#E8E8E3] bg-[#F2F0ED]/50 focus:bg-white text-[#141413] placeholder:text-[#8A8A85] focus:outline-none focus:border-[#100E90] focus:ring-1 focus:ring-[#100E90] transition-all shadow-2xs"
           />
           {searchInput && (
             <button
@@ -956,7 +956,7 @@ export function ArtworksClient({
                 setCurrentPage(1);
               }}
               aria-label="Filter by medium"
-              className="text-xs px-3 py-1.5 rounded-xl border border-[#E8E8E3] bg-white text-[#141413] focus:outline-none focus:border-[#1345EE] cursor-pointer"
+              className="text-xs px-3 py-1.5 rounded-xl border border-[#E8E8E3] bg-white text-[#141413] focus:outline-none focus:border-[#100E90] cursor-pointer"
             >
               <option value="all">All Media</option>
               {distinctMedia.map((medium) => (
@@ -970,7 +970,7 @@ export function ArtworksClient({
               <button
                 type="button"
                 onClick={handleResetFilters}
-                className="text-xs text-[#1345EE] hover:text-[#0E35B8] font-medium px-2 py-1 cursor-pointer"
+                className="text-xs text-[#100E90] hover:text-[#100E90] font-medium px-2 py-1 cursor-pointer"
               >
                 Reset
               </button>
@@ -987,9 +987,9 @@ export function ArtworksClient({
       {/* 3. BULK ACTION BAR (Table mode) */}
       {/* ========================================================================= */}
       {viewMode === "table" && selectedIds.size > 0 && (
-        <div className="flex items-center justify-between p-3 px-4 bg-[#F2F0ED] border border-[#1345EE]/30 rounded-3xl shadow-soft-sm animate-in fade-in duration-150">
+        <div className="flex items-center justify-between p-3 px-4 bg-[#F2F0ED] border border-[#100E90]/30 rounded-3xl shadow-soft-sm animate-in fade-in duration-150">
           <div className="flex items-center gap-2 text-xs font-medium text-[#141413]">
-            <CheckSquare className="w-4 h-4 text-[#1345EE]" />
+            <CheckSquare className="w-4 h-4 text-[#100E90]" />
             <span>
               {selectedIds.size} {selectedIds.size === 1 ? "artwork" : "artworks"} selected
             </span>
@@ -1085,7 +1085,7 @@ export function ArtworksClient({
                   {/* Subtle Hover Action Pill */}
                   <div className="absolute inset-0 bg-[#141413]/15 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
                     <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/95 text-[#141413] text-[11px] uppercase tracking-[0.06em] font-medium shadow-soft-sm backdrop-blur-xs">
-                      <HugeiconsIcon icon={ViewIcon} size={13} color="currentColor" strokeWidth={2} className="text-[#1345EE]" />
+                      <HugeiconsIcon icon={ViewIcon} size={13} color="currentColor" strokeWidth={2} className="text-[#100E90]" />
                       <span>View Specs</span>
                     </span>
                   </div>
@@ -1094,7 +1094,7 @@ export function ArtworksClient({
                 {/* Card Text Content */}
                 <div className="p-4 flex-1 flex flex-col justify-between space-y-2.5">
                   <div>
-                    <h4 className="text-sm font-medium text-[#141413] group-hover:text-[#1345EE] transition-colors truncate">
+                    <h4 className="text-sm font-medium text-[#141413] group-hover:text-[#100E90] transition-colors truncate">
                       {art.title}
                     </h4>
                     <p className="text-xs text-[#71716D] truncate mt-0.5">
@@ -1146,9 +1146,9 @@ export function ArtworksClient({
                       aria-label="Select all on this page"
                     >
                       {selectedIds.size === paginatedArtworks.length && paginatedArtworks.length > 0 ? (
-                        <CheckSquare className="w-4 h-4 text-[#1345EE]" />
+                        <CheckSquare className="w-4 h-4 text-[#100E90]" />
                       ) : selectedIds.size > 0 ? (
-                        <MinusSquare className="w-4 h-4 text-[#1345EE]" />
+                        <MinusSquare className="w-4 h-4 text-[#100E90]" />
                       ) : (
                         <Square className="w-4 h-4" />
                       )}
@@ -1179,7 +1179,7 @@ export function ArtworksClient({
                           aria-label={`Select ${art.title}`}
                         >
                           {isSelected ? (
-                            <CheckSquare className="w-4 h-4 text-[#1345EE]" />
+                            <CheckSquare className="w-4 h-4 text-[#100E90]" />
                           ) : (
                             <Square className="w-4 h-4" />
                           )}
@@ -1236,7 +1236,7 @@ export function ArtworksClient({
                             onClick={() => setViewingArtwork(art)}
                             title="View"
                             aria-label="View"
-                            className="w-7 h-7 inline-flex items-center justify-center rounded-lg border border-[#E8E8E3] text-[#141413] bg-white hover:bg-[#F2F0ED] hover:border-[#1345EE] hover:text-[#1345EE] transition-colors cursor-pointer select-none"
+                            className="w-7 h-7 inline-flex items-center justify-center rounded-lg border border-[#E8E8E3] text-[#141413] bg-white hover:bg-[#F2F0ED] hover:border-[#100E90] hover:text-[#100E90] transition-colors cursor-pointer select-none"
                           >
                             <HugeiconsIcon icon={ViewIcon} size={15} color="currentColor" strokeWidth={2} />
                           </button>
@@ -1266,7 +1266,7 @@ export function ArtworksClient({
                             aria-label={art.status === "published" ? "Hide" : "Revert"}
                             className={`w-7 h-7 inline-flex items-center justify-center rounded-lg border transition-colors cursor-pointer select-none ${
                               art.status === "published"
-                                ? "border-[#E8E8E3] text-[#141413] bg-white hover:bg-[#F2F0ED] hover:text-[#1345EE]"
+                                ? "border-[#E8E8E3] text-[#141413] bg-white hover:bg-[#F2F0ED] hover:text-[#100E90]"
                                 : "border-emerald-300 text-emerald-700 bg-emerald-50 hover:bg-emerald-100"
                             }`}
                           >
@@ -1421,7 +1421,7 @@ export function ArtworksClient({
                     <button
                       type="button"
                       onClick={() => setIsEditing((prev) => !prev)}
-                      className="inline-flex items-center gap-1 text-[11px] text-[#1345EE] hover:text-[#0E35B8] font-medium cursor-pointer"
+                      className="inline-flex items-center gap-1 text-[11px] text-[#100E90] hover:text-[#100E90] font-medium cursor-pointer"
                     >
                       <Edit3 className="w-3 h-3" />
                       <span>{isEditing ? "Close Edit" : "Edit Details"}</span>

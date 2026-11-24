@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
-import { Search, X, ChevronDown } from "lucide-react";
+import { Search, X, ChevronDown } from "@/components/admin/icons";
 import { SubscriptionsIcon } from "@/components/admin/icons";
 import { Subscriber, SubscriptionStats } from "@/lib/data/subscriptions";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -243,10 +243,10 @@ export function SubscriptionsClient({ initialSubscribers, stats }: Subscriptions
         <div className="bg-white border border-[#E8E8E3] rounded-2xl p-5 shadow-soft-sm hover:shadow-soft-md transition-all">
           <div className="flex items-center justify-between">
             <p className="text-xs uppercase tracking-[0.1em] font-medium text-[#71716D]">Pro & Elite Tier</p>
-            <span className="w-2 h-2 rounded-full bg-[#1345EE]" />
+            <span className="w-2 h-2 rounded-full bg-[#100E90]" />
           </div>
           <p className="mt-2 text-4xl font-semibold text-[#141413]">{stats.proCount}</p>
-          <p className="mt-1.5 text-[11px] text-[#1345EE] font-medium">Curated featured creators</p>
+          <p className="mt-1.5 text-[11px] text-[#100E90] font-medium">Curated featured creators</p>
         </div>
       </div>
 
@@ -258,7 +258,7 @@ export function SubscriptionsClient({ initialSubscribers, stats }: Subscriptions
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Search by name, email, location or discipline..."
-            className="w-full text-xs md:text-sm pl-11 pr-9 py-2.5 rounded-xl border border-[#E8E8E3] bg-[#F2F0ED]/50 focus:bg-white text-[#141413] placeholder:text-[#8A8A85] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all shadow-2xs"
+            className="w-full text-xs md:text-sm pl-11 pr-9 py-2.5 rounded-xl border border-[#E8E8E3] bg-[#F2F0ED]/50 focus:bg-white text-[#141413] placeholder:text-[#8A8A85] focus:outline-none focus:border-[#100E90] focus:ring-1 focus:ring-[#100E90] transition-all shadow-2xs"
           />
           {searchInput && (
             <button

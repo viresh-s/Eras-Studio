@@ -27,7 +27,7 @@ import {
   Clock,
   Sparkles,
   ArrowRight,
-} from "lucide-react";
+} from "@/components/admin/icons";
 
 interface CorMembersClientProps {
   initialMembers: CorMember[];
@@ -182,7 +182,7 @@ export function CorMembersClient({
                 <span>{tab.label}</span>
                 <span
                   className={`text-[10px] px-1.5 py-0.2 rounded-full ${
-                    active ? "bg-white text-[#1345EE]" : "bg-[#F2F0ED] text-[#71716D] border border-[#E8E8E3]"
+                    active ? "bg-white text-[#100E90]" : "bg-[#F2F0ED] text-[#71716D] border border-[#E8E8E3]"
                   }`}
                 >
                   {tab.count}
@@ -203,7 +203,7 @@ export function CorMembersClient({
               setSearchQuery(e.target.value);
               setCurrentPage(1);
             }}
-            className="w-full text-xs pl-9 pr-3 py-2 bg-[#F2F0ED]/50 focus:bg-white border border-[#E8E8E3] rounded-full text-[#141413] placeholder-[#8A8A85] focus:outline-none focus:border-[#1345EE] focus:ring-1 focus:ring-[#1345EE] transition-all"
+            className="w-full text-xs pl-9 pr-3 py-2 bg-[#F2F0ED]/50 focus:bg-white border border-[#E8E8E3] rounded-full text-[#141413] placeholder-[#8A8A85] focus:outline-none focus:border-[#100E90] focus:ring-1 focus:ring-[#100E90] transition-all"
           />
         </div>
       </div>
@@ -266,7 +266,7 @@ export function CorMembersClient({
                         </div>
                       )}
                       <div>
-                        <div className="font-medium text-sm text-[#141413] group-hover:text-[#1345EE] transition-colors">
+                        <div className="font-medium text-sm text-[#141413] group-hover:text-[#100E90] transition-colors">
                           {member.name}
                         </div>
                         <div className="text-xs text-[#71716D]">
@@ -327,7 +327,7 @@ export function CorMembersClient({
                         type="button"
                         onClick={() => handleOpenApplyModal(member)}
                         title="Apply for Opportunity"
-                        className="px-3 py-1 rounded-full text-xs font-medium border border-black bg-[#000000] text-white hover:bg-neutral-800 transition-colors whitespace-nowrap inline-flex items-center gap-1 shadow-soft-sm cursor-pointer"
+                        className="btn-premium-gradient-pill px-3.5 py-1 text-xs font-medium whitespace-nowrap inline-flex items-center gap-1 cursor-pointer"
                       >
                         <span>Apply</span>
                         <span aria-hidden="true">→</span>

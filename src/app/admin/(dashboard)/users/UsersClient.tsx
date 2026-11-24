@@ -9,7 +9,7 @@ import {
   Ban,
   CheckCircle,
   AlertTriangle,
-} from "lucide-react";
+} from "@/components/admin/icons";
 import { UsersIcon } from "@/components/admin/icons";
 import { User, UserStatus } from "@/lib/types";
 import {
@@ -177,9 +177,9 @@ export function UsersClient({ initialUsers }: UsersClientProps) {
       return <ArrowUpDown className="w-3 h-3 text-[#A0A09B] opacity-0 group-hover:opacity-100 transition-opacity" />;
     }
     return sortDirection === "asc" ? (
-      <ArrowUp className="w-3 h-3 text-[#1345EE]" />
+      <ArrowUp className="w-3 h-3 text-[#100E90]" />
     ) : (
-      <ArrowDown className="w-3 h-3 text-[#1345EE]" />
+      <ArrowDown className="w-3 h-3 text-[#100E90]" />
     );
   };
 
@@ -297,8 +297,8 @@ export function UsersClient({ initialUsers }: UsersClientProps) {
               <span
                 className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
                   isActive
-                    ? "bg-white text-[#1345EE]"
-                    : "bg-[#F2F0ED] text-[#1345EE] border border-[#1345EE]/25"
+                    ? "bg-white text-[#100E90]"
+                    : "bg-[#F2F0ED] text-[#100E90] border border-[#100E90]/25"
                 }`}
               >
                 {tab.count}
@@ -599,7 +599,7 @@ export function UsersClient({ initialUsers }: UsersClientProps) {
 
             {/* Profile Attributes List */}
             <div className="space-y-3.5 text-xs">
-              <h5 className="font-medium text-[#1345EE] uppercase tracking-[0.2em] text-[11px] font-sans">
+              <h5 className="font-medium text-[#100E90] uppercase tracking-[0.2em] text-[11px] font-sans">
                 Account Metadata
               </h5>
 
@@ -640,8 +640,8 @@ export function UsersClient({ initialUsers }: UsersClientProps) {
             </div>
 
             {/* Security / Notice */}
-            <div className="p-4 rounded-3xl bg-[#F2F0ED] border border-[#1345EE]/30 text-xs text-[#141413] space-y-1.5">
-              <div className="flex items-center gap-1.5 font-medium text-[#1345EE]">
+            <div className="p-4 rounded-3xl bg-[#F2F0ED] border border-[#100E90]/30 text-xs text-[#141413] space-y-1.5">
+              <div className="flex items-center gap-1.5 font-medium text-[#100E90]">
                 <AlertTriangle className="w-3.5 h-3.5" />
                 <span>Account Controls Notice</span>
               </div>

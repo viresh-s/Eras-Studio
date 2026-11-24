@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { Copy, Check } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Copy01Icon, Tick01Icon } from "@hugeicons/core-free-icons";
 
 interface MaskedIdProps {
   id?: string | null;
@@ -37,11 +38,11 @@ export function MaskedId({ id, className = "", showCopyIcon = false }: MaskedIdP
     >
       <span>{displayId}</span>
       {showCopyIcon && (
-        <span className="text-[#8A8A85] hover:text-[#1345EE] transition-colors ml-0.5 inline-flex items-center">
+        <span className="text-[#8A8A85] hover:text-[#100E90] transition-colors ml-0.5 inline-flex items-center">
           {copied ? (
-            <Check size={12} className="text-emerald-600 stroke-[2.5]" />
+            <HugeiconsIcon icon={Tick01Icon} size={12} className="text-emerald-600" strokeWidth={2.5} />
           ) : (
-            <Copy size={12} className="stroke-[2]" />
+            <HugeiconsIcon icon={Copy01Icon} size={12} strokeWidth={2} />
           )}
         </span>
       )}

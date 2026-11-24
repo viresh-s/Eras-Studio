@@ -2,7 +2,8 @@
 
 import React, { useEffect } from "react";
 import Link from "next/link";
-import { AlertTriangle, RefreshCw, LayoutDashboard } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Alert02Icon, Refresh01Icon, DashboardSquare01Icon } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/Button";
 
 export default function DashboardError({
@@ -20,7 +21,7 @@ export default function DashboardError({
     <div className="min-h-[50vh] flex flex-col items-center justify-center text-center px-4 py-12 animate-in fade-in duration-200">
       <div className="p-8 sm:p-10 rounded-2xl border border-[#E8E8E3] bg-white shadow-soft-sm max-w-lg w-full flex flex-col items-center">
         <div className="w-12 h-12 rounded-full bg-[#000000] border border-black flex items-center justify-center text-white mb-4 shadow-soft-sm">
-          <AlertTriangle className="w-6 h-6 stroke-[1.75]" />
+          <HugeiconsIcon icon={Alert02Icon} size={24} strokeWidth={1.75} />
         </div>
 
         <h2 className="text-2xl font-medium tracking-tight text-[#141413]">
@@ -39,9 +40,9 @@ export default function DashboardError({
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
           <button
             onClick={() => reset()}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#141413] hover:bg-[#2A2A28] text-white text-xs font-medium tracking-[0.04em] shadow-soft-sm transition-all"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#141413] hover:bg-[#2A2A28] text-white text-xs font-medium tracking-[0.04em] shadow-soft-sm transition-all cursor-pointer"
           >
-            <RefreshCw className="w-3.5 h-3.5" />
+            <HugeiconsIcon icon={Refresh01Icon} size={14} />
             <span>Try Again</span>
           </button>
 
@@ -49,7 +50,7 @@ export default function DashboardError({
             href="/admin/overview"
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-[#E8E8E3] bg-white text-xs font-medium text-[#6E6E69] hover:text-[#141413] hover:bg-[#F2F0ED] transition-all shadow-soft-sm"
           >
-            <LayoutDashboard className="w-3.5 h-3.5" />
+            <HugeiconsIcon icon={DashboardSquare01Icon} size={14} />
             <span>Back to Overview</span>
           </Link>
         </div>

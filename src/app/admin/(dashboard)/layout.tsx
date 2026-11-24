@@ -5,13 +5,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  Menu,
-  X,
-  LogOut,
-  Loader2,
-  ArrowUpRight,
-  Database as DbIcon,
-} from "lucide-react";
+  Menu01Icon,
+  Cancel01Icon,
+  Logout01Icon,
+  Loading01Icon,
+  ArrowUpRight01Icon,
+  Database01Icon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import {
   OverviewIcon,
   UsersIcon,
@@ -228,11 +229,11 @@ export default function DashboardLayout({
           </Link>
 
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-[#1345EE]/30 bg-white">
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-[#100E90]/30 bg-white">
               <div className="w-5 h-5 rounded-full bg-[#000000] border border-black flex items-center justify-center text-[10px] font-medium text-white">
                 A
               </div>
-              <span className="text-xs font-medium text-[#1345EE]">Admin</span>
+              <span className="text-xs font-medium text-[#100E90]">Admin</span>
             </div>
 
             <button
@@ -242,9 +243,9 @@ export default function DashboardLayout({
               className="p-2 rounded-lg border border-[#E8E8E3] bg-white text-[#141413] hover:bg-[#F2F0ED] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#141413]"
             >
               {mobileDrawerOpen ? (
-                <X className="w-4 h-4 stroke-[2]" />
+                <HugeiconsIcon icon={Cancel01Icon} size={16} strokeWidth={2} />
               ) : (
-                <Menu className="w-4 h-4 stroke-[2]" />
+                <HugeiconsIcon icon={Menu01Icon} size={16} strokeWidth={2} />
               )}
             </button>
           </div>
@@ -286,17 +287,17 @@ export default function DashboardLayout({
                           onMouseEnter={() => setMobileHoveredHref(item.href)}
                           className={`relative flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-medium transition-colors duration-200 select-none ${
                             isItemActive
-                              ? "text-[#1345EE] font-medium"
+                              ? "text-[#100E90] font-medium"
                               : isHovered
-                              ? "text-[#1345EE]"
-                              : "text-[#6E6E69] hover:text-[#1345EE]"
+                              ? "text-[#100E90]"
+                              : "text-[#6E6E69] hover:text-[#100E90]"
                           }`}
                         >
                           {/* Active page animated soft light-blue background */}
                           {isItemActive && (
                             <motion.div
                               layoutId="mobile-active-pill"
-                              className="absolute inset-0 rounded-xl bg-[#EEF2FE] border border-[#1345EE]/15 shadow-2xs -z-10"
+                              className="absolute inset-0 rounded-xl bg-[#EAE9F8] border border-[#100E90]/15 shadow-2xs -z-10"
                               transition={{ type: "spring", stiffness: 380, damping: 30 }}
                             />
                           )}
@@ -305,7 +306,7 @@ export default function DashboardLayout({
                           {isHovered && !isItemActive && (
                             <motion.div
                               layoutId="mobile-hover-pill"
-                              className="absolute inset-0 rounded-xl bg-[#1345EE]/[0.06] border border-[#1345EE]/10 -z-10"
+                              className="absolute inset-0 rounded-xl bg-[#100E90]/[0.06] border border-[#100E90]/10 -z-10"
                               transition={{ type: "spring", stiffness: 380, damping: 30 }}
                               initial={{ opacity: 0 }}
                               animate={{ opacity: 1 }}
@@ -316,7 +317,7 @@ export default function DashboardLayout({
                           <div className="flex items-center gap-3">
                             <Icon
                               className={`w-4 h-4 stroke-[1.75] transition-colors duration-200 ${
-                                isItemActive || isHovered ? "text-[#1345EE]" : "text-[#8A8A85]"
+                                isItemActive || isHovered ? "text-[#100E90]" : "text-[#8A8A85]"
                               }`}
                             />
                             <span className="transition-colors duration-200">{item.name}</span>
@@ -327,10 +328,10 @@ export default function DashboardLayout({
                               <span
                                 className={`text-[10px] font-bold px-2 py-0.5 rounded-md min-w-[20px] text-center transition-all duration-200 ${
                                   isItemActive
-                                    ? "bg-[#1345EE] text-white shadow-2xs"
+                                    ? "bg-[#100E90] text-white shadow-2xs"
                                     : isHovered
-                                    ? "bg-[#1345EE]/15 text-[#1345EE] border border-[#1345EE]/30"
-                                    : "bg-[#F2F0ED] text-[#1345EE] border border-[#1345EE]/25"
+                                    ? "bg-[#100E90]/15 text-[#100E90] border border-[#100E90]/30"
+                                    : "bg-[#F2F0ED] text-[#100E90] border border-[#100E90]/25"
                                 }`}
                               >
                                 {displayCounts.creators}
@@ -340,10 +341,10 @@ export default function DashboardLayout({
                               <span
                                 className={`text-[10px] font-bold px-2 py-0.5 rounded-md min-w-[20px] text-center transition-all duration-200 ${
                                   isItemActive
-                                    ? "bg-[#1345EE] text-white shadow-2xs"
+                                    ? "bg-[#100E90] text-white shadow-2xs"
                                     : isHovered
-                                    ? "bg-[#1345EE]/15 text-[#1345EE] border border-[#1345EE]/30"
-                                    : "bg-[#F2F0ED] text-[#1345EE] border border-[#1345EE]/25"
+                                    ? "bg-[#100E90]/15 text-[#100E90] border border-[#100E90]/30"
+                                    : "bg-[#F2F0ED] text-[#100E90] border border-[#100E90]/25"
                                 }`}
                               >
                                 {displayCounts.artworks}
@@ -353,10 +354,10 @@ export default function DashboardLayout({
                               <span
                                 className={`text-[10px] font-bold px-2 py-0.5 rounded-md min-w-[20px] text-center transition-all duration-200 ${
                                   isItemActive
-                                    ? "bg-[#1345EE] text-white shadow-2xs"
+                                    ? "bg-[#100E90] text-white shadow-2xs"
                                     : isHovered
-                                    ? "bg-[#1345EE]/15 text-[#1345EE] border border-[#1345EE]/30"
-                                    : "bg-[#F2F0ED] text-[#1345EE] border border-[#1345EE]/25"
+                                    ? "bg-[#100E90]/15 text-[#100E90] border border-[#100E90]/30"
+                                    : "bg-[#F2F0ED] text-[#100E90] border border-[#100E90]/25"
                                 }`}
                               >
                                 {displayCounts.reports}
@@ -366,8 +367,8 @@ export default function DashboardLayout({
                               <span
                                 className={`text-[10px] font-bold px-2 py-0.5 rounded-md min-w-[20px] text-center transition-all duration-200 ${
                                   isHovered
-                                    ? "bg-[#1345EE]/15 text-[#1345EE] border border-[#1345EE]/30"
-                                    : "bg-[#F2F0ED] text-[#1345EE] border border-[#1345EE]/25"
+                                    ? "bg-[#100E90]/15 text-[#100E90] border border-[#100E90]/30"
+                                    : "bg-[#F2F0ED] text-[#100E90] border border-[#100E90]/25"
                                 }`}
                               >
                                 {displayTotalCor}
@@ -378,7 +379,7 @@ export default function DashboardLayout({
                             {isItemActive && (
                               <motion.span
                                 layoutId="mobile-active-indicator"
-                                className="w-1.5 h-1.5 rounded-full bg-[#1345EE] shadow-[0_0_6px_rgba(19,69,238,0.45)] shrink-0"
+                                className="w-1.5 h-1.5 rounded-full bg-[#100E90] shadow-[0_0_6px_rgba(16,14,144,0.45)] shrink-0"
                                 transition={{ type: "spring", stiffness: 380, damping: 30 }}
                               />
                             )}
@@ -387,7 +388,7 @@ export default function DashboardLayout({
 
                         {isCor && isCorActive && (
                           <div
-                            className="pl-6 py-1 space-y-1 border-l-2 border-[#1345EE]/20 ml-5 my-1 relative"
+                            className="pl-6 py-1 space-y-1 border-l-2 border-[#100E90]/20 ml-5 my-1 relative"
                             onMouseLeave={() => setMobileHoveredSubHref(null)}
                           >
                             {corSubNav.map((sub) => {
@@ -402,23 +403,23 @@ export default function DashboardLayout({
                                   onMouseEnter={() => setMobileHoveredSubHref(sub.href)}
                                   className={`relative flex items-center justify-between px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors duration-200 select-none ${
                                     isSubActive
-                                      ? "text-[#1345EE] font-medium"
+                                      ? "text-[#100E90] font-medium"
                                       : isSubHovered
-                                      ? "text-[#1345EE]"
-                                      : "text-[#6E6E69] hover:text-[#1345EE]"
+                                      ? "text-[#100E90]"
+                                      : "text-[#6E6E69] hover:text-[#100E90]"
                                   }`}
                                 >
                                   {isSubActive && (
                                     <motion.div
                                       layoutId="mobile-sub-active-pill"
-                                      className="absolute inset-0 rounded-lg bg-[#EEF2FE] border border-[#1345EE]/15 -z-10"
+                                      className="absolute inset-0 rounded-lg bg-[#EAE9F8] border border-[#100E90]/15 -z-10"
                                       transition={{ type: "spring", stiffness: 380, damping: 30 }}
                                     />
                                   )}
                                   {isSubHovered && !isSubActive && (
                                     <motion.div
                                       layoutId="mobile-sub-hover-pill"
-                                      className="absolute inset-0 rounded-lg bg-[#1345EE]/[0.06] -z-10"
+                                      className="absolute inset-0 rounded-lg bg-[#100E90]/[0.06] -z-10"
                                       transition={{ type: "spring", stiffness: 380, damping: 30 }}
                                       initial={{ opacity: 0 }}
                                       animate={{ opacity: 1 }}
@@ -429,7 +430,7 @@ export default function DashboardLayout({
                                     {sub.icon && (
                                       <sub.icon
                                         className={`w-3.5 h-3.5 transition-colors ${
-                                          isSubActive || isSubHovered ? "text-[#1345EE]" : "text-[#8A8A85]"
+                                          isSubActive || isSubHovered ? "text-[#100E90]" : "text-[#8A8A85]"
                                         }`}
                                       />
                                     )}
@@ -440,8 +441,8 @@ export default function DashboardLayout({
                                       <span
                                         className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md ${
                                           isSubActive
-                                            ? "bg-[#1345EE] text-white"
-                                            : "bg-white border border-[#1345EE]/30 text-[#1345EE]"
+                                            ? "bg-[#100E90] text-white"
+                                            : "bg-white border border-[#100E90]/30 text-[#100E90]"
                                         }`}
                                       >
                                         {displayCounts.corRequests}
@@ -451,8 +452,8 @@ export default function DashboardLayout({
                                       <span
                                         className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md ${
                                           isSubActive
-                                            ? "bg-[#1345EE] text-white"
-                                            : "bg-white border border-[#1345EE]/30 text-[#1345EE]"
+                                            ? "bg-[#100E90] text-white"
+                                            : "bg-white border border-[#100E90]/30 text-[#100E90]"
                                         }`}
                                       >
                                         {displayCounts.corApplications}
@@ -461,7 +462,7 @@ export default function DashboardLayout({
                                     {isSubActive && (
                                       <motion.span
                                         layoutId="mobile-sub-active-dot"
-                                        className="w-1.5 h-1.5 rounded-full bg-[#1345EE] shrink-0"
+                                        className="w-1.5 h-1.5 rounded-full bg-[#100E90] shrink-0"
                                         transition={{ type: "spring", stiffness: 380, damping: 30 }}
                                       />
                                     )}
@@ -521,8 +522,8 @@ export default function DashboardLayout({
 
           {/* Navigation Links */}
           <div className="flex-1 px-4 py-6 overflow-y-auto">
-            <div className="mb-3 px-3 text-[11px] font-medium uppercase tracking-[0.2em] text-[#1345EE] font-sans flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#1345EE]" />
+            <div className="mb-3 px-3 text-[11px] font-medium uppercase tracking-[0.2em] text-[#100E90] font-sans flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#100E90]" />
               Platform
             </div>
             <LayoutGroup id="admin-desktop-sidebar">
@@ -551,17 +552,17 @@ export default function DashboardLayout({
                         onMouseEnter={() => setHoveredHref(item.href)}
                         className={`relative group flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs md:text-sm font-medium transition-colors duration-200 select-none ${
                           isItemActive
-                            ? "text-[#1345EE] font-medium"
+                            ? "text-[#100E90] font-medium"
                             : isHovered
-                            ? "text-[#1345EE]"
-                            : "text-[#6E6E69] hover:text-[#1345EE]"
+                            ? "text-[#100E90]"
+                            : "text-[#6E6E69] hover:text-[#100E90]"
                         }`}
                       >
                         {/* Active Page Animated Pill */}
                         {isItemActive && (
                           <motion.div
                             layoutId="desktop-active-pill"
-                            className="absolute inset-0 rounded-xl bg-[#EEF2FE] border border-[#1345EE]/15 shadow-2xs -z-10"
+                            className="absolute inset-0 rounded-xl bg-[#EAE9F8] border border-[#100E90]/15 shadow-2xs -z-10"
                             transition={{ type: "spring", stiffness: 380, damping: 30 }}
                           />
                         )}
@@ -570,7 +571,7 @@ export default function DashboardLayout({
                         {isHovered && !isItemActive && (
                           <motion.div
                             layoutId="desktop-hover-pill"
-                            className="absolute inset-0 rounded-xl bg-[#1345EE]/[0.06] border border-[#1345EE]/10 -z-10"
+                            className="absolute inset-0 rounded-xl bg-[#100E90]/[0.06] border border-[#100E90]/10 -z-10"
                             transition={{ type: "spring", stiffness: 380, damping: 30 }}
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
@@ -582,8 +583,8 @@ export default function DashboardLayout({
                           <Icon
                             className={`w-4 h-4 stroke-[1.75] transition-colors duration-200 ${
                               isItemActive || isHovered
-                                ? "text-[#1345EE]"
-                                : "text-[#8A8A85] group-hover:text-[#1345EE]"
+                                ? "text-[#100E90]"
+                                : "text-[#8A8A85] group-hover:text-[#100E90]"
                             }`}
                           />
                           <span className="transition-colors duration-200">{item.name}</span>
@@ -594,10 +595,10 @@ export default function DashboardLayout({
                             <span
                               className={`text-[10px] font-bold px-2 py-0.5 rounded-md min-w-[20px] text-center transition-all duration-200 ${
                                 isItemActive
-                                  ? "bg-[#1345EE] text-white shadow-2xs"
+                                  ? "bg-[#100E90] text-white shadow-2xs"
                                   : isHovered
-                                  ? "bg-[#1345EE]/15 text-[#1345EE] border border-[#1345EE]/30"
-                                  : "bg-[#F2F0ED] text-[#1345EE] border border-[#1345EE]/25"
+                                  ? "bg-[#100E90]/15 text-[#100E90] border border-[#100E90]/30"
+                                  : "bg-[#F2F0ED] text-[#100E90] border border-[#100E90]/25"
                               }`}
                             >
                               {displayCounts.creators}
@@ -607,10 +608,10 @@ export default function DashboardLayout({
                             <span
                               className={`text-[10px] font-bold px-2 py-0.5 rounded-md min-w-[20px] text-center transition-all duration-200 ${
                                 isItemActive
-                                  ? "bg-[#1345EE] text-white shadow-2xs"
+                                  ? "bg-[#100E90] text-white shadow-2xs"
                                   : isHovered
-                                  ? "bg-[#1345EE]/15 text-[#1345EE] border border-[#1345EE]/30"
-                                  : "bg-[#F2F0ED] text-[#1345EE] border border-[#1345EE]/25"
+                                  ? "bg-[#100E90]/15 text-[#100E90] border border-[#100E90]/30"
+                                  : "bg-[#F2F0ED] text-[#100E90] border border-[#100E90]/25"
                               }`}
                             >
                               {displayCounts.artworks}
@@ -620,10 +621,10 @@ export default function DashboardLayout({
                             <span
                               className={`text-[10px] font-bold px-2 py-0.5 rounded-md min-w-[20px] text-center transition-all duration-200 ${
                                 isItemActive
-                                  ? "bg-[#1345EE] text-white shadow-2xs"
+                                  ? "bg-[#100E90] text-white shadow-2xs"
                                   : isHovered
-                                  ? "bg-[#1345EE]/15 text-[#1345EE] border border-[#1345EE]/30"
-                                  : "bg-[#F2F0ED] text-[#1345EE] border border-[#1345EE]/25"
+                                  ? "bg-[#100E90]/15 text-[#100E90] border border-[#100E90]/30"
+                                  : "bg-[#F2F0ED] text-[#100E90] border border-[#100E90]/25"
                               }`}
                             >
                               {displayCounts.reports}
@@ -633,8 +634,8 @@ export default function DashboardLayout({
                             <span
                               className={`text-[10px] font-bold px-2 py-0.5 rounded-md min-w-[20px] text-center transition-all duration-200 ${
                                 isHovered
-                                  ? "bg-[#1345EE]/15 text-[#1345EE] border border-[#1345EE]/30"
-                                  : "bg-[#F2F0ED] text-[#1345EE] border border-[#1345EE]/25"
+                                  ? "bg-[#100E90]/15 text-[#100E90] border border-[#100E90]/30"
+                                  : "bg-[#F2F0ED] text-[#100E90] border border-[#100E90]/25"
                               }`}
                             >
                               {displayTotalCor}
@@ -645,7 +646,7 @@ export default function DashboardLayout({
                           {isItemActive && (
                             <motion.span
                               layoutId="desktop-active-indicator"
-                              className="w-1.5 h-1.5 rounded-full bg-[#1345EE] shadow-[0_0_6px_rgba(19,69,238,0.45)] shrink-0"
+                              className="w-1.5 h-1.5 rounded-full bg-[#100E90] shadow-[0_0_6px_rgba(16,14,144,0.45)] shrink-0"
                               transition={{ type: "spring", stiffness: 380, damping: 30 }}
                             />
                           )}
@@ -655,7 +656,7 @@ export default function DashboardLayout({
                       {/* Render COR sub-nav when in COR section */}
                       {isCor && isCorActive && (
                         <div
-                          className="pl-5 pr-2 py-1 space-y-1 border-l-2 border-[#1345EE]/20 ml-5 my-1 relative"
+                          className="pl-5 pr-2 py-1 space-y-1 border-l-2 border-[#100E90]/20 ml-5 my-1 relative"
                           onMouseLeave={() => setHoveredSubHref(null)}
                         >
                           {corSubNav.map((sub) => {
@@ -669,23 +670,23 @@ export default function DashboardLayout({
                                 onMouseEnter={() => setHoveredSubHref(sub.href)}
                                 className={`relative flex items-center justify-between px-3 py-1.5 rounded-lg text-xs font-medium transition-colors duration-200 select-none ${
                                   isSubActive
-                                    ? "text-[#1345EE] font-medium"
+                                    ? "text-[#100E90] font-medium"
                                     : isSubHovered
-                                    ? "text-[#1345EE]"
-                                    : "text-[#6E6E69] hover:text-[#1345EE]"
+                                    ? "text-[#100E90]"
+                                    : "text-[#6E6E69] hover:text-[#100E90]"
                                 }`}
                               >
                                 {isSubActive && (
                                   <motion.div
                                     layoutId="desktop-sub-active-pill"
-                                    className="absolute inset-0 rounded-lg bg-[#EEF2FE] border border-[#1345EE]/15 -z-10"
+                                    className="absolute inset-0 rounded-lg bg-[#EAE9F8] border border-[#100E90]/15 -z-10"
                                     transition={{ type: "spring", stiffness: 380, damping: 30 }}
                                   />
                                 )}
                                 {isSubHovered && !isSubActive && (
                                   <motion.div
                                     layoutId="desktop-sub-hover-pill"
-                                    className="absolute inset-0 rounded-lg bg-[#1345EE]/[0.06] -z-10"
+                                    className="absolute inset-0 rounded-lg bg-[#100E90]/[0.06] -z-10"
                                     transition={{ type: "spring", stiffness: 380, damping: 30 }}
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
@@ -696,7 +697,7 @@ export default function DashboardLayout({
                                   {sub.icon && (
                                     <sub.icon
                                       className={`w-3.5 h-3.5 transition-colors ${
-                                        isSubActive || isSubHovered ? "text-[#1345EE]" : "text-[#8A8A85]"
+                                        isSubActive || isSubHovered ? "text-[#100E90]" : "text-[#8A8A85]"
                                       }`}
                                     />
                                   )}
@@ -707,8 +708,8 @@ export default function DashboardLayout({
                                     <span
                                       className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md ${
                                         isSubActive
-                                          ? "bg-[#1345EE] text-white"
-                                          : "bg-white border border-[#1345EE]/30 text-[#1345EE]"
+                                          ? "bg-[#100E90] text-white"
+                                          : "bg-white border border-[#100E90]/30 text-[#100E90]"
                                       }`}
                                     >
                                       {displayCounts.corRequests}
@@ -718,8 +719,8 @@ export default function DashboardLayout({
                                     <span
                                       className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md ${
                                         isSubActive
-                                          ? "bg-[#1345EE] text-white"
-                                          : "bg-white border border-[#1345EE]/30 text-[#1345EE]"
+                                          ? "bg-[#100E90] text-white"
+                                          : "bg-white border border-[#100E90]/30 text-[#100E90]"
                                       }`}
                                     >
                                       {displayCounts.corApplications}
@@ -728,7 +729,7 @@ export default function DashboardLayout({
                                   {isSubActive && (
                                     <motion.span
                                       layoutId="desktop-sub-active-dot"
-                                      className="w-1.5 h-1.5 rounded-full bg-[#1345EE] shrink-0"
+                                      className="w-1.5 h-1.5 rounded-full bg-[#100E90] shrink-0"
                                       transition={{ type: "spring", stiffness: 380, damping: 30 }}
                                     />
                                   )}
@@ -744,8 +745,8 @@ export default function DashboardLayout({
               </nav>
             </LayoutGroup>
 
-            <div className="mt-8 mb-3 px-3 text-[11px] font-medium uppercase tracking-[0.2em] text-[#1345EE] font-sans flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#1345EE]" />
+            <div className="mt-8 mb-3 px-3 text-[11px] font-medium uppercase tracking-[0.2em] text-[#100E90] font-sans flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#100E90]" />
               Directory
             </div>
             <div className="space-y-1 text-xs">
@@ -754,14 +755,14 @@ export default function DashboardLayout({
                 className="flex items-center justify-between px-3.5 py-2 rounded-lg text-[#6E6E69] hover:text-[#141413] hover:bg-[#F2F0ED] transition-colors"
               >
                 <span>Browse Gallery</span>
-                <ArrowUpRight className="w-3.5 h-3.5 text-[#8A8A85]" />
+                <HugeiconsIcon icon={ArrowUpRight01Icon} size={14} strokeWidth={2} className="text-[#8A8A85]" />
               </Link>
               <Link
                 href="/about"
                 className="flex items-center justify-between px-3.5 py-2 rounded-lg text-[#6E6E69] hover:text-[#141413] hover:bg-[#F2F0ED] transition-colors"
               >
                 <span>About Eras</span>
-                <ArrowUpRight className="w-3.5 h-3.5 text-[#8A8A85]" />
+                <HugeiconsIcon icon={ArrowUpRight01Icon} size={14} strokeWidth={2} className="text-[#8A8A85]" />
               </Link>
             </div>
           </div>
@@ -791,9 +792,9 @@ export default function DashboardLayout({
                 className="p-2 rounded-lg text-[#8A8A85] hover:text-[#B83838] hover:bg-[#FDF2F2] transition-colors ml-1 cursor-pointer disabled:opacity-50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#141413]"
               >
                 {isLoggingOut ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <HugeiconsIcon icon={Loading01Icon} size={16} strokeWidth={2} className="animate-spin" />
                 ) : (
-                  <LogOut className="w-4 h-4 stroke-[1.75]" />
+                  <HugeiconsIcon icon={Logout01Icon} size={16} strokeWidth={2} />
                 )}
               </button>
             </div>
@@ -822,12 +823,12 @@ export default function DashboardLayout({
                     : "Using local in-memory dataset."
                 }
               >
-                <DbIcon className="w-3.5 h-3.5 text-[#1345EE]" />
+                <HugeiconsIcon icon={Database01Icon} size={14} strokeWidth={2} className="text-[#100E90]" />
                 <span
                   className={`w-1.5 h-1.5 rounded-full ${
                     isBrowserSupabaseConfigured
                       ? "bg-[#28633B] animate-pulse"
-                      : "bg-[#1345EE]"
+                      : "bg-[#100E90]"
                   }`}
                 />
                 <span className="font-medium text-[#141413]">
@@ -836,11 +837,11 @@ export default function DashboardLayout({
               </div>
 
               {/* Admin Avatar Pill */}
-              <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl border border-[#1345EE]/30 bg-white text-xs text-[#141413] shadow-2xs">
+              <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl border border-[#100E90]/30 bg-white text-xs text-[#141413] shadow-2xs">
                 <div className="w-5 h-5 rounded-full bg-[#000000] border border-black flex items-center justify-center text-[10px] font-medium text-white">
                   A
                 </div>
-                <span className="font-medium text-[#1345EE]">Admin</span>
+                <span className="font-medium text-[#100E90]">Admin</span>
                 <span className="w-1.5 h-1.5 rounded-full bg-[#28633B] ml-0.5" title="Online" />
               </div>
 

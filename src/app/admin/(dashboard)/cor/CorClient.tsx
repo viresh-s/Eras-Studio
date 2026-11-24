@@ -12,7 +12,7 @@ import {
 import { CorNavTabs } from "@/components/cor/CorNavTabs";
 import { ApplyForMemberModal } from "@/components/cor/ApplyForMemberModal";
 import { Button } from "@/components/ui/Button";
-import { Plus } from "lucide-react";
+import { Plus } from "@/components/admin/icons";
 import {
   RequestsIcon,
   ApplicationsIcon,
@@ -82,7 +82,7 @@ export function CorClient({
       {/* Needs Your Attention Section */}
       <div className="space-y-4">
         <div className="flex items-center gap-2">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#1345EE]" />
+          <span className="w-1.5 h-1.5 rounded-full bg-[#100E90]" />
           <h2 className="text-lg font-medium text-[#141413]">Needs Your Attention</h2>
         </div>
         <div className="grid grid-cols-1 gap-3.5">

@@ -37,7 +37,7 @@ import {
   Trash2,
   Clock,
   ArrowRight,
-} from "lucide-react";
+} from "@/components/admin/icons";
 
 interface CorOpportunitiesClientProps {
   initialOpportunities: CorOpportunity[];
@@ -270,7 +270,7 @@ export function CorOpportunitiesClient({
                 <span>{tab.label}</span>
                 <span
                   className={`text-[11px] px-2 py-0.2 rounded-full ${
-                    active ? "bg-white text-[#1345EE]" : "bg-[#F2F0ED] text-[#71716D]"
+                    active ? "bg-white text-[#100E90]" : "bg-[#F2F0ED] text-[#71716D]"
                   }`}
                 >
                   {tab.count}
@@ -291,7 +291,7 @@ export function CorOpportunitiesClient({
               setSearchQuery(e.target.value);
               setCurrentPage(1);
             }}
-            className="w-full text-xs bg-[#F2F0ED]/50 border border-[#E8E8E3] rounded-full pl-9 pr-3.5 py-2 text-[#141413] placeholder-[#8A8A85] focus:outline-none focus:bg-white focus:border-[#1345EE] transition-colors"
+            className="w-full text-xs bg-[#F2F0ED]/50 border border-[#E8E8E3] rounded-full pl-9 pr-3.5 py-2 text-[#141413] placeholder-[#8A8A85] focus:outline-none focus:bg-white focus:border-[#100E90] transition-colors"
           />
         </div>
       </div>
@@ -342,7 +342,7 @@ export function CorOpportunitiesClient({
                       href={`/admin/cor/opportunities/${opp.id}`}
                       className="group block"
                     >
-                      <div className="text-base font-medium text-[#141413] group-hover:text-[#1345EE] transition-colors">
+                      <div className="text-base font-medium text-[#141413] group-hover:text-[#100E90] transition-colors">
                         {opp.title}
                       </div>
                       <div className="text-xs text-[#6E6E69]">
@@ -504,7 +504,7 @@ export function CorOpportunitiesClient({
                     {match.reasons.map((r, i) => (
                       <div key={i} className="flex items-start gap-1.5">
                         {r.matched ? (
-                          <CheckCircle2 className="w-3.5 h-3.5 text-[#1345EE] shrink-0 mt-0.5" />
+                          <CheckCircle2 className="w-3.5 h-3.5 text-[#100E90] shrink-0 mt-0.5" />
                         ) : (
                           <span className="w-1.5 h-1.5 rounded-full bg-[#8A8A85] shrink-0 mt-1.5 mr-1 ml-0.5" />
                         )}
@@ -523,7 +523,7 @@ export function CorOpportunitiesClient({
                         setApplyOppId(selectedOpportunityForMatching.id);
                         setIsApplyModalOpen(true);
                       }}
-                      className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#141413] text-white text-xs font-medium hover:bg-[#2A2A28] transition-all shadow-soft-sm"
+                      className="btn-premium-gradient-pill inline-flex items-center gap-1.5 px-4 py-1.5 text-white text-xs font-medium cursor-pointer"
                     >
                       <Send className="w-3 h-3" />
                       <span>Apply for {match.member.name}</span>
@@ -709,7 +709,7 @@ export function CorOpportunitiesClient({
 
           {/* ── Footer ── */}
           <div className="flex items-center justify-between pt-5 mt-1 border-t border-[#E8E8E3]">
-            <p className="text-[11px] text-[#8A8A85]"><span className="text-[#1345EE]">*</span> Required fields</p>
+            <p className="text-[11px] text-[#8A8A85]"><span className="text-[#100E90]">*</span> Required fields</p>
             <div className="flex items-center gap-2.5">
               <button
                 type="button"

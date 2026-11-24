@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { Loader2 } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Loading01Icon } from "@hugeicons/core-free-icons";
 import { ExportIcon } from "@/components/admin/icons";
 import { useToast } from "@/components/ui";
 
@@ -66,12 +67,12 @@ export function ExportDropdown({ exportType, filters }: ExportDropdownProps) {
       type="button"
       onClick={handleExportCSV}
       disabled={isExporting}
-      className="group inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-[#1345EE]/40 bg-white text-xs uppercase tracking-[0.08em] font-medium text-[#1345EE] hover:bg-[#000000] hover:text-white hover:border-black transition-all focus:outline-none focus:ring-1 focus:ring-[#1345EE] shadow-xs disabled:opacity-50 cursor-pointer"
+      className="group inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-[#100E90]/40 bg-white text-xs uppercase tracking-[0.08em] font-medium text-[#100E90] hover:bg-[#000000] hover:text-white hover:border-black transition-all focus:outline-none focus:ring-1 focus:ring-[#100E90] shadow-xs disabled:opacity-50 cursor-pointer"
     >
       {isExporting ? (
-        <Loader2 className="w-3.5 h-3.5 text-[#1345EE] group-hover:text-white animate-spin" />
+        <HugeiconsIcon icon={Loading01Icon} size={14} className="text-[#100E90] group-hover:text-white animate-spin" />
       ) : (
-        <ExportIcon size={14} className="text-[#1345EE] group-hover:text-white" />
+        <ExportIcon size={14} className="text-[#100E90] group-hover:text-white" />
       )}
       <span>{isExporting ? "Preparing CSV..." : "Download CSV"}</span>
     </button>
