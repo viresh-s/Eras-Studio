@@ -19,7 +19,8 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@hugeicons-pro/core-stroke-rounded": ["./node_modules/@hugeicons/core-free-icons"]
     }
   },
   "include": [

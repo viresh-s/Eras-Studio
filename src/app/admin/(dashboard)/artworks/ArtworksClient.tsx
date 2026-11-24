@@ -29,6 +29,8 @@ import {
 } from "lucide-react";
 import { ArtworksIcon } from "@/components/admin/icons";
 import { TriangleAlertIcon, SaveIcon } from "@/components/ui/icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ViewIcon, EyeOffIcon, Flag03Icon } from "@hugeicons-pro/core-stroke-rounded";
 import { Artwork, ArtworkStatus, Creator } from "@/lib/types";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -726,7 +728,13 @@ export function ArtworksClient({
                 className="rounded-xl inline-flex items-center justify-center gap-2"
                 onClick={() => handleToggleFeature(viewingArtwork)}
               >
-                <Star className={`w-3.5 h-3.5 ${viewingArtwork.isFeatured ? "fill-current" : ""}`} />
+                <Image
+                  src="/images/featured-star.png"
+                  alt="Feature"
+                  width={15}
+                  height={15}
+                  className="w-3.5 h-3.5 object-contain shrink-0"
+                />
                 {viewingArtwork.isFeatured ? "Featured" : "Feature"}
               </Button>
 
@@ -747,8 +755,8 @@ export function ArtworksClient({
                   </>
                 ) : (
                   <>
-                    <EyeOff className="w-3.5 h-3.5" />
-                    Hide
+                    <HugeiconsIcon icon={EyeOffIcon} size={14} color="currentColor" strokeWidth={2} />
+                    <span>Hide</span>
                   </>
                 )}
               </Button>
@@ -1078,7 +1086,7 @@ export function ArtworksClient({
                   {/* Subtle Hover Action Pill */}
                   <div className="absolute inset-0 bg-[#141413]/15 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
                     <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/95 text-[#141413] text-[11px] uppercase tracking-[0.06em] font-medium shadow-soft-sm backdrop-blur-xs">
-                      <Eye className="w-3 h-3 text-[#1345EE]" />
+                      <HugeiconsIcon icon={ViewIcon} size={13} color="currentColor" strokeWidth={2} className="text-[#1345EE]" />
                       <span>View Specs</span>
                     </span>
                   </div>
@@ -1227,27 +1235,36 @@ export function ArtworksClient({
                           <button
                             type="button"
                             onClick={() => setViewingArtwork(art)}
-                            className="px-3 py-1 rounded-lg border border-[#E8E8E3] text-xs font-medium text-[#141413] bg-white hover:bg-[#F2F0ED] transition-colors cursor-pointer select-none"
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-[#E8E8E3] text-xs font-medium text-[#141413] bg-white hover:bg-[#F2F0ED] transition-colors cursor-pointer select-none"
                           >
-                            View
+                            <HugeiconsIcon icon={ViewIcon} size={14} color="currentColor" strokeWidth={2} />
+                            <span>View</span>
                           </button>
                           <button
                             type="button"
                             onClick={() => handleToggleFeature(art)}
-                            className="px-3 py-1 rounded-lg border border-[#E8E8E3] text-xs font-medium text-[#141413] bg-white hover:bg-[#F2F0ED] transition-colors cursor-pointer select-none"
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-[#E8E8E3] text-xs font-medium text-[#141413] bg-white hover:bg-[#F2F0ED] transition-colors cursor-pointer select-none"
                           >
-                            {art.isFeatured ? "Unfeature" : "Feature"}
+                            <Image
+                              src="/images/featured-star.png"
+                              alt="Feature"
+                              width={14}
+                              height={14}
+                              className="w-3.5 h-3.5 object-contain shrink-0"
+                            />
+                            <span>{art.isFeatured ? "Unfeature" : "Feature"}</span>
                           </button>
                           <button
                             type="button"
                             onClick={() => handleToggleHide(art)}
-                            className={`px-3 py-1 rounded-lg border text-xs font-medium transition-colors cursor-pointer select-none ${
+                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-medium transition-colors cursor-pointer select-none ${
                               art.status === "published"
                                 ? "border-[#E8E8E3] text-[#141413] bg-white hover:bg-[#F2F0ED]"
                                 : "border-emerald-300 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 font-medium"
                             }`}
                           >
-                            {art.status === "published" ? "Hide" : "Revert"}
+                            <HugeiconsIcon icon={EyeOffIcon} size={14} color="currentColor" strokeWidth={2} />
+                            <span>{art.status === "published" ? "Hide" : "Revert"}</span>
                           </button>
                           <button
                             type="button"
@@ -1262,13 +1279,14 @@ export function ArtworksClient({
                           <button
                             type="button"
                             onClick={() => handleToggleFlag(art)}
-                            className={`px-3 py-1 rounded-lg border text-xs font-medium transition-colors cursor-pointer select-none ${
+                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-medium transition-colors cursor-pointer select-none ${
                               art.isFlagged
                                 ? "bg-amber-50 text-amber-700 border-amber-300"
                                 : "border-[#E8E8E3] text-[#71716D] bg-white hover:bg-amber-50 hover:text-amber-700 hover:border-amber-200"
                             }`}
                           >
-                            {art.isFlagged ? "Flagged" : "Flag"}
+                            <HugeiconsIcon icon={Flag03Icon} size={14} color="currentColor" strokeWidth={2} />
+                            <span>{art.isFlagged ? "Flagged" : "Flag"}</span>
                           </button>
                         </div>
                       </TableCell>
