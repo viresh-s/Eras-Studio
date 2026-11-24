@@ -20,6 +20,16 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { ReportsIcon } from "@/components/admin/icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  Cancel01Icon,
+  EyeOffIcon,
+  ViewIcon,
+  UserBlock01Icon,
+  Delete02Icon,
+  CheckmarkCircle01Icon,
+  Refresh01Icon,
+} from "@hugeicons-pro/core-stroke-rounded";
 import { Report, ReportStatus } from "@/lib/types";
 import { Button } from "@/components/ui/Button";
 import { Drawer } from "@/components/ui/Drawer";
@@ -835,24 +845,27 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
                 <Button
                   variant="outline"
                   size="sm"
+                  className="rounded-xl inline-flex items-center gap-1.5"
                   onClick={() => {
                     setDismissTarget(selectedReport);
                     setIsDrawerOpen(false);
                   }}
                 >
-                  Dismiss
+                  <HugeiconsIcon icon={Cancel01Icon} size={14} strokeWidth={2} />
+                  <span>Dismiss</span>
                 </Button>
               ) : (
                 <Button
                   variant="outline"
                   size="sm"
-                  className="rounded-full text-amber-700 border-amber-300 hover:bg-amber-50"
+                  className="rounded-xl inline-flex items-center gap-1.5 text-amber-700 border-amber-300 hover:bg-amber-50"
                   onClick={() => {
                     handleReopenDirect(selectedReport);
                     setIsDrawerOpen(false);
                   }}
                 >
-                  Reopen (Pending)
+                  <HugeiconsIcon icon={Refresh01Icon} size={14} strokeWidth={2} />
+                  <span>Reopen (Pending)</span>
                 </Button>
               )}
 
@@ -861,24 +874,26 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="rounded-full text-emerald-700 border-emerald-300 hover:bg-emerald-50"
+                    className="rounded-xl inline-flex items-center gap-1.5 text-emerald-700 border-emerald-300 hover:bg-emerald-50"
                     onClick={() => {
                       handleConfirmUnhide(selectedReport);
                     }}
                   >
-                    Revert Hide (Unhide)
+                    <HugeiconsIcon icon={ViewIcon} size={14} strokeWidth={2} />
+                    <span>Revert Hide (Unhide)</span>
                   </Button>
                 ) : (
                   <Button
                     variant="outline"
                     size="sm"
-                    className="rounded-full"
+                    className="rounded-xl inline-flex items-center gap-1.5"
                     onClick={() => {
                       setHideTarget(selectedReport);
                       setIsDrawerOpen(false);
                     }}
                   >
-                    Hide Content
+                    <HugeiconsIcon icon={EyeOffIcon} size={14} strokeWidth={2} />
+                    <span>Hide Content</span>
                   </Button>
                 )}
 
@@ -886,62 +901,67 @@ export function ReportsClient({ initialReports }: ReportsClientProps) {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="rounded-full text-emerald-700 border-emerald-300 hover:bg-emerald-50"
+                    className="rounded-xl inline-flex items-center gap-1.5 text-emerald-700 border-emerald-300 hover:bg-emerald-50"
                     onClick={() => {
                       handleConfirmRevertSuspend(selectedReport);
                     }}
                   >
-                    Revert Suspension
+                    <HugeiconsIcon icon={CheckmarkCircle01Icon} size={14} strokeWidth={2} />
+                    <span>Revert Suspension</span>
                   </Button>
                 ) : (
                   <Button
                     variant="outline"
                     size="sm"
-                    className="rounded-full text-red-600 border-red-200 hover:bg-red-50"
+                    className="rounded-xl inline-flex items-center gap-1.5 text-red-600 border-red-200 hover:bg-red-50"
                     onClick={() => {
                       setSuspendTarget(selectedReport);
                       setIsDrawerOpen(false);
                     }}
                   >
-                    Suspend User
+                    <HugeiconsIcon icon={UserBlock01Icon} size={14} strokeWidth={2} />
+                    <span>Suspend User</span>
                   </Button>
                 )}
 
                 <Button
                   variant="danger"
                   size="sm"
-                  className="rounded-full"
+                  className="rounded-xl inline-flex items-center gap-1.5"
                   onClick={() => {
                     setRemoveTarget(selectedReport);
                     setIsDrawerOpen(false);
                   }}
                 >
-                  Remove Artwork
+                  <HugeiconsIcon icon={Delete02Icon} size={14} strokeWidth={2} />
+                  <span>Remove Artwork</span>
                 </Button>
 
                 {selectedReport.status !== "resolved" ? (
                   <Button
                     variant="primary"
                     size="sm"
-                    className="rounded-full"
+                    className="rounded-xl inline-flex items-center gap-1.5"
                     onClick={() => {
                       handleResolveDirect(selectedReport);
                       setIsDrawerOpen(false);
                     }}
                   >
-                    Mark Resolved
+                    <HugeiconsIcon icon={CheckmarkCircle01Icon} size={14} strokeWidth={2} />
+                    <span>Mark Resolved</span>
                   </Button>
                 ) : (
                   <Button
                     variant="outline"
                     size="sm"
-                    className="rounded-full"
+                    className="rounded-xl inline-flex items-center gap-1.5"
                     onClick={() => {
                       handleReopenDirect(selectedReport);
                       setIsDrawerOpen(false);
                     }}
                   >
-                    Reopen Report
+                    <HugeiconsIcon icon={Refresh01Icon} size={14} strokeWidth={2} />
+                    <span>Reopen Report</span>
                   </Button>
                 )}
               </div>

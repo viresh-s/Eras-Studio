@@ -713,20 +713,23 @@ export function ArtworksClient({
               <Button
                 variant="danger"
                 size="sm"
-                className="rounded-xl inline-flex items-center justify-center gap-2"
+                className="w-8 h-8 rounded-xl inline-flex items-center justify-center p-0"
+                title="Remove Artwork"
+                aria-label="Remove Artwork"
                 onClick={() => {
                   setSelectedArtwork(viewingArtwork);
                   setIsDeleteModalOpen(true);
                 }}
               >
                 <Trash2 className="w-3.5 h-3.5" />
-                Remove
               </Button>
 
               <Button
                 variant={viewingArtwork.isFeatured ? "primary" : "outline"}
                 size="sm"
-                className="rounded-xl inline-flex items-center justify-center gap-2"
+                className="w-8 h-8 rounded-xl inline-flex items-center justify-center p-0"
+                title={viewingArtwork.isFeatured ? "Unfeature" : "Feature"}
+                aria-label={viewingArtwork.isFeatured ? "Unfeature" : "Feature"}
                 onClick={() => handleToggleFeature(viewingArtwork)}
               >
                 <Image
@@ -736,29 +739,24 @@ export function ArtworksClient({
                   height={15}
                   className="w-3.5 h-3.5 object-contain shrink-0"
                 />
-                {viewingArtwork.isFeatured ? "Featured" : "Feature"}
               </Button>
 
               <Button
                 variant={viewingArtwork.status === "draft" || viewingArtwork.status === "rejected" ? "outline" : "outline"}
                 size="sm"
-                className={`rounded-xl inline-flex items-center justify-center gap-2 ${
+                className={`w-8 h-8 rounded-xl inline-flex items-center justify-center p-0 ${
                   viewingArtwork.status === "draft" || viewingArtwork.status === "rejected"
                     ? "text-emerald-700 border-emerald-300 hover:bg-emerald-50"
                     : ""
                 }`}
+                title={viewingArtwork.status === "draft" || viewingArtwork.status === "rejected" ? "Revert (Unhide)" : "Hide"}
+                aria-label={viewingArtwork.status === "draft" || viewingArtwork.status === "rejected" ? "Revert (Unhide)" : "Hide"}
                 onClick={() => handleToggleHide(viewingArtwork)}
               >
                 {viewingArtwork.status === "draft" || viewingArtwork.status === "rejected" ? (
-                  <>
-                    <Eye className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>Revert (Unhide)</span>
-                  </>
+                  <Eye className="w-3.5 h-3.5 text-emerald-600" />
                 ) : (
-                  <>
-                    <HugeiconsIcon icon={EyeOffIcon} size={14} color="currentColor" strokeWidth={2} />
-                    <span>Hide</span>
-                  </>
+                  <HugeiconsIcon icon={EyeOffIcon} size={15} color="currentColor" strokeWidth={2} />
                 )}
               </Button>
             </div>
