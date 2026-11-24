@@ -1231,40 +1231,47 @@ export function ArtworksClient({
                       </TableCell>
 
                       <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
-                        <div className="inline-flex items-center gap-1.5">
+                        <div className="inline-flex items-center gap-1.5 justify-end">
                           <button
                             type="button"
                             onClick={() => setViewingArtwork(art)}
-                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-[#E8E8E3] text-xs font-medium text-[#141413] bg-white hover:bg-[#F2F0ED] transition-colors cursor-pointer select-none"
+                            title="View"
+                            aria-label="View"
+                            className="w-7 h-7 inline-flex items-center justify-center rounded-lg border border-[#E8E8E3] text-[#141413] bg-white hover:bg-[#F2F0ED] hover:border-[#1345EE] hover:text-[#1345EE] transition-colors cursor-pointer select-none"
                           >
-                            <HugeiconsIcon icon={ViewIcon} size={14} color="currentColor" strokeWidth={2} />
-                            <span>View</span>
+                            <HugeiconsIcon icon={ViewIcon} size={15} color="currentColor" strokeWidth={2} />
                           </button>
                           <button
                             type="button"
                             onClick={() => handleToggleFeature(art)}
-                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-[#E8E8E3] text-xs font-medium text-[#141413] bg-white hover:bg-[#F2F0ED] transition-colors cursor-pointer select-none"
+                            title={art.isFeatured ? "Unfeature" : "Feature"}
+                            aria-label={art.isFeatured ? "Unfeature" : "Feature"}
+                            className={`w-7 h-7 inline-flex items-center justify-center rounded-lg border transition-colors cursor-pointer select-none ${
+                              art.isFeatured
+                                ? "border-black bg-[#FAF9F5] shadow-2xs"
+                                : "border-[#E8E8E3] bg-white hover:bg-[#F2F0ED] hover:border-[#141413]"
+                            }`}
                           >
                             <Image
                               src="/images/featured-star.png"
                               alt="Feature"
-                              width={14}
-                              height={14}
+                              width={15}
+                              height={15}
                               className="w-3.5 h-3.5 object-contain shrink-0"
                             />
-                            <span>{art.isFeatured ? "Unfeature" : "Feature"}</span>
                           </button>
                           <button
                             type="button"
                             onClick={() => handleToggleHide(art)}
-                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-medium transition-colors cursor-pointer select-none ${
+                            title={art.status === "published" ? "Hide" : "Revert"}
+                            aria-label={art.status === "published" ? "Hide" : "Revert"}
+                            className={`w-7 h-7 inline-flex items-center justify-center rounded-lg border transition-colors cursor-pointer select-none ${
                               art.status === "published"
-                                ? "border-[#E8E8E3] text-[#141413] bg-white hover:bg-[#F2F0ED]"
-                                : "border-emerald-300 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 font-medium"
+                                ? "border-[#E8E8E3] text-[#141413] bg-white hover:bg-[#F2F0ED] hover:text-[#1345EE]"
+                                : "border-emerald-300 text-emerald-700 bg-emerald-50 hover:bg-emerald-100"
                             }`}
                           >
-                            <HugeiconsIcon icon={EyeOffIcon} size={14} color="currentColor" strokeWidth={2} />
-                            <span>{art.status === "published" ? "Hide" : "Revert"}</span>
+                            <HugeiconsIcon icon={EyeOffIcon} size={15} color="currentColor" strokeWidth={2} />
                           </button>
                           <button
                             type="button"
@@ -1272,21 +1279,24 @@ export function ArtworksClient({
                               setSelectedArtwork(art);
                               setIsDeleteModalOpen(true);
                             }}
-                            className="px-3 py-1 rounded-lg border border-[#E8E8E3] text-xs font-medium text-[#9E3333] bg-white hover:bg-red-50 hover:border-red-200 transition-colors cursor-pointer select-none"
+                            title="Remove"
+                            aria-label="Remove"
+                            className="w-7 h-7 inline-flex items-center justify-center rounded-lg border border-[#E8E8E3] text-[#9E3333] bg-white hover:bg-red-50 hover:border-red-200 transition-colors cursor-pointer select-none"
                           >
-                            Remove
+                            <Trash2 className="w-3.5 h-3.5 text-[#9E3333]" />
                           </button>
                           <button
                             type="button"
                             onClick={() => handleToggleFlag(art)}
-                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-medium transition-colors cursor-pointer select-none ${
+                            title={art.isFlagged ? "Flagged" : "Flag"}
+                            aria-label={art.isFlagged ? "Flagged" : "Flag"}
+                            className={`w-7 h-7 inline-flex items-center justify-center rounded-lg border transition-colors cursor-pointer select-none ${
                               art.isFlagged
                                 ? "bg-amber-50 text-amber-700 border-amber-300"
                                 : "border-[#E8E8E3] text-[#71716D] bg-white hover:bg-amber-50 hover:text-amber-700 hover:border-amber-200"
                             }`}
                           >
-                            <HugeiconsIcon icon={Flag03Icon} size={14} color="currentColor" strokeWidth={2} />
-                            <span>{art.isFlagged ? "Flagged" : "Flag"}</span>
+                            <HugeiconsIcon icon={Flag03Icon} size={15} color="currentColor" strokeWidth={2} />
                           </button>
                         </div>
                       </TableCell>
