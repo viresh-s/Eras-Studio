@@ -13,10 +13,7 @@ import {
   isAuthorizedAdminEmail,
   isAuthorizedAdminUserId,
   resolveLoginIdentifier,
-  isAuthorizedAdminEmailAsync,
-  resolveAdminLoginIdentifierAsync,
 } from "./security/adminWhitelist";
-import { adminAccountsRepo } from "./data/adminAccounts";
 
 export const AUTH_COOKIE_NAME = "erasstudio_admin_session";
 
@@ -92,11 +89,10 @@ export async function verifyCredentials(
     };
   }
 
-  const authEmail = await resolveAdminLoginIdentifierAsync(cleanId);
+  const authEmail = resolveLoginIdentifier(cleanId);
 
-  // Restrict to authorized admin accounts only (predefined + created)
-  const isAuthorized = await isAuthorizedAdminEmailAsync(authEmail);
-  if (!isAuthorized) {
+  // Restrict to predefined admin accounts only
+  if (!isAuthorizedAdminEmail(authEmail)) {
     return {
       success: false,
       error: "Invalid credentials or unauthorized administrative identity.",
@@ -139,17 +135,13 @@ export async function verifyCredentials(
       };
     }
 
-    const adminRecord = await adminAccountsRepo.getByEmail(authEmail);
-    const assignedRole: AppRole =
-      adminRecord?.role || (authEmail === "admin123@internal.eras.studio" ? "super_admin" : "admin");
-
     return {
       success: true,
       user: {
         id: authData.user.id,
-        name: adminRecord?.displayName || profile?.full_name || authData.user.user_metadata?.full_name || "Administrator",
+        name: profile?.full_name || authData.user.user_metadata?.full_name || "Administrator",
         email: authData.user.email || authEmail,
-        role: assignedRole,
+        role: "super_admin",
         avatarUrl: DEFAULT_ADMIN.avatarUrl,
         lastLoginAt: new Date().toISOString(),
       },
@@ -242,16 +234,12 @@ export async function requireAdminSession(requiredPermission?: Permission): Prom
           .eq('id', user.id)
           .single();
 
-        const isAuthorized = await isAuthorizedAdminEmailAsync(user.email);
-        if (profile && profile.role === 'Admin' && isAuthorized) {
-          const adminRecord = await adminAccountsRepo.getByEmail(user.email || '');
-          const assignedRole: AppRole =
-            adminRecord?.role || (user.email === 'admin123@internal.eras.studio' ? 'super_admin' : 'admin');
+        if (profile && profile.role === 'Admin' && isAuthorizedAdminEmail(user.email)) {
           session = {
             id: user.id,
-            username: adminRecord?.username || user.user_metadata?.username || user.email?.split('@')[0] || 'admin',
-            role: assignedRole,
-            name: adminRecord?.displayName || profile.full_name || 'Administrator',
+            username: user.user_metadata?.username || user.email?.split('@')[0] || 'admin',
+            role: 'super_admin',
+            name: profile.full_name || 'Administrator',
             email: user.email || 'admin@eras.com',
           };
         }

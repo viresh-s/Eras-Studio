@@ -1,17 +1,6 @@
 /**
  * Centralized Role-Based Access Control (RBAC) System
  * Compliant with OWASP ASVS Section V4 (Access Control Verification)
- *
- * Eras Studio 3-Tier Administration Access Control:
- * 1. Super Admin (super_admin, root: admin123):
- *    - Full privileges across all domains.
- *    - Can download files/exports, generate reports, delete accounts, suspend/unsuspend, and manage admin accounts.
- * 2. Mod Admin (moderator / mod_admin):
- *    - Can view all dashboard records, download files/exports, and generate reports.
- *    - Strictly forbidden from deleting accounts, removing artworks, or suspending users.
- * 3. Simple Admin (admin / simple_admin):
- *    - Read-only inspection across all dashboard sections.
- *    - Strictly forbidden from downloading files, generating reports, deleting accounts, or suspending users.
  */
 
 export type AppRole =
@@ -38,9 +27,7 @@ export type Permission =
   | "analytics:view"
   | "audit:view"
   | "audit:export"
-  | "report:generate"
   | "settings:manage"
-  | "admin:manage"
   | "cor:view"
   | "cor:manage"
   | "cor:approve_request"
@@ -67,9 +54,32 @@ const ROLE_PERMISSIONS: Record<AppRole, readonly Permission[]> = {
     "analytics:view",
     "audit:view",
     "audit:export",
-    "report:generate",
     "settings:manage",
-    "admin:manage",
+    "cor:view",
+    "cor:manage",
+    "cor:approve_request",
+    "cor:decline_request",
+    "cor:apply",
+    "cor:update_application",
+    "cor:manage_opportunities",
+    "careers:view",
+    "careers:manage",
+  ],
+  admin: [
+    "report:view",
+    "report:create",
+    "report:resolve",
+    "report:dismiss",
+    "artwork:view_all",
+    "artwork:hide",
+    "artwork:remove",
+    "user:view_all",
+    "user:suspend",
+    "user:manage",
+    "analytics:view",
+    "audit:view",
+    "audit:export",
+    "settings:manage",
     "cor:view",
     "cor:manage",
     "cor:approve_request",
@@ -81,29 +91,13 @@ const ROLE_PERMISSIONS: Record<AppRole, readonly Permission[]> = {
     "careers:manage",
   ],
   moderator: [
-    // Mod Admin: can view, download files/exports, and generate reports, but CANNOT delete or suspend
     "report:view",
     "report:create",
     "report:resolve",
     "report:dismiss",
     "artwork:view_all",
     "artwork:hide",
-    "analytics:view",
     "audit:view",
-    "audit:export",
-    "report:generate",
-    "cor:view",
-    "careers:view",
-  ],
-  admin: [
-    // Simple Admin: view-only across all sections (cannot download files, cannot delete, cannot suspend)
-    "report:view",
-    "artwork:view_all",
-    "user:view_all",
-    "analytics:view",
-    "audit:view",
-    "cor:view",
-    "careers:view",
   ],
   creator: ["report:create"],
   collector: ["report:create"],
@@ -113,8 +107,8 @@ const ROLE_PERMISSIONS: Record<AppRole, readonly Permission[]> = {
 
 const ROLE_HIERARCHY: Record<AppRole, number> = {
   super_admin: 100,
+  admin: 80,
   moderator: 60,
-  admin: 40,
   creator: 20,
   collector: 20,
   user: 10,
@@ -126,10 +120,10 @@ const ROLE_HIERARCHY: Record<AppRole, number> = {
  */
 export function normalizeRole(role: string | undefined | null): AppRole {
   if (!role) return "anonymous";
-  const r = role.toLowerCase().trim().replace(/[\s_-]+/g, "");
-  if (r === "superadmin" || r === "super_admin") return "super_admin";
-  if (r === "moderator" || r === "mod" || r === "modadmin" || r === "mod_admin") return "moderator";
-  if (r === "admin" || r === "simpleadmin" || r === "simple_admin" || r === "administrator") return "admin";
+  const r = role.toLowerCase().trim();
+  if (r === "super_admin" || r === "superadmin") return "super_admin";
+  if (r === "admin") return "admin";
+  if (r === "moderator" || r === "mod") return "moderator";
   if (r === "creator") return "creator";
   if (r === "collector") return "collector";
   if (r === "user") return "user";
@@ -154,57 +148,8 @@ export function isAdminOrModerator(role: string | undefined | null): boolean {
 }
 
 /**
- * Role query helper functions
- */
-export function isSuperAdmin(role: string | undefined | null): boolean {
-  return normalizeRole(role) === "super_admin";
-}
-
-export function isModAdmin(role: string | undefined | null): boolean {
-  return normalizeRole(role) === "moderator";
-}
-
-export function isSimpleAdmin(role: string | undefined | null): boolean {
-  return normalizeRole(role) === "admin";
-}
-
-export function canDownloadFiles(role: string | undefined | null): boolean {
-  return hasPermission(role, "audit:export");
-}
-
-export function canGenerateReports(role: string | undefined | null): boolean {
-  return hasPermission(role, "report:generate");
-}
-
-export function canDeleteOrSuspend(role: string | undefined | null): boolean {
-  return isSuperAdmin(role);
-}
-
-export function canManageAdminAccounts(role: string | undefined | null): boolean {
-  return hasPermission(role, "admin:manage");
-}
-
-export function getRoleDisplayName(role: string | undefined | null): string {
-  const norm = normalizeRole(role);
-  switch (norm) {
-    case "super_admin":
-      return "Super Admin";
-    case "moderator":
-      return "Mod Admin";
-    case "admin":
-      return "Simple Admin";
-    case "creator":
-      return "Creator";
-    case "collector":
-      return "Collector";
-    default:
-      return "User";
-  }
-}
-
-/**
  * Enforces role hierarchy for sensitive moderation actions.
- * Only Super Admin accounts can delete or suspend users and records.
+ * Lower-level roles cannot suspend, modify, or demote equal or higher-level roles.
  */
 export function canModerateTarget(
   actorRole: string | undefined | null,
@@ -221,11 +166,8 @@ export function canModerateTarget(
   const actorScore = ROLE_HIERARCHY[actor] || 0;
   const targetScore = ROLE_HIERARCHY[target] || 0;
 
-  if (actor !== "super_admin") {
-    return {
-      allowed: false,
-      reason: "Account suspension and deletion are restricted strictly to Super Administrators.",
-    };
+  if (actorScore < 80) {
+    return { allowed: false, reason: "Moderator accounts do not have permission to suspend accounts." };
   }
 
   if (actorScore <= targetScore && actor !== "super_admin") {

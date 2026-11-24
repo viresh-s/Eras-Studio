@@ -18,8 +18,8 @@ async function verifyAdminAuth(req: NextRequest) {
     return { error: "Unauthorized. Valid administrative session required.", status: 401 };
   }
 
-  if (!hasPermission(session.role, "report:generate") && !hasPermission(session.role, "audit:export")) {
-    return { error: "Forbidden. Simple Admin accounts do not have permission to generate reports.", status: 403 };
+  if (!hasPermission(session.role, "analytics:view")) {
+    return { error: "Forbidden. Insufficient privileges to generate executive reports.", status: 403 };
   }
 
   // Rate limit: 10 reports per minute per admin

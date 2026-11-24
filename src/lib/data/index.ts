@@ -21,4 +21,3 @@ export * from "./cor-matching";
 export * from "./utils";
 
 export * from "./careers";
-export * from "./adminAccounts";
