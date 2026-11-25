@@ -141,7 +141,13 @@ export default async function ArtistProfilePage({ params }: ArtistProfilePagePro
 
         {/* Profile Tabs */}
         <div className="mt-8 max-w-6xl mx-auto">
-          <ProfileTabs artworks={artworks || []} profile={profile} collections={collections || []} />
+          <ProfileTabs
+            artworks={artworks || []}
+            profile={profile}
+            collections={collections || []}
+            isOwner={isOwner}
+            currentUserId={user?.id}
+          />
         </div>
       </div>
     </div>

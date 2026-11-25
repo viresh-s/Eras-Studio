@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { acceptChatRequest, sendMessage, rejectChatRequest } from '@/actions/chatActions';
+import { acceptChatRequest, sendMessage, rejectChatRequest, deleteMessage } from '@/actions/chatActions';
 import { createClient } from '@/lib/supabase/client';
 import ReportUserModal from '@/components/features/user/ReportUserModal';
 
@@ -31,6 +31,34 @@ const formatChatTime = (dateStr: string) => {
     return '';
   }
 };
+
+interface ParsedMessage {
+  reply?: {
+    id: string;
+    name: string;
+    snippet: string;
+  };
+  text: string;
+}
+
+function parseMessageContent(raw: string): ParsedMessage {
+  if (typeof raw === 'string' && raw.startsWith('{"_reply":')) {
+    try {
+      const parsed = JSON.parse(raw);
+      if (parsed._reply && typeof parsed.text === 'string') {
+        return {
+          reply: {
+            id: String(parsed._reply.id || ''),
+            name: String(parsed._reply.name || 'Participant'),
+            snippet: String(parsed._reply.snippet || ''),
+          },
+          text: parsed.text,
+        };
+      }
+    } catch {}
+  }
+  return { text: raw || '' };
+}
 
 interface ChatListClientProps {
   initialChats: any[];
@@ -807,8 +835,12 @@ function ConversationActiveView({
   const [isSending, setIsSending] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [replyingTo, setReplyingTo] = useState<{ id: string; senderName: string; content: string } | null>(null);
+  const [contextMenu, setContextMenu] = useState<{ message: any; x: number; y: number } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const contextMenuRef = useRef<HTMLDivElement>(null);
 
   const isGuest = chat.guest_id === currentUserId;
   const otherPerson = isGuest ? chat.creator : chat.guest;
@@ -817,15 +849,29 @@ function ConversationActiveView({
   const contactName = otherPerson?.full_name || 'Studio Participant';
   const avatarColor = getAvatarColor(contactName);
 
-  // Close dropdown menu on outside click
+  // Close dropdown menu and context menu on outside click or escape
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
         setMenuOpen(false);
       }
+      if (contextMenuRef.current && !contextMenuRef.current.contains(e.target as Node)) {
+        setContextMenu(null);
+      }
+    };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setMenuOpen(false);
+        setContextMenu(null);
+        setReplyingTo(null);
+      }
     };
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
   }, []);
 
   // Fetch initial messages and set up realtime subscription
@@ -848,7 +894,7 @@ function ConversationActiveView({
       }
     }
 
-    // 3. Realtime Postgres Changes
+    // 3. Realtime Postgres Changes (Insert & Delete)
     const channel = supabase
       .channel(channelName)
       .on(
@@ -866,6 +912,18 @@ function ConversationActiveView({
           });
         }
       )
+      .on(
+        'postgres_changes',
+        {
+          event: 'DELETE',
+          schema: 'public',
+          table: 'messages',
+          filter: `chat_id=eq.${chat.id}`,
+        },
+        (payload) => {
+          setMessages((prev) => prev.filter((m) => m.id !== payload.old.id));
+        }
+      )
       .subscribe();
 
     return () => {
@@ -877,14 +935,67 @@ function ConversationActiveView({
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  const handleInitiateReply = (msg: any) => {
+    const isMine = msg.sender_id === currentUserId;
+    const authorName = isMine ? 'You' : contactName;
+    const { text } = parseMessageContent(msg.content);
+    setReplyingTo({
+      id: msg.id,
+      senderName: authorName,
+      content: text,
+    });
+    setContextMenu(null);
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 50);
+  };
+
+  const handleDeleteMessage = async (messageId: string) => {
+    setMessages((prev) => prev.filter((m) => m.id !== messageId));
+    setContextMenu(null);
+    try {
+      await deleteMessage(messageId);
+    } catch (err) {
+      console.error('Failed to delete message:', err);
+      const supabase = createClient();
+      const { data } = await supabase
+        .from('messages')
+        .select('*, profiles(full_name, profile_pic_url)')
+        .eq('chat_id', chat.id)
+        .order('created_at', { ascending: true });
+      if (data) setMessages(data);
+    }
+  };
+
+  const handleOpenContextMenu = (message: any, clientX: number, clientY: number) => {
+    const menuWidth = 140;
+    const menuHeight = message.sender_id === currentUserId ? 90 : 50;
+    const x = Math.max(10, Math.min(clientX, window.innerWidth - menuWidth - 15));
+    const y = Math.max(10, Math.min(clientY, window.innerHeight - menuHeight - 15));
+    setContextMenu({ message, x, y });
+  };
+
   const handleSend = async () => {
     if (!newMessage.trim() || isSending) return;
     setIsSending(true);
     const content = newMessage.trim();
     setNewMessage('');
 
+    let finalContent = content;
+    if (replyingTo) {
+      finalContent = JSON.stringify({
+        _reply: {
+          id: replyingTo.id,
+          name: replyingTo.senderName,
+          snippet: replyingTo.content.slice(0, 150),
+        },
+        text: content,
+      });
+      setReplyingTo(null);
+    }
+
     try {
-      await sendMessage(chat.id, currentUserId, content);
+      await sendMessage(chat.id, currentUserId, finalContent);
     } catch (err) {
       console.error('Failed to send message:', err);
       setNewMessage(content); // Restore input on failure
@@ -894,6 +1005,11 @@ function ConversationActiveView({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Escape' && replyingTo) {
+      e.preventDefault();
+      setReplyingTo(null);
+      return;
+    }
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
@@ -1157,88 +1273,146 @@ function ConversationActiveView({
           </div>
         )}
 
-        {/* Chronological Messages */}
+        {/* Chronological Messages with Swipe-to-Reply and Right-Click Context Menu */}
         {messages.map((message) => {
           const isMine = message.sender_id === currentUserId;
 
           return (
-            <div
+            <MessageBubbleItem
               key={message.id}
-              className={`flex items-end gap-2.5 ${isMine ? 'justify-end' : 'justify-start'}`}
-            >
-              {/* Incoming Avatar */}
-              {!isMine && (
-                <div
-                  style={{
-                    background: otherPerson?.profile_pic_url ? '#E5E5E5' : avatarColor,
-                    borderRadius: 9999,
-                  }}
-                  className="w-7 h-7 rounded-full overflow-hidden shrink-0 flex items-center justify-center text-[9px] font-bold text-white shadow-2xs mb-1"
-                >
-                  {otherPerson?.profile_pic_url ? (
-                    <img
-                      src={otherPerson.profile_pic_url}
-                      alt={contactName}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    getInitials(contactName)
-                  )}
-                </div>
-              )}
-
-              {/* Message Bubble */}
-              <div
-                style={
-                  isMine
-                    ? {
-                        background: '#1A1A1A',
-                        borderTopLeftRadius: 14,
-                        borderTopRightRadius: 14,
-                        borderBottomRightRadius: 2,
-                        borderBottomLeftRadius: 14,
-                      }
-                    : {
-                        background: '#EAEAEA',
-                        borderTopLeftRadius: 14,
-                        borderTopRightRadius: 14,
-                        borderBottomRightRadius: 14,
-                        borderBottomLeftRadius: 2,
-                      }
-                }
-                className="px-4 py-3 max-w-[80%] sm:max-w-[70%] shadow-2xs"
-              >
-                <p
-                  style={{
-                    fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
-                    fontWeight: 400,
-                    color: isMine ? 'white' : '#101828',
-                  }}
-                  className="text-xs sm:text-[13px] leading-relaxed whitespace-pre-wrap break-words"
-                >
-                  {message.content}
-                </p>
-
-                <p
-                  suppressHydrationWarning
-                  style={{
-                    fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
-                    fontWeight: 500,
-                    color: isMine ? 'rgba(255, 255, 255, 0.50)' : 'rgba(16, 24, 40, 0.50)',
-                  }}
-                  className={`text-[9.5px] sm:text-[10px] mt-1.5 ${isMine ? 'text-right' : 'text-left'}`}
-                >
-                  {formatMessageTime(message.created_at)}
-                </p>
-              </div>
-            </div>
+              message={message}
+              isMine={isMine}
+              contactName={contactName}
+              otherPerson={otherPerson}
+              avatarColor={avatarColor}
+              formatMessageTime={formatMessageTime}
+              onReply={handleInitiateReply}
+              onOpenContextMenu={handleOpenContextMenu}
+            />
           );
         })}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* 3. BOTTOM INPUT CAPSULE: White rounded-full capsule with signature blue gradient "Send" button */}
+      {/* Floating Context Menu (Right-Click on Desktop / Long-Press on Mobile) */}
+      {contextMenu && (
+        <div
+          ref={contextMenuRef}
+          style={{
+            position: 'fixed',
+            left: `${contextMenu.x}px`,
+            top: `${contextMenu.y}px`,
+            zIndex: 9999,
+            background: 'white',
+            borderRadius: 14,
+            boxShadow: '0 10px 30px -5px rgba(0, 0, 0, 0.15), 0 0 1px 1px rgba(0, 0, 0, 0.05)',
+          }}
+          className="p-1.5 min-w-[130px] border border-[#E8E8E3] animate-in fade-in zoom-in-95 duration-100 select-none"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Reply Option (Available on all messages) */}
+          <button
+            type="button"
+            onClick={() => handleInitiateReply(contextMenu.message)}
+            className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-[#141413] hover:bg-[#F5F5F7] rounded-lg transition-colors text-left cursor-pointer"
+          >
+            <svg
+              width="13"
+              height="13"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#1345EE"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <polyline points="9 17 4 12 9 7" />
+              <path d="M20 18v-2a4 4 0 0 0-4-4H4" />
+            </svg>
+            <span>Reply</span>
+          </button>
+
+          {/* Delete Option (Strictly restricted to own messages) */}
+          {contextMenu.message.sender_id === currentUserId && (
+            <button
+              type="button"
+              onClick={() => handleDeleteMessage(contextMenu.message.id)}
+              className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors text-left cursor-pointer"
+            >
+              <svg
+                width="13"
+                height="13"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M3 6h18" />
+                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+              </svg>
+              <span>Delete</span>
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* 3. BOTTOM INPUT CAPSULE: With Active Reply Banner and Send Button */}
       <div className="p-3.5 sm:p-5 pt-2 bg-transparent shrink-0">
+        {/* Active Reply Banner (Rendered when Replying) */}
+        {replyingTo && (
+          <div className="mb-2 p-2.5 px-3.5 bg-white/95 backdrop-blur-md border border-[#E8E8E3] rounded-2xl flex items-center justify-between shadow-2xs animate-in fade-in slide-in-from-bottom-2 duration-150">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-1 h-7 rounded-full bg-[#1345EE] shrink-0" />
+              <div className="truncate text-xs">
+                <div className="flex items-center gap-1.5">
+                  <svg
+                    width="11"
+                    height="11"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#1345EE"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <polyline points="9 17 4 12 9 7" />
+                    <path d="M20 18v-2a4 4 0 0 0-4-4H4" />
+                  </svg>
+                  <span className="font-semibold text-[#141413]">
+                    Replying to {replyingTo.senderName}
+                  </span>
+                </div>
+                <p className="text-[#6E6E69] text-[11px] truncate mt-0.5 max-w-xs sm:max-w-md">
+                  {replyingTo.content}
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setReplyingTo(null)}
+              className="w-6 h-6 rounded-full flex items-center justify-center text-[#8A909D] hover:text-[#171E2C] hover:bg-gray-100 transition-colors cursor-pointer shrink-0 ml-2"
+              title="Cancel reply"
+            >
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          </div>
+        )}
+
         <div
           style={{
             background: 'white',
@@ -1248,11 +1422,12 @@ function ConversationActiveView({
           className="p-1.5 pl-5 sm:pl-6 flex items-center justify-between gap-3 border border-[#E8E8E3]"
         >
           <input
+            ref={inputRef}
             type="text"
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Type Your Message"
+            placeholder={replyingTo ? `Reply to ${replyingTo.senderName}...` : 'Type Your Message'}
             style={{
               fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
               fontWeight: 400,
@@ -1291,5 +1466,250 @@ function ConversationActiveView({
         />
       )}
     </>
+  );
+}
+
+// =========================================================================
+// Interactive Message Bubble: Swipe-to-Reply on Mobile, Right-Click on Desktop
+// =========================================================================
+interface MessageBubbleItemProps {
+  message: any;
+  isMine: boolean;
+  contactName: string;
+  otherPerson: any;
+  avatarColor: string;
+  formatMessageTime: (dateStr: string) => string;
+  onReply: (message: any) => void;
+  onOpenContextMenu: (message: any, x: number, y: number) => void;
+}
+
+function MessageBubbleItem({
+  message,
+  isMine,
+  contactName,
+  otherPerson,
+  avatarColor,
+  formatMessageTime,
+  onReply,
+  onOpenContextMenu,
+}: MessageBubbleItemProps) {
+  const [dragX, setDragX] = useState(0);
+  const [isSwiping, setIsSwiping] = useState(false);
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+  const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const { reply, text } = parseMessageContent(message.content);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    const touch = e.touches[0];
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+    setIsSwiping(false);
+
+    // Long press (500ms) to trigger context menu on mobile
+    longPressTimerRef.current = setTimeout(() => {
+      onOpenContextMenu(message, touch.clientX, touch.clientY);
+    }, 500);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!touchStartRef.current) return;
+    const touch = e.touches[0];
+    const dx = touch.clientX - touchStartRef.current.x;
+    const dy = touch.clientY - touchStartRef.current.y;
+
+    // Movement cancels long press
+    if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
+      if (longPressTimerRef.current) {
+        clearTimeout(longPressTimerRef.current);
+        longPressTimerRef.current = null;
+      }
+    }
+
+    // Swipe right for reply (horizontal swipe dominates)
+    if (dx > 0 && Math.abs(dx) > Math.abs(dy) * 1.2) {
+      setIsSwiping(true);
+      const damped = Math.min(dx * 0.45, 65);
+      setDragX(damped);
+    } else if (dx < 0 && isSwiping) {
+      setDragX(0);
+      setIsSwiping(false);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+
+    if (dragX >= 35) {
+      if (typeof navigator !== 'undefined' && navigator.vibrate) {
+        try {
+          navigator.vibrate(25);
+        } catch {}
+      }
+      onReply(message);
+    }
+
+    setDragX(0);
+    setIsSwiping(false);
+    touchStartRef.current = null;
+  };
+
+  return (
+    <div
+      id={`msg-${message.id}`}
+      className={`relative flex items-end gap-2.5 ${isMine ? 'justify-end' : 'justify-start'} group select-none`}
+      onContextMenu={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onOpenContextMenu(message, e.clientX, e.clientY);
+      }}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      onTouchCancel={handleTouchEnd}
+    >
+      {/* Swipe Right Indicator for Mobile */}
+      {dragX > 5 && (
+        <div
+          className="absolute -left-7 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-[#1345EE] text-white flex items-center justify-center shadow-xs pointer-events-none z-10 transition-opacity"
+          style={{
+            opacity: Math.min(dragX / 35, 1),
+            transform: `translateY(-50%) scale(${Math.min(dragX / 35, 1)})`,
+          }}
+        >
+          <svg
+            width="11"
+            height="11"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polyline points="9 17 4 12 9 7" />
+            <path d="M20 18v-2a4 4 0 0 0-4-4H4" />
+          </svg>
+        </div>
+      )}
+
+      {/* Incoming Avatar */}
+      {!isMine && (
+        <div
+          style={{
+            background: otherPerson?.profile_pic_url ? '#E5E5E5' : avatarColor,
+            borderRadius: 9999,
+          }}
+          className="w-7 h-7 rounded-full overflow-hidden shrink-0 flex items-center justify-center text-[9px] font-bold text-white shadow-2xs mb-1 select-none pointer-events-none"
+        >
+          {otherPerson?.profile_pic_url ? (
+            <img
+              src={otherPerson.profile_pic_url}
+              alt={contactName}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            getInitials(contactName)
+          )}
+        </div>
+      )}
+
+      {/* Message Bubble Container with Transform for Swipe */}
+      <div
+        style={{
+          transform: `translateX(${dragX}px)`,
+          transition: isSwiping ? 'none' : 'transform 0.25s cubic-bezier(0.2, 0.9, 0.3, 1)',
+        }}
+        className="max-w-[80%] sm:max-w-[70%]"
+      >
+        <div
+          style={
+            isMine
+              ? {
+                  background: '#1A1A1A',
+                  borderTopLeftRadius: 14,
+                  borderTopRightRadius: 14,
+                  borderBottomRightRadius: 2,
+                  borderBottomLeftRadius: 14,
+                }
+              : {
+                  background: '#EAEAEA',
+                  borderTopLeftRadius: 14,
+                  borderTopRightRadius: 14,
+                  borderBottomRightRadius: 14,
+                  borderBottomLeftRadius: 2,
+                }
+          }
+          className="px-4 py-3 shadow-2xs transition-shadow cursor-pointer relative"
+        >
+          {/* Quoted Reply Snippet */}
+          {reply && (
+            <div
+              onClick={(e) => {
+                e.stopPropagation();
+                if (reply.id) {
+                  const targetEl = document.getElementById(`msg-${reply.id}`);
+                  if (targetEl) {
+                    targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    targetEl.classList.add('ring-2', 'ring-[#1345EE]', 'transition-all');
+                    setTimeout(() => targetEl.classList.remove('ring-2', 'ring-[#1345EE]'), 1400);
+                  }
+                }
+              }}
+              className={`mb-2 p-2 rounded-lg text-[11px] cursor-pointer transition-opacity hover:opacity-90 ${
+                isMine
+                  ? 'bg-white/10 border-l-[3px] border-[#458CFF] text-white'
+                  : 'bg-black/5 border-l-[3px] border-[#1345EE] text-[#101828]'
+              }`}
+            >
+              <div className="flex items-center gap-1 font-semibold text-[10.5px] opacity-90 mb-0.5">
+                <svg
+                  width="10"
+                  height="10"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polyline points="9 17 4 12 9 7" />
+                  <path d="M20 18v-2a4 4 0 0 0-4-4H4" />
+                </svg>
+                <span>{reply.name}</span>
+              </div>
+              <p className="line-clamp-1 opacity-75">{reply.snippet}</p>
+            </div>
+          )}
+
+          {/* Main Message Text */}
+          <p
+            style={{
+              fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
+              fontWeight: 400,
+              color: isMine ? 'white' : '#101828',
+            }}
+            className="text-xs sm:text-[13px] leading-relaxed whitespace-pre-wrap break-words"
+          >
+            {text}
+          </p>
+
+          {/* Timestamp */}
+          <p
+            suppressHydrationWarning
+            style={{
+              fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
+              fontWeight: 500,
+              color: isMine ? 'rgba(255, 255, 255, 0.50)' : 'rgba(16, 24, 40, 0.50)',
+            }}
+            className={`text-[9.5px] sm:text-[10px] mt-1.5 ${isMine ? 'text-right' : 'text-left'}`}
+          >
+            {formatMessageTime(message.created_at)}
+          </p>
+        </div>
+      </div>
+    </div>
   );
 }

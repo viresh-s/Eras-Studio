@@ -290,3 +290,48 @@ export async function rejectChatRequest(chatId: string) {
     `/messages`
   );
 }
+
+const deleteMessageSchema = z.object({
+  messageId: z.string().uuid("Invalid message ID"),
+});
+
+export async function deleteMessage(messageId: string) {
+  // 1. Strict Server Authentication
+  const { user, supabase } = await requireAuth({ requireActive: true });
+
+  const parsed = deleteMessageSchema.safeParse({ messageId });
+  if (!parsed.success) {
+    throw new Error(`Validation Error: ${parsed.error.errors.map(e => e.message).join(', ')}`);
+  }
+
+  // 2. Fetch message to verify ownership
+  const { data: message, error: fetchError } = await supabase
+    .from('messages')
+    .select('id, sender_id, chat_id')
+    .eq('id', messageId)
+    .single();
+
+  if (fetchError || !message) {
+    throw new Error('Message not found.');
+  }
+
+  // 3. Strictly enforce that only the author can delete their own message
+  if (message.sender_id !== user.id) {
+    securityLogger.alert('UNAUTHORIZED_MESSAGE_DELETE_ATTEMPT', { messageId, userId: user.id });
+    throw new Error('You are only authorized to delete your own messages.');
+  }
+
+  // 4. Delete the message
+  const { error: deleteError } = await supabase
+    .from('messages')
+    .delete()
+    .eq('id', messageId);
+
+  if (deleteError) {
+    securityLogger.alert('MESSAGE_DELETE_ERROR', { messageId, userId: user.id, error: deleteError.message });
+    throw new Error('Failed to delete message.');
+  }
+
+  securityLogger.info('MESSAGE_DELETED', { messageId, userId: user.id });
+  return { success: true };
+}
