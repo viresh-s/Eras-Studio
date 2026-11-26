@@ -7,9 +7,9 @@ import Link from 'next/link';
 import { Search, SlidersHorizontal, X, Check, RotateCcw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createChatSession } from '@/actions/chatActions';
-import { fetchRankedDiscoveryArtworksAction } from '@/actions/rankingActions';
+import { fetchRankedDiscoveryArtworksAction, fetchTopCreatorsAction } from '@/actions/rankingActions';
 import TopCreatorsRow from '@/components/features/discovery/TopCreatorsRow';
-import { getTopCreators, RankedCreator } from '@/lib/services/rankingService';
+import type { RankedCreator } from '@/lib/services/rankingService';
 import { PROTECTED_CONTAINER_CLASS, PROTECTED_IMAGE_CLASS } from '@/lib/media/assetProtection';
 import { ArtworkGridSkeleton } from '@/components/ui/Skeleton';
 
@@ -146,7 +146,7 @@ export default function BrowsePage() {
 
     // Real-time Top Creators Ranking (cached after first fetch)
     setIsLoadingCreators(true);
-    getTopCreators(10)
+    fetchTopCreatorsAction(10)
       .then((data) => setTopCreators(data))
       .catch((err) => console.error('Failed to load top creators:', err))
       .finally(() => setIsLoadingCreators(false));

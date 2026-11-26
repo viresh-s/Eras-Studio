@@ -1,15 +1,16 @@
 'use server';
 
 import { createClient, getSupabaseAdmin } from '@/lib/supabase/server';
-import { calculateCreatorScore, RankedCreator } from '@/lib/services/rankingService';
+import { calculateCreatorScore, getFallbackSeedCreators, RankedCreator } from '@/lib/services/rankingService';
 
 /**
  * Server Action: Calculates and fetches the top ranked creators dynamically.
  * Every inquiry, save, published artwork, or profile update is reflected immediately.
+ * Uses getSupabaseAdmin() to bypass RLS and read accurate cross-creator platform metrics (inquiries & saves).
  */
 export async function fetchTopCreatorsAction(limit: number = 10): Promise<RankedCreator[]> {
   try {
-    const supabase = await createClient();
+    const supabase = getSupabaseAdmin() || (await createClient());
 
     // 1. Attempt PostgreSQL RPC if installed
     const { data: rpcData, error: rpcError } = await (supabase as any).rpc('get_top_creators', {
@@ -37,11 +38,11 @@ export async function fetchTopCreatorsAction(limit: number = 10): Promise<Ranked
     // 2. Direct table calculation fallback
     const { data: profiles, error: pError } = await supabase
       .from('profiles')
-      .select('id, full_name, profile_pic_url, primary_medium, location_city, location_country, is_premium, plan, about_me, artist_statement, awards, created_at')
+      .select('id, full_name, profile_pic_url, cover_image_url, primary_medium, location_city, location_country, is_premium, plan, about_me, artist_statement, awards, created_at')
       .eq('role', 'Creator');
 
     if (pError || !profiles || profiles.length === 0) {
-      return [];
+      return getFallbackSeedCreators(limit);
     }
 
     const [artworksRes, inquiriesRes, savesRes] = await Promise.all([
@@ -136,7 +137,7 @@ export async function fetchTopCreatorsAction(limit: number = 10): Promise<Ranked
         id: p.id,
         name: p.full_name || 'Anonymous Creator',
         profilePicUrl: p.profile_pic_url || null,
-        discipline: p.primary_medium || 'Visual Arts',
+        discipline: (p.primary_medium && p.primary_medium.trim()) ? p.primary_medium.trim() : 'Visual Arts',
         location: [p.location_city, p.location_country].filter(Boolean).join(', ') || null,
         isPremium: Boolean(p.is_premium || p.plan === 'pro' || p.plan === 'elite'),
         plan: p.plan || 'free',
@@ -146,7 +147,7 @@ export async function fetchTopCreatorsAction(limit: number = 10): Promise<Ranked
         soldCount,
         inquiryCount: userInquiries.length,
         saveCount: totalSaves,
-        featuredImageUrl: artworkFeaturedImage.get(p.id) || null,
+        featuredImageUrl: artworkFeaturedImage.get(p.id) || p.cover_image_url || null,
         latestActivity,
       });
     }
@@ -162,10 +163,14 @@ export async function fetchTopCreatorsAction(limit: number = 10): Promise<Ranked
       rank: i + 1,
     }));
 
+    if (ranked.length === 0) {
+      return getFallbackSeedCreators(limit);
+    }
+
     return ranked.slice(0, limit);
   } catch (err) {
     console.error('Error in fetchTopCreatorsAction:', err);
-    return [];
+    return getFallbackSeedCreators(limit);
   }
 }
 

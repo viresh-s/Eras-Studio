@@ -268,7 +268,7 @@ export async function getTopCreators(limit: number = 10): Promise<RankedCreator[
   }
 }
 
-function getFallbackSeedCreators(limit: number): RankedCreator[] {
+export function getFallbackSeedCreators(limit: number): RankedCreator[] {
   const curatedShowcase: RankedCreator[] = [
     {
       id: 'crt_01',
